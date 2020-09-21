@@ -11,13 +11,13 @@ set(DUNE_COMMON_SCRIPT_DIR ${PROJECT_SOURCE_DIR}/cmake/scripts)
 include(DuneMacros)
 
 # start a dune project with information from dune.module
-dune_project()
+# and create a module library
+dune_project(dunecommon)
 
-# Create the module library for dune-common
-dune_add_library(dunecommon)
-
-# Set properties to the dunecommon target
+# link against LAPACK or BLAS
 add_dune_blas_lapack_flags(dunecommon)
+
+# link against Threading Building Blocks
 add_dune_tbb_flags(dunecommon)
 
 # add subdirectories to execute CMakeLists.txt there
