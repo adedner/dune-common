@@ -1,5 +1,14 @@
 # Master (will become release 2.9)
 
+## Build System
+
+- Setting the minimal c++ standard in cmake is now done by a cmake feature-requirement
+  `cxx_std_17` on the `dunecommon` library target. This requirement is propagated to all
+  other modules by linking against `dunecommon`. The cmake options `CXX_MAX_STANDARD`,
+  `CXX_MAX_SUPPORTED_STANDARD` and `DISABLE_CXX_VERSION_CHECK` are removed.
+
+- The cmake function `dune_require_cxx_standard()` is deprecated.
+
 # Release 2.8
 
 - Set minimal required CMake version in cmake to >= 3.13.
