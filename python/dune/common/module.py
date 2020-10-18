@@ -21,6 +21,27 @@ else:
 
 logger = logging.getLogger(__name__)
 
+def inVEnv():
+    # If sys.real_prefix exists, this is a virtualenv set up with the virtualenv package
+    real_prefix = hasattr(sys, 'real_prefix')
+    if real_prefix:
+        return 1
+    # If a virtualenv is set up with pyvenv, we check for equality of base_prefix and prefix
+    if hasattr(sys, 'base_prefix'):
+        return (sys.prefix != sys.base_prefix)
+    # If none of the above conditions triggered, this is probably no virtualenv interpreter
+    return 0
+
+def get_local():
+    if inVEnv():
+        return sys.prefix
+    try:
+        home = expanduser("~")
+        return os.path.join(home, '.local')
+    except KeyError:
+        pass
+    return ''
+
 class Version:
     def __init__(self, s):
         if s is None:
@@ -294,14 +315,17 @@ def resolve_order(deps):
 
 
 def pkg_config(pkg, var=None):
+    pkgpath = os.path.join(get_local(),"lib","pkgconfig")
+    env = {'PKG_CONFIG_PATH':pkgpath}
     args = ['pkg-config', pkg]
     if var is not None:
         args += ['--variable=' + var]
-    pkgconfig = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    pkgconfig = subprocess.Popen(args, env=env,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     pkgconfig.wait()
     if pkgconfig.returncode != 0:
         raise KeyError('package ' + pkg + 'not found.')
-    return buffer_to_str(pkgconfig.stdout.read())
+    return buffer_to_str(pkgconfig.stdout.read()).strip()
 
 
 def get_prefix(module):
@@ -352,7 +376,11 @@ def get_module_path():
         pass
 
     # try to guess modules path for unix systems
-    path = [p for p in ['.', '/usr/local/lib/dunecontrol', '/usr/lib/dunecontrol'] if os.path.isdir(p)]
+    path = [p for p in ['.',
+                        '/usr/local/lib/dunecontrol',
+                        '/usr/lib/dunecontrol',
+                        os.path.join(get_local(),'lib','dunecontrol') ]
+                  if os.path.isdir(p)]
     try:
         pkg_config_path = [p for p in os.environ['PKG_CONFIG_PATH'].split(':') if p and os.path.isdir(p)]
         pkg_config_path = [os.path.join(p, '..', 'dunecontrol') for p in pkg_config_path]
@@ -387,7 +415,7 @@ def select_modules(modules=None):
                 else:
                   desc[n], dir[n] = d, p
             else:
-              if not is_installed(d, n):
+              if not is_installed(p, n):
                   raise KeyError('Multiple source versions for module \'' + n + '\' found.')
         else:
             desc[n], dir[n] = d, p
@@ -463,18 +491,6 @@ def build_module(builddir, build_args=None):
         raise RuntimeError(buffer_to_str(stderr))
     return buffer_to_str(stdout)
 
-def inVEnv():
-    # If sys.real_prefix exists, this is a virtualenv set up with the virtualenv package
-    real_prefix = hasattr(sys, 'real_prefix')
-    if real_prefix:
-        return 1
-    # If a virtualenv is set up with pyvenv, we check for equality of base_prefix and prefix
-    if hasattr(sys, 'base_prefix'):
-        return (sys.prefix != sys.base_prefix)
-    # If none of the above conditions triggered, this is probably no virtualenv interpreter
-    return 0
-
-
 def get_dune_py_dir():
     try:
         basedir = os.path.realpath( os.environ['DUNE_PY_DIR'] )
@@ -519,6 +535,17 @@ def get_cmake_definitions():
             except ValueError:
                 key, value = arg, None
             definitions[key] = value
+    else: # some defaults
+        definitions['BUILD_SHARED_LIBS']='TRUE'
+        definitions['DUNE_ENABLE_PYTHONBINDINGS']='TRUE'
+        definitions['DUNE_PYTHON_INSTALL_LOCATION']='none'
+        definitions['DUNE_GRID_GRIDTYPE_SELECTOR']='ON'
+        definitions['ALLOW_CXXFLAGS_OVERWRITE']='ON'
+        definitions['USE_PTHREADS']='ON'
+        definitions['CMAKE_BUILD_TYPE']='Release'
+        definitions['CMAKE_DISABLE_FIND_PACKAGE_LATEX']='TRUE'
+        definitions['CMAKE_DISABLE_DOCUMENTATION']='TRUE'
+
     return definitions
 
 
