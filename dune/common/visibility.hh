@@ -27,12 +27,13 @@
 
 #else // DOXYGEN
 
-#if __GNUC__ >= 4
+#if (__GNUC__ >= 4) || defined (__clang__)
 // GCC and Clang both define __GNUC__ to 4 and they both support the visibility
 // attribute
 #define DUNE_EXPORT __attribute__((visibility("default")))
 #define DUNE_PRIVATE __attribute__((visibility("hidden")))
 #else
+#warning NO VISIBILITY pragma available for this compiler
 // We don't know about the active compiler, so just turn the visibility macros to no-ops.
 #define DUNE_EXPORT
 #define DUNE_PRIVATE
