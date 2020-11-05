@@ -67,3 +67,14 @@ code-spelling-check:
   - codespell
     --ignore-words-list te,inout,incrementall,iif,\trun,referr,ba
     --skip pybind11
+
+# Verify code-formatting rules
+code-formatting-check:
+  stage: build
+  image: registry.dune-project.org/docker/ci/debian:10
+  script:
+    # Format all *.cc and *.hh files using the uncrustify tool
+    - uncrustify -l CPP -c dune-uncrustify.cfg --no-backup `find -name "*.cpp" -o -name "*.hh"`
+
+    # Did anything change?  That would indicate a violation of the formatting rules
+    - git diff --exit-code
