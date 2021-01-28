@@ -123,19 +123,23 @@ def resolve_order(deps):
     return order
 
 
-def pkg_config(pkg, var=None):
+def pkg_config(pkg, var=None, hint=None):
     args = ['pkg-config', pkg]
     if var is not None:
         args += ['--variable=' + var]
-    pkgconfig = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    env_vars = os.environ.copy()
+    if not hint is None:
+        env_vars['PKG_CONFIG_PATH'] = '{}:{}'.format(hint, os.environ['PKG_CONFIG_PATH'])
+    pkgconfig = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env_vars)
     pkgconfig.wait()
     if pkgconfig.returncode != 0:
         raise KeyError('package ' + pkg + ' not found.')
     return buffer_to_str(pkgconfig.stdout.read()).strip()
 
 
-def get_prefix(module):
-    return pkg_config(module, 'prefix')
+def get_prefix(dir, module):
+    hint = os.path.join(dir,'..','..','pkgconfig')
+    return pkg_config(module, 'prefix', hint)
 
 
 def is_installed(dir, module=None):
@@ -154,8 +158,8 @@ def is_installed(dir, module=None):
     if isinstance(module, Description):
         module = module.name
     try:
-        result = dir == os.path.join(get_prefix(module), 'lib', 'dunecontrol', module)
-        logger.debug('is_installed({}, {}, prefix={}) = {}'.format(dir,module,get_prefix(module),result))
+        result = dir == os.path.join(get_prefix(dir,module), 'lib', 'dunecontrol', module)
+        logger.debug('is_installed({}, {}, prefix={}) = {}'.format(dir,module,get_prefix(dir,module),result))
         return result
     except KeyError:
         return False
@@ -418,7 +422,7 @@ def build_dune_py_module(dune_py_dir=None, cmake_args=None, build_args=None, bui
     prefix = {}
     for name, dir in dirs.items():
         if is_installed(dir, name):
-            prefix[name] = os.path.join(get_prefix(name),'lib','cmake',name)
+            prefix[name] = get_prefix(dir,name)
         else:
             prefix[name] = default_build_dir(dir, name, builddir)
         logger.debug('build_dune_py_module: prefix[{}] = {}'.format(name,prefix[name]))
