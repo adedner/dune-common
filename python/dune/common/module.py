@@ -154,7 +154,9 @@ def is_installed(dir, module=None):
     if isinstance(module, Description):
         module = module.name
     try:
-        return dir == os.path.join(get_prefix(module), 'lib', 'dunecontrol', module)
+        result = dir == os.path.join(get_prefix(module), 'lib', 'dunecontrol', module)
+        logger.debug('is_installed({}, {}, prefix={}) = {}'.format(dir,module,get_prefix(module),result))
+        return result
     except KeyError:
         return False
 
@@ -215,7 +217,7 @@ def select_modules(modules=None, module=None):
     Args:
         modules (optional): List of (description, dir) pairs
             If not given, the find_modules(get_module_path()) is used
-        module (optional): 
+        module (optional):
 
     Returns:
         pair of dictionaries mapping module name to unique description and directory respectively
@@ -419,6 +421,7 @@ def build_dune_py_module(dune_py_dir=None, cmake_args=None, build_args=None, bui
             prefix[name] = os.path.join(get_prefix(name),'lib','cmake',name)
         else:
             prefix[name] = default_build_dir(dir, name, builddir)
+        logger.debug('build_dune_py_module: prefix[{}] = {}'.format(name,prefix[name]))
 
     output = configure_module(dune_py_dir, dune_py_dir, {d: prefix[d] for d in deps}, cmake_args)
     output += build_module(dune_py_dir, build_args)
