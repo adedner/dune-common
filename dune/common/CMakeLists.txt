@@ -28,7 +28,16 @@ dune_add_library("dunecommon"
   stdthread.cc
   ADD_LIBS "${_additional_libs}")
 
+# link found packages to dunecommon
 add_dune_tbb_flags(dunecommon)
+add_dune_gmp_flags(dunecommon)
+add_dune_quadmath_flags(dunecommon)
+add_dune_metis_flags(dunecommon)
+add_dune_parmetis_flags(dunecommon)
+target_compile_definitions(dunecommon PUBLIC
+  $<$<BOOL:${HAVE_LAPACK}>:HAVE_LAPACK>
+  $<$<BOOL:${HAVE_BLAS}>:HAVE_BLAS>)
+
 #install headers
 install(FILES
         alignedallocator.hh

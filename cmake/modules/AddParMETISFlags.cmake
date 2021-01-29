@@ -23,6 +23,8 @@ function(add_dune_parmetis_flags _targets)
   if(ParMETIS_FOUND)
     foreach(_target ${_targets})
       target_link_libraries(${_target} PUBLIC ParMETIS::ParMETIS)
+      target_compile_definitions(${_target} PUBLIC HAVE_PARMETIS
+        $<$<BOOL:${HAVE_PTSCOTCH_PARMETIS}>:HAVE_PTSCOTCH_PARMETIS>)
     endforeach(_target)
   endif()
 endfunction(add_dune_parmetis_flags)

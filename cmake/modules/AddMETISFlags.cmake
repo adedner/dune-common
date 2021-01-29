@@ -23,6 +23,8 @@ function(add_dune_metis_flags _targets)
   if(METIS_FOUND)
     foreach(_target ${_targets})
       target_link_libraries(${_target} PUBLIC METIS::METIS)
+      target_compile_definitions(${_target} PUBLIC HAVE_METIS
+        $<$<BOOL:${HAVE_SCOTCH_METIS}>:HAVE_SCOTCH_METIS>)
     endforeach(_target)
   endif()
 endfunction(add_dune_metis_flags _targets)

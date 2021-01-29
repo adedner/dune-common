@@ -53,32 +53,11 @@
 /* does the standard library provide identity ? */
 #cmakedefine DUNE_HAVE_CXX_STD_IDENTITY 1
 
-/* Define if you have a BLAS library. */
-#cmakedefine HAVE_BLAS 1
-
 /* does the compiler support abi::__cxa_demangle */
 #cmakedefine HAVE_CXA_DEMANGLE 1
 
-/* Define if you have LAPACK library. */
-#cmakedefine HAVE_LAPACK 1
-
 /* Define to 1 if you have the <malloc.h> header file. */
 // Not used! #cmakedefine01 HAVE_MALLOC_H
-
-/* Define if you have the MPI library.  */
-#cmakedefine HAVE_MPI ENABLE_MPI
-
-/* Define if you have the GNU GMP library. The value should be ENABLE_GMP
-   to facilitate activating and deactivating GMP using compile flags. */
-#cmakedefine HAVE_GMP ENABLE_GMP
-
-/* Define if you have the GCC Quad-Precision library. The value should be ENABLE_QUADMATH
-   to facilitate activating and deactivating QuadMath using compile flags. */
-#cmakedefine HAVE_QUADMATH ENABLE_QUADMATH
-
-/* Define if you have the Vc library. The value should be ENABLE_VC
-   to facilitate activating and deactivating Vc using compile flags. */
-#cmakedefine HAVE_VC ENABLE_VC
 
 /* Define to 1 if you have the symbol mprotect. */
 #cmakedefine HAVE_MPROTECT 1
@@ -88,9 +67,6 @@
 
 /* Define to 1 if you have <sys/mman.h>. */
 #cmakedefine HAVE_SYS_MMAN_H 1
-
-/* Define to 1 if you have the Threading Building Blocks (TBB) library */
-#cmakedefine HAVE_TBB 1
 
 /* begin private */
 
@@ -133,64 +109,6 @@
 
 /* Define to 1 if the compiler properly supports testing for operator[] */
 #cmakedefine HAVE_IS_INDEXABLE_SUPPORT 1
-
-/* Define to ENABLE_UMFPACK if the UMFPack library is available */
-#cmakedefine HAVE_UMFPACK ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse library is available */
-#cmakedefine HAVE_SUITESPARSE ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's AMD library is available */
-#cmakedefine HAVE_SUITESPARSE_AMD ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's BTF library is available */
-#cmakedefine HAVE_SUITESPARSE_BTF ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's CAMD library is available */
-#cmakedefine HAVE_SUITESPARSE_CAMD ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's CCOLAMD library is available */
-#cmakedefine HAVE_SUITESPARSE_CCOLAMD ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's CHOLMOD library is available */
-#cmakedefine HAVE_SUITESPARSE_CHOLMOD ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's COLAMD library is available */
-#cmakedefine HAVE_SUITESPARSE_COLAMD ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's CXSPARSE library is available */
-#cmakedefine HAVE_SUITESPARSE_CXSPARSE ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's KLU library is available */
-#cmakedefine HAVE_SUITESPARSE_KLU ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's LDL library is available */
-#cmakedefine HAVE_SUITESPARSE_LDL ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's RBIO library is available */
-#cmakedefine HAVE_SUITESPARSE_RBIO ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's SPQR library is available
-   and if it's version is at least 4.3 */
-#cmakedefine HAVE_SUITESPARSE_SPQR ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's UMFPACK library is available */
-#cmakedefine HAVE_SUITESPARSE_UMFPACK ENABLE_SUITESPARSE
-
-/* Define to 1 if METIS is available */
-#cmakedefine HAVE_METIS 1
-
-/* Define to 1 if the Scotch replacement for METIS is used. */
-#cmakedefine HAVE_SCOTCH_METIS 1
-
-/* Define to 1 if you have the ParMETIS library. */
-#cmakedefine HAVE_PARMETIS 1
-
-/* Define to 1 if the PTScotch replacement for ParMETIS is used. */
-#cmakedefine HAVE_PTSCOTCH_PARMETIS 1
-
-/* Define to 1 if PT-Scotch is available */
-#cmakedefine HAVE_PTSCOTCH 1
 
 /* Used to call lapack functions */
 #cmakedefine LAPACK_NEEDS_UNDERLINE

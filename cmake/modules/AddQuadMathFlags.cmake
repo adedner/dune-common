@@ -17,7 +17,7 @@ set(HAVE_QUADMATH ${QuadMath_FOUND})
 if(QuadMath_FOUND)
   dune_register_package_flags(
     LIBRARIES QuadMath::QuadMath
-    COMPILE_DEFINITIONS "ENABLE_QUADMATH=1"
+    COMPILE_DEFINITIONS "HAVE_QUADMATH"
   )
 endif()
 
@@ -26,7 +26,7 @@ function(add_dune_quadmath_flags _targets)
   if(QuadMath_FOUND)
     foreach(_target ${_targets})
       target_link_libraries(${_target} PUBLIC QuadMath::QuadMath)
-      target_compile_definitions(${_target} PUBLIC ENABLE_QUADMATH=1)
+      target_compile_definitions(${_target} PUBLIC HAVE_QUADMATH)
     endforeach(_target ${_targets})
   endif()
 endfunction(add_dune_quadmath_flags)

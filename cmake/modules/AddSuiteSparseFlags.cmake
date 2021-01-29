@@ -26,7 +26,20 @@ function(add_dune_suitesparse_flags _targets)
   if(SuiteSparse_FOUND)
     foreach(_target ${_targets})
       target_link_libraries(${_target} PUBLIC SuiteSparse::SuiteSparse)
-      target_compile_definitions(${_target} PUBLIC ENABLE_SUITESPARSE=1)
+      target_compile_definitions(${_target} PUBLIC HAVE_SUITESPARSE HAVE_UMFPACK
+        $<$<BOOL:${HAVE_SUITESPARSE_AMD}>:HAVE_SUITESPARSE_AMD>
+        $<$<BOOL:${HAVE_SUITESPARSE_BTF}>:HAVE_SUITESPARSE_BTF>
+        $<$<BOOL:${HAVE_SUITESPARSE_CAMD}>:HAVE_SUITESPARSE_CAMD>
+        $<$<BOOL:${HAVE_SUITESPARSE_CCOLAMD}>:HAVE_SUITESPARSE_CCOLAMD>
+        $<$<BOOL:${HAVE_SUITESPARSE_CHOLMOD}>:HAVE_SUITESPARSE_CHOLMOD>
+        $<$<BOOL:${HAVE_SUITESPARSE_COLAMD}>:HAVE_SUITESPARSE_COLAMD>
+        $<$<BOOL:${HAVE_SUITESPARSE_CXSPARSE}>:HAVE_SUITESPARSE_CXSPARSE>
+        $<$<BOOL:${HAVE_SUITESPARSE_KLU}>:HAVE_SUITESPARSE_KLU>
+        $<$<BOOL:${HAVE_SUITESPARSE_LDL}>:HAVE_SUITESPARSE_LDL>
+        $<$<BOOL:${HAVE_SUITESPARSE_RBIO}>:HAVE_SUITESPARSE_RBIO>
+        $<$<BOOL:${HAVE_SUITESPARSE_SPQR}>:HAVE_SUITESPARSE_SPQR>
+        $<$<BOOL:${HAVE_SUITESPARSE_UMFPACK}>:HAVE_SUITESPARSE_UMFPACK>
+      )
     endforeach(_target)
   endif()
 endfunction(add_dune_suitesparse_flags)
