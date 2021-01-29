@@ -3,11 +3,11 @@
 #include <dune/internal/dune-common.hh>
 
 /** @file
-*  @brief Include file for users of the SIMD abstraction layer
-*
-* Include this file if you want to be able to handle SIMD types -- do not
-* include the internal headers directly.
-*/
+ *  @brief Include file for users of the SIMD abstraction layer
+ *
+ * Include this file if you want to be able to handle SIMD types -- do not
+ * include the internal headers directly.
+ */
 
 #include <dune/common/simd/interface.hh>
 #include <dune/common/simd/standard.hh>

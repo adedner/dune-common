@@ -11,108 +11,108 @@
 #include <dune/common/unused.hh>
 
 /**
-* @file
-* @brief Allocators that use malloc/free.
-*/
+ * @file
+ * @brief Allocators that use malloc/free.
+ */
 namespace Dune
 {
-/**
-@ingroup Allocators
-@brief Allocators implementation which simply calls malloc/free
-*/
-template <class T>
-class MallocAllocator {
-public:
-typedef std::size_t size_type;
-typedef std::ptrdiff_t difference_type;
-typedef T* pointer;
-typedef const T* const_pointer;
-typedef T& reference;
-typedef const T& const_reference;
-typedef T value_type;
-template <class U> struct rebind {
-typedef MallocAllocator<U> other;
-};
+  /**
+     @ingroup Allocators
+     @brief Allocators implementation which simply calls malloc/free
+   */
+  template <class T>
+  class MallocAllocator {
+  public:
+    typedef std::size_t size_type;
+    typedef std::ptrdiff_t difference_type;
+    typedef T* pointer;
+    typedef const T* const_pointer;
+    typedef T& reference;
+    typedef const T& const_reference;
+    typedef T value_type;
+    template <class U> struct rebind {
+      typedef MallocAllocator<U> other;
+    };
 
-//! create a new MallocAllocator
-MallocAllocator() noexcept {}
-//! copy construct from an other MallocAllocator, possibly for a different result type
-template <class U>
-MallocAllocator(const MallocAllocator<U>&) noexcept {}
-//! cleanup this allocator
-~MallocAllocator() noexcept {}
+    //! create a new MallocAllocator
+    MallocAllocator() noexcept {}
+    //! copy construct from an other MallocAllocator, possibly for a different result type
+    template <class U>
+    MallocAllocator(const MallocAllocator<U>&) noexcept {}
+    //! cleanup this allocator
+    ~MallocAllocator() noexcept {}
 
-pointer address(reference x) const
-{
-return &x;
-}
-const_pointer address(const_reference x) const
-{
-return &x;
-}
+    pointer address(reference x) const
+    {
+      return &x;
+    }
+    const_pointer address(const_reference x) const
+    {
+      return &x;
+    }
 
-//! allocate n objects of type T
-pointer allocate(size_type n,
-const void* hint = 0)
-{
-DUNE_UNUSED_PARAMETER(hint);
-if (n > this->max_size())
-throw std::bad_alloc();
+    //! allocate n objects of type T
+    pointer allocate(size_type n,
+                     const void* hint = 0)
+    {
+      DUNE_UNUSED_PARAMETER(hint);
+      if (n > this->max_size())
+        throw std::bad_alloc();
 
-pointer ret = static_cast<pointer>(std::malloc(n * sizeof(T)));
-if (!ret)
-throw std::bad_alloc();
-return ret;
-}
+      pointer ret = static_cast<pointer>(std::malloc(n * sizeof(T)));
+      if (!ret)
+        throw std::bad_alloc();
+      return ret;
+    }
 
-//! deallocate n objects of type T at address p
-void deallocate(pointer p, size_type n)
-{
-DUNE_UNUSED_PARAMETER(n);
-std::free(p);
-}
+    //! deallocate n objects of type T at address p
+    void deallocate(pointer p, size_type n)
+    {
+      DUNE_UNUSED_PARAMETER(n);
+      std::free(p);
+    }
 
-//! max size for allocate
-size_type max_size() const noexcept
-{
-return size_type(-1) / sizeof(T);
-}
+    //! max size for allocate
+    size_type max_size() const noexcept
+    {
+      return size_type(-1) / sizeof(T);
+    }
 
-//! copy-construct an object of type T (i.e. make a placement new on p)
-void construct(pointer p, const T& val)
-{
-::new((void*)p)T(val);
-}
+    //! copy-construct an object of type T (i.e. make a placement new on p)
+    void construct(pointer p, const T& val)
+    {
+      ::new((void*)p)T(val);
+    }
 
-//! construct an object of type T from variadic parameters
-template<typename ... Args>
-void construct(pointer p, Args&&... args)
-{
-::new((void *)p)T(std::forward<Args>(args) ...);
-}
+    //! construct an object of type T from variadic parameters
+    template<typename ... Args>
+    void construct(pointer p, Args&&... args)
+    {
+      ::new((void *)p)T(std::forward<Args>(args) ...);
+    }
 
-//! destroy an object of type T (i.e. call the destructor)
-void destroy(pointer p)
-{
-p->~T();
-}
-};
+    //! destroy an object of type T (i.e. call the destructor)
+    void destroy(pointer p)
+    {
+      p->~T();
+    }
+  };
 
-//! check whether allocators are equivalent
-template<class T>
-constexpr bool
-operator==(const MallocAllocator<T> &, const MallocAllocator<T> &)
-{
-return true;
-}
+  //! check whether allocators are equivalent
+  template<class T>
+  constexpr bool
+  operator==(const MallocAllocator<T> &, const MallocAllocator<T> &)
+  {
+    return true;
+  }
 
-//! check whether allocators are not equivalent
-template<class T>
-constexpr bool
-operator!=(const MallocAllocator<T> &, const MallocAllocator<T> &)
-{
-return false;
-}
+  //! check whether allocators are not equivalent
+  template<class T>
+  constexpr bool
+  operator!=(const MallocAllocator<T> &, const MallocAllocator<T> &)
+  {
+    return false;
+  }
 }
 
 #endif // DUNE_MALLOC_ALLOCATOR_HH

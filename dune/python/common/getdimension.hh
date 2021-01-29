@@ -12,12 +12,12 @@ struct GetDimension;
 
 template< class T >
 struct GetDimension< T, std::enable_if_t<std::is_arithmetic<T>::value>>
-: public std::integral_constant< int, 1 > {};
+   : public std::integral_constant< int, 1 > {};
 template< class FT, int dim >
 struct GetDimension<Dune::FieldVector<FT,dim>>
-: public std::integral_constant< int, dim > {};
+   : public std::integral_constant< int, dim > {};
 template< class FT, int dimr, int dimc >
 struct GetDimension<Dune::FieldMatrix<FT,dimr,dimc>>
-: public std::integral_constant< int, dimr*dimc > {};
+   : public std::integral_constant< int, dimr*dimc > {};
 
 #endif // DUNE_PYTHON_COMMON_GETDIMENSION_HH

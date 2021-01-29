@@ -9,20 +9,20 @@
 
 namespace Dune
 {
-/**
-* @brief Calculator of the greatest common divisor.
-*/
-template<long a, long b>
-struct [[deprecated("Will be removed after Dune 2.8. Use std::gcd from <numeric> instead!")]] Gcd
-{
-/**
-* @brief The greatest common divisior of a and b. */
-constexpr static long value = std::gcd(a,b);
-};
+  /**
+   * @brief Calculator of the greatest common divisor.
+   */
+  template<long a, long b>
+  struct [[deprecated("Will be removed after Dune 2.8. Use std::gcd from <numeric> instead!")]] Gcd
+  {
+    /**
+     * @brief The greatest common divisior of a and b. */
+    constexpr static long value = std::gcd(a,b);
+  };
 
-/**
-* @}
-*/
+  /**
+   * @}
+   */
 }
 
 #endif

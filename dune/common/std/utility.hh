@@ -5,21 +5,21 @@
 #include <utility>
 
 #warning dune/common/std/utility.hh is deprecated and will be removed after Dune 2.8.\
-Include <utility> instead
+ Include <utility> instead
 
 namespace Dune
 {
 
-namespace Std
-{
+  namespace Std
+  {
 
-using std::integer_sequence;
-using std::index_sequence;
-using std::make_integer_sequence;
-using std::make_index_sequence;
-using std::index_sequence_for;
+    using std::integer_sequence;
+    using std::index_sequence;
+    using std::make_integer_sequence;
+    using std::make_index_sequence;
+    using std::index_sequence_for;
 
-} // namespace Std
+  } // namespace Std
 
 } // namespace Dune
 

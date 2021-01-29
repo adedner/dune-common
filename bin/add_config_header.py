@@ -14,7 +14,7 @@ def add_config_header(module, dir):
 
         contains_config_header = False
         with open(file,'r') as f:
-          file_content = [line.strip() for line in f.readlines()]
+          file_content = [line.rstrip() for line in f.readlines()]
           for l,line in enumerate(file_content):
             if config_header in line:
               contains_config_header = True

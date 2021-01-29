@@ -6,59 +6,59 @@
 
 namespace Dune {
 
-//! Simple range between a begin and an end iterator.
-/**
-* IteratorRange is mainly useful as a lightweight adaptor
-* class when adding support for range-based for loops to
-* existing containers that lack a standard begin(), end()
-* pair of member functions.
-*
-* \tparam Iterator  The type of iterator
-* \ingroup CxxUtilities
-*/
-template<typename Iterator>
-class IteratorRange
-{
+  //! Simple range between a begin and an end iterator.
+  /**
+   * IteratorRange is mainly useful as a lightweight adaptor
+   * class when adding support for range-based for loops to
+   * existing containers that lack a standard begin(), end()
+   * pair of member functions.
+   *
+   * \tparam Iterator  The type of iterator
+   * \ingroup CxxUtilities
+   */
+  template<typename Iterator>
+  class IteratorRange
+  {
 
-public:
+  public:
 
-//! The iterator belonging to this range.
-typedef Iterator iterator;
+    //! The iterator belonging to this range.
+    typedef Iterator iterator;
 
-//! The iterator belonging to this range.
-/**
-* This typedef is here mainly for compatibility reasons.
-*/
-typedef Iterator const_iterator;
+    //! The iterator belonging to this range.
+    /**
+     * This typedef is here mainly for compatibility reasons.
+     */
+    typedef Iterator const_iterator;
 
-//! Constructs an iterator range on [begin,end).
-IteratorRange(const Iterator& begin, const Iterator& end)
-: _begin(begin)
-, _end(end)
-{}
+    //! Constructs an iterator range on [begin,end).
+    IteratorRange(const Iterator& begin, const Iterator& end)
+      : _begin(begin)
+      , _end(end)
+    {}
 
-//! Default constructor, relies on iterators being default-constructible.
-IteratorRange()
-{}
+    //! Default constructor, relies on iterators being default-constructible.
+    IteratorRange()
+    {}
 
-//! Returns an iterator pointing to the begin of the range.
-iterator begin() const
-{
-return _begin;
-}
+    //! Returns an iterator pointing to the begin of the range.
+    iterator begin() const
+    {
+      return _begin;
+    }
 
-//! Returns an iterator pointing past the end of the range.
-iterator end() const
-{
-return _end;
-}
+    //! Returns an iterator pointing past the end of the range.
+    iterator end() const
+    {
+      return _end;
+    }
 
-private:
+  private:
 
-Iterator _begin;
-Iterator _end;
+    Iterator _begin;
+    Iterator _end;
 
-};
+  };
 
 }
 
