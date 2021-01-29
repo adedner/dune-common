@@ -844,7 +844,6 @@ if(${ProjectName}_LIBRARIES)
 endif()
 endif()")
   endif()
-
   get_property(DUNE_MODULE_LIBRARIES GLOBAL PROPERTY DUNE_MODULE_LIBRARIES)
 
   # compute under which libdir the package configuration files are to be installed.
@@ -931,7 +930,7 @@ endif()
   # install pkg-config files
   create_and_install_pkconfig(${DUNE_INSTALL_LIBDIR})
 
-  if("${ARGC}" GREATER "1")
+  if("${ARGC}" EQUAL "1")
     message(STATUS "Adding custom target for config.h generation")
     dune_regenerate_config_cmake()
     # add a target to generate config.h.cmake
