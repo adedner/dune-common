@@ -1222,7 +1222,9 @@ macro(dune_target_add_config_header _target _scope _config_h)
   #   $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}/dune/internal/${ProjectName}.hh>)
 
   # force include of the generated config header
-  target_compile_options(${_target} ${_scope}
-    $<BUILD_INTERFACE:-include${PROJECT_BINARY_DIR}/dune/internal/${ProjectName}.hh>
-    $<INSTALL_INTERFACE:-include$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}/dune/internal/${ProjectName}.hh>)
+  if(NOT DUNE_DISABLE_FORCED_INCLUDE)
+    target_compile_options(${_target} ${_scope}
+      $<BUILD_INTERFACE:-include${PROJECT_BINARY_DIR}/dune/internal/${ProjectName}.hh>
+      $<INSTALL_INTERFACE:-include$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}/dune/internal/${ProjectName}.hh>)
+  endif()
 endmacro(dune_target_add_config_header)

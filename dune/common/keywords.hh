@@ -1,16 +1,17 @@
 #ifndef DUNE_COMMON_KEYWORDS_HH
 #define DUNE_COMMON_KEYWORDS_HH
+#include <dune/internal/dune-common.hh>
 
 /** \file
- * \brief Definitions of several macros that conditionally make C++ syntax
- *      available.
- *
- * This header contains several macros that enable C++ features depending on your
- * compiler. Most of these features are optional and provide additional functionality
- * like making code constexpr.
- *
- * \ingroup CxxUtilities
- */
+* \brief Definitions of several macros that conditionally make C++ syntax
+*      available.
+*
+* This header contains several macros that enable C++ features depending on your
+* compiler. Most of these features are optional and provide additional functionality
+* like making code constexpr.
+*
+* \ingroup CxxUtilities
+*/
 
 
 #if __cpp_inline_variables >= 201606
@@ -18,8 +19,8 @@
 #else
 //! Preprocessor macro used for marking variables inline on supported compilers.
 /**
- * \ingroup CxxUtilities
- */
+* \ingroup CxxUtilities
+*/
 #define DUNE_INLINE_VARIABLE
 #endif
 
@@ -29,8 +30,8 @@
 #else
 //! Preprocessor macro used for marking code as constexpr under the relaxed rules of C++14 if supported by the compiler.
 /**
- * \ingroup CxxUtilities
- */
+* \ingroup CxxUtilities
+*/
 #define DUNE_GENERALIZED_CONSTEXPR
 #endif
 

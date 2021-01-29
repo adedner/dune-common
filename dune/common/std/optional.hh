@@ -1,5 +1,6 @@
 #ifndef DUNE_COMMON_STD_OPTIONAL_HH
 #define DUNE_COMMON_STD_OPTIONAL_HH
+#include <dune/internal/dune-common.hh>
 
 #include <cassert>
 #include <functional>
@@ -10,29 +11,29 @@
 #include <optional>
 
 #warning dune/common/std/optional.hh is deprecated and will be removed after Dune 2.8.\
- Include <optional> instead
+Include <optional> instead
 
 namespace Dune
 {
 
-  namespace Std
-  {
-    // In case of C++ standard >= 17 we forward optionals into our namespace
-    template< class T >
-    using optional = std::optional< T >;
+namespace Std
+{
+// In case of C++ standard >= 17 we forward optionals into our namespace
+template< class T >
+using optional = std::optional< T >;
 
-    using nullopt_t = std::nullopt_t;
-    using in_place_t = std::in_place_t;
+using nullopt_t = std::nullopt_t;
+using in_place_t = std::in_place_t;
 
-    namespace
-    {
-      const std::nullopt_t nullopt = std::nullopt;
-      const std::in_place_t in_place =  std::in_place;
-    } // anonymous namespace
+namespace
+{
+const std::nullopt_t nullopt = std::nullopt;
+const std::in_place_t in_place =  std::in_place;
+} // anonymous namespace
 
-    using bad_optional_access = std::bad_optional_access;
+using bad_optional_access = std::bad_optional_access;
 
-  } // namespace Std
+} // namespace Std
 
 } // namespace Dune
 

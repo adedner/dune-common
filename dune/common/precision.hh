@@ -2,47 +2,48 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_PRECISION_HH
 #define DUNE_PRECISION_HH
+#include <dune/internal/dune-common.hh>
 
 /** \file
- * \brief Various precision settings for calculations with FieldMatrix and FieldVector
- */
+* \brief Various precision settings for calculations with FieldMatrix and FieldVector
+*/
 
 #include <stdlib.h>
 
 namespace Dune {
 
-  /**
-      @addtogroup DenseMatVec
-      @{
-   */
+/**
+@addtogroup DenseMatVec
+@{
+*/
 
-  /**
-   * @brief Precisions for calculations with FieldMatrix and FieldVector.
-   */
-  template <class ctype = double>
-  class FMatrixPrecision {
-  public:
-    //! return threshold to declare matrix singular
-    static ctype absolute_limit ()
-    {
-      return _absolute;
-    }
+/**
+* @brief Precisions for calculations with FieldMatrix and FieldVector.
+*/
+template <class ctype = double>
+class FMatrixPrecision {
+public:
+//! return threshold to declare matrix singular
+static ctype absolute_limit ()
+{
+return _absolute;
+}
 
-    //! set singular threshold
-    static void set_absolute_limit (ctype absthres)
-    {
-      _absolute = absthres;
-    }
+//! set singular threshold
+static void set_absolute_limit (ctype absthres)
+{
+_absolute = absthres;
+}
 
-  private:
-    // just to demonstrate some state information
-    static ctype _absolute;
-  };
+private:
+// just to demonstrate some state information
+static ctype _absolute;
+};
 
-  template <class ctype>
-  ctype FMatrixPrecision<ctype>::_absolute = 1E-80;
+template <class ctype>
+ctype FMatrixPrecision<ctype>::_absolute = 1E-80;
 
-  /** @} end documentation */
+/** @} end documentation */
 
 } // end namespace
 

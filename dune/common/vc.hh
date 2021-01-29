@@ -1,14 +1,15 @@
 #ifndef DUNE_COMMON_VC_HH
 #define DUNE_COMMON_VC_HH
+#include <dune/internal/dune-common.hh>
 
 /**
-   \file
+\file
 
-   \brief Compatibility header for including <Vc/Vc>
+\brief Compatibility header for including <Vc/Vc>
 
-   Certain versions (1.3.2) of Vc (https://github.com/VcDevel/Vc) have a
-   problem with certain compiler versions (g++ 7.2.0) in c++17 mode, see #88.
- */
+Certain versions (1.3.2) of Vc (https://github.com/VcDevel/Vc) have a
+problem with certain compiler versions (g++ 7.2.0) in c++17 mode, see #88.
+*/
 
 #if HAVE_VC
 

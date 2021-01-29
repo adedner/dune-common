@@ -2,37 +2,38 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_PROMOTIONTRAITS_HH
 #define DUNE_PROMOTIONTRAITS_HH
+#include <dune/internal/dune-common.hh>
 
 #include <utility>
 
 namespace Dune {
-  /**
-   * @file
-   * @brief  Compute type of the result of an arithmetic operation involving two different number types.
-   *
-   * @author Matthias Wohlmuth
-   */
+/**
+* @file
+* @brief  Compute type of the result of an arithmetic operation involving two different number types.
+*
+* @author Matthias Wohlmuth
+*/
 
-  /** @addtogroup Common
-   *
-   * @{
-   */
+/** @addtogroup Common
+*
+* @{
+*/
 
-  /** \brief Compute type of the result of an arithmetic operation involving two different number types.
-  */
-  template <typename T1, typename T2>
-  struct PromotionTraits
-  {
-    typedef decltype(std::declval<T1>()+std::declval<T2>()) PromotedType;
-  };
+/** \brief Compute type of the result of an arithmetic operation involving two different number types.
+*/
+template <typename T1, typename T2>
+struct PromotionTraits
+{
+typedef decltype(std::declval<T1>()+std::declval<T2>()) PromotedType;
+};
 
-  // Specialization for the case of two equal types
-  // One should think that the generic template should handle this case as well.
-  // However, the fvectortest.cc unit test fails without it if ENABLE_GMP is set.
-  template <typename T1>
-  struct PromotionTraits<T1,T1> { typedef T1 PromotedType; };
+// Specialization for the case of two equal types
+// One should think that the generic template should handle this case as well.
+// However, the fvectortest.cc unit test fails without it if ENABLE_GMP is set.
+template <typename T1>
+struct PromotionTraits<T1,T1> { typedef T1 PromotedType; };
 
-  /** @} */
+/** @} */
 } // end namespace
 
 

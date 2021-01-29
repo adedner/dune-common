@@ -1,5 +1,6 @@
 #ifndef DUNE_PYTHON_COMMON_NUMPYVECTOR_HH
 #define DUNE_PYTHON_COMMON_NUMPYVECTOR_HH
+#include <dune/internal/dune-common.hh>
 
 #include <dune/common/densevector.hh>
 #include <dune/common/ftraits.hh>
@@ -11,134 +12,134 @@
 namespace Dune
 {
 
-  namespace Python
-  {
+namespace Python
+{
 
-    // Internal Forward Declarations
-    // -----------------------------
+// Internal Forward Declarations
+// -----------------------------
 
-    template< class T >
-    class NumPyVector;
+template< class T >
+class NumPyVector;
 
-  } // namespace Python
-
-
-
-  // DenseMatVecTraits for NumPyVector
-  // ---------------------------------
-
-  template< class T >
-  struct DenseMatVecTraits< Python::NumPyVector< T > >
-  {
-    typedef Python::NumPyVector< T > derived_type;
-    typedef pybind11::array_t< T > container_type;
-    typedef T value_type;
-    typedef std::size_t size_type;
-  };
+} // namespace Python
 
 
 
-  // FieldTraits for NumPyVector
-  // ---------------------------
+// DenseMatVecTraits for NumPyVector
+// ---------------------------------
 
-  template< class T >
-  struct FieldTraits< Python::NumPyVector< T > >
-  {
-    typedef typename FieldTraits< T >::field_type field_type;
-    typedef typename FieldTraits< T >::real_type real_type;
-  };
+template< class T >
+struct DenseMatVecTraits< Python::NumPyVector< T > >
+{
+typedef Python::NumPyVector< T > derived_type;
+typedef pybind11::array_t< T > container_type;
+typedef T value_type;
+typedef std::size_t size_type;
+};
 
 
-  namespace Python
-  {
 
-    template< class T >
-    class NumPyVector
-      : public DenseVector< NumPyVector< T > >
-    {
-      typedef NumPyVector< T > This;
-      typedef DenseVector< NumPyVector< T > > Base;
+// FieldTraits for NumPyVector
+// ---------------------------
 
-    public:
-      typedef typename Base::size_type size_type;
-      typedef typename Base::value_type value_type;
+template< class T >
+struct FieldTraits< Python::NumPyVector< T > >
+{
+typedef typename FieldTraits< T >::field_type field_type;
+typedef typename FieldTraits< T >::real_type real_type;
+};
 
-      explicit NumPyVector ( size_type size )
-        : array_( pybind11::buffer_info( nullptr, sizeof( T ),
-                  pybind11::format_descriptor< T >::value, 1, { size }, { sizeof( T ) } )
-                ),
-          size_(size)
-      {}
 
-      NumPyVector ( pybind11::buffer buf )
-        : array_( buf ),
-          size_( 0 )
-      {
-        pybind11::buffer_info info = buf.request();
-        if (info.ndim != 1)
-          DUNE_THROW( InvalidStateException, "NumPyVector can only be created from one-dimensional array" );
-        size_ = info.shape[0];
-      }
+namespace Python
+{
 
-      NumPyVector ( const This &other ) = delete;
-      NumPyVector ( This &&other ) = delete;
+template< class T >
+class NumPyVector
+: public DenseVector< NumPyVector< T > >
+{
+typedef NumPyVector< T > This;
+typedef DenseVector< NumPyVector< T > > Base;
 
-      ~NumPyVector() {}
+public:
+typedef typename Base::size_type size_type;
+typedef typename Base::value_type value_type;
 
-      This &operator= ( const This &other ) = delete;
-      This &operator= ( This &&other ) = delete;
+explicit NumPyVector ( size_type size )
+: array_( pybind11::buffer_info( nullptr, sizeof( T ),
+pybind11::format_descriptor< T >::value, 1, { size }, { sizeof( T ) } )
+),
+size_(size)
+{}
 
-      operator pybind11::array_t< T > () const { return array_; }
+NumPyVector ( pybind11::buffer buf )
+: array_( buf ),
+size_( 0 )
+{
+pybind11::buffer_info info = buf.request();
+if (info.ndim != 1)
+DUNE_THROW( InvalidStateException, "NumPyVector can only be created from one-dimensional array" );
+size_ = info.shape[0];
+}
 
-      const value_type &operator[] ( size_type index ) const
-      {
-        return data()[ index ];
-      }
-      value_type &operator[] ( size_type index )
-      {
-        return data()[ index ];
-      }
-      value_type &vec_access ( size_type index )
-      {
-        return data()[ index ];
-      }
-      const value_type &vec_access ( size_type index ) const
-      {
-        return data()[ index ];
-      }
+NumPyVector ( const This &other ) = delete;
+NumPyVector ( This &&other ) = delete;
 
-      inline const value_type *data () const
-      {
-        return static_cast< const value_type * >( const_cast<pybind11::array_t< T >&>(array_).request(false).ptr );
-      }
-      inline value_type *data ()
-      {
-        return static_cast< value_type * >( array_.request(true).ptr );
-      }
-      pybind11::array_t< T > &coefficients()
-      {
-        return array_;
-      }
-      pybind11::array_t< T > &coefficients() const
-      {
-        return array_;
-      }
+~NumPyVector() {}
 
-      size_type size () const
-      {
-        return size_;
-      }
-      size_type vec_size () const
-      {
-        return size_;
-      }
+This &operator= ( const This &other ) = delete;
+This &operator= ( This &&other ) = delete;
 
-    private:
-      pybind11::array_t< T > array_;
-      size_type size_;
-    };
+operator pybind11::array_t< T > () const { return array_; }
 
-  } // namespace Python
+const value_type &operator[] ( size_type index ) const
+{
+return data()[ index ];
+}
+value_type &operator[] ( size_type index )
+{
+return data()[ index ];
+}
+value_type &vec_access ( size_type index )
+{
+return data()[ index ];
+}
+const value_type &vec_access ( size_type index ) const
+{
+return data()[ index ];
+}
+
+inline const value_type *data () const
+{
+return static_cast< const value_type * >( const_cast<pybind11::array_t< T >&>(array_).request(false).ptr );
+}
+inline value_type *data ()
+{
+return static_cast< value_type * >( array_.request(true).ptr );
+}
+pybind11::array_t< T > &coefficients()
+{
+return array_;
+}
+pybind11::array_t< T > &coefficients() const
+{
+return array_;
+}
+
+size_type size () const
+{
+return size_;
+}
+size_type vec_size () const
+{
+return size_;
+}
+
+private:
+pybind11::array_t< T > array_;
+size_type size_;
+};
+
+} // namespace Python
 
 } // namespace Dune
 
