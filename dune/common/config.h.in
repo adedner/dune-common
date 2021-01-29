@@ -1,3 +1,5 @@
+#pragma once
+
 /* begin dune-common
    put the definitions for config.h specific to
    your project here. Everything above will be

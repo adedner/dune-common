@@ -1,5 +1,3 @@
-#include "config.h"
-
 #if !HAVE_VC
 #error Inconsistent buildsystem.  This program should not be built in the \
   absence of Vc.

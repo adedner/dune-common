@@ -106,8 +106,6 @@
 #
 #      // @GENERATED_SOURCE@
 #
-#      #include <config.h>
-#
 #      #include <mytest.hh>
 #
 #      int main() {
@@ -133,8 +131,6 @@
 #    ``mytest_instance.cc.in``::
 #
 #      // @GENERATED_SOURCE@
-#
-#      #include <config.h>
 #
 #      #include <mytest.hh>
 #

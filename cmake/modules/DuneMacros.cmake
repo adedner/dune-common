@@ -682,6 +682,7 @@ macro(dune_project)
 
   # set include path and link path for the current project.
   include_directories("${PROJECT_SOURCE_DIR}")
+  include_directories("${PROJECT_BINARY_DIR}")
 
   # Search for MPI and set the relevant variables.
   include(DuneMPI)
@@ -939,13 +940,11 @@ endif()
     # actually write the config.h file to disk
     # using generated file
     configure_file(${CMAKE_CURRENT_BINARY_DIR}/config_collected.h.cmake ${PROJECT_BINARY_DIR}/config.h)
-    include_directories("${PROJECT_BINARY_DIR}")
     add_definitions(-DHAVE_CONFIG_H)
   elseif(EXISTS ${CMAKE_SOURCE_DIR}/config.h.cmake)
     message(STATUS "Not adding custom target for config.h generation")
     # actually write the config.h file to disk
     configure_file(${CMAKE_SOURCE_DIR}/config.h.cmake ${PROJECT_BINARY_DIR}/config.h)
-    include_directories("${PROJECT_BINARY_DIR}")
     add_definitions(-DHAVE_CONFIG_H)
   endif()
 
@@ -1203,7 +1202,7 @@ endmacro(add_dune_all_flags targets)
 macro(dune_target_add_config_header _target _scope _config_h)
   configure_file(${_config_h} ${PROJECT_BINARY_DIR}/dune/internal/${ProjectName}.hh)
   install(FILES ${PROJECT_BINARY_DIR}/dune/internal/${ProjectName}.hh
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/internal/${ProjectName}.hh)
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/internal)
 
   # Set the generated header as precompiled-header to be automatically included
   # target_precompile_headers(${_target} ${_scope}
@@ -1212,6 +1211,6 @@ macro(dune_target_add_config_header _target _scope _config_h)
 
   # force include of the generated config header
   target_compile_options(${_target} ${_scope}
-    $<BUILD_INTERFACE:-include ${PROJECT_BINARY_DIR}/dune/internal/${ProjectName}.hh>
-    $<INSTALL_INTERFACE:-include ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}/dune/internal/${ProjectName}.hh>) # does not work
+    $<BUILD_INTERFACE:-include${PROJECT_BINARY_DIR}/dune/internal/${ProjectName}.hh>
+    $<INSTALL_INTERFACE:-include${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}/dune/internal/${ProjectName}.hh>) # does not work
 endmacro(dune_target_add_config_header)

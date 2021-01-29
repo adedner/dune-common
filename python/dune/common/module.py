@@ -215,7 +215,7 @@ def select_modules(modules=None, module=None):
     Args:
         modules (optional): List of (description, dir) pairs
             If not given, the find_modules(get_module_path()) is used
-        module (optional): 
+        module (optional):
 
     Returns:
         pair of dictionaries mapping module name to unique description and directory respectively
@@ -370,7 +370,6 @@ def make_dune_py_module(dune_py_dir=None, deps=None):
         project.write_cmake_file(generated_dir, cmake_content)
 
         with open(os.path.join(generated_dir, 'generated_test.cc'), 'w') as file:
-            file.write('#include <config.h>\n\n')
             file.write('#define USING_DUNE_PYTHON 1\n\n')
             file.write('\n#include "generated_module.hh"\n')
 

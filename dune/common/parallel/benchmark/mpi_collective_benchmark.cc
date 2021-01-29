@@ -63,9 +63,6 @@
  * (https://software.intel.com/en-us/mpi-developer-reference-linux-asynchronous-progress-control)
  */
 
-
-#include <config.h>
-
 #include <iostream>
 #include <iomanip>
 #include <thread>

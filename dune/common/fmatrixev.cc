@@ -3,10 +3,6 @@
 #ifndef DUNE_FMATRIXEIGENVALUES_CC
 #define DUNE_FMATRIXEIGENVALUES_CC
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <iostream>
 #include <cmath>
 #include <cassert>

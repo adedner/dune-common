@@ -1,5 +1,3 @@
-#include <config.h>
-
 #include <cstdint>
 #include <tuple>
 #include <vector>

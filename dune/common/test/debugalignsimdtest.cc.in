@@ -1,7 +1,4 @@
 // @GENERATED_SOURCE@
-
-#include <config.h>
-
 #include <cstdlib>
 #include <type_traits>
 

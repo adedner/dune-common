@@ -28,9 +28,9 @@ int main(int argc, char** argv)
     Dune::MPIHelper::MPICommunicator comm = Dune::MPIHelper::getCommunication();
 
 #if HAVE_MPI
-    if (MPI_COMM_SELF !=  Dune::MPIHelper::getLocalCommunication())
+    if (MPI_COMM_SELF !=  Dune::MPIHelper::getLocalCommunicator())
     {
-        std::cerr<<"Dune::MPIHelper::getLocalCommunication() gives wrong result"<<std::endl;
+        std::cerr<<"Dune::MPIHelper::getLocalCommunicator() gives wrong result"<<std::endl;
         ++ret;
     }
     if (MPI_COMM_WORLD !=  Dune::MPIHelper::getCommunication())

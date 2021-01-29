@@ -1,5 +1,3 @@
-#include "config.h"
-
 #include <array>
 #include <map>
 #include <vector>

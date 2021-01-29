@@ -1,4 +1,5 @@
-#include <config.h>
+#include <dune/internal/dune-common.hh>
+
 #include <cassert>
 #include <iostream>
 #include <vector>
