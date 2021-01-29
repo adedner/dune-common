@@ -3,7 +3,7 @@
 
 #ifndef DUNE_COMMON_INDICES_HH
 #define DUNE_COMMON_INDICES_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #include <cstddef>
 #include <type_traits>

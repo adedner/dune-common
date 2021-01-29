@@ -3,7 +3,7 @@
 
 #ifndef DUNE_BIGUNSIGNEDINT_HH
 #define DUNE_BIGUNSIGNEDINT_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #include <algorithm>
 #include <iostream>

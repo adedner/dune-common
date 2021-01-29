@@ -3,7 +3,7 @@
 
 #ifndef DUNE_COMMON_LOCALINDEX_HH
 #define DUNE_COMMON_LOCALINDEX_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #include <cstddef>
 

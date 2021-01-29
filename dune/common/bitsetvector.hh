@@ -2,7 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_BLOCK_BITFIELD_HH
 #define DUNE_BLOCK_BITFIELD_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 /** \file
     \brief Efficient implementation of a dynamic array of static arrays of booleans

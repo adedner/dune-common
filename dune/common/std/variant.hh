@@ -2,7 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_COMMON_STD_VARIANT_HH
 #define DUNE_COMMON_STD_VARIANT_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #warning dune/common/std/variant.hh is deprecated and will be removed after Dune 2.8.\
  Include <variant> instead

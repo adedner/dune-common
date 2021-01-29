@@ -1,6 +1,6 @@
 #ifndef DUNE_COMMON_SIMD_DEFAULTS_HH
 #define DUNE_COMMON_SIMD_DEFAULTS_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 /** @file
  *  @brief Default implementations for SIMD Implementations

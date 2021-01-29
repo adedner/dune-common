@@ -2,7 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_PYTHON_COMMON_MPIHELPER_HH
 #define DUNE_PYTHON_COMMON_MPIHELPER_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #include <dune/common/parallel/communication.hh>
 #include <dune/common/parallel/mpihelper.hh>

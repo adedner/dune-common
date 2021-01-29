@@ -2,7 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_DEBUGALIGN_HH
 #define DUNE_DEBUGALIGN_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #include <algorithm>
 #include <cassert>

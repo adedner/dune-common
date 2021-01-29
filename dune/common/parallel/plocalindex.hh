@@ -3,7 +3,7 @@
 
 #ifndef DUNE_PLOCALINDEX_HH
 #define DUNE_PLOCALINDEX_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #include "localindex.hh"
 #include "indexset.hh"

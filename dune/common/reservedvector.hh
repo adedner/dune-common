@@ -2,7 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_COMMON_RESERVEDVECTOR_HH
 #define DUNE_COMMON_RESERVEDVECTOR_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 /** \file
  * \brief An stl-compliant random-access container which stores everything on the stack

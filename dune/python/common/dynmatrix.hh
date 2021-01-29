@@ -3,7 +3,7 @@
 
 #ifndef DUNE_PYTHON_COMMON_DYNMATRIX_HH
 #define DUNE_PYTHON_COMMON_DYNMATRIX_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #include <string>
 #include <tuple>

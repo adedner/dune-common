@@ -2,7 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_INTERFACE_HH
 #define DUNE_INTERFACE_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #if HAVE_MPI
 

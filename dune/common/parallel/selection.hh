@@ -2,7 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_SELECTION_HH
 #define DUNE_SELECTION_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #include "indexset.hh"
 #include <dune/common/iteratorfacades.hh>

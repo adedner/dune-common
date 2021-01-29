@@ -2,7 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_TIMER_HH
 #define DUNE_TIMER_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #ifndef TIMER_USE_STD_CLOCK
 // headers for std::chrono

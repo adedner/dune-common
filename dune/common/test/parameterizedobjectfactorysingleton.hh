@@ -1,6 +1,6 @@
 #ifndef DUNE_COMMON_TEST_PARAMETERIZEDOBJECTFACTORYSINGLETON_HH
 #define DUNE_COMMON_TEST_PARAMETERIZEDOBJECTFACTORYSINGLETON_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #include <dune/common/parameterizedobject.hh>
 #include <dune/common/singleton.hh>

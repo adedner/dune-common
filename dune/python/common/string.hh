@@ -1,6 +1,6 @@
 #ifndef DUNE_PYTHON_COMMON_STRING_HH
 #define DUNE_PYTHON_COMMON_STRING_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #include <string>
 #include <type_traits>

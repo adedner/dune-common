@@ -3,7 +3,7 @@
 
 #ifndef DUNE_DEBUGSTREAM_HH
 #define DUNE_DEBUGSTREAM_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 /** \file
  * \brief Defines several output streams for messages of different importance

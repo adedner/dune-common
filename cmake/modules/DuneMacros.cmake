@@ -1198,33 +1198,19 @@ endmacro(add_dune_all_flags targets)
 
 
 # create a module specific config header file and force an include
-macro(dune_target_add_config_header _target _scope _config_h)
-  set(CONFIG_H_IN_FILE ${CMAKE_CURRENT_BINARY_DIR}/config.h.in)
-  file(READ ${_config_h} _config_h_content)
-  file(WRITE ${CONFIG_H_IN_FILE} "${_config_h_content}")
+macro(dune_add_config_header _config_hh_in _config_hh)
+  set(_config_hh_tmp ${CMAKE_CURRENT_BINARY_DIR}/config.hh.in)
+  file(READ ${_config_hh_in} _config_hh_content)
+  file(WRITE ${_config_hh_tmp} "${_config_hh_content}")
 
   # define that we found this module
   set(${ProjectName}_FOUND 1)
   foreach(_dep ${ProjectName} ${ALL_DEPENDENCIES})
     dune_module_to_uppercase(_upper ${_dep})
     set(HAVE_${_upper} ${${_dep}_FOUND})
-    file(APPEND ${CONFIG_H_IN_FILE}
-      "\n\n/* Define to 1 if you have module ${_dep} available */\n#cmakedefine01 HAVE_${_upper}\n")
+    file(APPEND ${_config_hh_tmp}
+      "\n/* Define to 1 if you have module ${_dep} available */\n#cmakedefine01 HAVE_${_upper}\n")
   endforeach()
 
-  configure_file(${CONFIG_H_IN_FILE} ${PROJECT_BINARY_DIR}/dune/internal/${ProjectName}.hh)
-  install(FILES ${PROJECT_BINARY_DIR}/dune/internal/${ProjectName}.hh
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/internal)
-
-  # Set the generated header as precompiled-header to be automatically included
-  # target_precompile_headers(${_target} ${_scope}
-  #   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/dune/internal/${ProjectName}.hh>
-  #   $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}/dune/internal/${ProjectName}.hh>)
-
-  # force include of the generated config header
-  if(NOT DUNE_DISABLE_FORCED_INCLUDE)
-    target_compile_options(${_target} ${_scope}
-      $<BUILD_INTERFACE:-include${PROJECT_BINARY_DIR}/dune/internal/${ProjectName}.hh>
-      $<INSTALL_INTERFACE:-include$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}/dune/internal/${ProjectName}.hh>)
-  endif()
-endmacro(dune_target_add_config_header)
+  configure_file(${_config_hh_tmp} ${_config_hh})
+endmacro(dune_add_config_header)

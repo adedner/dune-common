@@ -1,4 +1,4 @@
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #include <cassert>
 #include <iostream>

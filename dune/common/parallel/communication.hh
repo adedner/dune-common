@@ -2,7 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_COMMON_PARALLEL_COMMUNICATION_HH
 #define DUNE_COMMON_PARALLEL_COMMUNICATION_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 /*!
    \file
    \brief Implements an utility class that provides

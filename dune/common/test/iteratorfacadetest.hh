@@ -2,7 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_ITERATORFACADETEST_HH
 #define DUNE_ITERATORFACADETEST_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 #include <dune/common/iteratorfacades.hh>
 #include <dune/common/genericiterator.hh>
 #include <dune/common/typetraits.hh>

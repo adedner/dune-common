@@ -2,7 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_FMATRIXEIGENVALUES_HH
 #define DUNE_FMATRIXEIGENVALUES_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 /** \file
  * \brief Eigenvalue computations for the FieldMatrix class

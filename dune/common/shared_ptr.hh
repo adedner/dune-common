@@ -3,7 +3,7 @@
 
 #ifndef DUNE_SHARED_PTR_HH
 #define DUNE_SHARED_PTR_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #include <memory>
 

@@ -1,6 +1,6 @@
 #ifndef DUNE_COMMON_KEYWORDS_HH
 #define DUNE_COMMON_KEYWORDS_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 /** \file
  * \brief Definitions of several macros that conditionally make C++ syntax

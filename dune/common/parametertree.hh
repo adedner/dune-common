@@ -2,7 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_PARAMETERTREE_HH
 #define DUNE_PARAMETERTREE_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 /** \file
  * \brief A hierarchical structure of string parameters

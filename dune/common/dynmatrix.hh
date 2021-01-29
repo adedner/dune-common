@@ -2,7 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_DYNMATRIX_HH
 #define DUNE_DYNMATRIX_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #include <cmath>
 #include <cstddef>

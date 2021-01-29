@@ -8,7 +8,7 @@
 
 #ifndef DUNE_FUNCTION_HH
 #define DUNE_FUNCTION_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #include <utility>
 

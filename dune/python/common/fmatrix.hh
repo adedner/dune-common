@@ -1,6 +1,6 @@
 #ifndef DUNE_PYTHON_COMMON_FMATRIX_HH
 #define DUNE_PYTHON_COMMON_FMATRIX_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #include <cstddef>
 

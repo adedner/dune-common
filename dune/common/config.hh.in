@@ -1,12 +1,14 @@
 #pragma once
 
-/* begin dune-common
-   put the definitions for config.h specific to
-   your project here. Everything above will be
-   overwritten
-*/
+/**
+ * \file
+ * This file acts as a template for configuration specific
+ * definitions and is filled automatically by cmake.
+ *
+ * The generated file will be stored in the build or install directory
+ * without the file extending as dune/common/config.hh
+**/
 
-/* begin private */
 /* Define to the version of dune-common */
 #define DUNE_COMMON_VERSION "${DUNE_COMMON_VERSION}"
 
@@ -176,7 +178,3 @@
 #endif
 
 #define FC_FUNC LAPACK_MANGLE
-
-/* end dune-common
-   Everything below here will be overwritten
-*/

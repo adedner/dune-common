@@ -3,7 +3,7 @@
 
 #ifndef DUNE_EXCEPTIONS_HH
 #define DUNE_EXCEPTIONS_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #include <exception>
 #include <string>

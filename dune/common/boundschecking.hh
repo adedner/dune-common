@@ -1,6 +1,6 @@
 #ifndef DUNE_BOUNDSCHECKING_HH
 #define DUNE_BOUNDSCHECKING_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #include <dune/common/exceptions.hh>
 

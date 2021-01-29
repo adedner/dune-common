@@ -1,12 +1,12 @@
 import os
 import sys
 
-def add_config_header(module, dir):
+def add_config_header(config_file, dir):
   if not os.path.exists(dir):
     print('directory {} does not exist.'.format(dir))
     exit(2)
 
-  config_header = '#include <dune/internal/{}.hh>'.format(module)
+  config_header = '#include <{}>'.format(config_file)
   for root, dirs, files in os.walk(dir):
     for filename in filter(lambda f: f.endswith('.hh'), files):
         file = os.path.join(root,filename)
@@ -43,7 +43,7 @@ def add_config_header(module, dir):
 
 if __name__ == '__main__':
   if len(sys.argv) < 3:
-    print('usage: {} <module> <dir>'.format(sys.argv[0]))
+    print('usage: {} <config_file> <dir>'.format(sys.argv[0]))
     exit(1)
 
   add_config_header(sys.argv[1], sys.argv[2])

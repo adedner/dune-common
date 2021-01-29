@@ -3,7 +3,7 @@
 
 #ifndef DUNE_COMMON_ARRAYLIST_HH
 #define DUNE_COMMON_ARRAYLIST_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #include <array>
 #include <cassert>

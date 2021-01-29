@@ -1,6 +1,6 @@
 #ifndef DUNE_COMMON_SIMD_SIMD_HH
 #define DUNE_COMMON_SIMD_SIMD_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 /** @file
  *  @brief Include file for users of the SIMD abstraction layer

@@ -1,6 +1,6 @@
 #ifndef DUNE_PYTHON_COMMON_TYPE_TRAITS_HH
 #define DUNE_PYTHON_COMMON_TYPE_TRAITS_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 #include <type_traits>
 #include <utility>

@@ -125,5 +125,14 @@ install(FILES test/iteratortest.hh
   test/checkmatrixinterface.hh
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/common/test)
 
-# create and install package config.h file
-dune_target_add_config_header(dunecommon PUBLIC config.h.in)
+# create and install package config.hh header
+dune_add_config_header(config.hh.in ${CMAKE_CURRENT_BINARY_DIR}/config.hh)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.hh
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/common)
+
+# force include of the generated config header
+if(NOT DUNE_DISABLE_FORCED_INCLUDE)
+  target_compile_options(dunecommon PUBLIC
+    $<BUILD_INTERFACE:-include${CMAKE_CURRENT_BINARY_DIR}/config.hh>
+    $<INSTALL_INTERFACE:-include$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}/dune/common/config.hh>)
+endif()

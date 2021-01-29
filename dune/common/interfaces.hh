@@ -2,7 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_INTERFACES_HH
 #define DUNE_INTERFACES_HH
-#include <dune/internal/dune-common.hh>
+#include <dune/common/config.hh>
 
 /** @file
    @author Robert Kloefkorn
