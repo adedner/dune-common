@@ -1193,3 +1193,13 @@ macro(add_dune_all_flags targets)
     target_compile_options(${target} PUBLIC ${opts})
   endforeach()
 endmacro(add_dune_all_flags targets)
+
+
+# set compile definitions for variables of they exist and are true
+macro(dune_target_compile_definitions _target _scope)
+  foreach(_var ${ARGN})
+    if (${_var})
+      target_compile_definitions(${_target} ${_scope} ${_var})
+    endif()
+  endforeach(_var)
+endmacro(dune_target_compile_definitions)

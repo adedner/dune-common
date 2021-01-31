@@ -34,9 +34,26 @@ add_dune_gmp_flags(dunecommon)
 add_dune_quadmath_flags(dunecommon)
 add_dune_metis_flags(dunecommon)
 add_dune_parmetis_flags(dunecommon)
-target_compile_definitions(dunecommon PUBLIC
-  $<$<BOOL:${HAVE_LAPACK}>:HAVE_LAPACK>
-  $<$<BOOL:${HAVE_BLAS}>:HAVE_BLAS>)
+
+# set compile definitions for found libraries
+dune_target_compile_definitions(dunecommon PUBLIC
+  HAVE_LAPACK
+  HAVE_BLAS)
+
+# set compile features
+dune_target_compile_definitions(dunecommon PUBLIC
+  HAS_ATTRIBUTE_UNUSED
+  HAS_ATTRIBUTE_DEPRECATED
+  HAS_ATTRIBUTE_DEPRECATED_MSG
+  HAVE_IS_INDEXABLE_SUPPORT
+  DUNE_HAVE_HEADER_EXPERIMENTAL_TYPE_TRAITS
+  DUNE_HAVE_CXX_BOOL_CONSTANT
+  DUNE_HAVE_CXX_EXPERIMENTAL_BOOL_CONSTANT
+  DUNE_HAVE_CXX_APPLY
+  DUNE_HAVE_CXX_EXPERIMENTAL_APPLY
+  DUNE_HAVE_CXX_EXPERIMENTAL_MAKE_ARRAY
+  DUNE_HAVE_CXX_EXPERIMENTAL_IS_DETECTED
+  DUNE_HAVE_CXX_STD_IDENTITY)
 
 #install headers
 install(FILES

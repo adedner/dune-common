@@ -189,6 +189,7 @@ endif()
 dune_require_cxx_standard(MODULE "DUNE" VERSION 17)
 
 # perform tests
+if(${ProjectName} STREQUAL "dune-common")
 
 # __attribute__((unused))
 check_cxx_source_compiles("
@@ -197,8 +198,7 @@ check_cxx_source_compiles("
      int __attribute__((unused)) foo;
      return 0;
    };
-"  HAS_ATTRIBUTE_UNUSED
-)
+"  HAS_ATTRIBUTE_UNUSED)
 
 # __attribute__((deprecated))
 check_cxx_source_compiles("
@@ -229,8 +229,7 @@ check_cxx_source_compiles("
    {
      return 0;
    };
-"  HAS_ATTRIBUTE_DEPRECATED
-)
+"  HAS_ATTRIBUTE_DEPRECATED)
 
 # __attribute__((deprecated("msg")))
 check_cxx_source_compiles("
@@ -261,8 +260,7 @@ check_cxx_source_compiles("
    {
      return 0;
    };
-"  HAS_ATTRIBUTE_DEPRECATED_MSG
-)
+"  HAS_ATTRIBUTE_DEPRECATED_MSG)
 
 # full support for is_indexable (checking whether a type supports operator[])
 check_cxx_source_compiles("
@@ -309,8 +307,7 @@ check_cxx_source_compiles("
 
     return 0;
   }
-" HAVE_IS_INDEXABLE_SUPPORT
-  )
+" HAVE_IS_INDEXABLE_SUPPORT)
 
 # ******************************************************************************
 #
@@ -329,51 +326,45 @@ check_cxx_source_compiles("
 # Check whether we have <experimental/type_traits> (for is_detected et. al.)
 check_include_file_cxx(
   experimental/type_traits
-  DUNE_HAVE_HEADER_EXPERIMENTAL_TYPE_TRAITS
-  )
+  DUNE_HAVE_HEADER_EXPERIMENTAL_TYPE_TRAITS)
 
 check_cxx_symbol_exists(
   "std::move<std::bool_constant<true>>"
   "utility;type_traits"
-  DUNE_HAVE_CXX_BOOL_CONSTANT
-  )
+  DUNE_HAVE_CXX_BOOL_CONSTANT)
 
 if (NOT DUNE_HAVE_CXX_BOOL_CONSTANT)
   check_cxx_symbol_exists(
     "std::move<std::experimental::bool_constant<true>>"
     "utility;experimental/type_traits"
-    DUNE_HAVE_CXX_EXPERIMENTAL_BOOL_CONSTANT
-    )
+    DUNE_HAVE_CXX_EXPERIMENTAL_BOOL_CONSTANT)
 endif()
 
 check_cxx_symbol_exists(
   "std::apply<std::negate<int>,std::tuple<int>>"
   "functional;tuple"
-  DUNE_HAVE_CXX_APPLY
-  )
+  DUNE_HAVE_CXX_APPLY)
 
 if (NOT DUNE_HAVE_CXX_APPLY)
   check_cxx_symbol_exists(
     "std::experimental::apply<std::negate<int>,std::tuple<int>>"
     "functional;experimental/tuple"
-    DUNE_HAVE_CXX_EXPERIMENTAL_APPLY
-  )
+    DUNE_HAVE_CXX_EXPERIMENTAL_APPLY)
 endif()
 
 check_cxx_symbol_exists(
   "std::experimental::make_array<int,int>"
   "experimental/array"
-  DUNE_HAVE_CXX_EXPERIMENTAL_MAKE_ARRAY
-  )
+  DUNE_HAVE_CXX_EXPERIMENTAL_MAKE_ARRAY)
 
 check_cxx_symbol_exists(
   "std::move<std::experimental::detected_t<std::decay_t,int>>"
   "utility;experimental/type_traits"
-  DUNE_HAVE_CXX_EXPERIMENTAL_IS_DETECTED
-  )
+  DUNE_HAVE_CXX_EXPERIMENTAL_IS_DETECTED)
 
 check_cxx_symbol_exists(
   "std::identity"
   "functional"
-  DUNE_HAVE_CXX_STD_IDENTITY
-  )
+  DUNE_HAVE_CXX_STD_IDENTITY)
+
+endif() # only for dune-common
