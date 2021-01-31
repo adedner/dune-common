@@ -1198,10 +1198,27 @@ endmacro(add_dune_all_flags targets)
 
 
 # create a module specific config header file and force an include
-macro(dune_add_config_header _config_hh_in _config_hh)
-  set(_config_hh_tmp ${CMAKE_CURRENT_BINARY_DIR}/config.hh.in)
+function(dune_add_config_header _config_hh_in _config_hh)
+  set(_config_hh_tmp ${CMAKE_CURRENT_BINARY_DIR}/${_config_hh_in}.tmp)
   file(READ ${_config_hh_in} _config_hh_content)
   file(WRITE ${_config_hh_tmp} "${_config_hh_content}")
+
+  # append version information about the current module
+  dune_module_to_uppercase(PROJECT_NAME ${ProjectName})
+  file(APPEND ${_config_hh_tmp}
+"
+/* Define to the version of ${ProjectName} */
+#define ${PROJECT_NAME}_VERSION \"\${${PROJECT_NAME}_VERSION}\"
+
+/* Define to the major version of ${ProjectName} */
+#define ${PROJECT_NAME}_VERSION_MAJOR \${${PROJECT_NAME}_VERSION_MAJOR}
+
+/* Define to the minor version of ${ProjectName} */
+#define ${PROJECT_NAME}_VERSION_MINOR \${${PROJECT_NAME}_VERSION_MINOR}
+
+/* Define to the revision of ${ProjectName} */
+#define ${PROJECT_NAME}_VERSION_REVISION \${${PROJECT_NAME}_VERSION_REVISION}
+")
 
   # define that we found this module
   set(${ProjectName}_FOUND 1)
@@ -1213,4 +1230,4 @@ macro(dune_add_config_header _config_hh_in _config_hh)
   endforeach()
 
   configure_file(${_config_hh_tmp} ${_config_hh})
-endmacro(dune_add_config_header)
+endfunction(dune_add_config_header)
