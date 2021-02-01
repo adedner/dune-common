@@ -189,6 +189,7 @@ endif()
 dune_require_cxx_standard(MODULE "DUNE" VERSION 17)
 
 # perform tests
+if(${ProjectName} STREQUAL "dune-common")
 
 # __attribute__((unused))
 check_cxx_source_compiles("
@@ -377,3 +378,5 @@ check_cxx_symbol_exists(
   "functional"
   DUNE_HAVE_CXX_STD_IDENTITY
   )
+
+endif() # only in dune-common
