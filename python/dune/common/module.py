@@ -215,7 +215,7 @@ def select_modules(modules=None, module=None):
     Args:
         modules (optional): List of (description, dir) pairs
             If not given, the find_modules(get_module_path()) is used
-        module (optional): 
+        module (optional):
 
     Returns:
         pair of dictionaries mapping module name to unique description and directory respectively
@@ -379,7 +379,7 @@ def make_dune_py_module(dune_py_dir=None, deps=None):
             deps = modules.keys()
 
         description = Description(module='dune-py', version=get_dune_py_version(),  maintainer='dune@lists.dune-project.org', depends=list(deps))
-        logger.debug('dune-py will depend on ' + ' '.join([m[0] + (' ' + str(c) if c else '') for m, c in description.depends]))
+        logger.debug('dune-py will depend on ' + ' '.join([m + (' ' + str(c) if c else '') for m, c in description.depends]))
         project.make_project(dune_py_dir, description,
                 subdirs=[generated_dir_rel], is_dunepy=True)
     else:
