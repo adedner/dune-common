@@ -409,7 +409,7 @@ def make_dune_py_module(dune_py_dir=None, deps=None):
             raise RuntimeError('"' + dune_py_dir + '" contains a different version of the dune-py module.')
         logger.info('Using dune-py module in ' + dune_py_dir)
 
-def build_dune_py_module(dune_py_dir=None, cmake_args=None, build_args=None, builddir=None, deps=None):
+def build_dune_py_module(dune_py_dir=None, cmake_args=None, build_args=None, builddir=None, deps=None, writetagfile=False):
     if dune_py_dir is None:
         dune_py_dir = get_dune_py_dir()
     if cmake_args is None:
@@ -433,14 +433,32 @@ def build_dune_py_module(dune_py_dir=None, cmake_args=None, build_args=None, bui
     prefix = {}
     for name, dir in dirs.items():
         if is_installed(dir, name):
-            print("instaled:",dir)
-            prefix[name] = dir.replace("dunecontrol","cmake")
-            print(name,prefix[name])
+            found = False
+            # switch prefix to location of name-config.cmake
+            for l in ['lib','lib32','lib64']:
+                substr = l + '/cmake'
+                newpath = dir.replace('lib/dunecontrol', substr)
+                for _, _, files in os.walk(newpath):
+                    # if name-config.cmake is found
+                    # then this is the correct folder
+                    if name+'-config.cmake' in files:
+                        found = True
+                        prefix[name] = newpath
+                        break
+                if found: break
+            assert found
+            # store new module path
         else:
             prefix[name] = default_build_dir(dir, name, builddir)
 
     output = configure_module(dune_py_dir, dune_py_dir, {d: prefix[d] for d in deps}, cmake_args)
     output += build_module(dune_py_dir, build_args)
+
+    if writetagfile:
+        # set a tag file to avoid automatic reconfiguration in builder
+        tagfile = os.path.join(dune_py_dir, ".noconfigure")
+        f = open(tagfile, 'w')
+        f.close()
     return output
 
 def getCXXFlags():
