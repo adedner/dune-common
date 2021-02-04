@@ -180,7 +180,7 @@ def main(argv):
 
             requirements = ['pip', 'python', 'mkl', 'tbb', 'intel-openmp',
                             'libgcc-ng', 'libstdcxx-ng', 'gmp', 'scikit-build',
-                            'mpip4py', 'matplotlib', 'numpy', 'scipy', 'ufl']
+                            'mpi4py', 'matplotlib', 'numpy', 'scipy', 'ufl']
 
             for dep in data.depends:
                 requirements += [dep[0]]
