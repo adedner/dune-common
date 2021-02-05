@@ -5,6 +5,7 @@ import subprocess
 import os
 import sys
 
+from portalocker import Lock as _Lock
 try:
     from portalocker import Lock as _Lock
     from portalocker.constants import LOCK_EX, LOCK_SH
