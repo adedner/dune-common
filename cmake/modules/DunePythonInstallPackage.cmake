@@ -114,9 +114,9 @@ function(dune_python_install_package)
   #
 
   # Leave this function if no installation rules are required
-  if("${DUNE_PYTHON_INSTALL_LOCATION}" STREQUAL "none")
-    return()
-  endif()
+  # if("${DUNE_PYTHON_INSTALL_LOCATION}" STREQUAL "none")
+  #   return()
+  # endif()
 
   dune_module_path(MODULE dune-common
                    RESULT scriptdir
@@ -127,7 +127,7 @@ function(dune_python_install_package)
 
   # Add a custom target that globally installs this package if requested
   add_custom_target(${targetname}
-                    COMMAND ${Python3_EXECUTABLE} ${INSTALL_CMDLINE}
+                    COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} ${INSTALL_CMDLINE}
                     COMMENT "Installing the python package at ${PYINST_FULLPATH}"
                     )
 
@@ -141,7 +141,8 @@ function(dune_python_install_package)
   #
 
   # Construct the wheel installation commandline
-  set(WHEEL_COMMAND ${Python3_EXECUTABLE} -m pip wheel -w ${DUNE_PYTHON_WHEELHOUSE} ${PYINST_FULLPATH} ${PYINST_ADDITIONAL_PIP_PARAMS} ${DUNE_PYTHON_ADDITIONAL_PIP_PARAMS})
+  # set(WHEEL_COMMAND ${Python3_EXECUTABLE} -m pip wheel -w ${DUNE_PYTHON_WHEELHOUSE} ${PYINST_FULLPATH} ${PYINST_ADDITIONAL_PIP_PARAMS} ${DUNE_PYTHON_ADDITIONAL_PIP_PARAMS})
+  set(WHEEL_COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m pip wheel -w ${DUNE_PYTHON_WHEELHOUSE} ${PYINST_FULLPATH} ${PYINST_ADDITIONAL_PIP_PARAMS} ${DUNE_PYTHON_ADDITIONAL_PIP_PARAMS})
 
   # Add the installation rule
   install(CODE "message(\"Installing wheel for python package at ${PYINST_FULLPATH}...\")
