@@ -265,12 +265,15 @@ def cmakeFlags():
     ]))
     # test environment for additional flags
     cmakeFlags = os.environ.get('DUNE_CMAKE_FLAGS')
+    print("@@@@@ cmakeFlags=",cmakeFlags)
+    # split cmakeFlags and add them to flags
     if cmakeFlags is not None:
         flags += shlex.split(cmakeFlags)
     cmakeFlags = os.environ.get('CMAKE_FLAGS')
+    print("@@@@@ cmakeFlags=",cmakeFlags)
     if cmakeFlags is not None:
         flags += shlex.split(cmakeFlags)
-    # split cmakeFlags and add them to flags
+    print("@@@@@ flags=",flags)
     return flags
 
 def metaData(version=None, dependencyCheck=True):
