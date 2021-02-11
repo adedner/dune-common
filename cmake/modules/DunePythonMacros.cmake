@@ -23,4 +23,12 @@ if( DUNE_ENABLE_PYTHONBINDINGS )
   endfunction()
 
   include(DuneAddPybind11Module)
+
+  # Add a custom command that triggers the configuration of dune-py
+  set(CONFIGURE_DUNEPY -m dune configure)
+
+  add_custom_command(TARGET install_python POST_BUILD
+                     COMMAND ${Python3_EXECUTABLE} ${CONFIGURE_DUNEPY}
+                     )
+
 endif()
