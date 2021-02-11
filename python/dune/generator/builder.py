@@ -71,7 +71,7 @@ class Builder:
                 if not os.path.isfile(tagfile):
                     dune.common.module.build_dune_py_module(self.dune_py_dir)
                 else:
-                    logger.info('using pre configured dune-py module')
+                    logger.debug('using pre configured dune-py module')
         comm.barrier()
 
         self.build_args = dune.common.module.get_default_build_args()
@@ -143,8 +143,7 @@ class Builder:
                     with Lock(os.path.join(self.dune_py_dir, 'lock-'+moduleName+'.lock'), flags=LOCK_EX):
                         sourceFileName = os.path.join(self.generated_dir, moduleName + ".cc")
                         if not os.path.isfile(sourceFileName):
-                            print("-- Compiling " + pythonName + "...")
-                            logger.info("Loading " + pythonName + " (new)")
+                            logger.info("Compiling " + pythonName)
                             code = str(source)
                             # the CMakeLists.txt needs changing and cmake rerun - lock folder
                             with open(os.path.join(sourceFileName), 'w') as out:
@@ -160,13 +159,12 @@ class Builder:
                                 # update build system
                                 self.compile()
                         elif isString(source) and not source == open(os.path.join(sourceFileName), 'r').read():
-                            print("-- Compiling " + pythonName + "...")
-                            logger.info("Loading " + pythonName + " (updated)")
+                            logger.info("Compiling " + pythonName + " (updated)")
                             code = str(source)
                             with open(os.path.join(sourceFileName), 'w') as out:
                                 out.write(code)
                         else:
-                            logger.info("Loading " + pythonName)
+                            logger.debug("Loading " + pythonName)
                 # end of exclusive dune-py lock
 
                 # for compilation a shared lock is enough
