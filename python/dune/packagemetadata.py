@@ -367,12 +367,11 @@ def metaData(version=None, dependencyCheck=True):
             "python_requires":'>=3.4',
          })
 
-    from .__main__ import configure
     from skbuild.command.build_py import build_py
     class dunepyinstall(build_py):
         def run(self):
             build_py.run(self)
-            configure()
+            subprocess.call([sys.executable, '-m', 'dune', 'configure'])
 
     setupParams['cmdclass'] = {'build_py': dunepyinstall}
 
