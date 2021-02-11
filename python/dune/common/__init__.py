@@ -11,7 +11,7 @@ except KeyError:
 except AttributeError:
     logger.warn('Invalid log level in environment variable DUNE_LOG_LEVEL')
 
-logformat = os.environ.get('DUNE_LOG_FORMAT', '%(levelname)s: %(message)s')
+logformat = os.environ.get('DUNE_LOG_FORMAT', 'DUNE-%(levelname)s: %(message)s')
 
 logging.basicConfig(format=logformat, level=loglevel)
 
