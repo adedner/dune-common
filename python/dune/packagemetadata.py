@@ -335,7 +335,7 @@ def metaData(version=None, dependencyCheck=True):
          })
 
     from skbuild.command.sdist import sdist
-    class dunebuildsdist(sdist):
+    class DuneBuildSdist(sdist):
         def run(self):
             # append hash of current git commit to README
             githash = ['git', 'rev-parse', 'HEAD']
@@ -349,6 +349,6 @@ def metaData(version=None, dependencyCheck=True):
             checkout = ['git', 'checkout', 'README.md']
             subprocess.call(checkout)
 
-    setupParams['cmdclass'] = {'sdist': dunebuildsdist}
+    setupParams['cmdclass'] = {'sdist': DuneBuildSdist}
 
     return data, setupParams
