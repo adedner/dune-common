@@ -277,6 +277,12 @@ def cmakeFlags():
     return flags
 
 def inVEnv():
+    # check whether we are in a anaconda environment
+    # were the checks based on prefix and base_prefix
+    # seem to fail
+    if "CONDA_DEFAULT_ENV" in os.environ:
+        return 1
+
     # If sys.real_prefix exists, this is a virtualenv set up with the virtualenv package
     real_prefix = hasattr(sys, 'real_prefix')
     if real_prefix:

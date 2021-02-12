@@ -5,6 +5,7 @@ try:
         def __init__(self, path, flags, *args, **kwargs):
             _Lock.__init__(self,path,*args,flags=flags,timeout=None,**kwargs)
 except ModuleNotFoundError:
+    import os
     import fcntl
     from fcntl import LOCK_EX, LOCK_SH
     # file locking from fcntl
