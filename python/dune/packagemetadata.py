@@ -106,7 +106,7 @@ class Description:
         data = kwargs.copy()
 
         valid_entries = ['Module','Maintainer','Version','Maintainer',
-                         'Depends','Suggests',
+                         'Depends','Suggests','Python-Requires',
                          'Whitespace-Hook',
                          'Author','Description','URL']
 
@@ -117,7 +117,7 @@ class Description:
                     line = line.strip()
                     if not line or line[ 0 ] == '#':
                         continue
-                    m = re.search(r'^(\w+):(.*)', line)
+                    m = re.search(r'^([a-zA-Z0-9-_]+):(.*)', line)
                     if m:
                         key = m.group(1)
                         val = m.group(2)
