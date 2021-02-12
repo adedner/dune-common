@@ -5,49 +5,8 @@ import subprocess
 import os
 import sys
 
-try:
-    from portalocker import Lock as _Lock
-    from portalocker.constants import LOCK_EX, LOCK_SH
-    class Lock(_Lock):
-        def __init__(self, path, flags, *args, **kwargs):
-            _Lock.__init__(self,path,*args,flags=flags,timeout=None,**kwargs)
-except ModuleNotFoundError:
-    import fcntl
-    from fcntl import LOCK_EX, LOCK_SH
-    # file locking from fcntl
-    def lock_file(f, cmd=fcntl.LOCK_EX):
-        fcntl.flock(f, cmd)
-        return f
-    def unlock_file(f):
-        fcntl.flock(f, fcntl.LOCK_UN)
-        return f
-
-    # This file opener *must* be used in a "with" block.
-    class Lock:
-        # Open the file with arguments provided by user. Then acquire
-        # a lock on that file object (WARNING: Advisory locking).
-        def __init__(self, path, flags, *args, **kwargs):
-            # Open the file and acquire a lock on the file before operating
-            self.file = open(path, mode='w+', *args, **kwargs)
-            # Lock the opened file
-            self.file = lock_file(self.file, flags) # flags are either LOCK_EX or LOCK_SH
-
-        # Return the opened file object (knowing a lock has been obtained).
-        def __enter__(self, *args, **kwargs): return self.file
-
-        # Unlock the file and close the file object.
-        def __exit__(self, exc_type=None, exc_value=None, traceback=None):
-            # Flush to make sure all buffered contents are written to file.
-            self.file.flush()
-            os.fsync(self.file.fileno())
-            # Release the lock on the file.
-            self.file = unlock_file(self.file)
-            self.file.close()
-            # Handle exceptions that may have come up during execution, by
-            # default any exceptions are raised to the user.
-            return exc_type == None
-
 from dune.common import comm
+from dune.common.locking import Lock, LOCK_EX,LOCK_SH
 from dune.common.utility import buffer_to_str, isString, reload_module
 from dune.generator.exceptions import CompileError, ConfigurationError
 import dune.common.module
@@ -144,22 +103,20 @@ class Builder:
                     # module must be generated so lock the source file
                     with Lock(os.path.join(self.dune_py_dir, 'lock-'+moduleName+'.lock'), flags=LOCK_EX):
                         sourceFileName = os.path.join(self.generated_dir, moduleName + ".cc")
-                        if not os.path.isfile(sourceFileName):
-                            logger.info("Compiling " + pythonName)
+                        line = "dune_add_pybind11_module(NAME " + moduleName + " EXCLUDE_FROM_ALL)"
+                        # first check if this line is already present in the CMakeLists file
+                        # (possible if a previous script was stopped by user before module was compiled)
+                        with open(os.path.join(self.generated_dir, "CMakeLists.txt"), 'r') as out:
+                            found = line in out.read()
+                        if not os.path.isfile(sourceFileName) or not found:
+                            logger.info("Loading " + pythonName)
                             code = str(source)
-                            # the CMakeLists.txt needs changing and cmake rerun - lock folder
                             with open(os.path.join(sourceFileName), 'w') as out:
                                 out.write(code)
-                            line = "dune_add_pybind11_module(NAME " + moduleName + " EXCLUDE_FROM_ALL)"
-                            # first check if this line is already present in the CMakeLists file
-                            # (possible if a previous script was stopped by user before module was compiled)
-                            with open(os.path.join(self.generated_dir, "CMakeLists.txt"), 'r') as out:
-                                found = line in out.read()
-                            if not found:
-                                with open(os.path.join(self.generated_dir, "CMakeLists.txt"), 'a') as out:
-                                    out.write(line+"\n")
-                                # update build system
-                                self.compile()
+                            with open(os.path.join(self.generated_dir, "CMakeLists.txt"), 'a') as out:
+                                out.write(line+"\n")
+                            # update build system
+                            self.compile()
                         elif isString(source) and not source == open(os.path.join(sourceFileName), 'r').read():
                             logger.info("Compiling " + pythonName + " (updated)")
                             code = str(source)
