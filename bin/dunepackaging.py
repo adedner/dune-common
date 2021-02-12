@@ -96,7 +96,7 @@ def main(argv):
     # Generate pyproject.toml
     print("Generate pyproject.toml")
     f = open("pyproject.toml", "w")
-    requires = ["setuptools", "wheel", "scikit-build", "cmake", "ninja", "requests", "portalocker", "numpy"]
+    requires = ["setuptools", "wheel", "scikit-build", "cmake", "ninja", "requests"]
     requires += data.asPythonRequirementString(data.depends + data.python_requires)
     f.write("[build-system]\n")
     f.write("requires = "+requires.__str__()+"\n")
