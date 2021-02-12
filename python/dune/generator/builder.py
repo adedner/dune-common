@@ -109,7 +109,7 @@ class Builder:
                         with open(os.path.join(self.generated_dir, "CMakeLists.txt"), 'r') as out:
                             found = line in out.read()
                         if not os.path.isfile(sourceFileName) or not found:
-                            logger.info("Loading " + pythonName)
+                            logger.info("Compiling " + pythonName)
                             code = str(source)
                             with open(os.path.join(sourceFileName), 'w') as out:
                                 out.write(code)
