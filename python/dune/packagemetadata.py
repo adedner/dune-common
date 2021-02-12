@@ -389,13 +389,15 @@ def metaData(version=None, dependencyCheck=True):
             checkout = ['git', 'checkout', 'README.md']
             subprocess.call(checkout)
 
-    setupParams['cmdclass'] = {'sdist': DuneBuildSdist}
     from skbuild.command.build_py import build_py
-    class dunepyinstall(build_py):
+    class DunepyConfigure(build_py):
         def run(self):
             build_py.run(self)
             subprocess.call([sys.executable, '-m', 'dune', 'configure'])
 
-    setupParams['cmdclass'] = {'build_py': dunepyinstall}
+    setupParams['cmdclass'] = {
+        'build_py': DunepyConfigure,
+        'sdist': DuneBuildSdist
+    }
 
     return data, setupParams
