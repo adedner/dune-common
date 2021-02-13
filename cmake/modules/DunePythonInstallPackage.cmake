@@ -146,7 +146,6 @@ function(dune_python_install_package)
   # Add the installation rule
   install(CODE "message(\"Installing wheel for python package at ${PYINST_FULLPATH}...\")
                 dune_execute_process(COMMAND ${WHEEL_COMMAND}
-                                     ERROR_MESSAGE \"Error installing wheel for python package at ${PYINST_FULLPATH}\"
                                      )"
           )
 endfunction()
