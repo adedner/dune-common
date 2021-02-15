@@ -50,9 +50,9 @@ def main(argv):
             sys.exit(2)
         elif opt in ("-o", "--opts"):
             optsfile = arg
-        elif opt in ("--builddir"):
+        elif opt in ("--builddir",):
             builddir = arg
-        elif opt in ("--module"):
+        elif opt in ("--module",):
             masterModule = arg
     if len(args) > 0:
         execute = args[0]
