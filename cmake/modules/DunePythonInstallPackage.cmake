@@ -106,7 +106,7 @@ function(dune_python_install_package)
   # Determine a target name for installing this package into the env
   string(REPLACE "/" "_" envtargetname "env_install_python_${CMAKE_CURRENT_SOURCE_DIR}_${PYINST_PATH}")
 
-  message("Command line: ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} ${INSTALL_CMDLINE}")
+  # Install the Python Package into the Dune virtual environment in the build stage
   add_custom_target(
     ${envtargetname}
     ALL
