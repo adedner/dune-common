@@ -11,3 +11,17 @@ if(DUNE_PYTHON_INSTALL_EDITABLE)
      you can do so with `-DDUNE_PYTHON_ADDITIONAL_PIP_PARAMS=--editable`
 ")
 endif()
+
+if(DUNE_PYTHON_VIRTUALENV_SETUP)
+  message(WARNING
+"    The DUNE_PYTHON_VIRTUALENV_SETUP variable is deprecated, as it's
+     behaviour is now enabled by default.
+")
+endif()
+
+function(dune_python_require_virtualenv_setup)
+  message(WARNING
+"    The dune_python_require_virtualenv_setup function is deprecated, as the
+     internal virtual environment is now enabled by default.
+")
+endfunction()
