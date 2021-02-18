@@ -83,7 +83,7 @@ def dunepy_from_template(dunepy_dir):
     def zip_across_modules(key, value):
         result = {}
         for moddata in data.values():
-            for k, v in zip(moddata[key], moddata[value]):
+            for k, v in zip(moddata[key].split(" "), moddata[value].split(";")):
                 result[k] = v
         return result
 

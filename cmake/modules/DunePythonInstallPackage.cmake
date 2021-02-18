@@ -171,9 +171,8 @@ function(dune_python_install_package)
       metadata_${envtargetname}
       COMMAND ${CMAKE_COMMAND}
         -Dmetadatafile=${metadatafile}
-        -DBUILDDIR=${CMAKE_BINARY_DIR}
         -DDEPBUILDDIRS=${_export_builddirs}
-        -DDEPS=${ALL_DEPENDENCIES}
+        -DDEPS="${PROJECT_NAME};${ALL_DEPENDENCIES}"
         -DMODULENAME=${PROJECT_NAME}
         -P ${scriptdir}/WritePythonCMakeMetadata.cmake
       COMMENT "Generating the CMake metadata file at ${PYINST_CMAKE_METADATA_FILE}"
@@ -186,7 +185,7 @@ function(dune_python_install_package)
         metadata_${targetname}
         COMMAND ${CMAKE_COMMAND}
           -Dmetadatafile=${metadatafile}
-          -DDEPS="${ALL_DEPENDENCIES}"
+          -DDEPS="${PROJECT_NAME}:${ALL_DEPENDENCIES}"
           -DMODULENAME=${PROJECT_NAME}
           -DINSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
           -P ${scriptdir}/WritePythonCMakeMetadata.cmake
