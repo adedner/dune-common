@@ -2,15 +2,12 @@
 
 #include <dune/common/fvector.hh>
 #include <dune/python/common/fvector.hh>
-#include <dune/python/pybind11/embed.h>
+#include <dune/python/embed.hh>
 
 #include<Python.h>
 int main()
 {
-  const wchar_t* path = L"/home/domse/buildsytem/build/common-build/dune-python-env/bin/python";
-  Py_SetProgramName(path);
-
-  pybind11::scoped_interpreter guard{};
+  auto guard = Dune::get_scoped_interpreter();
   auto global = pybind11::dict(pybind11::module::import("__main__").attr("__dict__"));
   {
     pybind11::module dcommon = pybind11::module::import("dune.common");

@@ -2,7 +2,7 @@
 
 #include <dune/common/fvector.hh>
 #include <dune/python/common/fvector.hh>
-#include <dune/python/pybind11/embed.h>
+#include <dune/python/embed.hh>
 
 int main()
 {
@@ -13,7 +13,7 @@ int main()
              types - although a 'dummy' scope can also be used, i.e.,
              pybind11::handle scope;
   */
-  pybind11::scoped_interpreter guard{};
+  auto guard = Dune::get_scoped_interpreter();
   pybind11::module dcommon = pybind11::module::import("dune.common");
   auto global = pybind11::dict(pybind11::module::import("__main__").attr("__dict__"));
 

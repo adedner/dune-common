@@ -62,6 +62,7 @@ endif()
 # Include all the other parts of the python extension to avoid that users need
 # to explicitly include parts of our build system.
 include(DunePythonDeprecations)
+include(DunePythonEmbed)
 include(DunePythonFindPackage)
 include(DunePythonInstallPackage)
 include(DunePythonTestCommand)
