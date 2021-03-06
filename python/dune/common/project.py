@@ -89,7 +89,7 @@ def make_project(dir, description, subdirs=None, enable_all_packages=True, is_du
                           'endif()']
     if subdirs is not None:
         cmake_content += [''] + ['add_subdirectory("' + d + '")' for d in subdirs]
-    cmake_content += ['', 'finalize_dune_project(GENERATE_CONFIG_H_CMAKE)']
+    cmake_content += ['', 'dune_finalize_project(GENERATE_CONFIG_H_CMAKE)']
     write_cmake_file(dir, cmake_content)
 
     with open(os.path.join(dir, description.name + '.pc.in'), 'w') as file:

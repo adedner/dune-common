@@ -39,10 +39,10 @@ endif()
 add_custom_target(doxygen_install)
 
 #
-# prepare_doxyfile()
+# dune_prepare_doxyfile()
 # This functions adds the necessary routines for the generation of the
 # Doxyfile[.in] files needed to doxygen.
-macro(prepare_doxyfile)
+function(dune_prepare_doxyfile)
   message(STATUS "using ${DOXYSTYLE_FILE} to create doxystyle file")
   message(STATUS "using C macro definitions from ${DOXYGENMACROS_FILE} for Doxygen")
 
@@ -63,9 +63,14 @@ macro(prepare_doxyfile)
       DEPENDS ${DOXYSTYLE_FILE} ${DOXYGENMACROS_FILE})
   endif()
   add_custom_target(doxyfile DEPENDS Doxyfile.in Doxyfile)
+endfunction(dune_prepare_doxyfile)
+
+macro(prepare_doxyfile)
+  message(DEPRECATION "prepare_doxyfile is deprecated. Use 'dune_prepare_doxyfile' instead.")
+  dune_prepare_doxyfile(${ARGV})
 endmacro(prepare_doxyfile)
 
-macro(add_doxygen_target)
+function(dune_add_doxygen_target)
   set(options )
   set(oneValueArgs TARGET OUTPUT)
   set(multiValueArgs DEPENDS)
@@ -89,7 +94,7 @@ macro(add_doxygen_target)
   message(STATUS "Using scripts from ${scriptdir} for creating doxygen stuff.")
 
   if(DOXYGEN_FOUND)
-    prepare_doxyfile()
+    dune_prepare_doxyfile()
     # custom command that executes doxygen
     add_custom_command(OUTPUT ${DOXYGEN_OUTPUT}
       COMMAND ${CMAKE_COMMAND} -D DOXYGEN_EXECUTABLE=${DOXYGEN_EXECUTABLE} -P ${scriptdir}/RunDoxygen.cmake
@@ -122,4 +127,9 @@ macro(add_doxygen_target)
          file(INSTALL \${doxygenfiles} DESTINATION ${CMAKE_INSTALL_FULL_DOCDIR}/doxygen)
          message(STATUS \"Installed doxygen into ${CMAKE_INSTALL_FULL_DOCDIR}/doxygen\")")
   endif()
+endfunction(dune_add_doxygen_target)
+
+macro(add_doxygen_target)
+  message(DEPRECATION "add_doxygen_target is deprecated. Use 'dune_add_doxygen_target' instead.")
+  dune_add_doxygen_target(${ARGV})
 endmacro(add_doxygen_target)

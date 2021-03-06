@@ -1,6 +1,6 @@
 # Defines the functions to use TBB
 #
-# .. cmake_function:: add_dune_tbb_flags
+# .. cmake_function:: dune_add_tbb_flags
 #
 #    .. cmake_param:: targets
 #       :positional:
@@ -22,11 +22,16 @@ if (TBB_FOUND)
 endif()
 
 # function for adding TBB flags to a list of targets
-function(add_dune_tbb_flags _targets)
+function(dune_add_tbb_flags _targets)
   if(TBB_FOUND)
     foreach(_target ${_targets})
       target_link_libraries(${_target} PUBLIC TBB::tbb)
       target_compile_definitions(${_target} PUBLIC ENABLE_TBB=1)
     endforeach(_target)
   endif()
-endfunction(add_dune_tbb_flags)
+endfunction(dune_add_tbb_flags)
+
+macro(add_dune_tbb_flags _targets)
+  message(DEPRECATION "add_dune_tbb_flags is deprecated. Use 'dune_add_tbb_flags' instead.")
+  dune_add_gmp_flags(${_targets})
+endmacro(add_dune_tbb_flags)

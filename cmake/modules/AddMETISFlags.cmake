@@ -1,6 +1,6 @@
 # Defines the functions to use METIS
 #
-# .. cmake_function:: add_dune_metis_flags
+# .. cmake_function:: dune_add_metis_flags
 #
 #    .. cmake_param:: targets
 #       :positional:
@@ -19,10 +19,15 @@ if(METIS_FOUND)
 endif()
 
 # Add function to link targets against METIS library
-function(add_dune_metis_flags _targets)
+function(dune_add_metis_flags _targets)
   if(METIS_FOUND)
     foreach(_target ${_targets})
       target_link_libraries(${_target} PUBLIC METIS::METIS)
     endforeach(_target)
   endif()
-endfunction(add_dune_metis_flags _targets)
+endfunction(dune_add_metis_flags _targets)
+
+macro(add_dune_metis_flags _targets)
+  message(DEPRECATION "add_dune_metis_flags is deprecated. Use 'dune_add_metis_flags' instead.")
+  dune_add_gmp_flags(${_targets})
+endmacro(add_dune_metis_flags)

@@ -38,7 +38,7 @@
  * that ensures a name mangling scheme that can distiguish the
  * compiler-intrinsic vector types from non-vector types is used.)
  *
- * - Either use `add_dune_vc_flags(your_application)` in `CMakeLists.txt`,
+ * - Either use `dune_add_vc_flags(your_application)` in `CMakeLists.txt`,
  *
  * - or use `dune_enable_all_packages()` in your module's toplevel
  *   `CMakeLists.txt`.

@@ -28,7 +28,7 @@ dune_add_library("dunecommon"
   stdthread.cc
   ADD_LIBS "${_additional_libs}")
 
-add_dune_tbb_flags(dunecommon)
+dune_add_tbb_flags(dunecommon)
 #install headers
 install(FILES
         alignedallocator.hh

@@ -64,7 +64,7 @@
 #       :argname: def
 #
 #       A set of compile definitions to add to the target.
-#       Only definitions beyond the application of :ref:`add_dune_all_flags`
+#       Only definitions beyond the application of :ref:`dune_add_all_flags`
 #       have to be stated.
 #       This is only used, if :code:`dune_add_test` adds the executable itself.
 #
@@ -73,7 +73,7 @@
 #       :argname: flag
 #
 #       A set of non-definition compile flags to add to the target.
-#       Only flags beyond the application of :ref:`add_dune_all_flags`
+#       Only flags beyond the application of :ref:`dune_add_all_flags`
 #       have to be stated.
 #       This is only used, if :code:`dune_add_test` adds the executable itself.
 #
@@ -82,7 +82,7 @@
 #       :argname: lib
 #
 #       A list of libraries to link the target to.
-#       Only libraries beyond the application of :ref:`add_dune_all_flags`
+#       Only libraries beyond the application of :ref:`dune_add_all_flags`
 #       have to be stated.
 #       This is only used, if :code:`dune_add_test` adds the executable itself.
 #
@@ -335,7 +335,7 @@ function(dune_add_test)
   if(ADDTEST_SOURCES)
     add_executable(${ADDTEST_NAME} ${ADDTEST_SOURCES})
     # add all flags to the target!
-    add_dune_all_flags(${ADDTEST_NAME})
+    dune_add_all_flags(${ADDTEST_NAME})
     # This is just a placeholder
     target_compile_definitions(${ADDTEST_NAME} PUBLIC ${ADDTEST_COMPILE_DEFINITIONS})
     target_compile_options(${ADDTEST_NAME} PUBLIC ${ADDTEST_COMPILE_FLAGS})

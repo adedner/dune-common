@@ -185,7 +185,7 @@ dune_add_test(SOURCES filledarraytest.cc
 dune_add_test(SOURCES fmatrixtest.cc
               LINK_LIBRARIES dunecommon
               LABELS quick)
-add_dune_vc_flags(fmatrixtest)
+dune_add_vc_flags(fmatrixtest)
 
 dune_add_test(SOURCES functiontest.cc
               LINK_LIBRARIES dunecommon
@@ -225,7 +225,7 @@ dune_add_test(SOURCES mathclassifierstest.cc
 
 dune_add_test(SOURCES metistest.cc
               CMAKE_GUARD METIS_FOUND)
-add_dune_metis_flags(metistest)
+dune_add_metis_flags(metistest)
 
 dune_add_test(SOURCES mpicommunicationtest.cc
               LINK_LIBRARIES dunecommon
@@ -275,7 +275,7 @@ dune_add_test(SOURCES parmetistest.cc
               TIMEOUT 300
               CMAKE_GUARD ParMETIS_FOUND
               LABELS quick)
-add_dune_parmetis_flags(parmetistest)
+dune_add_parmetis_flags(parmetistest)
 
 dune_add_test(SOURCES pathtest.cc
               LINK_LIBRARIES dunecommon
@@ -426,7 +426,7 @@ dune_add_test(SOURCES vcexpectedimpltest.cc
               LINK_LIBRARIES dunecommon
               LABELS quick
               CMAKE_GUARD Vc_FOUND)
-add_dune_vc_flags(vcexpectedimpltest)
+dune_add_vc_flags(vcexpectedimpltest)
 
 dune_add_test(SOURCES alignedallocatortest.cc
               LINK_LIBRARIES dunecommon)

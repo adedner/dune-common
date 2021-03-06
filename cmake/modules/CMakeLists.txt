@@ -52,5 +52,4 @@ install(FILES
   latexmkrc.cmake
   OverloadCompilerFlags.cmake
   UseInkscape.cmake
-  UseLatexMk.cmake
   DESTINATION ${DUNE_INSTALL_MODULEDIR})

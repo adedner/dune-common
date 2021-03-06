@@ -9,7 +9,7 @@ set_package_properties("PkgConfig" PROPERTIES
   DESCRIPTION "Unified interface for querying installed libraries"
   PURPOSE "To find Dune module dependencies")
 
-function(create_and_install_pkconfig installlibdir)
+function(dune_create_and_install_pkconfig installlibdir)
   # set some variables that are used in the pkg-config file
   include(GNUInstallDirs)
 
@@ -60,4 +60,9 @@ function(create_and_install_pkconfig installlibdir)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${ProjectName}.pc
     DESTINATION ${installlibdir}/pkgconfig)
 
-endfunction(create_and_install_pkconfig)
+endfunction(dune_create_and_install_pkconfig)
+
+macro(create_and_install_pkconfig)
+  message(DEPRECATION "create_and_install_pkconfig is deprecated. Use 'dune_create_and_install_pkconfig' instead.")
+  dune_create_and_install_pkconfig(${ARGV})
+endmacro(create_and_install_pkconfig)

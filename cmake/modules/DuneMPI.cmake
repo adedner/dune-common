@@ -10,7 +10,7 @@
 # compiler with MPI flags usually used for C. CXX bindings
 # are deactivated to prevent ABI problems.
 #
-# .. cmake_function:: add_dune_mpi_flags
+# .. cmake_function:: dune_add_mpi_flags
 #
 #    .. cmake_param:: targets
 #       :single:
@@ -49,7 +49,7 @@ if(MPI_C_FOUND)
 endif(MPI_C_FOUND)
 
 # adds MPI flags to the targets
-function(add_dune_mpi_flags)
+function(dune_add_mpi_flags)
   cmake_parse_arguments(ADD_MPI "SOURCE_ONLY;OBJECT" "" "" ${ARGN})
   if(ADD_MPI_SOURCE_ONLY)
     set(_prefix SOURCE)
@@ -68,4 +68,9 @@ function(add_dune_mpi_flags)
     endforeach(target ${ADD_MPI_UNPARSED_ARGUMENTS})
     endif(NOT (ADD_MPI_SOURCE_ONLY OR ADD_MPI_OBJECT))
   endif(MPI_C_FOUND)
-endfunction(add_dune_mpi_flags)
+endfunction(dune_add_mpi_flags)
+
+macro(add_dune_mpi_flags _targets)
+  message(DEPRECATION "add_dune_mpi_flags is deprecated. Use 'dune_add_mpi_flags' instead.")
+  dune_add_gmp_flags(${_targets})
+endmacro(add_dune_mpi_flags)

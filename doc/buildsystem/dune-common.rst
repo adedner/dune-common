@@ -63,16 +63,16 @@ How do I modify the flags and linked libraries of a given target?
 =================================================================
 
 Again, there are multiple ways to do this. The Dune build system offers macros to make this task as
-easy as possible. For each external module, there is a macro :code:`add_dune_*_flags`. Those macros should
+easy as possible. For each external module, there is a macro :code:`dune_add_*_flags`. Those macros should
 cover most flags. Example usage:
 
 .. code-block:: cmake
 
     add_executable(foo foo.cc)
-    add_dune_umfpack_flags(foo)
-    add_dune_mpi_flags(foo)
+    dune_add_umfpack_flags(foo)
+    dune_add_mpi_flags(foo)
 
-There is also the macro :ref:`add_dune_all_flags`, which uses the same flag registry mechanism as the simplified
+There is also the macro :ref:`dune_add_all_flags`, which uses the same flag registry mechanism as the simplified
 build system in section :ref:`simplified`.
 
 If you want to fully control the configuration of the targets, you can do so. Build system entities such
@@ -111,7 +111,7 @@ Depending on how common your external package is, you may not even need to write
 You can have a look at the list of find modules shipped by CMake or simply search the
 internet for the module name and profit from other open-source project's work.
 
-It is considered good style to also provide a macro :code:`add_dune_somepackage_flags`.
+It is considered good style to also provide a macro :code:`dune_add_somepackage_flags`.
 
 .. _outofsource:
 

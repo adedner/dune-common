@@ -86,7 +86,7 @@ dune_add_test(NAME vcarraytest
   LINK_LIBRARIES dunecommon
   CMAKE_GUARD Vc_FOUND
 )
-add_dune_vc_flags(vcarraytest)
+dune_add_vc_flags(vcarraytest)
 # no need to install vcarraytest.hh, used by vctest*.cc only
 
 # Generate files with instanciations, external declarations, and also the
@@ -109,5 +109,5 @@ dune_add_test(NAME vcvectortest
   LINK_LIBRARIES dunecommon
   CMAKE_GUARD Vc_FOUND
 )
-add_dune_vc_flags(vcvectortest)
+dune_add_vc_flags(vcvectortest)
 # no need to install vcvectortest.hh, used by vctest*.cc only

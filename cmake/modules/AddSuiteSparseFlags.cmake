@@ -1,6 +1,6 @@
 # Defines the functions to use SuiteSparse
 #
-# .. cmake_function:: add_dune_suitesparse_flags
+# .. cmake_function:: dune_add_suitesparse_flags
 #
 #    .. cmake_param:: targets
 #       :positional:
@@ -22,11 +22,16 @@ if(SuiteSparse_FOUND)
 endif()
 
 # Provide function to set target properties for linking to SuiteSparse
-function(add_dune_suitesparse_flags _targets)
+function(dune_add_suitesparse_flags _targets)
   if(SuiteSparse_FOUND)
     foreach(_target ${_targets})
       target_link_libraries(${_target} PUBLIC SuiteSparse::SuiteSparse)
       target_compile_definitions(${_target} PUBLIC ENABLE_SUITESPARSE=1)
     endforeach(_target)
   endif()
-endfunction(add_dune_suitesparse_flags)
+endfunction(dune_add_suitesparse_flags)
+
+macro(add_dune_suitesparse_flags _targets)
+  message(DEPRECATION "add_dune_suitesparse_flags is deprecated. Use 'dune_add_suitesparse_flags' instead.")
+  dune_add_gmp_flags(${_targets})
+endmacro(add_dune_suitesparse_flags)

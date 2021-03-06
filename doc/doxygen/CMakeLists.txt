@@ -1,5 +1,5 @@
 # create Doxyfile.in and Doxyfile
-add_doxygen_target()
+dune_add_doxygen_target()
 
 install(
   FILES

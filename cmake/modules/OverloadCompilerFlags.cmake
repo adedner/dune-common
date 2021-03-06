@@ -2,10 +2,10 @@
 #
 # Provides the following macros:
 #
-#   initialize_compiler_script() : needs to be called before further flags are added to CMAKE_CXX_FLAGS
-#   finalize_compiler_script()   : needs to be called at the end of the cmake macros, e.g. in finalize_dune_project
+#   dune_initialize_compiler_script() : needs to be called before further flags are added to CMAKE_CXX_FLAGS
+#   dune_finalize_compiler_script()   : needs to be called at the end of the cmake macros, e.g. in dune_finalize_project
 #
-# Those two macro calls are hooked into dune_project/finalize_dune_project.
+# Those two macro calls are hooked into dune_project/dune_finalize_project.
 #
 # .. cmake_variable:: ALLOW_CXXFLAGS_OVERWRITE
 #
@@ -29,7 +29,7 @@ option(ALLOW_CFLAGS_OVERWRITE OFF)
 set(CXX_COMPILER_SCRIPT "${CMAKE_BINARY_DIR}/CXX_compiler.sh" )
 set(C_COMPILER_SCRIPT "${CMAKE_BINARY_DIR}/C_compiler.sh" )
 
-macro(find_extended_unix_commands)
+macro(dune_find_extended_unix_commands)
   include(FindUnixCommands)
   set(FLAGSNAMES "ALLOW_CXXFLAGS_OVERWRITE and/or ALLOW_CFLAGS_OVERWRITE")
   find_program (GREP_PROGRAM grep)
@@ -62,13 +62,19 @@ macro(find_extended_unix_commands)
   mark_as_advanced(ENV_PROGRAM)
   mark_as_advanced(ECHO_PROGRAM)
   mark_as_advanced(CHMOD_PROGRAM)
+endmacro(dune_find_extended_unix_commands)
+
+# deprecated
+macro(find_extended_unix_commands)
+  message(DEPRECATION "find_extended_unix_commands is deprecated. Use 'dune_find_extended_unix_commands' instead.")
+  dune_find_extended_unix_commands(${ARGV})
 endmacro(find_extended_unix_commands)
 
 # init compiler script and store CXX flags
-macro(initialize_compiler_script)
+macro(dune_initialize_compiler_script)
   if(ALLOW_CXXFLAGS_OVERWRITE AND (${CMAKE_GENERATOR} MATCHES ".*Unix Makefiles.*"))
     # check for unix commands necessary
-    find_extended_unix_commands()
+    dune_find_extended_unix_commands()
     # set CXXFLAGS as environment variable
     set( DEFAULT_CXXFLAGS ${CMAKE_CXX_FLAGS} CACHE STRING "default CXX flags")
     set( CMAKE_CXX_FLAGS "" )
@@ -80,7 +86,7 @@ macro(initialize_compiler_script)
   endif()
   if(ALLOW_CFLAGS_OVERWRITE AND (${CMAKE_GENERATOR} MATCHES ".*Unix Makefiles.*"))
     # check for unix commands necessary
-    find_extended_unix_commands()
+    dune_find_extended_unix_commands()
     # set CFLAGS as environment variable
     set( DEFAULT_CFLAGS ${CMAKE_C_FLAGS} CACHE STRING "default C flags")
     set( CMAKE_C_FLAGS "" )
@@ -90,10 +96,16 @@ macro(initialize_compiler_script)
     execute_process(COMMAND ${CHMOD_PROGRAM} 755 ${C_COMPILER_SCRIPT})
     set(CMAKE_C_COMPILER ${C_COMPILER_SCRIPT})
   endif()
-endmacro()
+endmacro(dune_initialize_compiler_script)
+
+# deprecated
+macro(initialize_compiler_script)
+  message(DEPRECATION "initialize_compiler_script is deprecated. Use 'dune_initialize_compiler_script' instead.")
+  dune_initialize_compiler_script(${ARGV})
+endmacro(initialize_compiler_script)
 
 # finalize compiler script and write it
-macro(finalize_compiler_script)
+macro(dune_finalize_compiler_script)
   if(${CMAKE_GENERATOR} MATCHES ".*Unix Makefiles.*")
     # check CXX compiler
     if((ALLOW_CXXFLAGS_OVERWRITE))
@@ -139,4 +151,10 @@ macro(finalize_compiler_script)
       endif()
     endforeach()
   endif()
-endmacro()
+endmacro(dune_finalize_compiler_script)
+
+# deprecated
+macro(finalize_compiler_script)
+  message(DEPRECATION "finalize_compiler_script is deprecated. Use 'dune_finalize_compiler_script' instead.")
+  dune_finalize_compiler_script(${ARGV})
+endmacro(finalize_compiler_script)

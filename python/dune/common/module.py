@@ -215,7 +215,7 @@ def select_modules(modules=None, module=None):
     Args:
         modules (optional): List of (description, dir) pairs
             If not given, the find_modules(get_module_path()) is used
-        module (optional): 
+        module (optional):
 
     Returns:
         pair of dictionaries mapping module name to unique description and directory respectively
@@ -361,7 +361,7 @@ def make_dune_py_module(dune_py_dir=None, deps=None):
             os.makedirs(generated_dir)
 
         cmake_content = ['add_executable(generated_test EXCLUDE_FROM_ALL generated_test.cc)',
-                         'add_dune_mpi_flags(generated_test)',
+                         'dune_add_mpi_flags(generated_test)',
                          'target_compile_definitions(generated_test PRIVATE USING_DUNE_PYTHON)',
                          'target_link_libraries(generated_test PUBLIC ${DUNE_LIBS})',
                          'file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/__init__.py")',

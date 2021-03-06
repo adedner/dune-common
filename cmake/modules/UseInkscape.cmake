@@ -26,6 +26,7 @@
 include(CMakeParseArguments)
 
 function(inkscape_generate_png_from_svg)
+  message(DEPRECATION "inkscape_generate_png_from_svg function is deprecated and will be removed after 2.7.")
   if(NOT INKSCAPE)
     return()
   endif()

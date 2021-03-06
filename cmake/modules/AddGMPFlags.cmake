@@ -1,6 +1,6 @@
 # Defines the functions to use GMP
 #
-# .. cmake_function:: add_dune_gmp_flags
+# .. cmake_function:: dune_add_gmp_flags
 #
 #    .. cmake_param:: targets
 #       :positional:
@@ -22,11 +22,16 @@ if(GMP_FOUND)
 endif()
 
 # add function to link against the GMP library
-function(add_dune_gmp_flags _targets)
+function(dune_add_gmp_flags _targets)
   if(GMP_FOUND)
     foreach(_target ${_targets})
       target_link_libraries(${_target} PUBLIC GMP::gmpxx)
       target_compile_definitions(${_target} PUBLIC ENABLE_GMP=1)
     endforeach(_target ${_targets})
   endif(GMP_FOUND)
-endfunction(add_dune_gmp_flags)
+endfunction(dune_add_gmp_flags)
+
+macro(add_dune_gmp_flags _targets)
+  message(DEPRECATION "add_dune_gmp_flags is deprecated. Use 'dune_add_gmp_flags' instead.")
+  dune_add_gmp_flags(${_targets})
+endmacro(add_dune_gmp_flags)

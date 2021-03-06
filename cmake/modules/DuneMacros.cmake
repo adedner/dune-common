@@ -7,9 +7,9 @@
 #    Initialize a Dune module. This function needs to be run from every
 #    top-level CMakeLists.txt file. It sets up the module, defines basic
 #    variables and manages depedencies. Don't forget to call
-#    :ref:`finalize_dune_project` afterwards.
+#    :ref:`dune_finalize_project` afterwards.
 #
-# .. cmake_function:: finalize_dune_project
+# .. cmake_function:: dune_finalize_project
 #
 #    Finalize a Dune module. This function needs to be run at the end of
 #    every top-level CMakeLists.txt file. Among other things it creates
@@ -87,7 +87,7 @@
 #    library BASENAME
 #
 #
-# .. cmake_function:: add_dune_all_flags
+# .. cmake_function:: dune_add_all_flags
 #
 #    .. cmake_param:: targets
 #       :single:
@@ -152,6 +152,7 @@ include(DuneSymlinkOrCopy)
 include(DunePathHelper)
 include(DuneExecuteProcess)
 
+
 macro(target_link_libraries)
   # do nothing if not at least the two arguments target and scope are passed
   if(${ARGC} GREATER_EQUAL 2)
@@ -177,7 +178,7 @@ macro(dune_module_to_uppercase _upper _module)
   string(REPLACE "-" "_" ${_upper} "${${_upper}}")
 endmacro(dune_module_to_uppercase _upper _module)
 
-macro(find_dune_package module)
+macro(dune_find_package module)
   include(CMakeParseArguments)
   cmake_parse_arguments(DUNE_FIND "REQUIRED" "VERSION" "" ${ARGN})
   if(DUNE_FIND_REQUIRED)
@@ -193,7 +194,7 @@ macro(find_dune_package module)
     string(REGEX REPLACE "(>=|=|<=)(.*)" "\\1" DUNE_FIND_VERSION_OP ${DUNE_FIND_VERSION})
     string(REGEX REPLACE "(>=|=|<=)(.*)" "\\2" DUNE_FIND_VERSION_NUMBER ${DUNE_FIND_VERSION})
     string(STRIP ${DUNE_FIND_VERSION_NUMBER} DUNE_FIND_VERSION_NUMBER)
-    extract_major_minor_version("${DUNE_FIND_VERSION_NUMBER}" DUNE_FIND_VERSION)
+    dune_extract_major_minor_version("${DUNE_FIND_VERSION_NUMBER}" DUNE_FIND_VERSION)
     set(DUNE_FIND_VERSION_STRING "${DUNE_FIND_VERSION_MAJOR}.${DUNE_FIND_VERSION_MINOR}.${DUNE_FIND_VERSION_REVISION}")
   else()
     set(DUNE_FIND_VERSION_STRING "0.0.0")
@@ -301,9 +302,9 @@ macro(find_dune_package module)
     endif()
   endif()
   set(DUNE_${module}_FOUND ${${module}_FOUND})
-endmacro(find_dune_package module)
+endmacro(dune_find_package module)
 
-macro(extract_line HEADER  OUTPUT FILE_NAME)
+macro(dune_extract_line HEADER  OUTPUT FILE_NAME)
   set(REGEX "^${HEADER}[ ]*[^\\n]+")
   file(STRINGS "${FILE_NAME}" OUTPUT1 REGEX "${REGEX}")
   if(OUTPUT1)
@@ -312,13 +313,13 @@ macro(extract_line HEADER  OUTPUT FILE_NAME)
   else(OUTPUT1)
     set(OUTPUT OUTPUT-NOTFOUND)
   endif()
-endmacro(extract_line)
+endmacro(dune_extract_line)
 
 #
 # split list of modules, potentially with version information
 # into list of modules and list of versions
 #
-macro(split_module_version STRING MODULES VERSIONS)
+macro(dune_split_module_version STRING MODULES VERSIONS)
   set(REGEX "[a-zA-Z0-9-]+[ ]*(\\([ ]*([^ ]+)?[ ]*[^ ]+[ ]*\\))?")
   string(REGEX MATCHALL "${REGEX}" matches "${STRING}")
   set(${MODULES} "")
@@ -338,20 +339,20 @@ macro(split_module_version STRING MODULES VERSIONS)
     list(APPEND ${MODULES} ${mod})
     list(APPEND ${VERSIONS} ${version})
   endforeach()
-endmacro(split_module_version)
+endmacro(dune_split_module_version)
 
 #
 # Convert a string with spaces in a list which is a string with semicolon
 #
-function(convert_deps_to_list var)
+function(dune_convert_deps_to_list var)
   string(REGEX REPLACE "([a-zA-Z0-9\\)]) ([a-zA-Z0-9])" "\\1;\\2" ${var} ${${var}})
   set(${var} ${${var}} PARENT_SCOPE)
-endfunction(convert_deps_to_list var)
+endfunction(dune_convert_deps_to_list var)
 
 #
 # extracts major, minor, and revision from version string
 #
-function(extract_major_minor_version version_string varname)
+function(dune_extract_major_minor_version version_string varname)
     string(REGEX REPLACE "([0-9]+).*" "\\1" ${varname}_MAJOR "${version_string}")
   string(REGEX REPLACE "[0-9]+\\.([0-9]+).*" "\\1" ${varname}_MINOR "${version_string}")
   string(REGEX REPLACE "[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" ${varname}_REVISION "${version_string}")
@@ -370,51 +371,51 @@ function(extract_major_minor_version version_string varname)
   else()
     set(${varname}_REVISION ${${varname}_REVISION} PARENT_SCOPE)
   endif()
-endfunction(extract_major_minor_version version_string varname)
+endfunction(dune_extract_major_minor_version version_string varname)
 
 # add dune-common version from dune.module to config.h
 # optional second argument is verbosity
 macro(dune_module_information MODULE_DIR)
   # find version strings
-  extract_line("Version:" MODULE_LINE "${MODULE_DIR}/dune.module")
+  dune_extract_line("Version:" MODULE_LINE "${MODULE_DIR}/dune.module")
   if(NOT MODULE_LINE MATCHES ".+")
     message(FATAL_ERROR "${MODULE_DIR}/dune.module is missing a version.")
   endif()
 
   string(REGEX REPLACE ".*Version:[ ]*([^ \n]+).*" "\\1" DUNE_MOD_VERSION "${MODULE_LINE}")
-  extract_major_minor_version("${DUNE_MOD_VERSION}" DUNE_VERSION)
+  dune_extract_major_minor_version("${DUNE_MOD_VERSION}" DUNE_VERSION)
 
   # find strings for module name, maintainer
   # 1. Check for line starting with Module
-  extract_line("Module:" DUNE_MOD_NAME "${MODULE_DIR}/dune.module")
+  dune_extract_line("Module:" DUNE_MOD_NAME "${MODULE_DIR}/dune.module")
   if(NOT DUNE_MOD_NAME)
     message(FATAL_ERROR "${MODULE_DIR}/dune.module is missing a module name.")
   endif()
 
   # 2. Check for line starting with Maintainer
-  extract_line("Maintainer:" DUNE_MAINTAINER "${MODULE_DIR}/dune.module")
+  dune_extract_line("Maintainer:" DUNE_MAINTAINER "${MODULE_DIR}/dune.module")
   if(NOT DUNE_MAINTAINER)
     message(FATAL_ERROR "${MODULE_DIR}/dune.module is missing a maintainer.")
   endif()
 
   # 3. Check for line starting with Depends
-  extract_line("Depends:" ${DUNE_MOD_NAME}_DEPENDS "${MODULE_DIR}/dune.module")
+  dune_extract_line("Depends:" ${DUNE_MOD_NAME}_DEPENDS "${MODULE_DIR}/dune.module")
   if(${DUNE_MOD_NAME}_DEPENDS)
-    split_module_version(${${DUNE_MOD_NAME}_DEPENDS} ${DUNE_MOD_NAME}_DEPENDS_MODULE ${DUNE_MOD_NAME}_DEPENDS_VERSION)
+    dune_split_module_version(${${DUNE_MOD_NAME}_DEPENDS} ${DUNE_MOD_NAME}_DEPENDS_MODULE ${DUNE_MOD_NAME}_DEPENDS_VERSION)
     foreach(_mod ${${DUNE_MOD_NAME}_DEPENDS})
       set(${_mod}_REQUIRED REQUIRED)
     endforeach()
-    convert_deps_to_list(${DUNE_MOD_NAME}_DEPENDS)
+    dune_convert_deps_to_list(${DUNE_MOD_NAME}_DEPENDS)
     if(NOT ("${ARGV1}" STREQUAL QUIET))
       message(STATUS "Dependencies for ${DUNE_MOD_NAME}: ${${DUNE_MOD_NAME}_DEPENDS}")
     endif()
   endif()
 
   # 4. Check for line starting with Suggests
-  extract_line("Suggests:" ${DUNE_MOD_NAME}_SUGGESTS "${MODULE_DIR}/dune.module")
+  dune_extract_line("Suggests:" ${DUNE_MOD_NAME}_SUGGESTS "${MODULE_DIR}/dune.module")
   if(${DUNE_MOD_NAME}_SUGGESTS)
-    split_module_version(${${DUNE_MOD_NAME}_SUGGESTS} ${DUNE_MOD_NAME}_SUGGESTS_MODULE ${DUNE_MOD_NAME}_SUGGESTS_VERSION)
-    convert_deps_to_list(${DUNE_MOD_NAME}_SUGGESTS)
+    dune_split_module_version(${${DUNE_MOD_NAME}_SUGGESTS} ${DUNE_MOD_NAME}_SUGGESTS_MODULE ${DUNE_MOD_NAME}_SUGGESTS_VERSION)
+    dune_convert_deps_to_list(${DUNE_MOD_NAME}_SUGGESTS)
     if(NOT ("${ARGV1}" STREQUAL QUIET))
       message(STATUS "Suggestions for ${DUNE_MOD_NAME}: ${${DUNE_MOD_NAME}_SUGGESTS}")
     endif()
@@ -423,10 +424,10 @@ macro(dune_module_information MODULE_DIR)
   dune_module_to_uppercase(DUNE_MOD_NAME_UPPERCASE ${DUNE_MOD_NAME})
 
   # 5. Check for optional meta data
-  extract_line("Author:" ${DUNE_MOD_NAME_UPPERCASE}_AUTHOR "${MODULE_DIR}/dune.module")
-  extract_line("Description:" ${DUNE_MOD_NAME_UPPERCASE}_DESCRIPTION "${MODULE_DIR}/dune.module")
-  extract_line("URL:" ${DUNE_MOD_NAME_UPPERCASE}_URL "${MODULE_DIR}/dune.module")
-  extract_line("Python-Requires:" ${DUNE_MOD_NAME_UPPERCASE}_PYTHON_REQUIRES "${MODULE_DIR}/dune.module")
+  dune_extract_line("Author:" ${DUNE_MOD_NAME_UPPERCASE}_AUTHOR "${MODULE_DIR}/dune.module")
+  dune_extract_line("Description:" ${DUNE_MOD_NAME_UPPERCASE}_DESCRIPTION "${MODULE_DIR}/dune.module")
+  dune_extract_line("URL:" ${DUNE_MOD_NAME_UPPERCASE}_URL "${MODULE_DIR}/dune.module")
+  dune_extract_line("Python-Requires:" ${DUNE_MOD_NAME_UPPERCASE}_PYTHON_REQUIRES "${MODULE_DIR}/dune.module")
 
   # set module version
   set(${DUNE_MOD_NAME_UPPERCASE}_VERSION          "${DUNE_MOD_VERSION}")
@@ -452,7 +453,7 @@ macro(dune_process_dependency_leafs modules versions is_required next_level_deps
     foreach(i RANGE 0 ${length})
       list(GET mmodules ${i} _mod)
       list(GET mversions ${i} _ver)
-      find_dune_package(${_mod} ${is_required} VERSION "${_ver}")
+      dune_find_package(${_mod} ${is_required} VERSION "${_ver}")
       set(${_mod}_SEARCHED ON)
       if(NOT "${is_required}" STREQUAL "")
         set(${_mod}_REQUIRED ON)
@@ -471,7 +472,7 @@ macro(dune_process_dependency_leafs modules versions is_required next_level_deps
   endif()
 endmacro(dune_process_dependency_leafs)
 
-function(remove_processed_modules modules versions is_required)
+function(dune_remove_processed_modules modules versions is_required)
   list(LENGTH ${modules} mlength)
   if(mlength GREATER 0)
     math(EXPR length "${mlength}-1")
@@ -488,7 +489,7 @@ function(remove_processed_modules modules versions is_required)
   endif()
   set(${modules} ${${modules}} PARENT_SCOPE)
   set(${versions} ${${versions}} PARENT_SCOPE)
-endfunction(remove_processed_modules modules versions is_required)
+endfunction(dune_remove_processed_modules modules versions is_required)
 
 macro(dune_create_dependency_leafs depends depends_versions suggests suggests_versions)
   set(deps "")
@@ -501,8 +502,8 @@ macro(dune_create_dependency_leafs depends depends_versions suggests suggests_ve
   if(NOT "${suggests}" STREQUAL "")
     dune_process_dependency_leafs("${suggests}" "${suggests_versions}" "" deps sugs)
   endif()
-  split_module_version("${deps}" next_mod_depends next_depends_versions)
-  split_module_version("${sugs}" next_mod_suggests next_suggests_versions)
+  dune_split_module_version("${deps}" next_mod_depends next_depends_versions)
+  dune_split_module_version("${sugs}" next_mod_suggests next_suggests_versions)
   set(ALL_DEPENDENCIES ${ALL_DEPENDENCIES} ${next_mod_depends} ${next_mod_suggests})
   # Move to next level
   if(next_mod_suggests OR next_mod_depends)
@@ -636,11 +637,11 @@ endmacro(dune_process_dependency_macros)
 # macro that should be called near the begin of the top level CMakeLists.txt.
 # Namely it sets up the module, defines basic variables and manages
 # depedencies.
-# Don't forget to call finalize_dune_project afterwards.
+# Don't forget to call dune_finalize_project afterwards.
 macro(dune_project)
 
   # check if CXX flag overloading has been enabled (see OverloadCompilerFlags.cmake)
-  initialize_compiler_script()
+  dune_initialize_compiler_script()
 
   # extract information from dune.module
   dune_module_information(${CMAKE_SOURCE_DIR})
@@ -729,7 +730,7 @@ macro(dune_project)
   endif()
   # set up make headercheck
   include(Headercheck)
-  setup_headercheck()
+  dune_setup_headercheck()
 
 endmacro(dune_project)
 
@@ -796,13 +797,13 @@ endmacro(dune_regenerate_config_cmake)
 # macro that should be called at the end of the top level CMakeLists.txt.
 # Namely it creates config.h and the cmake-config files,
 # some install directives and exports the module.
-macro(finalize_dune_project)
+macro(dune_finalize_project)
   if(DUNE_SYMLINK_TO_SOURCE_TREE)
     dune_symlink_to_source_tree()
   endif()
 
   #configure all headerchecks
-  finalize_headercheck()
+  dune_finalize_headercheck()
 
   #create cmake-config files for installation tree
   include(CMakePackageConfigHelpers)
@@ -932,7 +933,7 @@ endif()
   endif()
 
   # install pkg-config files
-  create_and_install_pkconfig(${DUNE_INSTALL_LIBDIR})
+  dune_create_and_install_pkconfig(${DUNE_INSTALL_LIBDIR})
 
   if("${ARGC}" EQUAL "1")
     message(STATUS "Adding custom target for config.h generation")
@@ -954,7 +955,12 @@ endif()
 
   # check if CXX flag overloading has been enabled
   # and write compiler script (see OverloadCompilerFlags.cmake)
-  finalize_compiler_script()
+  dune_finalize_compiler_script()
+endmacro(dune_finalize_project)
+
+macro(finalize_dune_project)
+  message(DEPRECATION "finalize_dune_project is deprecated. Use 'dune_finalize_project' instead.")
+  dune_finalize_project(${ARGV})
 endmacro(finalize_dune_project)
 
 macro(target_link_dune_default_libraries _target)
@@ -1067,7 +1073,7 @@ macro(dune_add_library basename)
   endif()
 endmacro(dune_add_library basename sources)
 
-macro(replace_properties_for_one)
+macro(dune_replace_properties_for_one)
   get_property(properties ${option_command} ${_target}
     PROPERTY ${REPLACE_PROPERTY})
   if(NOT properties)
@@ -1105,13 +1111,14 @@ macro(replace_properties_for_one)
       PROPERTY ${REPLACE_PROPERTY} ${new_props})
   endif()
   get_property(properties ${option_command} ${_target} PROPERTY ${REPLACE_PROPERTY})
-endmacro(replace_properties_for_one)
+endmacro(dune_replace_properties_for_one)
 
 function(dune_target_link_libraries basename libraries)
-  target_link_libraries(${basename} ${libraries})
+  target_link_libraries(${basename} PUBLIC ${libraries})
 endfunction(dune_target_link_libraries basename libraries)
 
-function(replace_properties)
+
+function(dune_replace_properties)
   include(CMakeParseArguments)
   set(_first_opts "GLOBAL;DIRECTORY;TARGET;SOURCE;CACHE")
   cmake_parse_arguments(REPLACE "GLOBAL"
@@ -1177,16 +1184,16 @@ and a replacement string. ${REPLACE_UNPARSED_ARGUMENTS}")
   endif()
 
   foreach(_target ${option_arg})
-    replace_properties_for_one()
+    dune_replace_properties_for_one()
   endforeach()
 
   list(LENGTH option_arg _length)
   if(_length EQUAL 0)
-    replace_properties_for_one()
+    dune_replace_properties_for_one()
   endif()
-endfunction(replace_properties)
+endfunction(dune_replace_properties)
 
-macro(add_dune_all_flags targets)
+function(dune_add_all_flags targets)
   get_property(incs GLOBAL PROPERTY ALL_PKG_INCS)
   get_property(defs GLOBAL PROPERTY ALL_PKG_DEFS)
   get_property(libs GLOBAL PROPERTY ALL_PKG_LIBS)
@@ -1197,4 +1204,9 @@ macro(add_dune_all_flags targets)
     target_link_libraries(${target} PUBLIC ${DUNE_LIBS} ${libs})
     target_compile_options(${target} PUBLIC ${opts})
   endforeach()
+endfunction(dune_add_all_flags)
+
+macro(add_dune_all_flags targets)
+  message(DEPRECATION "add_dune_all_flags is deprecated. Use 'dune_add_all_flags' instead.")
+  dune_add_all_flags(${_targets})
 endmacro(add_dune_all_flags targets)

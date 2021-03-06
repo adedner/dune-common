@@ -1,6 +1,6 @@
 # Defines the functions to use QuadMath
 #
-# .. cmake_function:: add_dune_quadmath_flags
+# .. cmake_function:: dune_add_quadmath_flags
 #
 #    .. cmake_param:: targets
 #       :positional:
@@ -22,11 +22,16 @@ if(QuadMath_FOUND)
 endif()
 
 # add function to link against QuadMath::QuadMath
-function(add_dune_quadmath_flags _targets)
+function(dune_add_quadmath_flags _targets)
   if(QuadMath_FOUND)
     foreach(_target ${_targets})
       target_link_libraries(${_target} PUBLIC QuadMath::QuadMath)
       target_compile_definitions(${_target} PUBLIC ENABLE_QUADMATH=1)
     endforeach(_target ${_targets})
   endif()
-endfunction(add_dune_quadmath_flags)
+endfunction(dune_add_quadmath_flags)
+
+macro(add_dune_quadmath_flags _targets)
+  message(DEPRECATION "add_dune_quadmath_flags is deprecated. Use 'dune_add_quadmath_flags' instead.")
+  dune_add_gmp_flags(${_targets})
+endmacro(add_dune_quadmath_flags)

@@ -7,7 +7,7 @@ target_link_libraries(poosc08_test PUBLIC "dunecommon")
 add_executable(indexset "indexset.cc")
 target_link_libraries(indexset PUBLIC "dunecommon")
 
-add_dune_mpi_flags("poosc08;poosc08_test;indexset")
+dune_add_mpi_flags("poosc08;poosc08_test;indexset")
 
 dune_add_latex_document(
   SOURCE communication.tex

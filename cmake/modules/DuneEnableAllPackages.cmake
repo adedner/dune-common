@@ -316,6 +316,7 @@ endfunction(dune_target_enable_all_packages)
 
 
 function(dune_library_add_sources lib)
+  message(DEPRECATION "dune_library_add_sources is deprecated. Use 'target_sources' directly.")
 
   if (NOT (DEFINED DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES))
     message(FATAL_ERROR "You must call dune_enable_all_packages with the MODULE_LIBRARIES option before calling dune_library_add_sources")
