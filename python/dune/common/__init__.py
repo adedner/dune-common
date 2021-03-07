@@ -42,7 +42,16 @@ while not finished:
     except KeyError:
         finished = True
 
-def loadvec(includes ,typeName ,constructors=None, methods=None):
+def loadvec(includes ,typeName ,constructors=None, methods=None, dim=None):
+    # try to load default module
+    if dim is not None:
+        try:
+            import importlib
+            return importlib.import_module( "dune.common._defaultfieldvector_"+str(dim) )
+        except ImportError:
+            pass
+
+    # generate appropriate module and load it
     from dune.generator.generator import SimpleGenerator
     from dune.common.hashit import hashIt
     generatorvec = SimpleGenerator("FieldVector","Dune::Python")
@@ -50,6 +59,7 @@ def loadvec(includes ,typeName ,constructors=None, methods=None):
     typeHash = "fieldvector_" + hashIt(typeName)
     return generatorvec.load(includes ,typeName ,typeHash,
             constructors ,methods, bufferProtocol=True)
+
 def FieldVector(values):
     values = list(values)
     fv = "FieldVector_" + str(len(values))
@@ -58,7 +68,7 @@ def FieldVector(values):
     except KeyError:
         typeName = "Dune::FieldVector< double ," + str(len(values)) + " >"
         includes = []
-        cls = loadvec(includes, typeName).FieldVector
+        cls = loadvec(includes, typeName, dim=len(values)).FieldVector
         setattr(cls, "_getitem", cls.__getitem__)
         setattr(cls, "__getitem__", fvgetitem)
         globals().update({fv:cls})
