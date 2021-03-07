@@ -20,6 +20,7 @@ dune_add_library("dunecommon"
 
 # minimal c++ standard required
 target_compile_features(dunecommon PUBLIC cxx_std_17)
+target_include_directories(dunecommon PUBLIC ${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 
 add_dune_blas_lapack_flags(dunecommon)
 add_dune_tbb_flags(dunecommon)
