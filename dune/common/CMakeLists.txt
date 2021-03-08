@@ -5,7 +5,7 @@ add_subdirectory("test")
 
 #build the library dunecommon
 
-dune_add_library("dunecommon"
+target_sources(dunecommon PRIVATE
   debugalign.cc
   debugallocator.cc
   exceptions.cc
