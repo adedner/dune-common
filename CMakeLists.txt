@@ -19,6 +19,9 @@ target_compile_features(dunecommon PUBLIC cxx_std_17)
 
 add_subdirectory(cmake)
 
+add_dune_blas_lapack_flags(dunecommon)
+add_dune_tbb_flags(dunecommon)
+
 # link against lapack or blas
 if(LAPACK_FOUND)
   target_link_libraries(dunecommon PUBLIC ${LAPACK_LIBRARIES})
