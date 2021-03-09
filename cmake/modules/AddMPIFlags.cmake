@@ -11,6 +11,7 @@
 #
 #       The target list to add the MPI flags to.
 #
+include_guard(GLOBAL)
 
 # text for feature summary
 set_package_properties("MPI" PROPERTIES
