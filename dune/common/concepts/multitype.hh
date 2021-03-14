@@ -41,14 +41,13 @@ namespace Impl
     std::declval<M&>()[std::integral_constant<S,I>{}][std::integral_constant<S,J>]
   );
 
-
   template <class M, class RowSeq, class ColSeq,
             template <class,class,typename M::size_type,typename M::size_type> class Check>
-  struct AllIndexAccessible;
+  struct AllIndexAccessibleMat;
 
   template <class M, class S, S... rows, class ColSeq,
             template <class,class,typename M::size_type,typename M::size_type> class Check>
-  struct AllIndexAccessible<M, std::integer_sequence<S, rows...>, ColSeq, Check>
+  struct AllIndexAccessibleMat<M, std::integer_sequence<S, rows...>, ColSeq, Check>
   {
     template <S row, class Seq> struct Helper;
     template <S row, S... cols> struct Helper<row, std::integer_sequence<S, cols...>>
@@ -61,17 +60,51 @@ namespace Impl
 
 template <class M>
 concept MultiTypeMatrix = MultiTypeAlgebraicCollection<M> &&
-  Impl::AllIndexAccessible<M, std::make_integer_sequence<typename M::size_type, M::N()>,
-                              std::make_integer_sequence<typename M::size_type, M::M()>,
+  Impl::AllIndexAccessibleMat<M, std::make_integer_sequence<typename M::size_type, M::N()>,
+                                 std::make_integer_sequence<typename M::size_type, M::M()>,
                               Impl::IndexAccessibleConstantMatrix>::value;
 
 template <class M>
 concept MutableMultiTypeMatrix = MultiTypeAlgebraicCollection<M> &&
-  Impl::AllIndexAccessible<M, std::make_integer_sequence<typename M::size_type, M::N()>,
-                              std::make_integer_sequence<typename M::size_type, M::M()>,
+  Impl::AllIndexAccessibleMat<M, std::make_integer_sequence<typename M::size_type, M::N()>,
+                                 std::make_integer_sequence<typename M::size_type, M::M()>,
                               Impl::MutableIndexAccessibleConstantMatrix>::value;
 
-}} // end namespace Dune::Concepts
+
+namespace Impl
+{
+  template <class V, class S, S I>
+  using IndexAccessibleConstantVector = decltype(
+    std::declval<const V&>()[std::integral_constant<S,I>{}]
+  );
+
+  template <class V, class S, S I>
+  using MutableIndexAccessibleConstantVector = decltype(
+    std::declval<V&>()[std::integral_constant<S,I>{}]
+  );
+
+  template <class V, class Seq, template <class,class,typename V::size_type> class Check>
+  struct AllIndexAccessibleVec;
+
+  template <class V, class S, S... indices, template <class,class,typename V::size_type> class Check>
+  struct AllIndexAccessibleVec<V, std::integer_sequence<S, indices...>, Check>
+  {
+    static constexpr bool value = (Dune::Std::is_detected_v<Check, M, S, indices> &&...);
+  };
+
+} // end namespace Impl
+
+template <class V>
+concept MultiTypeVector = MultiTypeAlgebraicCollection<V> &&
+  Impl::AllIndexAccessibleVec<V, std::make_integer_sequence<typename V::size_type, V::size()>,
+                              Impl::IndexAccessibleConstantVector>::value;
+
+template <class V>
+concept MutableMultiTypeVector = MultiTypeAlgebraicCollection<V> &&
+  Impl::AllIndexAccessibleVec<V, std::make_integer_sequence<typename V::size_type, V::size()>,
+                              Impl::MutableIndexAccessibleConstantVector>::value;
+
+}} // end namespace Dune::Concept
 
 #endif // __has_include(<concepts>)
 #endif // DUNE_CONCEPTS_MULTITYPE_HH

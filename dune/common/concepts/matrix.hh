@@ -36,7 +36,7 @@ concept MutableIndexAccessibleMatrix = MutableCollection<M>
 // Matrix types
 
 template <class M>
-concept Matrix = AlgebraicCollection<M>
+concept Matrix = AlgebraicMatrix<M>
   && IndexAccessibleMatrix<M, typename M::size_type, typename M::size_type>;
 
 template <class M>
@@ -45,11 +45,11 @@ concept MutableMatrix = Matrix<M>
 
 template <class M>
 concept ConstantSizeMatrix = Matrix<M>
-  && ConstantSizeAlgebraicCollection<M>;
+  && ConstantSizeAlgebraicMatrix<M>;
 
 template <class M>
 concept MutableConstantSizeMatrix = MutableMatrix<M>
-  && ConstantSizeAlgebraicCollection<M>;
+  && ConstantSizeAlgebraicMatrix<M>;
 
 
 // Resizeable
@@ -65,6 +65,20 @@ concept ResizeableMatrix = Matrix<M>
 // Traversal
 
 template <class M>
+concept TraversableMatrix = TraversableCollection<M>
+  && requires(const M& matrix)
+{
+  { *matrix.begin() } -> TraversableCollection;
+};
+
+template <class M>
+concept TraversableMutableMatrix = TraversableMutableCollection<M>
+  && requires(M& matrix)
+{
+  { *matrix.begin() } -> TraversableMutableCollection;
+};
+
+template <class M>
 struct IsRowMajor : std::false_type {};
 
 template <class M>
@@ -72,10 +86,10 @@ struct IsColMajor : std::false_type {};
 
 
 template <class M>
-concept RowMajorTraversableMatrix = Matrix<M> && TraversableCollection<M> && IsRowMajor<M>::value;
+concept RowMajorTraversableMatrix = Matrix<M> && TraversableMatrix<M> && IsRowMajor<M>::value;
 
 template <class M>
-concept ColMajorTraversableMatrix = Matrix<M> && TraversableCollection<M> && IsColMajor<M>::value;
+concept ColMajorTraversableMatrix = Matrix<M> && TraversableMatrix<M> && IsColMajor<M>::value;
 
 
 // Sparse matrices
@@ -105,7 +119,7 @@ concept MutableDiagonalMatrix = DiagonalMatrix<M>
 };
 
 
-}} // end namespace Dune::Concepts
+}} // end namespace Dune::Concept
 
 #endif //__has_include(<concepts>)
 #endif // DUNE_CONCEPTS_MATRIX_HH

@@ -33,7 +33,7 @@ concept MutableIndexAccessibleVector = MutableCollection<V>
 // Vector types
 
 template <class V>
-concept Vector = AlgebraicCollection<V>
+concept Vector = AlgebraicVector<V>
   && IndexAccessibleVector<V, typename V::size_type>;
 
 template <class V>
@@ -42,11 +42,11 @@ concept MutableVector = Vector<V>
 
 template <class V>
 concept ConstantSizeVector = Vector<V>
-  && ConstantSizeAlgebraicCollection<V>;
+  && ConstantSizeAlgebraicVector<V>;
 
 template <class V>
 concept MutableConstantSizeVector = MutableVector<V>
-  && ConstantSizeAlgebraicCollection<V>;
+  && ConstantSizeAlgebraicVector<V>;
 
 
 // Resizeable
@@ -65,7 +65,7 @@ template <class V>
 concept TraversableVector = Vector<V> && TraversableCollection<V>;
 
 
-}} // end namespace Dune::Concepts
+}} // end namespace Dune::Concept
 
 #endif // __has_include(<concepts>)
 #endif // DUNE_CONCEPTS_VECTOR_HH

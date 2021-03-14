@@ -6,3 +6,5 @@ install(FILES
   vector.hh
   vectorspace.hh
 DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/common/concepts)
+
+add_subdirectory(test)
