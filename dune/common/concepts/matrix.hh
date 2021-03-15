@@ -68,14 +68,14 @@ template <class M>
 concept TraversableMatrix = TraversableCollection<M>
   && requires(const M& matrix)
 {
-  { *matrix.begin() } -> TraversableCollection;
+  requires TraversableCollection<std::decay_t<decltype(*matrix.begin())>>;
 };
 
 template <class M>
 concept TraversableMutableMatrix = TraversableMutableCollection<M>
   && requires(M& matrix)
 {
-  { *matrix.begin() } -> TraversableMutableCollection;
+  requires TraversableMutableCollection<std::decay_t<decltype(*matrix.begin())>>;
 };
 
 template <class M>
@@ -107,15 +107,15 @@ concept DiagonalMatrix = SparseMatrix<M>
   && requires(const M& matrix, typename M::size_type i)
 {
   { matrix.diagonal()  } -> Vector;
-  { matrix.diagonal(i) } -> std::convertible_to<typename M::value_type>
+  { matrix.diagonal(i) } -> std::convertible_to<typename M::value_type>;
 };
 
 template <class M>
 concept MutableDiagonalMatrix = DiagonalMatrix<M>
-  && requires(M& matrix, typename M::size_type i)
+  && requires(M& matrix, typename M::size_type i, typename M::value_type value)
 {
   { matrix.diagonal()  } -> MutableVector;
-  { matrix.diagonal(i) } -> std::convertible_to<typename M::reference>
+  { matrix.diagonal(i) = value };
 };
 
 

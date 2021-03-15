@@ -16,15 +16,17 @@ template <class C>
 concept Collection = requires
 {
   typename C::value_type;
-  typename C::const_reference;
+//  typename C::const_reference;
   typename C::size_type;
 };
 
 template <class C>
-concept MutableCollection = requires
-{
-  typename C::reference;
-};
+concept MutableCollection = Collection<C>
+//  && requires
+//{
+//  typename C::reference;
+//}
+;
 
 
 // Size information
@@ -65,7 +67,7 @@ template <class I, class SizeType>
 concept ForwardIndexedIterator = std::forward_iterator<I>
   && requires(I iter)
 {
-  {iter.index() } -> std::convertible_to<SizeType>;
+  { iter.index() } -> std::convertible_to<SizeType>;
 };
 
 template <class C>

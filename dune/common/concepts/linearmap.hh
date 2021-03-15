@@ -35,7 +35,7 @@ template <class L, class X, class Y>
 concept HermitianLinearMap = LinearMap<L,X,Y>
   && requires(const L& A, const X& x, Y& y, typename L::field_type alpha)
 {
-  A.mhv(x, y);          // y = A^H x
+//  A.mhv(x, y);          // y = A^H x (this operation does not exist)
   A.umhv(x, y);         // y+= A^H x
   A.mmhv(x, y);         // y-= A^H x
   A.usmhv(alpha, x, y); // y+= alpha A^H x
