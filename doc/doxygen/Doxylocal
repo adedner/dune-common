@@ -3,6 +3,7 @@ INPUT                 += @srcdir@/mainpage.txt \
                          @srcdir@/modules.txt \
                          @top_srcdir@/dune/common/modules.txt \
                          @top_srcdir@/dune/common
+                         @top_srcdir@/dune/common/concepts
 EXCLUDE               += @top_srcdir@/dune/common/test \
                          @top_srcdir@/dune/common/debugallocator.cc
 

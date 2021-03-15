@@ -3,7 +3,7 @@
 #ifndef DUNE_CONCEPTS_VECTOR_HH
 #define DUNE_CONCEPTS_VECTOR_HH
 
-#if __has_include(<concepts>)
+#if __has_include(<concepts>) || DOXYGEN
 #include <concepts>
 
 #include <dune/common/concepts/collection.hh>
@@ -33,7 +33,7 @@ concept MutableIndexAccessibleVector = MutableCollection<V>
 // Vector types
 
 template <class V>
-concept Vector = AlgebraicVector<V>
+concept Vector = AlgebraicCollection<V>
   && IndexAccessibleVector<V, typename V::size_type>;
 
 template <class V>
@@ -42,11 +42,11 @@ concept MutableVector = Vector<V>
 
 template <class V>
 concept ConstantSizeVector = Vector<V>
-  && ConstantSizeAlgebraicVector<V>;
+  && ConstantSizeAlgebraicCollection<V>;
 
 template <class V>
 concept MutableConstantSizeVector = MutableVector<V>
-  && ConstantSizeAlgebraicVector<V>;
+  && ConstantSizeAlgebraicCollection<V>;
 
 
 // Resizeable

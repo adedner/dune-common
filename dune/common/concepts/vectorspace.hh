@@ -3,7 +3,7 @@
 #ifndef DUNE_CONCEPTS_VECTORSPACE_HH
 #define DUNE_CONCEPTS_VECTORSPACE_HH
 
-#if __has_include(<concepts>)
+#if __has_include(<concepts>) || DOXYGEN
 #include <concepts>
 #include <cmath>
 

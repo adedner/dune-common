@@ -3,7 +3,7 @@
 #ifndef DUNE_CONCEPTS_MULTITYPE_HH
 #define DUNE_CONCEPTS_MULTITYPE_HH
 
-#if __has_include(<concepts>)
+#if __has_include(<concepts>) || DOXYGEN
 #include <type_traits>
 #include <utility>
 
