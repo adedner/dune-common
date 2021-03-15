@@ -13,6 +13,11 @@
 namespace Dune {
 namespace Concept {
 
+/**
+ * \ingroup CxxConcepts
+ * @{
+ **/
+
 template <class K>
 concept Scalar = Dune::IsNumber<K>::value;
 
@@ -118,6 +123,8 @@ template <class I, class X,
           class F = typename Dune::FieldTraits<X>::field_type,
           class R = typename Dune::FieldTraits<X>::real_type>
 concept HilbertSpace = BanachSpace<InducedNorm_t<I>,X,F,R> && InnerProductSpace<I,X,F>;
+
+/** @} */
 
 }} // end namespace Dune::Concept
 

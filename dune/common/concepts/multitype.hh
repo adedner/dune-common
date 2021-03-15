@@ -13,6 +13,11 @@
 namespace Dune {
 namespace Concept {
 
+/**
+ * \ingroup CxxConcepts
+ * @{
+ **/
+
 template <class C>
 concept MultiTypeCollection = requires
 {
@@ -103,6 +108,8 @@ template <class V>
 concept MutableMultiTypeVector = MultiTypeAlgebraicCollection<V> &&
   Impl::AllIndexAccessibleVec<V, std::make_integer_sequence<typename V::size_type, V::size()>,
                               Impl::MutableIndexAccessibleConstantVector>::value;
+
+/** @} */
 
 }} // end namespace Dune::Concept
 

@@ -11,46 +11,83 @@
 namespace Dune {
 namespace Concept {
 
-// Element access
+/**
+ * \ingroup CxxConcepts
+ * @{
+ **/
 
-template <class V, class I>
-concept IndexAccessibleVector = Collection<V>
-  && std::convertible_to<I, typename V::size_type>
-  && requires(const V& vector, I i)
+/// \brief A vector is a collection with direct element acccess.
+/**
+ * The concept models vector-like collections, providing indexed element access.
+ *
+ * \par Notation:
+ * Let `v` be a vector of type `V` and `i` an index of `size_type`
+ *
+ * \par Refinement:
+ * - `V` is a model of \ref AlgebraicCollection
+ *
+ * \par Valid expressions:
+ * - `v[i]`: Access the i'th element of the vector
+ *
+ * \hideinitializer
+ **/
+template <class V>
+concept Vector = AlgebraicCollection<V>
+  && requires(const V& vector, typename V::size_type i)
 {
   { vector[i] } -> std::convertible_to<typename V::value_type>;
 };
 
-template <class V, class I>
-concept MutableIndexAccessibleVector = MutableCollection<V>
-  && std::convertible_to<I, typename V::size_type>
-  && requires(V& vector, I i, typename V::value_type value)
+
+/// \brief A mutable vector is a collection with direct mutable element acccess.
+/**
+ * The concept models vector-like collections, providing mutable indexed element access.
+ *
+ * \par Notation:
+ * Let `v` be a vector of type `V` and `i` an index of `size_type`
+ *
+ * \par Refinement:
+ * - `V` is a model of \ref Vector
+ *
+ * \par Valid expressions:
+ * - `v[i]`: Mutable access to the i'th element of the vector
+ *
+ * \hideinitializer
+ **/
+template <class V>
+concept MutableVector = Vector<V>
+  && requires(V& vector, typename V::size_type i, typename V::value_type value)
 {
   vector[i] = value;
 };
 
 
-// Vector types
-
+/// \brief A \ref Vector with constant size.
+/// \hideinitializer
 template <class V>
-concept Vector = AlgebraicCollection<V>
-  && IndexAccessibleVector<V, typename V::size_type>;
+concept ConstantSizeVector = Vector<V> && ConstantSizeAlgebraicCollection<V>;
 
+/// \brief A \ref MutableVector with constant size.
+/// \hideinitializer
 template <class V>
-concept MutableVector = Vector<V>
-  && MutableIndexAccessibleVector<V, typename V::size_type>;
-
-template <class V>
-concept ConstantSizeVector = Vector<V>
-  && ConstantSizeAlgebraicCollection<V>;
-
-template <class V>
-concept MutableConstantSizeVector = MutableVector<V>
-  && ConstantSizeAlgebraicCollection<V>;
+concept MutableConstantSizeVector = MutableVector<V> && ConstantSizeAlgebraicCollection<V>;
 
 
-// Resizeable
-
+/// \brief A vector that can be resized
+/**
+ * The concept models vector collections with `resize()` function.
+ *
+ * \par Notation:
+ * Let `v` be a vector of type `V` and `s` a new size of `size_type`
+ *
+ * \par Refinement:
+ * - `V` is a model of \ref Vector
+ *
+ * \par Valid expressions:
+ * - `v.resize(s)`: Resize the vector to the new size `s`
+ *
+ * \hideinitializer
+ **/
 template <class V>
 concept ResizeableVector = Vector<V>
   && requires(V& vector, typename V::size_type s)
@@ -59,11 +96,12 @@ concept ResizeableVector = Vector<V>
 };
 
 
-// Traversal
-
+/// \brief A \ref Vector that is traversable.
+/// \hideinitializer
 template <class V>
 concept TraversableVector = Vector<V> && TraversableCollection<V>;
 
+/** @} */
 
 }} // end namespace Dune::Concept
 

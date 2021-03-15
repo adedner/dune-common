@@ -11,8 +11,8 @@ namespace Dune {
 namespace Concept {
 
 /**
- *  \ingroup CxxConcepts
- *  @{
+ * \ingroup CxxConcepts
+ * @{
  **/
 
 /// \brief A Collection is the base concept of matrices and vectors
@@ -39,7 +39,7 @@ concept Collection = requires
 /// \brief MutableCollection is a Collection that allows to modify its elements.
 /**
  * \par Refinement of:
- * - `Collection`
+ * - \ref Collection
  *
  * \hideinitializer
  **/
@@ -56,6 +56,9 @@ concept MutableCollection = Collection<C>
 /**
  * A collection that provides the size information, i.e., the number of elements
  * stored in the collection.
+ *
+ * \par Refinement of:
+ * - \ref Collection
  *
  * \par Notation:
  * Let `c` be a collection of type `C`
@@ -95,7 +98,8 @@ concept AlgebraicMatrix = AlgebraicCollection<C>
 };
 
 
-/// \brief An AlgebraicCollection with size is constexpr
+/// \brief An AlgebraicCollection with size is constexpr.
+/// \hideinitializer
 template <class C>
 concept ConstantSizeAlgebraicCollection = AlgebraicCollection<C>
   && requires
@@ -104,7 +108,8 @@ concept ConstantSizeAlgebraicCollection = AlgebraicCollection<C>
 };
 
 
-/// \brief An AlgebraicMatrix with rows and columns is constexpr
+/// \brief An AlgebraicMatrix with rows and columns is constexpr.
+/// \hideinitializer
 template <class C>
 concept ConstantSizeAlgebraicMatrix = AlgebraicMatrix<C>
   && requires
@@ -144,10 +149,10 @@ concept ForwardIndexedIterator = std::forward_iterator<I>
  * providing an element index.
  *
  * \par Notation:
- * Let `c` be a collection o type `C`
+ * Let `c` be a collection of type `C`
  *
  * \par Refinement of:
- * - `C` is a model of `Collection`
+ * - `C` is a model of \ref Collection
  *
  * \par Valid expressions:
  * - `c.begin()`: Iterator to the first element int the collection
@@ -167,6 +172,7 @@ concept TraversableCollection = Collection<C>
 
 
 /// \brief A ForwardIndexedIterator that is also an std::output_iterator.
+/// \hideinitializer
 template <class I, class T, class SizeType>
 concept ForwardOutputIterator = ForwardIndexedIterator<I,SizeType> && std::output_iterator<I,T>;
 
@@ -177,11 +183,11 @@ concept ForwardOutputIterator = ForwardIndexedIterator<I,SizeType> && std::outpu
  * to modify the collection elements. Those iterators also provide an element index.
  *
  * \par Notation:
- * Let `c` be a collection o type `C`
+ * Let `c` be a collection of type `C`
  *
  * \par Refinement of:
- * - `C` is a model of `MutableCollection`
- * - `C` is a model of `TraversableCollection`
+ * - `C` is a model of \ref MutableCollection
+ * - `C` is a model of \ref TraversableCollection
  *
  * \par Valid expressions:
  * - `c.begin()`: Output-iterator to the first element int the collection
@@ -230,10 +236,10 @@ concept BidirectionalIndexedIterator = std::bidirectional_iterator<I>
  * from the last element in the collection.
  *
  * \par Notation:
- * Let `c` be a collection o type `C`
+ * Let `c` be a collection of type `C`
  *
- * \par Refinement of:
- * - `C` is a model of `Collection`
+ * \par Refinement:
+ * - `C` is a model of \ref Collection
  *
  * \par Valid expressions:
  * - `c.beforeEnd()`: Iterator to the last element int the collection
@@ -250,7 +256,8 @@ concept ReverseTraversableCollection = Collection<C>
 };
 
 
-/// \brief A BidirectionalIndexedIterator that is also an std::output_iterator
+/// \brief A BidirectionalIndexedIterator that is also an std::output_iterator.
+/// \hideinitializer
 template <class I, class T, class SizeType>
 concept BidirectionalOutputIterator = BidirectionalIndexedIterator<I,SizeType> && std::output_iterator<I,T>;
 
@@ -262,11 +269,11 @@ concept BidirectionalOutputIterator = BidirectionalIndexedIterator<I,SizeType> &
  * It allows to traverse in reverse order starting from the last element in the collection.
  *
  * \par Notation:
- * Let `c` be a collection o type `C`
+ * Let `c` be a collection of type `C`
  *
- * \par Refinement of:
- * - `C` is a model of `MutableCollection`
- * - `C` is a model of `ReverseTraversableCollection`
+ * \par Refinement:
+ * - `C` is a model of \ref MutableCollection
+ * - `C` is a model of \ref ReverseTraversableCollection
  *
  * \par Valid expressions:
  * - `c.beforeEnd()`: Output-iterator to the last element int the collection
