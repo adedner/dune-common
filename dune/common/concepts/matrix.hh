@@ -106,7 +106,8 @@ template <class M>
 concept DiagonalMatrix = SparseMatrix<M>
   && requires(const M& matrix, typename M::size_type i)
 {
-  { matrix.diagonal()  } -> Vector;
+  matrix.diagonal();
+  requires Vector<std::decay_t<decltype(matrix.diagonal())>>;
   { matrix.diagonal(i) } -> std::convertible_to<typename M::value_type>;
 };
 
@@ -114,8 +115,8 @@ template <class M>
 concept MutableDiagonalMatrix = DiagonalMatrix<M>
   && requires(M& matrix, typename M::size_type i, typename M::value_type value)
 {
-  { matrix.diagonal()  } -> MutableVector;
-  { matrix.diagonal(i) = value };
+  requires MutableVector<std::decay_t<decltype(matrix.diagonal())>>;
+  matrix.diagonal(i) = value;
 };
 
 

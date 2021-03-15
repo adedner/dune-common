@@ -7,15 +7,16 @@
 #include <array>
 #include <vector>
 
+#include <dune/common/arraylist.hh>
 #include <dune/common/fvector.hh>
 #include <dune/common/dynvector.hh>
+#include <dune/common/reservedvector.hh>
+#include <dune/common/sllist.hh>
 #include <dune/common/concepts/vector.hh>
 #include <dune/common/concepts/vectorspace.hh>
 
 int main(int argc, char** argv)
 {
-  Dune::TestSuite test;
-
   static_assert(Dune::Concept::Vector<Dune::FieldVector<double,2>>);
   static_assert(Dune::Concept::TraversableCollection<Dune::FieldVector<double,2>>);
   static_assert(Dune::Concept::VectorSpace<Dune::FieldVector<double,2>>);
@@ -33,6 +34,10 @@ int main(int argc, char** argv)
   // missing: index() methon in iterators
   // static_assert(Dune::Concept::TraversableCollection<std::array<double,2>>);
   // static_assert(Dune::Concept::TraversableCollection<std::vector<double>>);
+
+  static_assert(Dune::Concept::Vector<Dune::ArrayList<double>>);
+  // static_assert(Dune::Concept::Vector<Dune::SLList<double>>); // missing value_type
+  static_assert(Dune::Concept::Vector<Dune::ReservedVector<double,2>>);
 }
 
 #else

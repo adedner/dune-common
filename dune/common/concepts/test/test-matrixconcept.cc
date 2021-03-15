@@ -12,6 +12,7 @@
 #include <dune/common/diagonalmatrix.hh>
 #include <dune/common/dynmatrix.hh>
 #include <dune/common/dynvector.hh>
+#include <dune/common/transpose.hh>
 #include <dune/common/concepts/matrix.hh>
 #include <dune/common/concepts/linearmap.hh>
 #include <dune/common/concepts/vectorspace.hh>
@@ -28,23 +29,38 @@ struct IsColMajor<Dune::DiagonalMatrix<K,n>> : std::true_type {};
 
 int main(int argc, char** argv)
 {
-  Dune::TestSuite test;
+  using Mat1 = Dune::FieldMatrix<double,2,2>;
+  using Vec1 = Dune::FieldVector<double,2>;
+  static_assert(Dune::Concept::Matrix<Mat1>);
+  static_assert(Dune::Concept::TraversableMatrix<Mat1>);
+  static_assert(Dune::Concept::VectorSpace<Mat1>);
+  static_assert(Dune::Concept::LinearMap<Mat1, Vec1, Vec1>);
+  static_assert(Dune::Concept::TransposableLinearMap<Mat1, Vec1, Vec1>);
+  static_assert(Dune::Concept::HermitianLinearMap<Mat1, Vec1, Vec1>);
 
-  static_assert(Dune::Concept::Matrix<Dune::FieldMatrix<double,2,2>>);
-  static_assert(Dune::Concept::TraversableMatrix<Dune::FieldMatrix<double,2,2>>);
-  static_assert(Dune::Concept::VectorSpace<Dune::FieldMatrix<double,2,2>>);
-  static_assert(Dune::Concept::LinearMap<Dune::FieldMatrix<double,2,2>, Dune::FieldVector<double,2>, Dune::FieldVector<double,2>>);
-  static_assert(Dune::Concept::TransposableLinearMap<Dune::FieldMatrix<double,2,2>, Dune::FieldVector<double,2>, Dune::FieldVector<double,2>>);
-  static_assert(Dune::Concept::HermitianLinearMap<Dune::FieldMatrix<double,2,2>, Dune::FieldVector<double,2>, Dune::FieldVector<double,2>>);
+  using Mat2 = Dune::DynamicMatrix<double>;
+  using Vec2 = Dune::DynamicVector<double>;
+  static_assert(Dune::Concept::Matrix<Mat2>);
+  static_assert(Dune::Concept::TraversableMatrix<Mat2>);
+  // static_assert(Dune::Concept::VectorSpace<Mat2>); // missing + and -
+  static_assert(Dune::Concept::LinearMap<Mat2, Vec2, Vec2>);
+  static_assert(Dune::Concept::TransposableLinearMap<Mat2, Vec2, Vec2>);
+  static_assert(Dune::Concept::HermitianLinearMap<Mat2, Vec2, Vec2>);
 
-  static_assert(Dune::Concept::Matrix<Dune::DynamicMatrix<double>>);
-  static_assert(Dune::Concept::TraversableMatrix<Dune::DynamicMatrix<double>>);
-  // static_assert(Dune::Concept::VectorSpace<Dune::DynamicMatrix<double>>); // missing + and -
+  using Mat3 = Dune::DiagonalMatrix<double,2>;
+  using Vec3 = Dune::FieldVector<double,2>;
+  static_assert(Dune::Concept::Matrix<Mat3>);
+  static_assert(Dune::Concept::MutableMatrix<Mat3>);
+  // static_assert(Dune::Concept::TraversableMatrix<Mat3>); // row not traversable
+  // static_assert(Dune::Concept::SparseMatrix<Mat3>); // missing nonzeroes()
+  // static_assert(Dune::Concept::DiagonalMatrix<Mat3>); // missing nonzeroes()
+  // static_assert(Dune::Concept::MutableDiagonalMatrix<Mat3>); // missing nonzeroes()
+  static_assert(Dune::Concept::LinearMap<Mat3, Vec3, Vec3>);
+  static_assert(Dune::Concept::TransposableLinearMap<Mat3, Vec3, Vec3>);
+  static_assert(Dune::Concept::HermitianLinearMap<Mat3, Vec3, Vec3>);
 
-  static_assert(Dune::Concept::Matrix<Dune::DiagonalMatrix<double,2>>);
-  // static_assert(Dune::Concept::TraversableMatrix<Dune::DiagonalMatrix<double,2>>); // row not traversable
-  // static_assert(Dune::Concept::SparseMatrix<Dune::DiagonalMatrix<double,2>>); // missing nonzeroes()
-
+  using Mat4 = decltype(transpose(std::declval<Mat1>()));
+  // static_assert(Dune::Concept::Matrix<Mat4>); // no collection or matrix concept is fulfilled.
 }
 
 #else
