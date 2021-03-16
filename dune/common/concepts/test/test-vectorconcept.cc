@@ -20,8 +20,8 @@ int main(int argc, char** argv)
   static_assert(Dune::Concept::Vector<Dune::FieldVector<double,2>>);
   static_assert(Dune::Concept::TraversableCollection<Dune::FieldVector<double,2>>);
   static_assert(Dune::Concept::VectorSpace<Dune::FieldVector<double,2>>);
-  static_assert(Dune::Concept::BanachSpace<Dune::Concept::TwoNorm, Dune::FieldVector<double,2>>);
-  static_assert(Dune::Concept::HilbertSpace<Dune::Concept::Dot, Dune::FieldVector<double,2>>);
+  static_assert(Dune::Concept::BanachSpace<Dune::FieldVector<double,2>>);
+  static_assert(Dune::Concept::HilbertSpace<Dune::FieldVector<double,2>>);
 
   static_assert(Dune::Concept::Vector<Dune::DynamicVector<double>>);
   static_assert(Dune::Concept::TraversableCollection<Dune::DynamicVector<double>>);
