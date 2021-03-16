@@ -131,11 +131,11 @@ concept ResizeableMatrix = Matrix<M>
  *
  * \hideinitializer
  **/
-template <class M>
-concept TraversableMatrix = TraversableCollection<M>
-  && requires(const M& matrix)
+template <class M, class RangeWrapper = Identity>
+concept TraversableMatrix = TraversableCollection<M, RangeWrapper>
+  && requires(const M& matrix, RangeWrapper wrapper)
 {
-  requires TraversableCollection<std::decay_t<decltype(*matrix.begin())>>;
+  requires TraversableCollection<std::decay_t<decltype(*wrapper(matrix).begin())>>;
 };
 
 /// \brief A \ref MutableMatrix that is traversable
@@ -146,33 +146,86 @@ concept TraversableMatrix = TraversableCollection<M>
  *
  * \hideinitializer
  **/
-template <class M>
-concept TraversableMutableMatrix = TraversableMatrix<M>
-  && TraversableMutableCollection<M>
-  && requires(M& matrix)
+template <class M, class RangeWrapper = Identity>
+concept TraversableMutableMatrix = TraversableMatrix<M, RangeWrapper>
+  && TraversableMutableCollection<M, RangeWrapper>
+  && requires(M& matrix, RangeWrapper wrapper)
 {
-  requires TraversableMutableCollection<std::decay_t<decltype(*matrix.begin())>>;
+  requires TraversableMutableCollection<std::decay_t<decltype(*wrapper(matrix).begin())>>;
 };
 
 
-/// \brief Traits class indicating whether matrix-traversal is row-major.
-template <class M>
-struct IsRowMajor : std::false_type {};
 
-/// \brief Traits class indicating whether matrix-traversal is column-major.
-template <class M>
-struct IsColMajor : std::false_type {};
+/// \brief Concept Map to traverse iterators `begin_rowss()` into `begin()` and `end_rows()` into `end()`.
+struct RowMajorRange
+{
+  template <class M>
+  struct ConstRange {
+    auto begin () const { return m.begin_rows(); }
+    auto end () const { return m.end_rows(); }
+    M const& m;
+  };
+
+  template <class M>
+  struct MutableRange {
+    auto begin () { return m.begin_rows(); }
+    auto end () { return m.end_rows(); }
+    M& m;
+  };
+
+  template <class M>
+  auto operator()(const M& matrix) const { return ConstRange{matrix}; }
+
+  template <class M>
+  auto operator()(M& matrix) const { return MutableRange{matrix}; }
+};
+
+/// \brief Concept Map to traverse iterators `begin_cols()` into `begin()` and `end_cols()` into `end()`.
+struct ColMajorRange
+{
+  template <class M>
+  struct ConstRange {
+    auto begin () const { return m.begin_cols(); }
+    auto end () const { return m.end_cols(); }
+    M const& m;
+  };
+
+  template <class M>
+  struct MutableRange {
+    auto begin () { return m.begin_cols(); }
+    auto end () { return m.end_cols(); }
+    M& m;
+  };
+
+  template <class M>
+  auto operator()(const M& matrix) const { return ConstRange{matrix}; }
+
+  template <class M>
+  auto operator()(M& matrix) const { return MutableRange{matrix}; }
+};
 
 
 /// \brief A traversable matrix with row-major traversal.
-/// \hideinitializer
+/**
+ * A matrix collection that provides iterators `begin()` and `end()` traversing the
+ * rows of the matrix. The dereferenced iterators are traversable and provide iterators
+ * over the columns of the corresponding row.
+ *
+ * \hideinitializer
+ **/
 template <class M>
-concept RowMajorTraversableMatrix = Matrix<M> && TraversableMatrix<M> && IsRowMajor<M>::value;
+concept RowMajorTraversableMatrix = Matrix<M> && TraversableMatrix<M,RowMajorRange>;
 
 /// \brief A traversable matrix with column-major traversal.
-/// \hideinitializer
+/**
+ * A matrix collection that provides iterators `begin()` and `end()` traversing the
+ * columns of the matrix. The dereferenced iterators are traversable and provide iterators
+ * over the rows of the corresponding column.
+ *
+ * \hideinitializer
+ **/
 template <class M>
-concept ColMajorTraversableMatrix = Matrix<M> && TraversableMatrix<M> && IsColMajor<M>::value;
+concept ColMajorTraversableMatrix = Matrix<M> && TraversableMatrix<M,ColMajorRange>;
 
 
 

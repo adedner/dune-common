@@ -22,8 +22,8 @@ namespace Concept {
  * these data-structures need to provide.
  *
  * \par Associated types:
- * - `value_type`: The type of the elements stored in the collection
- * - `size_type`: Integer type used store size and maybe index information
+ * - `C::value_type`: The type of the elements stored in the collection
+ * - `C::size_type`: Integer type used to store size and maybe index information
  *
  * \hideinitializer
  **/
@@ -146,6 +146,14 @@ concept ForwardIndexedIterator = std::forward_iterator<I>
 };
 
 
+
+struct Identity
+{
+  template <class C>
+  decltype(auto) operator()(C&& collection) const { return collection; }
+};
+
+
 /// \brief A collection that can be traversed similar to a range.
 /**
  * The concept models collections that have begin and end iterators
@@ -163,14 +171,12 @@ concept ForwardIndexedIterator = std::forward_iterator<I>
  *
  * \hideinitializer
  **/
-template <class C>
+template <class C, class RangeWrapper = Identity>
 concept TraversableCollection = Collection<C>
-  && requires(const C& collection)
+  && requires(const C& collection, RangeWrapper wrapper)
 {
-  { collection.begin()  } -> ForwardIndexedIterator<typename C::size_type>;
-  { collection.end()    } -> ForwardIndexedIterator<typename C::size_type>;
-//{ collection.cbegin() } -> ForwardIndexedIterator<typename C::size_type>;
-//{ collection.cend()   } -> ForwardIndexedIterator<typename C::size_type>;
+  { wrapper(collection).begin()  } -> ForwardIndexedIterator<typename C::size_type>;
+  { wrapper(collection).end()    } -> ForwardIndexedIterator<typename C::size_type>;
 };
 
 
@@ -198,13 +204,13 @@ concept ForwardOutputIterator = ForwardIndexedIterator<I,SizeType> && std::outpu
  *
  * \hideinitializer
  **/
-template <class C>
+template <class C, class RangeWrapper = Identity>
 concept TraversableMutableCollection = MutableCollection<C>
   && TraversableCollection<C>
-  && requires(C& collection)
+  && requires(C& collection, RangeWrapper wrapper)
 {
-  { collection.begin() } -> ForwardOutputIterator<typename C::value_type, typename C::size_type>;
-  { collection.end()   } -> ForwardOutputIterator<typename C::value_type, typename C::size_type>;
+  { wrapper(collection).begin() } -> ForwardOutputIterator<typename C::value_type, typename C::size_type>;
+  { wrapper(collection).end()   } -> ForwardOutputIterator<typename C::value_type, typename C::size_type>;
 };
 
 
@@ -250,12 +256,12 @@ concept BidirectionalIndexedIterator = std::bidirectional_iterator<I>
  *
  * \hideinitializer
  **/
-template <class C>
+template <class C, class RangeWrapper = Identity>
 concept ReverseTraversableCollection = Collection<C>
-  && requires(const C& collection)
+  && requires(const C& collection, RangeWrapper wrapper)
 {
-  { collection.beforeEnd()   } -> BidirectionalIndexedIterator<typename C::size_type>;
-  { collection.beforeBegin() } -> BidirectionalIndexedIterator<typename C::size_type>;
+  { wrapper(collection).beforeEnd()   } -> BidirectionalIndexedIterator<typename C::size_type>;
+  { wrapper(collection).beforeBegin() } -> BidirectionalIndexedIterator<typename C::size_type>;
 };
 
 
@@ -284,13 +290,13 @@ concept BidirectionalOutputIterator = BidirectionalIndexedIterator<I,SizeType> &
  *
  * \hideinitializer
  **/
-template <class C>
+template <class C, class RangeWrapper = Identity>
 concept ReverseTraversableMutableCollection = MutableCollection<C>
   && ReverseTraversableCollection<C>
-  && requires(C& collection)
+  && requires(C& collection, RangeWrapper wrapper)
 {
-  { collection.beforeEnd()   } -> BidirectionalOutputIterator<typename C::value_type, typename C::size_type>;
-  { collection.beforeBegin() } -> BidirectionalOutputIterator<typename C::value_type, typename C::size_type>;
+  { wrapper(collection).beforeEnd()   } -> BidirectionalOutputIterator<typename C::value_type, typename C::size_type>;
+  { wrapper(collection).beforeBegin() } -> BidirectionalOutputIterator<typename C::value_type, typename C::size_type>;
 };
 
 /** @} */

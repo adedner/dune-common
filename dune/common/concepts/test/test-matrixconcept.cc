@@ -17,16 +17,6 @@
 #include <dune/common/concepts/linearmap.hh>
 #include <dune/common/concepts/vectorspace.hh>
 
-namespace Dune::Concept {
-
-template<class K, int n>
-struct IsRowMajor<Dune::DiagonalMatrix<K,n>> : std::true_type {};
-
-template<class K, int n>
-struct IsColMajor<Dune::DiagonalMatrix<K,n>> : std::true_type {};
-
-}
-
 int main(int argc, char** argv)
 {
   using Mat1 = Dune::FieldMatrix<double,2,2>;
