@@ -22,19 +22,25 @@ namespace Concept {
  * A linear map `L:X->Y` from vector space `X` to vector space `Y`
  * is an operator providing matrix-vector multiplication operations.
  *
- * \par Notation:
- * Let `A` be a linear map of type `L`, `x` of type `X` and `y` of type `Y`.
- * Additionally, let `alpha` be a scalar factor of type `field_t<L>`.
- *
- * \par Refinement:
+ * \par Type requirements:
  * - `X` is a model of \ref VectorSpace
  * - `Y` is a model of \ref VectorSpace
+ *
+ * \par Notation:
+ * - `A`: a linear map of type `L`.
+ * - `x` of type `X` and `y` of type `Y`.
+ * - Additionally, let `alpha` be a scalar factor of type `field_t<L>`.
  *
  * \par Valid expressions:
  * - `A.mv(x,y)`: Matrix-vector product `y = A x`
  * - `A.umv(x,y)`: Matrix-vector product with update `y+= A x`
  * - `A.mmv(x,y)`: Matrix-vector product with minus-update `y-= A x`
  * - `A.usmv(alpha,x,y)`: Scaled matrix-vector product with update `y+= alpha A x`
+ *
+ * \par Models:
+ * - \ref FieldMatrix
+ * - \ref DynamicMatrix
+ * - \ref DiagonalMatrix
  *
  * \hideinitializer
  **/
@@ -54,13 +60,13 @@ concept LinearMap = VectorSpace<X> && VectorSpace<Y>
  * A linear map `L^T:X->Y` from vector space `X` to vector space `Y`
  * is an operator providing matrix-vector multiplication operations.
  *
- * \par Notation:
- * Let `A` be a linear map of type `L`, `x` of type `X` and `y` of type `Y`.
- * Additionally, let `alpha` be a scalar factor of type `field_t<L>`.
+ * \par Refinement of:
+ * - \ref LinearMap
  *
- * \par Refinement:
- * - `X` is a model of \ref VectorSpace
- * - `Y` is a model of \ref VectorSpace
+ * \par Notation:
+ * - `A`: a linear map of type `L`.
+ * - `x` of type `X` and `y` of type `Y`.
+ * - Additionally, let `alpha` be a scalar factor of type `field_t<L>`.
  *
  * \par Valid expressions:
  * - `A.mtv(x,y)`: Matrix-vector product `y = A^T x`
@@ -86,13 +92,13 @@ concept TransposableLinearMap = LinearMap<L,X,Y>
  * A linear map `L^H:X->Y` from vector space `X` to vector space `Y`
  * is an operator providing matrix-vector multiplication operations.
  *
- * \par Notation:
- * Let `A` be a linear map of type `L`, `x` of type `X` and `y` of type `Y`.
- * Additionally, let `alpha` be a scalar factor of type `field_t<L>`.
+ * \par Refinement of:
+ * - \ref LinearMap
  *
- * \par Refinement:
- * - `X` is a model of \ref VectorSpace
- * - `Y` is a model of \ref VectorSpace
+ * \par Notation:
+ * - `A`: a linear map of type `L`.
+ * - `x` of type `X` and `y` of type `Y`.
+ * - Additionally, let `alpha` be a scalar factor of type `field_t<L>`.
  *
  * \par Valid expressions:
  * - `A.umhv(x,y)`: Matrix-vector product with update `y+= A^H x`

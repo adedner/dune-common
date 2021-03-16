@@ -22,8 +22,8 @@ namespace Concept {
  * these data-structures need to provide.
  *
  * \par Associated types:
- * - `value_type`  The type of the elements stored in the collection
- * - `size_type`   Integer type used store size and maybe index information
+ * - `value_type`: The type of the elements stored in the collection
+ * - `size_type`: Integer type used store size and maybe index information
  *
  * \hideinitializer
  **/
@@ -61,10 +61,10 @@ concept MutableCollection = Collection<C>
  * - \ref Collection
  *
  * \par Notation:
- * Let `c` be a collection of type `C`
+ * - `c`: a collection of type `C`
  *
  * \par Valid Expressions:
- * - `c.size()`: Returns the number of elements in the collection.
+ * - `c.size()`: Returns the number of elements in the collection. `[[post: c.size() >= 0]]`
  *
  * \hideinitializer
  **/
@@ -72,7 +72,7 @@ template <class C>
 concept AlgebraicCollection = Collection<C>
   && requires(const C& collection)
 {
-  { collection.size() } -> std::convertible_to<typename C::size_type>; // number of elements
+  { collection.size() } -> std::convertible_to<typename C::size_type>;
 };
 
 
@@ -80,12 +80,15 @@ concept AlgebraicCollection = Collection<C>
 /**
  * A collection that provides the number of rows and columns.
  *
+ * \par Refinement of:
+ * - \ref AlgebraicCollection
+ *
  * \par Notation:
- * Let `c` be a collection of type `C`
+ * - `c`: a collection of type `C`
  *
  * \par Valid Expressions:
- * - `c.N()`: Returns the number of rows
- * - `c.M()`: Returns the number of columns
+ * - `c.N()`: Returns the number of rows. `[[post: c.N() >= 0]]`
+ * - `c.M()`: Returns the number of columns. `[[post: c.M() >= 0]]`
  *
  * \hideinitializer
  **/
@@ -93,8 +96,8 @@ template <class C>
 concept AlgebraicMatrix = AlgebraicCollection<C>
   && requires(const C& collection)
 {
-  { collection.N() } -> std::convertible_to<typename C::size_type>; // number of rows
-  { collection.M() } -> std::convertible_to<typename C::size_type>; // number of columns
+  { collection.N() } -> std::convertible_to<typename C::size_type>;
+  { collection.M() } -> std::convertible_to<typename C::size_type>;
 };
 
 
@@ -124,14 +127,14 @@ concept ConstantSizeAlgebraicMatrix = AlgebraicMatrix<C>
  * A forward iterator that provides for each iterated element its index inside the
  * collection that is traversed.
  *
- * \par Notation:
- * Let `iter` be the iterator of type `I`.
- *
  * \par Refinement of:
  * - `std::forward_iterator`
  *
+ * \par Notation:
+ * - `iter`: the iterator of type `I`.
+ *
  * \par Valid expressions:
- * - `i.index()`: The element-index inside the traversed collection
+ * - `iter.index()`: The element-index inside the traversed collection. `[[post: iter.index() >= 0]]`
  *
  * \hideinitializer
  **/
@@ -148,11 +151,11 @@ concept ForwardIndexedIterator = std::forward_iterator<I>
  * The concept models collections that have begin and end iterators
  * providing an element index.
  *
- * \par Notation:
- * Let `c` be a collection of type `C`
- *
  * \par Refinement of:
- * - `C` is a model of \ref Collection
+ * - \ref Collection
+ *
+ * \par Notation:
+ * - `c`: a collection of type `C`
  *
  * \par Valid expressions:
  * - `c.begin()`: Iterator to the first element int the collection
@@ -182,12 +185,12 @@ concept ForwardOutputIterator = ForwardIndexedIterator<I,SizeType> && std::outpu
  * The concept models collections that have begin and end output-iterators
  * to modify the collection elements. Those iterators also provide an element index.
  *
- * \par Notation:
- * Let `c` be a collection of type `C`
- *
  * \par Refinement of:
- * - `C` is a model of \ref MutableCollection
- * - `C` is a model of \ref TraversableCollection
+ * - \ref MutableCollection
+ * - \ref TraversableCollection
+ *
+ * \par Notation:
+ * - `c`: a collection of type `C`
  *
  * \par Valid expressions:
  * - `c.begin()`: Output-iterator to the first element int the collection
@@ -210,14 +213,14 @@ concept TraversableMutableCollection = MutableCollection<C>
  * A bidirectional iterator that provides for each iterated element its index inside the
  * collection that is traversed.
  *
- * \par Notation:
- * Let `iter` be the iterator of type `I`.
- *
  * \par Refinement of:
  * - `std::bidirectional_iterator`
  *
+ * \par Notation:
+ * - `iter`: the iterator of type `I`.
+ *
  * \par Valid expressions:
- * - `i.index()`: The element-index inside the traversed collection
+ * - `iter.index()`: The element-index inside the traversed collection. `[[post: iter.index() >= 0]]`
  *
  * \hideinitializer
  **/
@@ -235,11 +238,11 @@ concept BidirectionalIndexedIterator = std::bidirectional_iterator<I>
  * providing an element index. It allows to traverse in reverse order starting
  * from the last element in the collection.
  *
- * \par Notation:
- * Let `c` be a collection of type `C`
+ * \par Refinement of:
+ * - \ref Collection
  *
- * \par Refinement:
- * - `C` is a model of \ref Collection
+ * \par Notation:
+ * - `c`: a collection of type `C`
  *
  * \par Valid expressions:
  * - `c.beforeEnd()`: Iterator to the last element int the collection
@@ -264,16 +267,16 @@ concept BidirectionalOutputIterator = BidirectionalIndexedIterator<I,SizeType> &
 
 /// \brief A ReverseTraversableCollection with iterators are output-iterators.
 /**
- * The concept models collections that have beforeEnd and beforeBegin outpt-iterators
+ * The concept models collections that have beforeEnd and beforeBegin output-iterators
  * to modify the collection elements. Those iterators also provide an element index.
  * It allows to traverse in reverse order starting from the last element in the collection.
  *
- * \par Notation:
- * Let `c` be a collection of type `C`
+ * \par Refinement of:
+ * - \ref MutableCollection
+ * - \ref ReverseTraversableCollection
  *
- * \par Refinement:
- * - `C` is a model of \ref MutableCollection
- * - `C` is a model of \ref ReverseTraversableCollection
+ * \par Notation:
+ * - `c`: a collection of type `C`
  *
  * \par Valid expressions:
  * - `c.beforeEnd()`: Output-iterator to the last element int the collection

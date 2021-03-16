@@ -21,15 +21,21 @@ namespace Concept {
 /**
  * The concept models matrix-like collections, providing indexed element access.
  *
- * \par Notation:
- * Let `m` be a matrix of type `M` and `i,j` indices of `size_type`
+ * \par Refinement of:
+ * - \ref AlgebraicMatrix
  *
- * \par Refinement:
- * - `M` is a model of \ref AlgebraicMatrix
+ * \par Notation:
+ * - `m`: a matrix of type `M`.
+ * - `i,j`: indices of `size_type`.
  *
  * \par Valid expressions:
  * - `m[i][j]`: Access the (i,j)'th element of the matrix where `i` is the row index
- *   and `j` the column index
+ *   and `j` the column index. `[[pre: 0 <= i < m.N() &&  0 <= j < m.M()]]`
+ *
+ * \par Models:
+ * - \ref FieldMatrix
+ * - \ref DynamicMatrix
+ * - \ref DiagonalMatrix
  *
  * \hideinitializer
  **/
@@ -45,15 +51,17 @@ concept Matrix = AlgebraicMatrix<M>
 /**
  * The concept models matrix-like collections, providing mutable indexed element access.
  *
- * \par Notation:
- * Let `m` be a matrix of type `M` and `i,j` indices of `size_type`
+ * \par Refinement of:
+ * - \ref Matrix
  *
- * \par Refinement:
- * - `M` is a model of \ref Matrix
+ * \par Notation:
+ * - `m`: a matrix of type `M`.
+ * - `i,j`: indices of `size_type`.
+ * - `value` of `value_type`.
  *
  * \par Valid expressions:
  * - `m[i][j]`: Mutable access to the (i,j)'th element of the matrix where `i` is the
- *   row index and `j` the column index
+ *   row index and `j` the column index. `[[pre: 0 <= i < m.N() &&  0 <= j < m.M()]]`
  *
  * \hideinitializer
  **/
@@ -79,15 +87,19 @@ concept MutableConstantSizeMatrix = MutableMatrix<M> && ConstantSizeAlgebraicMat
 /**
  * The concept models matrix collections with `resize()` function.
  *
- * \par Notation:
- * Let `m` be a matrix of type `M` and `r,c` new number of rows and columns of `size_type`
+ * \par Refinement of:
+ * - \ref Matrix
  *
- * \par Refinement:
- * - `M` is a model of \ref Matrix
+ * \par Notation:
+ * - `m`: a matrix of type `M`.
+ * - `r,c`: new number of rows and columns of `size_type`
  *
  * \par Valid expressions:
- * - `m.resize(r,c)`: Resize the matrix to the new size `rxc` where `r` is the number of
- *   rows and `c` is the number of columns.
+ * - `m.resize(r,c)`: Resize the matrix to the new size `r x c` where `r` is the number of
+ *   rows and `c` is the number of columns. `[[pre: r >= 0 && c >= 0]]`
+ *
+ * \par Models:
+ * - \ref DynamicMatrix
  *
  * \hideinitializer
  **/
@@ -107,15 +119,15 @@ concept ResizeableMatrix = Matrix<M>
  * rows first or the columns. A specialization in which way the matrix is traversed is given
  * by the concepts \ref RowMajorTraversableMatrix and \ref ColMajorTraversableMatrix.
  *
- * \par Notation:
- * Let `m` be a matrix of type `M`
+ * \par Refinement of:
+ * - \ref TraversableCollection
  *
- * \par Refinement:
- * - `M` is a model of \ref TraversableCollection
+ * \par Notation:
+ * - `m`: a matrix of type `M`.
  *
  * \par Valid expressions:
  * - `*m.begin()`: Return a traversable collection, meaning the dereferenced iterator can
- *   be traversed again and the traversal iterator id a model of TraversableCollection.
+ *   be traversed again and the traversal iterator is a model of \ref TraversableCollection.
  *
  * \hideinitializer
  **/
@@ -128,7 +140,11 @@ concept TraversableMatrix = TraversableCollection<M>
 
 /// \brief A \ref MutableMatrix that is traversable
 /**
- * Refinement of \ref TraversableMatrix but with mutable traversal.
+ * \par Refinement of:
+ * - \ref TraversableMatrix
+ * - \ref TraversableMutableCollection
+ *
+ * \hideinitializer
  **/
 template <class M>
 concept TraversableMutableMatrix = TraversableMatrix<M>
@@ -140,21 +156,21 @@ concept TraversableMutableMatrix = TraversableMatrix<M>
 
 
 /// \brief Traits class indicating whether matrix-traversal is row-major.
-/// \hideinitializer
 template <class M>
 struct IsRowMajor : std::false_type {};
 
 /// \brief Traits class indicating whether matrix-traversal is column-major.
-/// \hideinitializer
 template <class M>
 struct IsColMajor : std::false_type {};
 
 
 /// \brief A traversable matrix with row-major traversal.
+/// \hideinitializer
 template <class M>
 concept RowMajorTraversableMatrix = Matrix<M> && TraversableMatrix<M> && IsRowMajor<M>::value;
 
 /// \brief A traversable matrix with column-major traversal.
+/// \hideinitializer
 template <class M>
 concept ColMajorTraversableMatrix = Matrix<M> && TraversableMatrix<M> && IsColMajor<M>::value;
 
@@ -165,16 +181,18 @@ concept ColMajorTraversableMatrix = Matrix<M> && TraversableMatrix<M> && IsColMa
  * The concept models matrices with possibly sparse storage, like banded matrices or
  * crs/ccs matrices.
  *
- * \par Notation:
- * Let `m` be a matrix of type `M`, `i,j` indices of `size_type`
+ * \par Refinement of:
+ * - \ref Matrix
  *
- * \par Refinement:
- * - `M` is a model of \ref Matrix
+ * \par Notation:
+ * - `m`: a matrix of type `M`.
+ * - `i,j`: indices of `size_type`.
  *
  * \par Valid expressions:
- * - `m.exists(i,j)`: Return whether the element `(i,j)` is stored in the sparse matrix
- *   and thus a nonzero element.
+ * - `m.exists(i,j)`: Return `true` if the element `(i,j)` is stored in the sparse matrix
+ *   and thus is a nonzero element, `false` otherwise. `[[pre: 0 <= i < m.N() &&  0 <= j < m.M()]]`
  * - `m.nonzeroes()`: Return the number of nonzero elements stored in the sparse matrix.
+ *   `[[post: m.nonzeroes() >= 0]]`
  *
  * \hideinitializer
  **/

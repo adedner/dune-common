@@ -42,6 +42,7 @@ int main(int argc, char** argv)
   using Vec2 = Dune::DynamicVector<double>;
   static_assert(Dune::Concept::Matrix<Mat2>);
   static_assert(Dune::Concept::TraversableMatrix<Mat2>);
+  static_assert(Dune::Concept::ResizeableMatrix<Mat2>);
   // static_assert(Dune::Concept::VectorSpace<Mat2>); // missing + and -
   static_assert(Dune::Concept::LinearMap<Mat2, Vec2, Vec2>);
   static_assert(Dune::Concept::TransposableLinearMap<Mat2, Vec2, Vec2>);

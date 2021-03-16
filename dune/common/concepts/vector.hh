@@ -20,14 +20,19 @@ namespace Concept {
 /**
  * The concept models vector-like collections, providing indexed element access.
  *
- * \par Notation:
- * Let `v` be a vector of type `V` and `i` an index of `size_type`
+ * \par Refinement of:
+ * - \ref AlgebraicCollection
  *
- * \par Refinement:
- * - `V` is a model of \ref AlgebraicCollection
+ * \par Notation:
+ * - `v`: a vector of type `V`.
+ * - `i`: an index of `size_type`.
  *
  * \par Valid expressions:
- * - `v[i]`: Access the i'th element of the vector
+ * - `v[i]`: Access the i'th element of the vector. `[[pre: 0 <= i < v.size()]]`
+ *
+ * \par Models:
+ * - \ref FieldVector
+ * - \ref DynamicVector
  *
  * \hideinitializer
  **/
@@ -43,14 +48,16 @@ concept Vector = AlgebraicCollection<V>
 /**
  * The concept models vector-like collections, providing mutable indexed element access.
  *
- * \par Notation:
- * Let `v` be a vector of type `V` and `i` an index of `size_type`
+ * \par Refinement of:
+ * - \ref Vector
  *
- * \par Refinement:
- * - `V` is a model of \ref Vector
+ * \par Notation:
+ * - `v`: a vector of type `V`.
+ * - `i`: an index of `size_type`.
+ * - `value` of `value_type`.
  *
  * \par Valid expressions:
- * - `v[i]`: Mutable access to the i'th element of the vector
+ * - `v[i]`: Mutable access to the i'th element of the vector. `[[pre: 0 <= i < v.size()]]`
  *
  * \hideinitializer
  **/
@@ -77,14 +84,18 @@ concept MutableConstantSizeVector = MutableVector<V> && ConstantSizeAlgebraicCol
 /**
  * The concept models vector collections with `resize()` function.
  *
- * \par Notation:
- * Let `v` be a vector of type `V` and `s` a new size of `size_type`
+ * \par Refinement of:
+ * - \ref Vector
  *
- * \par Refinement:
- * - `V` is a model of \ref Vector
+ * \par Notation:
+ * - `v`: a vector of type `V`.
+ * - `s`: new size of `size_type`.
  *
  * \par Valid expressions:
- * - `v.resize(s)`: Resize the vector to the new size `s`
+ * - `v.resize(s)`: Resize the vector to the new size `s`: `[[pre: s >= 0]]`
+ *
+ * \par Models:
+ * - \ref DynamicVector
  *
  * \hideinitializer
  **/
