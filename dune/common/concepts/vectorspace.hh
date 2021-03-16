@@ -259,10 +259,11 @@ struct InducedNorm<Dot>
   using type = TwoNorm;
 };
 
+#endif // !DOXYGEN
+
 template <class I>
 using InducedNorm_t = typename InducedNorm<I>::type;
 
-#endif // !DOXYGEN
 
 /// \brief A HilbertSpace is a VectorSpace with inner-product and an induced norm.
 template <class X, class I = Dot,

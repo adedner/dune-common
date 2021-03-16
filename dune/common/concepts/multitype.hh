@@ -91,7 +91,8 @@ namespace Impl
   {
     template <S row, class Seq> struct Helper;
     template <S row, S... cols> struct Helper<row, std::integer_sequence<S, cols...>>
-      : std::conjunction<Dune::Std::is_detected<Check, M, std::integral_constant<S,row>, std::integral_constant<S,cols>>...> {};
+      : std::conjunction<Dune::Std::is_detected<Check, M,
+          std::integral_constant<S,row>, std::integral_constant<S,cols>>...> {};
 
     static constexpr bool value = (Helper<rows,ColSeq>::value &&...);
   };
@@ -99,7 +100,8 @@ namespace Impl
 } // end namespace Impl
 
 
-/// \brief A MultiTypeMatrix is a matrix storing different type of elements that can be accessed directly.
+/// \brief A MultiTypeMatrix is a matrix storing different type of elements that can be
+/// accessed directly.
 /**
  * \par Refinement of:
  * - \ref MultiTypeAlgebraicMatrix
@@ -111,7 +113,8 @@ namespace Impl
  *
  * \par Valid expressions:
  * - `m[i][j]`: Access the (i,j)'th element of the matrix where `i` is the row index
- *   and `j` the column index. Note, all indices must be given as `std::integral_constant<size_type, ...>`
+ *   and `j` the column index. Note, all indices must be given as
+ *   `std::integral_constant<size_type, ...>`.
  *
  * \hideinitializer
  **/
@@ -133,7 +136,8 @@ concept MultiTypeMatrix = MultiTypeAlgebraicMatrix<M> &&
  *
  * \par Valid expressions:
  * - `m[i][j]`: Mutable access to the (i,j)'th element of the matrix where `i` is the row index
- *   and `j` the column index. Note, all indices must be given as `std::integral_constant<size_type, ...>`
+ *   and `j` the column index. Note, all indices must be given as
+ *   `std::integral_constant<size_type, ...>`.
  *
  * \hideinitializer
  **/
@@ -162,13 +166,15 @@ namespace Impl
   template <class V, class S, S... indices, template <class,class> class Check>
   struct AllIndexAccessibleVec<V, std::integer_sequence<S, indices...>, Check>
   {
-    static constexpr bool value = (Dune::Std::is_detected_v<Check, V, std::integral_constant<S,indices>> &&...);
+    static constexpr bool value
+      = (Dune::Std::is_detected_v<Check, V, std::integral_constant<S,indices>> &&...);
   };
 
 } // end namespace Impl
 
 
-/// \brief A MultiTypeVector is a vector storing different types of elements that can be accessed directly.
+/// \brief A MultiTypeVector is a vector storing different types of elements that can be
+/// accessed directly.
 /**
  * \par Refinement of:
  * - \ref MultiTypeAlgebraicCollection
