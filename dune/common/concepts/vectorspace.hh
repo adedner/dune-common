@@ -232,7 +232,7 @@ template <> struct IsInnerProduct<TDot> : std::true_type {};
  * \par Invariants:
  * - Linearity in the first argument: `inner(a * x, y) == a * inner(x, y)` and
  *   `inner(x + y, z) == inner(x, z) + inner(y, z)`
- * - Conjugate symmetry or Hermitian symmetry: `inner(x, y) == inner(y, x)`
+ * - Conjugate symmetry or Hermitian symmetry: `inner(x, y) == conj(inner(y, x))`
  * - Positive definiteness: `inner(x, x) > 0 if x != 0`
  *
  * \hideinitializer
