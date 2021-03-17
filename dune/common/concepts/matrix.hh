@@ -155,8 +155,14 @@ concept TraversableMutableMatrix = TraversableMatrix<M, RangeWrapper>
 };
 
 
+template <class M>
+concept RowTraversal = requires(M matrix)
+{
+  matrix.begin_rows();
+  matrix.end_rows();
+};
 
-/// \brief Concept Map to traverse iterators `begin_rowss()` into `begin()` and `end_rows()` into `end()`.
+/// \brief Concept Map to transform iterators `begin_rows()` into `begin()` and `end_rows()` into `end()`.
 struct RowMajorRange
 {
   template <class M>
@@ -173,14 +179,22 @@ struct RowMajorRange
     M& m;
   };
 
-  template <class M>
-  auto operator()(const M& matrix) const { return ConstRange{matrix}; }
+  template <RowTraversal M>
+  auto operator() (const M& matrix) const { return ConstRange{matrix}; }
 
-  template <class M>
-  auto operator()(M& matrix) const { return MutableRange{matrix}; }
+  template <RowTraversal M>
+  auto operator() (M& matrix) const { return MutableRange{matrix}; }
 };
 
-/// \brief Concept Map to traverse iterators `begin_cols()` into `begin()` and `end_cols()` into `end()`.
+
+template <class M>
+concept ColTraversal = requires(M matrix)
+{
+  matrix.begin_cols();
+  matrix.end_cols();
+};
+
+/// \brief Concept Map to transform iterators `begin_cols()` into `begin()` and `end_cols()` into `end()`.
 struct ColMajorRange
 {
   template <class M>
@@ -197,17 +211,17 @@ struct ColMajorRange
     M& m;
   };
 
-  template <class M>
-  auto operator()(const M& matrix) const { return ConstRange{matrix}; }
+  template <ColTraversal M>
+  auto operator() (const M& matrix) const { return ConstRange{matrix}; }
 
-  template <class M>
-  auto operator()(M& matrix) const { return MutableRange{matrix}; }
+  template <ColTraversal M>
+  auto operator() (M& matrix) const { return MutableRange{matrix}; }
 };
 
 
 /// \brief A traversable matrix with row-major traversal.
 /**
- * A matrix collection that provides iterators `begin()` and `end()` traversing the
+ * A matrix collection that provides iterators `begin_rows()` and `end_rows()` traversing the
  * rows of the matrix. The dereferenced iterators are traversable and provide iterators
  * over the columns of the corresponding row.
  *
@@ -218,7 +232,7 @@ concept RowMajorTraversableMatrix = Matrix<M> && TraversableMatrix<M,RowMajorRan
 
 /// \brief A traversable matrix with column-major traversal.
 /**
- * A matrix collection that provides iterators `begin()` and `end()` traversing the
+ * A matrix collection that provides iterators `begin_cols()` and `end_cols()` traversing the
  * columns of the matrix. The dereferenced iterators are traversable and provide iterators
  * over the rows of the corresponding column.
  *
