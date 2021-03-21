@@ -1131,7 +1131,6 @@ macro(dune_add_library basename)
         set(_append APPEND)
       endif()
 
-      message(STATUS "============= CMAKE_INSTALL_LIBDIR = ${CMAKE_INSTALL_LIBDIR}")
       # install targets to use the libraries in other modules.
       install(TARGETS ${basename}
         EXPORT ${ProjectName}-targets

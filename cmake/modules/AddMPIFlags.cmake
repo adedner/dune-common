@@ -22,9 +22,9 @@ if(MPI_C_FOUND)
   set(HAVE_MPI ${MPI_C_FOUND})
 
   # provide flags to manually disable c++ bindings in MPI_C-library
-  set(MPI_DISABLE_CXX_BINDINGS MPICH_SKIP_MPICXX OMPI_SKIP_MPICXX MPIPP_H MPI_NO_CPPBIND)
+  set(MPI_DISABLE_CXX_BINDINGS MPICH_SKIP_MPICXX OMPI_SKIP_MPICXX _MPICC_H)
 
-  dune_register_package_flags(COMPILE_DEFINITIONS "ENABLE_MPI=1;${MPI_DISABLE_CXX_BINDINGS}"
+  dune_register_package_flags(COMPILE_DEFINITIONS "${MPI_DISABLE_CXX_BINDINGS}"
                               LIBRARIES MPI::MPI_C)
 endif()
 
@@ -36,7 +36,7 @@ function(add_dune_mpi_flags)
   if(MPI_C_FOUND)
     foreach(target ${targets})
       target_link_libraries(${target} PUBLIC MPI::MPI_C)
-      target_compile_definitions(${target} PUBLIC "ENABLE_MPI=1;${MPI_DISABLE_CXX_BINDINGS}")
+      target_compile_definitions(${target} PUBLIC "${MPI_DISABLE_CXX_BINDINGS}")
     endforeach(target)
   endif()
 endfunction(add_dune_mpi_flags)

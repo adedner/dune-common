@@ -45,7 +45,7 @@
 #cmakedefine HAVE_LAPACK 1
 
 /* Define if you have the MPI library.  */
-#cmakedefine HAVE_MPI ENABLE_MPI
+#cmakedefine HAVE_MPI 1
 
 /* Define if you have the GNU GMP library. The value should be ENABLE_GMP
    to facilitate activating and deactivating GMP using compile flags. */
