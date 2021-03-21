@@ -747,6 +747,7 @@ macro(dune_regenerate_config_cmake)
    It was generated from config_collected.h.cmake which in turn is generated automatically
    from the config.h.cmake files of modules this module depends on. */"
    )
+   file(WRITE ${CONFIG_H_CMAKE_FILE} "\n\n#include <dune/common/config.hh>\n")
 
  # define that we found this module
  set(${ProjectName}_FOUND 1)
