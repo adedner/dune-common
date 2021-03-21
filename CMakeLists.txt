@@ -1,12 +1,15 @@
 cmake_minimum_required(VERSION 3.13)
 project(dune-common LANGUAGES C CXX)
 
+if(POLICY CMP0087)
+  cmake_policy(SET CMP0087 NEW)
+endif()
+
 # make sure our own modules are found
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 
 # set the script dir for the macros.
 set(DUNE_COMMON_SCRIPT_DIR ${PROJECT_SOURCE_DIR}/cmake/scripts)
-set(DUNE_MODERN_CMAKE TRUE)
 
 #include the dune macros
 include(DuneMacros)
@@ -21,6 +24,7 @@ add_subdirectory(cmake)
 
 add_dune_blas_lapack_flags(dunecommon)
 add_dune_tbb_flags(dunecommon)
+add_dune_mpi_flags(dunecommon)
 
 # link against lapack or blas
 if(LAPACK_FOUND)
