@@ -1133,7 +1133,9 @@ macro(dune_add_library basename)
 
       # install targets to use the libraries in other modules.
       install(TARGETS ${basename}
-        EXPORT ${ProjectName}-targets DESTINATION ${CMAKE_INSTALL_LIBDIR})
+        EXPORT ${ProjectName}-targets
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
       install(EXPORT ${ProjectName}-targets
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${ProjectName})
 
