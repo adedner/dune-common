@@ -255,7 +255,7 @@ dune_add_test(SOURCES parametertreetest.cc
 dune_add_test(SOURCES parmetistest.cc
               MPI_RANKS 3
               TIMEOUT 300
-              CMAKE_GUARD ParMETIS_FOUND
+              CMAKE_GUARD HAVE_PARMETIS
               LINK_LIBRARIES dunecommon
               LABELS quick)
 add_dune_parmetis_flags(parmetistest)
@@ -275,6 +275,7 @@ dune_add_test(SOURCES powertest.cc
 dune_add_test(SOURCES quadmathtest.cc
               LINK_LIBRARIES dunecommon
               CMAKE_GUARD HAVE_QUADMATH)
+add_dune_quadmath_flags(quadmathtest)
 
 dune_add_test(SOURCES rangeutilitiestest.cc
               LINK_LIBRARIES dunecommon
