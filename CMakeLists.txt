@@ -20,8 +20,7 @@ dune_project(dunecommon)
 # minimal c++ standard required
 target_compile_features(dunecommon PUBLIC cxx_std_17)
 
-add_subdirectory(cmake)
-
+# Add required packages to dunecommon
 add_dune_blas_lapack_flags(dunecommon)
 add_dune_tbb_flags(dunecommon)
 add_dune_mpi_flags(dunecommon)
@@ -35,6 +34,7 @@ endif(LAPACK_FOUND)
 
 # add subdirectories to execute CMakeLists.txt there
 add_subdirectory(bin)
+add_subdirectory(cmake)
 add_subdirectory(doc)
 add_subdirectory(dune)
 add_subdirectory(lib)
