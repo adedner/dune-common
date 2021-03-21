@@ -3,6 +3,7 @@
 
 #ifndef DUNE_COMMON_PARALLEL_MPIDATA_HH
 #define DUNE_COMMON_PARALLEL_MPIDATA_HH
+#include <dune/common/config.hh>
 
 #include <vector>
 #include <string>

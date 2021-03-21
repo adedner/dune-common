@@ -1,5 +1,6 @@
 #ifndef DUNE_PYTHON_COMMON_DENSEMATRIX_HH
 #define DUNE_PYTHON_COMMON_DENSEMATRIX_HH
+#include <dune/common/config.hh>
 
 #include <string>
 #include <tuple>

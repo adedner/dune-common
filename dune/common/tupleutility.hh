@@ -3,6 +3,7 @@
 
 #ifndef DUNE_TUPLE_UTILITY_HH
 #define DUNE_TUPLE_UTILITY_HH
+#include <dune/common/config.hh>
 
 #include <cstddef>
 #include <tuple>

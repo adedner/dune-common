@@ -2,6 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_COMMUNICATOR
 #define DUNE_COMMUNICATOR
+#include <dune/common/config.hh>
 
 #if HAVE_MPI
 

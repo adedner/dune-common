@@ -1,5 +1,6 @@
 #ifndef DUNE_COMMON_SIMD_IO_HH
 #define DUNE_COMMON_SIMD_IO_HH
+#include <dune/common/config.hh>
 
 /** @file
  *  @brief IO interface of the SIMD abstraction

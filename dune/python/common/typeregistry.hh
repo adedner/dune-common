@@ -1,5 +1,6 @@
 #ifndef DUNE_PYTHON_COMMON_TYPEREGISTRY_HH
 #define DUNE_PYTHON_COMMON_TYPEREGISTRY_HH
+#include <dune/common/config.hh>
 
 #include <algorithm>
 #include <cassert>

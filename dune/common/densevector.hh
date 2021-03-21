@@ -2,6 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_DENSEVECTOR_HH
 #define DUNE_DENSEVECTOR_HH
+#include <dune/common/config.hh>
 
 #include <algorithm>
 #include <limits>

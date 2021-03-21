@@ -2,6 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_LCM_HH
 #define DUNE_LCM_HH
+#include <dune/common/config.hh>
 
 #warning "This header is deprecated and will be removed after release 2.8. Use std::lcm instead."
 

@@ -1,5 +1,3 @@
-#include <config.h>
-
 #include <iostream>
 #include <numeric>
 #include <dune/common/parallel/mpihelper.hh>

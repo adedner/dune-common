@@ -10,6 +10,7 @@
 
 #ifndef DUNE_COMMON_MPIGUARD_HH
 #define DUNE_COMMON_MPIGUARD_HH
+#include <dune/common/config.hh>
 
 #include "mpihelper.hh"
 #include "communication.hh"

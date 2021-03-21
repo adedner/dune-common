@@ -2,6 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_FTRAITS_HH
 #define DUNE_FTRAITS_HH
+#include <dune/common/config.hh>
 
 /** \file
  * \brief Type traits to determine the type of reals (when working with complex numbers)

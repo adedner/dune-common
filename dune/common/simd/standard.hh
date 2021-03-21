@@ -1,5 +1,6 @@
 #ifndef DUNE_COMMON_SIMD_STANDARD_HH
 #define DUNE_COMMON_SIMD_STANDARD_HH
+#include <dune/common/config.hh>
 
 /** @file
  *  @ingroup SIMDStandard

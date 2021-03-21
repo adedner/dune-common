@@ -18,7 +18,7 @@ set(HAVE_GMP ${GMP_FOUND})
 if(GMP_FOUND)
   dune_register_package_flags(
     LIBRARIES GMP::gmpxx
-    COMPILE_DEFINITIONS "ENABLE_GMP=1"
+    COMPILE_DEFINITIONS HAVE_GMP
   )
 endif()
 
@@ -27,7 +27,7 @@ function(add_dune_gmp_flags _targets)
   if(GMP_FOUND)
     foreach(_target ${_targets})
       target_link_libraries(${_target} PUBLIC GMP::gmpxx)
-      target_compile_definitions(${_target} PUBLIC ENABLE_GMP=1)
+      target_compile_definitions(${_target} PUBLIC HAVE_GMP)
     endforeach(_target ${_targets})
   endif(GMP_FOUND)
 endfunction(add_dune_gmp_flags)

@@ -2,6 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_GMPFIELD_HH
 #define DUNE_GMPFIELD_HH
+#include <dune/common/config.hh>
 
 /** \file
  * \brief Wrapper for the GNU multiprecision (GMP) library

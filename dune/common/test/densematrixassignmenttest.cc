@@ -1,5 +1,3 @@
-#include "config.h"
-
 #define DUNE_CHECK_BOUNDS
 
 #include <complex>

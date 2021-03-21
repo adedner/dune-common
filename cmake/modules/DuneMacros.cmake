@@ -691,13 +691,10 @@ macro(dune_project)
       $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
       $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
       $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-
-    target_compile_definitions(${DUNE_MODULE_LIBRARY} PUBLIC HAVE_CONFIG_H)
   else()
     # fallback for legacy cmake build system
     include_directories(${PROJECT_BINARY_DIR})
     include_directories(${PROJECT_SOURCE_DIR})
-    add_definitions(-DHAVE_CONFIG_H)
   endif()
 
   # Create custom target for building the documentation
@@ -879,9 +876,12 @@ macro(finalize_dune_project)
   # file section of dune-grid.
   set(DUNE_MODULE_SRC_DOCDIR "\${${ProjectName}_PREFIX}/${CMAKE_INSTALL_DOCDIR}")
 
-  if(NOT EXISTS ${PROJECT_SOURCE_DIR}/cmake/pkg/${ProjectName}-config.cmake.in)
+  if(EXISTS ${PROJECT_SOURCE_DIR}/cmake/pkg/${ProjectName}-config.cmake.in)
+    set(CONFIG_SOURCE_FILE ${PROJECT_SOURCE_DIR}/cmake/pkg/${ProjectName}-config.cmake.in)
+  else()
     # Generate a standard cmake package configuration file
-    file(WRITE ${PROJECT_BINARY_DIR}/CMakeFiles/${ProjectName}-config.cmake.in
+    set(CONFIG_SOURCE_FILE ${PROJECT_BINARY_DIR}/CMakeFiles/${ProjectName}-config.cmake.in)
+    file(WRITE ${CONFIG_SOURCE_FILE}
 "if(NOT ${ProjectName}_FOUND)
 # Whether this module is installed or not
 set(${ProjectName}_INSTALLED @MODULE_INSTALLED@)
@@ -913,9 +913,6 @@ if(${ProjectName}_LIBRARIES)
   include(\"\${_dir}/${ProjectName}-targets.cmake\")
 endif()
 endif()")
-      set(CONFIG_SOURCE_FILE ${PROJECT_BINARY_DIR}/CMakeFiles/${ProjectName}-config.cmake.in)
-  else()
-    set(CONFIG_SOURCE_FILE ${PROJECT_SOURCE_DIR}/cmake/pkg/${ProjectName}-config.cmake.in)
   endif()
   get_property(DUNE_MODULE_LIBRARIES GLOBAL PROPERTY DUNE_MODULE_LIBRARIES)
 
@@ -938,9 +935,10 @@ endif()")
 
   configure_package_config_file(${CONFIG_SOURCE_FILE}
     ${PROJECT_BINARY_DIR}/cmake/pkg/${ProjectName}-config.cmake
-    INSTALL_DESTINATION  ${DUNE_INSTALL_LIBDIR}/cmake/${ProjectName}
-    PATH_VARS CMAKE_INSTALL_DATAROOTDIR DUNE_INSTALL_MODULEDIR CMAKE_INSTALL_INCLUDEDIR
-    DOXYSTYLE_DIR SCRIPT_DIR)
+    INSTALL_DESTINATION
+      ${DUNE_INSTALL_LIBDIR}/cmake/${ProjectName}
+    PATH_VARS
+      CMAKE_INSTALL_DATAROOTDIR DUNE_INSTALL_MODULEDIR CMAKE_INSTALL_INCLUDEDIR DOXYSTYLE_DIR SCRIPT_DIR)
 
 
   #create cmake-config files for build tree
@@ -987,9 +985,12 @@ endif()
   install(FILES dune.module DESTINATION ${DUNE_INSTALL_NONOBJECTLIBDIR}/dunecontrol/${ProjectName})
 
   # install cmake-config files
-  install(FILES ${PROJECT_BINARY_DIR}/cmake/pkg/${ProjectName}-config.cmake
-    ${PROJECT_BINARY_DIR}/${ProjectName}-config-version.cmake
-    DESTINATION ${DUNE_INSTALL_LIBDIR}/cmake/${ProjectName})
+  install(
+    FILES
+      ${PROJECT_BINARY_DIR}/cmake/pkg/${ProjectName}-config.cmake
+      ${PROJECT_BINARY_DIR}/${ProjectName}-config-version.cmake
+    DESTINATION
+      ${DUNE_INSTALL_LIBDIR}/cmake/${ProjectName})
 
   # install config.h
   if(EXISTS ${PROJECT_SOURCE_DIR}/config.h.cmake)
@@ -1009,12 +1010,13 @@ endif()
     endif()
     # actually write the config.h file to disk
     # using generated file
-    configure_file(${CMAKE_CURRENT_BINARY_DIR}/config_collected.h.cmake
-      ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-  else()
+    configure_file(${CMAKE_CURRENT_BINARY_DIR}/config_collected.h.cmake ${PROJECT_BINARY_DIR}/config.h)
+    add_definitions(-DHAVE_CONFIG_H)
+  elseif(EXISTS ${CMAKE_SOURCE_DIR}/config.h.cmake)
     message(STATUS "Not adding custom target for config.h generation")
     # actually write the config.h file to disk
-    configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+    configure_file(${CMAKE_SOURCE_DIR}/config.h.cmake ${PROJECT_BINARY_DIR}/config.h)
+    add_definitions(-DHAVE_CONFIG_H)
   endif()
 
   if(NOT PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
@@ -1277,3 +1279,38 @@ macro(add_dune_all_flags targets)
     target_compile_options(${target} PUBLIC ${opts})
   endforeach()
 endmacro(add_dune_all_flags targets)
+
+# create a module specific config header file and force an include
+function(dune_add_config_header _config_hh_in _config_hh)
+  set(_config_hh_tmp ${CMAKE_CURRENT_BINARY_DIR}/${_config_hh_in}.tmp)
+  file(READ ${_config_hh_in} _config_hh_content)
+  file(WRITE ${_config_hh_tmp} "${_config_hh_content}")
+
+  # append version information about the current module
+  dune_module_to_uppercase(PROJECT_NAME ${ProjectName})
+  file(APPEND ${_config_hh_tmp}
+"
+/* Define to the version of ${ProjectName} */
+#define ${PROJECT_NAME}_VERSION \"\${${PROJECT_NAME}_VERSION}\"
+
+/* Define to the major version of ${ProjectName} */
+#define ${PROJECT_NAME}_VERSION_MAJOR \${${PROJECT_NAME}_VERSION_MAJOR}
+
+/* Define to the minor version of ${ProjectName} */
+#define ${PROJECT_NAME}_VERSION_MINOR \${${PROJECT_NAME}_VERSION_MINOR}
+
+/* Define to the revision of ${ProjectName} */
+#define ${PROJECT_NAME}_VERSION_REVISION \${${PROJECT_NAME}_VERSION_REVISION}
+")
+
+  # define that we found this module
+  set(${ProjectName}_FOUND 1)
+  foreach(_dep ${ProjectName} ${ALL_DEPENDENCIES})
+    dune_module_to_uppercase(_upper ${_dep})
+    set(HAVE_${_upper} ${${_dep}_FOUND})
+    file(APPEND ${_config_hh_tmp}
+      "\n/* Define to 1 if you have module ${_dep} available */\n#cmakedefine01 HAVE_${_upper}\n")
+  endforeach()
+
+  configure_file(${_config_hh_tmp} ${_config_hh})
+endfunction(dune_add_config_header)

@@ -3,6 +3,7 @@
 
 #ifndef DUNE_COMMON_DOCUMENTATION_HH
 #define DUNE_COMMON_DOCUMENTATION_HH
+#include <dune/common/config.hh>
 
 /** \file
     \brief Documentation related stuff

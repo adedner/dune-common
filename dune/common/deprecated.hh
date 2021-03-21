@@ -2,6 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_DEPRECATED_HH
 #define DUNE_DEPRECATED_HH
+#include <dune/common/config.hh>
 
 /** \file
  * \brief Definition of the DUNE_DEPRECATED macro for the case that config.h

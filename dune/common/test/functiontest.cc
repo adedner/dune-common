@@ -1,7 +1,4 @@
-#include "config.h"
-
 #include <type_traits>
-
 
 #include <dune/common/deprecated.hh>
 #define DUNE_FUNCTION_HH_SILENCE_DEPRECATION

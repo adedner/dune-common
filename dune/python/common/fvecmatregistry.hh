@@ -1,5 +1,6 @@
 #ifndef DUNE_PYTHON_COMMON_FVECMATREG_HH
 #define DUNE_PYTHON_COMMON_FVECMATREG_HH
+#include <dune/common/config.hh>
 
 #include <dune/python/pybind11/pybind11.h>
 #include <dune/python/common/fvector.hh>

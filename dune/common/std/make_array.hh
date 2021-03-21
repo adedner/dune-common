@@ -1,5 +1,6 @@
 #ifndef DUNE_COMMON_STD_MAKE_ARRAY_HH
 #define DUNE_COMMON_STD_MAKE_ARRAY_HH
+#include <dune/common/config.hh>
 
 #include <array>
 #include <type_traits>

@@ -1,5 +1,6 @@
 #ifndef DUNE_COMMON_SIMD_TEST_HH
 #define DUNE_COMMON_SIMD_TEST_HH
+#include <dune/common/config.hh>
 
 /** @file
  *  @brief Common tests for simd abstraction implementations

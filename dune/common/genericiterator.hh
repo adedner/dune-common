@@ -2,6 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_GENERICITERATOR_HH
 #define DUNE_GENERICITERATOR_HH
+#include <dune/common/config.hh>
 
 #include <dune/common/iteratorfacades.hh>
 #include <cassert>

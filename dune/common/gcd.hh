@@ -2,6 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_GCD_HH
 #define DUNE_GCD_HH
+#include <dune/common/config.hh>
 #warning "This header is deprecated and will be removed after Dune release 2.8. Use std::gcd instead"
 
 #include <numeric>

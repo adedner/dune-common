@@ -2,6 +2,7 @@
 // vi: set ts=8 sw=2 et sts=2:
 #ifndef DUNE_COMMON_STD_FUNCTIONAL_HH
 #define DUNE_COMMON_STD_FUNCTIONAL_HH
+#include <dune/common/config.hh>
 
 #include <functional>
 

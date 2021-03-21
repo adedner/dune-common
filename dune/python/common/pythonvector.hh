@@ -1,5 +1,6 @@
 #ifndef DUNE_PYTHON_COMMON_PYTHONVECTOR_HH
 #define DUNE_PYTHON_COMMON_PYTHONVECTOR_HH
+#include <dune/common/config.hh>
 
 #include <cstddef>
 

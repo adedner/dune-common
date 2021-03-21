@@ -1,5 +1,3 @@
-#include <config.h>
-
 #include <dune/common/bitsetvector.hh>
 #include <dune/common/diagonalmatrix.hh>
 #include <dune/common/dynvector.hh>

@@ -3,6 +3,7 @@
 
 #ifndef DUNE_COMMON_TEST_ITERATORTEST_HH
 #define DUNE_COMMON_TEST_ITERATORTEST_HH
+#include <dune/common/config.hh>
 #include <iostream>
 #include <algorithm>
 #include <dune/common/classname.hh>

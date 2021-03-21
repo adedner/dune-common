@@ -1,5 +1,6 @@
 #ifndef DUNE_COMMON_SIMD_INTERFACE_HH
 #define DUNE_COMMON_SIMD_INTERFACE_HH
+#include <dune/common/config.hh>
 
 /** @file
  *  @brief User interface of the SIMD abstraction

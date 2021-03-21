@@ -3,6 +3,7 @@
 
 #ifndef DUNE_STREAMOPERATORS_HH
 #define DUNE_STREAMOPERATORS_HH
+#include <dune/common/config.hh>
 
 /** \file
     \brief Implementation of stream operators for std::array and std::tuple

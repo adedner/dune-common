@@ -2,6 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_COMMON_OVERLOADSET_HH
 #define DUNE_COMMON_OVERLOADSET_HH
+#include <dune/common/config.hh>
 
 #include <utility>
 #include <type_traits>

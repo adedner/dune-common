@@ -1,5 +1,6 @@
 #ifndef DUNE_COMMON_SIMD_HH
 #define DUNE_COMMON_SIMD_HH
+#include <dune/common/config.hh>
 
 #warning dune/common/simd.hh is deprecated.
 #warning Use the new infrastructure from dune/common/simd/simd.h instead.

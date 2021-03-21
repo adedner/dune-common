@@ -1,5 +1,6 @@
 #ifndef DUNE_COMMON_STD_UTILITY_HH
 #define DUNE_COMMON_STD_UTILITY_HH
+#include <dune/common/config.hh>
 
 #include <utility>
 

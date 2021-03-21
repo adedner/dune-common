@@ -2,6 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_PRECISION_HH
 #define DUNE_PRECISION_HH
+#include <dune/common/config.hh>
 
 /** \file
  * \brief Various precision settings for calculations with FieldMatrix and FieldVector

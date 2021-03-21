@@ -2,6 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_COMMON_POWER_HH
 #define DUNE_COMMON_POWER_HH
+#include <dune/common/config.hh>
 
 /** \file
     \brief Various implementations of the power function for run-time and static arguments

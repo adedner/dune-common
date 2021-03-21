@@ -1,5 +1,6 @@
 #ifndef DUNE_COMMON_SIMD_LOOP_HH
 #define DUNE_COMMON_SIMD_LOOP_HH
+#include <dune/common/config.hh>
 
 #include <array>
 #include <cmath>

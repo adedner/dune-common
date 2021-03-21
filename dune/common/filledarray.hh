@@ -3,6 +3,7 @@
 
 #ifndef DUNE_COMMON_FILLED_ARRAY_HH
 #define DUNE_COMMON_FILLED_ARRAY_HH
+#include <dune/common/config.hh>
 
 /** \file
     \brief Utility to generate an array with a certain value

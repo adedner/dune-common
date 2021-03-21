@@ -3,6 +3,7 @@
 
 #ifndef DUNE_COMMON_STDTHREAD_HH
 #define DUNE_COMMON_STDTHREAD_HH
+#include <dune/common/config.hh>
 
 #include <dune/common/unused.hh>
 

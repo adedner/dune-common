@@ -2,6 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_ALIGNED_ALLOCATOR_HH
 #define DUNE_ALIGNED_ALLOCATOR_HH
+#include <dune/common/config.hh>
 
 #include "mallocallocator.hh"
 #include <cstdlib>

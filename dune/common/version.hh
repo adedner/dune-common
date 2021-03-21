@@ -2,6 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_VERSION_HH
 #define DUNE_VERSION_HH
+#include <dune/common/config.hh>
 
 /** \file
  * \brief Various macros to work with %Dune module version numbers

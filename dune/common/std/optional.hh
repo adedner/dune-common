@@ -1,5 +1,6 @@
 #ifndef DUNE_COMMON_STD_OPTIONAL_HH
 #define DUNE_COMMON_STD_OPTIONAL_HH
+#include <dune/common/config.hh>
 
 #include <cassert>
 #include <functional>

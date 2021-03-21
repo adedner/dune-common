@@ -3,6 +3,7 @@
 
 #ifndef DUNE_TO_UNIQUE_PTR_HH
 #define DUNE_TO_UNIQUE_PTR_HH
+#include <dune/common/config.hh>
 
 #include <memory>
 

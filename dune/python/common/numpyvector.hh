@@ -1,5 +1,6 @@
 #ifndef DUNE_PYTHON_COMMON_NUMPYVECTOR_HH
 #define DUNE_PYTHON_COMMON_NUMPYVECTOR_HH
+#include <dune/common/config.hh>
 
 #include <dune/common/densevector.hh>
 #include <dune/common/ftraits.hh>

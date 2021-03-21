@@ -2,6 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_COMMON_UNUSED_HH
 #define DUNE_COMMON_UNUSED_HH
+#include <dune/common/config.hh>
 
 /** \file
  * \brief Definition of the DUNE_UNUSED macro for the case that config.h

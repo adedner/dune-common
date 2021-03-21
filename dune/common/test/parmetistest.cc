@@ -1,7 +1,7 @@
-#include <config.h>
 #include <cassert>
 #include <iostream>
 #include <vector>
+#include <dune/common/config.hh>
 
 #if ! HAVE_PARMETIS
 #error "ParMETIS is required for this test."

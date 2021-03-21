@@ -1,5 +1,6 @@
 #ifndef DUNE_PYTHON_COMMON_DIMRANGE_HH
 #define DUNE_PYTHON_COMMON_DIMRANGE_HH
+#include <dune/common/config.hh>
 
 #include <cstddef>
 

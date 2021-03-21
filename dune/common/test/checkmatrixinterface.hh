@@ -2,6 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_COMMON_CHECK_MATRIX_INTERFACE_HH
 #define DUNE_COMMON_CHECK_MATRIX_INTERFACE_HH
+#include <dune/common/config.hh>
 
 #include <algorithm>
 #include <limits>

@@ -2,6 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_COMMON_TEST_ARITHMETICTESTSUITE_HH
 #define DUNE_COMMON_TEST_ARITHMETICTESTSUITE_HH
+#include <dune/common/config.hh>
 
 #include <string>
 #include <type_traits>

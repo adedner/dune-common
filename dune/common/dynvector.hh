@@ -2,6 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_DYNVECTOR_HH
 #define DUNE_DYNVECTOR_HH
+#include <dune/common/config.hh>
 
 #include <cmath>
 #include <cstddef>

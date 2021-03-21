@@ -1,5 +1,6 @@
 #ifndef DUNE_COMMON_SIMD_VC_HH
 #define DUNE_COMMON_SIMD_VC_HH
+#include <dune/common/config.hh>
 
 /** @file
  *  @ingroup SIMDVc

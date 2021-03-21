@@ -2,6 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_TYPETRAITS_HH
 #define DUNE_TYPETRAITS_HH
+#include <dune/common/config.hh>
 
 #include <complex>
 #include <type_traits>

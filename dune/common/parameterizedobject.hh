@@ -2,6 +2,7 @@
 // vi: set et ts=4 sw=4 sts=4:
 #ifndef DUNE_COMMON_PARAMETERIZEDOBJECT_HH
 #define DUNE_COMMON_PARAMETERIZEDOBJECT_HH
+#include <dune/common/config.hh>
 
 #include <functional>
 #include <map>

@@ -2,6 +2,7 @@
 // vi: set et ts=4 sw=2 sts=2:
 #ifndef DUNE_DIAGONAL_MATRIX_HH
 #define DUNE_DIAGONAL_MATRIX_HH
+#include <dune/common/config.hh>
 
 /*! \file
    \brief  This file implements a quadratic diagonal matrix of fixed size.
