@@ -119,48 +119,17 @@ dune_add_test(NAME debugalignsimdtest
 dune_add_test(SOURCES densematrixassignmenttest.cc
               LINK_LIBRARIES dunecommon
               LABELS quick)
-dune_add_test(NAME densematrixassignmenttest_fail0
-              SOURCES densematrixassignmenttest.cc
-              LINK_LIBRARIES dunecommon
-              COMPILE_DEFINITIONS "FAILURE0"
-              EXPECT_COMPILE_FAIL
-              LABELS quick)
-dune_add_test(NAME densematrixassignmenttest_fail1
-              SOURCES densematrixassignmenttest.cc
-              LINK_LIBRARIES dunecommon
-              COMPILE_DEFINITIONS "FAILURE1"
-              EXPECT_COMPILE_FAIL
-              LABELS quick)
-dune_add_test(NAME densematrixassignmenttest_fail2
-              SOURCES densematrixassignmenttest.cc
-              LINK_LIBRARIES dunecommon
-              COMPILE_DEFINITIONS "FAILURE2"
-              EXPECT_COMPILE_FAIL
-              LABELS quick)
-dune_add_test(NAME densematrixassignmenttest_fail3
-              SOURCES densematrixassignmenttest.cc
-              LINK_LIBRARIES dunecommon
-              COMPILE_DEFINITIONS "FAILURE3"
-              EXPECT_COMPILE_FAIL
-              LABELS quick)
-dune_add_test(NAME densematrixassignmenttest_fail4
-              SOURCES densematrixassignmenttest.cc
-              LINK_LIBRARIES dunecommon
-              COMPILE_DEFINITIONS "FAILURE4"
-              EXPECT_COMPILE_FAIL
-              LABELS quick)
-dune_add_test(NAME densematrixassignmenttest_fail5
-              SOURCES densematrixassignmenttest.cc
-              LINK_LIBRARIES dunecommon
-              COMPILE_DEFINITIONS "FAILURE5"
-              EXPECT_COMPILE_FAIL
-              LABELS quick)
-dune_add_test(NAME densematrixassignmenttest_fail6
-              SOURCES densematrixassignmenttest.cc
-              LINK_LIBRARIES dunecommon
-              COMPILE_DEFINITIONS "FAILURE6"
-              EXPECT_COMPILE_FAIL
-              LABELS quick)
+add_dune_gmp_flags(densematrixassignmenttest)
+
+foreach(fail 1 2 3 4 5 6)
+  dune_add_test(NAME densematrixassignmenttest_fail${fail}
+                SOURCES densematrixassignmenttest.cc
+                LINK_LIBRARIES dunecommon
+                COMPILE_DEFINITIONS "FAILURE${fail}"
+                EXPECT_COMPILE_FAIL
+                LABELS quick)
+  add_dune_gmp_flags(densematrixassignmenttest_fail${fail})
+endforeach()
 
 dune_add_test(SOURCES densevectorassignmenttest.cc
               LINK_LIBRARIES dunecommon
@@ -317,8 +286,9 @@ dune_add_test(SOURCES reservedvectortest.cc
 
 dune_add_test(SOURCES scotchtest.cc
               LINK_LIBRARIES dunecommon
-              CMAKE_GUARD PTScotch_FOUND
+              CMAKE_GUARD HAVE_SCOTCH
               LABELS quick)
+add_dune_ptscotch_flags(scotchtest)
 
 dune_add_test(SOURCES shared_ptrtest.cc
               LINK_LIBRARIES dunecommon
