@@ -146,6 +146,7 @@ if(${CMAKE_VERSION} VERSION_LESS "3.19.4")
 endif()
 
 include(FeatureSummary)
+include(GNUInstallDirs)
 include(DuneEnableAllPackages)
 include(DuneTestMacros)
 include(OverloadCompilerFlags)
@@ -710,7 +711,6 @@ macro(dune_project)
   # Process the macros provided by the dependencies and ourself
   dune_process_dependency_macros()
 
-  include(GNUInstallDirs)
   # Set variable where the cmake modules will be installed.
   # Thus the user can override it and for example install
   # directly into the CMake installation. We use a cache variable
@@ -1131,6 +1131,7 @@ macro(dune_add_library basename)
         set(_append APPEND)
       endif()
 
+      message(STATUS "============= CMAKE_INSTALL_LIBDIR = ${CMAKE_INSTALL_LIBDIR}")
       # install targets to use the libraries in other modules.
       install(TARGETS ${basename}
         EXPORT ${ProjectName}-targets
