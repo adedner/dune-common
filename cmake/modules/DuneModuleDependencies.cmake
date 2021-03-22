@@ -33,58 +33,21 @@ include(DuneUtilities)
 
 
 macro(dune_create_dependency_tree)
-  if(dune-common_MODULE_PATH)
-    list(REMOVE_ITEM CMAKE_MODULE_PATH "${dune-common_MODULE_PATH}")
-  endif()
-  list(FIND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules start)
-  set(ALL_DEPENDENCIES "")
+  # collect direct (and transitive) dependencies
+  set(ALL_DEPENDENCIES)
   if(${ProjectName}_DEPENDS_MODULE OR ${ProjectName}_SUGGESTS_MODULE)
     set(ALL_DEPENDENCIES ${${ProjectName}_DEPENDS_MODULE} ${${ProjectName}_SUGGESTS_MODULE})
-    dune_create_dependency_leafs("${${ProjectName}_DEPENDS_MODULE}" "${${ProjectName}_DEPENDS_VERSION}"
-      "${${ProjectName}_SUGGESTS_MODULE}" "${${ProjectName}_SUGGESTS_VERSION}")
+    dune_create_dependency_leafs(
+      "${${ProjectName}_DEPENDS_MODULE}"
+      "${${ProjectName}_DEPENDS_VERSION}"
+      "${${ProjectName}_SUGGESTS_MODULE}"
+      "${${ProjectName}_SUGGESTS_VERSION}")
   endif()
-  set(_my_path "")
+
+  # process list of dependencies
   if(ALL_DEPENDENCIES)
-    # Reverse the order of the modules and remove duplicates
-    # At end of this clause we have have a list modules
-    # where for each entry all dependencies are before the
-    # module in the list.
-    set(NEW_ALL_DEPS "")
-    list(LENGTH ALL_DEPENDENCIES length)
-    if(length GREATER 0)
-      math(EXPR length "${length}-1")
-      list(GET ALL_DEPENDENCIES ${length} _mod)
-      set(${_mod}_cmake_path_processed 1)
-      set(_my_path ${${_mod}_MODULE_PATH})
-      list(APPEND NEW_ALL_DEPS ${_mod})
-      if(length GREATER 0)
-        math(EXPR length "${length}-1")
-        foreach(i RANGE ${length} 0 -1)
-          list(GET ALL_DEPENDENCIES ${i} _mod)
-          if(NOT ${_mod}_cmake_path_processed)
-            set(${_mod}_cmake_path_processed 1)
-            if(${_mod}_MODULE_PATH)
-              list(INSERT _my_path 0 ${${_mod}_MODULE_PATH})
-            endif()
-            list(APPEND NEW_ALL_DEPS ${_mod})
-          endif()
-        endforeach()
-      endif()
-      list(LENGTH CMAKE_MODULE_PATH length)
-      math(EXPR length "${length}-1")
-      if(start EQUAL -1)
-        list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules ${_my_path})
-      else()
-        if(start EQUAL ${length})
-          list(APPEND CMAKE_MODULE_PATH ${_my_path})
-        else()
-          if(_my_path)
-            list(INSERT CMAKE_MODULE_PATH ${start} ${_my_path})
-          endif()
-        endif()
-      endif()
-    endif()
-    set(ALL_DEPENDENCIES ${NEW_ALL_DEPS})
+    list(REVERSE ALL_DEPENDENCIES)
+    list(REMOVE_DUPLICATES ALL_DEPENDENCIES)
   endif()
 endmacro(dune_create_dependency_tree)
 
@@ -114,20 +77,11 @@ macro(dune_process_dependency_macros)
           message(STATUS "No module specific tests for module '${_mod}' ('${_macro}.cmake' not found)")
         endif()
       endif()
-      dune_module_to_uppercase(_upper_case "${_mod}")
-      if(${_mod}_INCLUDE_DIRS)
-        message(STATUS "Setting ${_mod}_INCLUDE_DIRS=${${_mod}_INCLUDE_DIRS}")
-        include_directories("${${_mod}_INCLUDE_DIRS}")
-      endif()
       if(${_mod}_LIBRARIES)
-        message(STATUS "Setting ${_mod}_LIBRARIES=${${_mod}_LIBRARIES}")
         foreach(_lib ${${_mod}_LIBRARIES})
           list(INSERT DUNE_LIBS 0 "${_lib}")
         endforeach()
       endif()
-
-      # register dune module
-      dune_register_package_flags(INCLUDE_DIRS "${${_mod}_INCLUDE_DIRS}")
     endif()
   endforeach()
 endmacro(dune_process_dependency_macros)
@@ -138,7 +92,7 @@ endmacro(dune_process_dependency_macros)
 # ------------------------------------------------------------------------
 
 
-macro(find_dune_package module)
+macro(dune_find_module module)
   cmake_parse_arguments(DUNE_FIND "REQUIRED" "VERSION" "" ${ARGN})
   if(DUNE_FIND_REQUIRED)
     set(required REQUIRED)
@@ -149,121 +103,64 @@ macro(find_dune_package module)
     set(_warning_level "WARNING")
     set_package_properties(${module} PROPERTIES TYPE OPTIONAL)
   endif()
+
   if(DUNE_FIND_VERSION MATCHES "(>=|=|<=).*")
     string(REGEX REPLACE "(>=|=|<=)(.*)" "\\1" DUNE_FIND_VERSION_OP ${DUNE_FIND_VERSION})
     string(REGEX REPLACE "(>=|=|<=)(.*)" "\\2" DUNE_FIND_VERSION_NUMBER ${DUNE_FIND_VERSION})
     string(STRIP ${DUNE_FIND_VERSION_NUMBER} DUNE_FIND_VERSION_NUMBER)
-    extract_major_minor_version("${DUNE_FIND_VERSION_NUMBER}" DUNE_FIND_VERSION)
-    set(DUNE_FIND_VERSION_STRING "${DUNE_FIND_VERSION_MAJOR}.${DUNE_FIND_VERSION_MINOR}.${DUNE_FIND_VERSION_REVISION}")
+    dune_extract_major_minor_version("${DUNE_FIND_VERSION_NUMBER}" DUNE_FIND_VERSION)
+    set(DUNE_FIND_VERSION_STRING
+      "${DUNE_FIND_VERSION_MAJOR}.${DUNE_FIND_VERSION_MINOR}.${DUNE_FIND_VERSION_REVISION}")
   else()
     set(DUNE_FIND_VERSION_STRING "0.0.0")
   endif()
+
+  # search for dune module only if not found or provided otherwise
   if(NOT ${module}_FOUND)
-    if(NOT (${module}_DIR OR ${module}_ROOT OR
-       "${CMAKE_PREFIX_PATH}" MATCHES ".*${module}.*"))
-      string(REPLACE  ${ProjectName} ${module} ${module}_DIR
-        ${PROJECT_BINARY_DIR})
+    if(NOT (${module}_DIR OR ${module}_ROOT OR "${CMAKE_PREFIX_PATH}" MATCHES ".*${module}.*"))
+      string(REPLACE  ${ProjectName} ${module} ${module}_DIR ${PROJECT_BINARY_DIR})
     endif()
-    find_package(${module} NO_CMAKE_PACKAGE_REGISTRY)
+    find_package(${module} ${required} NO_CMAKE_PACKAGE_REGISTRY)
   endif()
-  if(NOT ${module}_FOUND AND NOT CMAKE_DISABLE_FIND_PACKAGE_${module})
-    message(STATUS "No full CMake package configuration support available."
-      " Falling back to pkg-config.")
-    # use pkg-config
-    find_package(PkgConfig)
-    if(NOT PKG_CONFIG_FOUND AND required)
-      message(FATAL_ERROR "Could not find module ${module}. We tried to use"
-        "pkg-config but could not find it. ")
-    endif()
-        pkg_check_modules (${module} ${required} ${module}${DUNE_FIND_VERSION})
-    set(${module}_FAKE_CMAKE_PKGCONFIG TRUE)
-  endif()
-  if(${module}_FAKE_CMAKE_PKGCONFIG)
-    # compute the path to the libraries
-    if(${module}_LIBRARIES)
-      unset(_module_lib)
-      foreach(lib ${${module}_LIBRARIES})
-        foreach(libdir ${${module}_LIBRARY_DIRS})
-          if(EXISTS ${libdir}/lib${lib}.a)
-            set(_module_lib ${libdir}/lib${lib}.a)
-            set(_module_lib_static "STATIC")
-          endif()
-          if(EXISTS ${libdir}/lib${lib}.so)
-            set(_module_lib ${libdir}/lib${lib}.so)
-            set(_module_lib_static "")
-          endif()
-          if(_module_lib)
-            #import library
-            add_library(${lib} ${_module_lib_static} IMPORTED)
-            set_property(TARGET ${lib} APPEND PROPERTY IMPORTED_CONFIGURATIONS NOCONFIG)
-            set_target_properties(${lib} PROPERTIES
-              IMPORTED_LINK_INTERFACE_LANGUAGES_NOCONFIG "CXX"
-              IMPORTED_LOCATION_NOCONFIG "${_module_lib}")
-            break()
-          endif()
-        endforeach()
-      endforeach()
-    endif()
-    if(NOT ${module}_MODULE_PATH)
-      if(${module}_INCLUDE_DIRS)
-        list(GET ${module}_INCLUDE_DIRS 0 _dir)
-        if(EXISTS ${_dir}/../share/dune/cmake/modules)
-          set(${module}_MODULE_PATH ${_dir}/../share/dune/cmake/modules)
-        endif()
-      endif()
-    endif()
-    unset(${module}_FAKE_CMAKE_PKGCONFIG)
-  endif()
+
+  # check whether dependency matches version requirement
   if(${module}_FOUND)
-    # parse other module's dune.module file to generate variables for config.h
-    unset(${module}_dune_module)
-    foreach(_dune_module_file
-        ${${module}_PREFIX}/dune.module
-        ${${module}_PREFIX}/lib/dunecontrol/${module}/dune.module
-        ${${module}_PREFIX}/lib64/dunecontrol/${module}/dune.module)
-      if(EXISTS ${_dune_module_file})
-        get_filename_component(_dune_module_file_path ${_dune_module_file} PATH)
-        dune_module_information(${_dune_module_file_path})# QUIET)
-        set(${module}_dune_module 1)
-        set(DUNE_FIND_MOD_VERSION_STRING "${DUNE_VERSION_MAJOR}.${DUNE_VERSION_MINOR}.${DUNE_VERSION_REVISION}")
-        # check whether dependency mathes version requirement
-        unset(module_version_wrong)
-        if(DUNE_FIND_VERSION_OP MATCHES ">=")
-          if(NOT (DUNE_FIND_MOD_VERSION_STRING VERSION_EQUAL DUNE_FIND_VERSION_STRING OR
-                  DUNE_FIND_MOD_VERSION_STRING VERSION_GREATER DUNE_FIND_VERSION_STRING))
-            set(module_version_wrong 1)
-          endif()
-        elseif(DUNE_FIND_VERSION_OP MATCHES "<=")
-          if(NOT (DUNE_FIND_MOD_VERSION_STRING VERSION_EQUAL DUNE_FIND_VERSION_STRING OR
-                  DUNE_FIND_MOD_VERSION_STRING VERSION_LESS DUNE_FIND_VERSION_STRING))
-            set(module_version_wrong 1)
-          endif()
-        elseif(DUNE_FIND_VERSION_OP MATCHES "=" AND
-           NOT (DUNE_FIND_MOD_VERSION_STRING VERSION_EQUAL DUNE_FIND_VERSION_STRING))
-          set(module_version_wrong 1)
-        endif()
+    set(DUNE_FOUND_VERSION_STRING ${${module}_VERSION}) # version string provided by find_package
+
+    unset(module_version_wrong)
+    if(DUNE_FIND_VERSION_OP MATCHES ">=")
+      if(NOT (DUNE_FOUND_VERSION_STRING VERSION_GREATER_EQUAL DUNE_FIND_VERSION_STRING))
+        set(module_version_wrong 1)
       endif()
-    endforeach()
-    if(NOT ${module}_dune_module)
-      message(${_warning_level} "Could not find dune.module file for module ${module} "
-        "in ${${module}_PREFIX},  ${${module}_PREFIX}/lib/dunecontrol/${module}/, "
-        "${${module}_PREFIX}/lib64/dunecontrol/${module}/dune.module")
-      set(${module}_FOUND OFF)
+    elseif(DUNE_FIND_VERSION_OP MATCHES "<=")
+      if(NOT (DUNE_FOUND_VERSION_STRING VERSION_LESS_EQUAL DUNE_FIND_VERSION_STRING))
+        set(module_version_wrong 1)
+      endif()
+    elseif(DUNE_FIND_VERSION_OP MATCHES "=" AND
+        NOT (DUNE_FOUND_VERSION_STRING VERSION_EQUAL DUNE_FIND_VERSION_STRING))
+      set(module_version_wrong 1)
     endif()
+
     if(module_version_wrong)
       message(${_warning_level} "Could not find requested version of module ${module}. "
-        "Requested version was ${DUNE_FIND_VERSION}, found version is ${DUNE_FIND_MOD_VERSION_STRING}")
+        "Requested version was ${DUNE_FIND_VERSION}, found version is ${DUNE_FOUND_VERSION_STRING}")
       set(${module}_FOUND OFF)
-    endif()
-  else(${module}_FOUND)
-    if(required)
-      message(FATAL_ERROR "Could not find required module ${module}.")
+    else()
+      dune_module_to_uppercase(DUNE_MOD_NAME_UPPERCASE ${module})
+
+      # set module version
+      set(${DUNE_MOD_NAME_UPPERCASE}_VERSION          "${${module}_VERSION}")
+      set(${DUNE_MOD_NAME_UPPERCASE}_VERSION_MAJOR    "${${module}_VERSION_MAJOR}")
+      set(${DUNE_MOD_NAME_UPPERCASE}_VERSION_MINOR    "${${module}_VERSION_MINOR}")
+      set(${DUNE_MOD_NAME_UPPERCASE}_VERSION_REVISION "${${module}_VERSION_PATCH}")
     endif()
   endif()
+
+  if(NOT ${module}_FOUND AND required)
+    message(FATAL_ERROR "Could not find required module ${module}.")
+  endif()
   set(DUNE_${module}_FOUND ${${module}_FOUND})
-  dune_module_to_uppercase(_upper_case ${module})
-  set(HAVE_${_upper_case} ${${module}_FOUND}) # need for example for the python meta data...
-endmacro(find_dune_package module)
+endmacro(dune_find_module module)
 
 
 macro(dune_process_dependency_leafs modules versions is_required next_level_deps
@@ -301,28 +198,6 @@ macro(dune_process_dependency_leafs modules versions is_required next_level_deps
     list(REMOVE_DUPLICATES ${next_level_deps})
   endif()
 endmacro(dune_process_dependency_leafs)
-
-
-function(remove_processed_modules modules versions is_required)
-  message(DEPRECATION "The cmake function remove_processed_modules() is deprecated and "
-                      "will be removed after release 2.9.")
-  list(LENGTH ${modules} mlength)
-  if(mlength GREATER 0)
-    math(EXPR length "${mlength}-1")
-    foreach(i RANGE ${length} 0 -1)
-      list(GET ${modules} ${i} _mod)
-      if(${_mod}_SEARCHED)
-        list(REMOVE_AT ${modules} ${i})
-        list(REMOVE_AT ${versions} ${i})
-        if(is_required AND NOT ${_mod}_REQUIRED AND NOT ${_mod}_FOUND)
-          message(FATAL_ERROR "Required module ${_mod} not found!")
-        endif()
-      endif()
-    endforeach()
-  endif()
-  set(${modules} ${${modules}} PARENT_SCOPE)
-  set(${versions} ${${versions}} PARENT_SCOPE)
-endfunction(remove_processed_modules modules versions is_required)
 
 
 macro(dune_create_dependency_leafs depends depends_versions suggests suggests_versions)

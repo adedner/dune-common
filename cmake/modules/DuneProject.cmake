@@ -11,11 +11,13 @@ Initialize and finalize a Dune module.
 
   .. code-block:: cmake
 
-    dune_project()
+    dune_project([<target>])
 
-  This function needs to be called from every module top-level
-  ``CMakeLists.txt`` file. It sets up the module, defines basic variables and
-  manages dependencies. Don't forget to call :command:`finalize_dune_project`
+  This function starts a new Dune module by setting several variables and
+  optionally creating a library target that is added to the export list.
+  It needs to be called from every module top-level ``CMakeLists.txt`` file.
+  It sets up the module, defines basic variables and manages dependencies.
+  Don't forget to call :command:`finalize_dune_project`
   at the end of that ``CMakeLists.txt`` file.
 
 
@@ -95,7 +97,6 @@ macro(dune_project)
   # This should allow DUNE modules to use CMake's object libraries.
   # This can be overwritten for targets by setting the target property
   # POSITION_INDEPENDENT_CODE to false/OFF
-  include(CMakeDependentOption)
   cmake_dependent_option(CMAKE_POSITION_INDEPENDENT_CODE "Build position independent code" ON "NOT BUILD_SHARED_LIBS" ON)
 
   # check for C++ features, set compiler flags for C++14 or C++11 mode
@@ -119,7 +120,6 @@ macro(dune_project)
   # Process the macros provided by the dependencies and ourself
   dune_process_dependency_macros()
 
-  include(GNUInstallDirs)
   # Set variable where the cmake modules will be installed.
   # Thus the user can override it and for example install
   # directly into the CMake installation. We use a cache variable
@@ -139,13 +139,12 @@ macro(dune_project)
       "Installation directory for libraries that are not architecture dependent. Default is lib when not set explicitely")
     set(DUNE_INSTALL_NONOBJECTLIBDIR lib)
   endif()
+
   # set up make headercheck
-  include(Headercheck)
   setup_headercheck()
 
   # define that we found this module
   set(${ProjectName}_FOUND 1)
-
 endmacro(dune_project)
 
 
@@ -161,8 +160,6 @@ macro(finalize_dune_project)
   finalize_headercheck()
 
   #create cmake-config files for installation tree
-  include(CMakePackageConfigHelpers)
-  include(GNUInstallDirs)
   set(DOXYSTYLE_DIR ${CMAKE_INSTALL_DATAROOTDIR}/dune-common/doc/doxygen/)
   set(SCRIPT_DIR ${CMAKE_INSTALL_DATAROOTDIR}/dune/cmake/scripts)
   # Set the location where the doc sources are installed.
@@ -205,7 +202,6 @@ if(${ProjectName}_LIBRARIES)
   get_filename_component(_dir \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)
   include(\"\${_dir}/${ProjectName}-targets.cmake\")
 endif()
-
 endif()")
       set(CONFIG_SOURCE_FILE ${PROJECT_BINARY_DIR}/CMakeFiles/${ProjectName}-config.cmake.in)
   else()
@@ -260,7 +256,6 @@ macro(set_and_check _var _file)
   endif()
 endmacro()")
   set(MODULE_INSTALLED OFF)
-
   configure_file(
     ${CONFIG_SOURCE_FILE}
     ${PROJECT_BINARY_DIR}/${ProjectName}-config.cmake @ONLY)

@@ -173,10 +173,11 @@ function(dune_add_library_normal _name)
     endif()
 
     set_target_properties(${_name} PROPERTIES EXPORT_NAME ${ARG_EXPORT_NAME})
+    add_library(Dune::${ARG_EXPORT_NAME} ALIAS ${_name})
 
     # Register library in global property <module>LIBRARIES
     if(NOT ARG_NO_MODULE_LIBRARY)
-      set_property(GLOBAL APPEND PROPERTY ${ProjectName}_LIBRARIES ${ARG_EXPORT_NAME})
+      set_property(GLOBAL APPEND PROPERTY ${ProjectName}_LIBRARIES Dune::${ARG_EXPORT_NAME})
     endif()
 
     # Install targets to use the libraries in other modules.
@@ -216,10 +217,11 @@ function(dune_add_library_interface _name)
     endif()
 
     set_target_properties(${_name} PROPERTIES EXPORT_NAME ${ARG_EXPORT_NAME})
+    add_library(Dune::${ARG_EXPORT_NAME} ALIAS ${_name})
 
     # Register library in global property <module>_LIBRARIES
     if(NOT ARG_NO_MODULE_LIBRARY)
-      set_property(GLOBAL APPEND PROPERTY ${ProjectName}_LIBRARIES ${ARG_EXPORT_NAME})
+      set_property(GLOBAL APPEND PROPERTY ${ProjectName}_LIBRARIES Dune::${ARG_EXPORT_NAME})
     endif()
 
     # Install targets to use the libraries in other modules.

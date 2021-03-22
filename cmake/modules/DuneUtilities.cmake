@@ -46,6 +46,25 @@ macro(dune_module_to_uppercase _upper _module)
 endmacro(dune_module_to_uppercase _upper _module)
 
 
+# Converts a module name given by _module into an lowercase string
+# _output where all non-alphanumeric characters are removed
+# Example: dune-common -> dunecommon
+macro(dune_module_to_output_name _output _module)
+  string(TOLOWER "${_module}" ${_output})
+  string(REGEX REPLACE "[^a-zA-Z0-9]+" "" ${_output} "${${_output}}")
+endmacro(dune_module_to_output_name)
+
+
+# Converts a module name given by _module into an lowercase string
+# _output with any dune prefix removed removed
+# Example: dune-common -> common
+macro(dune_module_to_export_name _output _module)
+  string(TOLOWER "${_module}" ${_output})
+  string(REPLACE "dune-" "" ${_output} "${${_output}}")
+  string(REPLACE "dune_" "" ${_output} "${${_output}}")
+endmacro(dune_module_to_export_name)
+
+
 # Converts a module name given by _dune_module into a string _macro_name
 # where all dashes (-) are removed and letters after a dash are capitalized
 # Example: dune-grid-howto -> DuneGridHowto
