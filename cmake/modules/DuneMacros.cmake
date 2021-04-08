@@ -179,12 +179,13 @@ macro(dune_module_to_uppercase _upper _module)
 endmacro(dune_module_to_uppercase _upper _module)
 
 macro(find_dune_package module)
-  include(CMakeParseArguments)
   cmake_parse_arguments(DUNE_FIND "REQUIRED" "VERSION" "" ${ARGN})
+  # extract only the ">= 1.2.3" part
+  string(REGEX REPLACE ">=[ ]*([0-9.]+)" "\\1" ver "${DUNE_FIND_VERSION}")
   if(DUNE_FIND_REQUIRED)
-    find_package(${module} REQUIRED ${DUNE_FIND_VERSION})
+    find_package(${module} ${ver} REQUIRED)
   else()
-    find_package(${module} ${DUNE_FIND_VERSION})
+    find_package(${module} ${ver})
   endif()
   set(DUNE_${module}_FOUND ${${module}_FOUND})
 endmacro(find_dune_package module)
@@ -682,6 +683,7 @@ endmacro(dune_regenerate_config_cmake)
 # Namely it creates config.h and the cmake-config files,
 # some install directives and exports the module.
 macro(finalize_dune_project)
+  cmake_parse_arguments(FINALIZE "" "COMPATIBILITY" "" ${ARGN})
   if(DUNE_SYMLINK_TO_SOURCE_TREE)
     dune_symlink_to_source_tree()
   endif()
@@ -789,9 +791,12 @@ endmacro()")
     configure_file(${PROJECT_SOURCE_DIR}/${ProjectName}-config-version.cmake.in
       ${CONFIG_VERSION_FILE} @ONLY)
   else()
+    if(NOT FINALIZE_COMPATIBILITY)
+      set(FINALIZE_COMPATIBILITY "SameMinorVersion")
+    endif()
     write_basic_package_version_file(${CONFIG_VERSION_FILE}
       VERSION ${ProjectVersionString}
-      COMPATIBILITY SameMinorVersion)
+      COMPATIBILITY ${FINALIZE_COMPATIBILITY})
   endif()
 
   # install dune.module file
@@ -810,7 +815,7 @@ endmacro()")
   # install pkg-config files
   create_and_install_pkconfig(${DUNE_INSTALL_LIBDIR})
 
-  if("${ARGC}" EQUAL "1")
+  if(FINALIZE_UNPARSED_ARGUMENTS)
     message(STATUS "Adding custom target for config.h generation")
     dune_regenerate_config_cmake()
     # add a target to generate config.h.cmake
