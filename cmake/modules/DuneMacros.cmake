@@ -180,12 +180,29 @@ endmacro(dune_module_to_uppercase _upper _module)
 
 macro(find_dune_package module)
   cmake_parse_arguments(DUNE_FIND "REQUIRED" "VERSION" "" ${ARGN})
-  # extract only the ">= 1.2.3" part
+
+  # extract only the ">= 1.2.3" part for compatible version match
+  unset(ver)
   string(REGEX REPLACE ">=[ ]*([0-9.]+)" "\\1" ver "${DUNE_FIND_VERSION}")
-  if(DUNE_FIND_REQUIRED)
-    find_package(${module} ${ver} REQUIRED)
+  if(ver)
+    string(STRIP "${ver}" compatible_ver)
   else()
-    find_package(${module} ${ver})
+    unset(compatible_ver)
+  endif()
+
+  # extract only the "== 1.2.3" part for exact version match
+  unset(ver)
+  string(REGEX REPLACE "==[ ]*([0-9.]+)" "\\1" ver "${DUNE_FIND_VERSION}")
+  if(ver)
+    string(STRIP "${ver} EXACT" exact_ver)
+  else()
+    unset(exact_ver)
+  endif()
+
+  if(DUNE_FIND_REQUIRED)
+    find_package(${module} ${compatible_ver} ${exact_ver} REQUIRED)
+  else()
+    find_package(${module} ${compatible_ver} ${exact_ver})
   endif()
   set(DUNE_${module}_FOUND ${${module}_FOUND})
 endmacro(find_dune_package module)
