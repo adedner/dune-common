@@ -91,7 +91,9 @@ def _plotData(fig, grid, solution, level=0, gridLines="black",
                 else:
                   data = data[:,component]
                 minData = amin(data)
+                minData *= (1.-1e-8)
                 maxData = amax(data)
+                maxData *= (1.+1e-8)
                 if clim == None:
                     clim = [minData, maxData]
                 if clim[0] > minData and clim[1] < maxData:
@@ -105,7 +107,7 @@ def _plotData(fig, grid, solution, level=0, gridLines="black",
                 norm = matplotlib.colors.Normalize(vmin=clim[0], vmax=clim[1])
                 levels = linspace(clim[0], clim[1], 256, endpoint=True)
                 pyplot.tricontourf(triangulation, data, cmap=cmap, levels=levels,
-                                extend=extend, norm=norm)
+                                   extend=extend, norm=norm)
 
             if colorbar is not None and colorbar:
                 if isinstance(colorbar,bool):
