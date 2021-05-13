@@ -21,6 +21,8 @@ dune_add_library("dunecommon"
 add_dune_blas_lapack_flags(dunecommon)
 add_dune_tbb_flags(dunecommon)
 
+make_pybind11_docu(fvector.hh fmatrix.hh densevector.hh densematrix.hh)
+
 #install headers
 install(FILES
         alignedallocator.hh

@@ -24,3 +24,5 @@ install(FILES
         selection.hh
         variablesizecommunicator.hh
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/common/parallel)
+
+make_pybind11_docu(communication.hh mpihelper.hh)
