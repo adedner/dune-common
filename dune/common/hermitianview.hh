@@ -66,13 +66,13 @@ public:
   }
 
   //! Return the number of columns of the wrapped matrix
-  constexpr size_type N () const
+  size_type N () const
   {
     return matrix_.M();
   }
 
   //! Return the number of rows of the wrapped matrix
-  constexpr size_type M () const
+  size_type M () const
   {
     return matrix_.N();
   }
@@ -138,17 +138,17 @@ public:
 
   //! y += alpha A x
   template<class X, class Y>
-  void usmv (const typename FieldTraits<Y>::field_type & alpha, const X& x, Y& y) const
+  void usmv (typename FieldTraits<Y>::field_type alpha, const X& x, Y& y) const
   {
     matrix_.usmhv(alpha,x,y);
   }
 
   template<class X, class Y>
-  void usmtv (const typename FieldTraits<Y>::field_type & alpha, const X& x, Y& y) const = delete;
+  void usmtv (typename FieldTraits<Y>::field_type alpha, const X& x, Y& y) const = delete;
 
   //! y += alpha A^H x
   template<class X, class Y>
-  void usmhv (const typename FieldTraits<Y>::field_type & alpha, const X& x, Y& y) const
+  void usmhv (typename FieldTraits<Y>::field_type alpha, const X& x, Y& y) const
   {
     matrix_.usmv(alpha,x,y);
   }
