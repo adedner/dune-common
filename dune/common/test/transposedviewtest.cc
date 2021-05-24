@@ -46,6 +46,19 @@ bool compareMatrix (const M1& mat1, const M2& mat2)
   return true;
 }
 
+template <class M1, class M2>
+bool compareDiagonalMatrix (const M1& mat1, const M2& mat2)
+{
+  if (mat1.N() != mat2.N())
+    return false;
+  if (mat1.M() != mat2.M())
+    return false;
+  for (typename M1::size_type i = 0; i < mat1.N(); ++i)
+    if (!compare(mat1[i][i], mat2[i][i]))
+      return false;
+  return true;
+}
+
 
 int main()
 {
@@ -129,9 +142,10 @@ int main()
 
   { // check transposed of diagonal matrix
     auto D = Dune::DiagonalMatrix<double,4>{};
-    testFillDense(D);
+    for (int i = 0; i < 4; ++i)
+      D[i][i] = i+1;
     auto Dt = Dune::transposedView(D);
-    suite.check(compareMatrix(D,Dt)) << "Test D^T == D";
+    suite.check(compareDiagonalMatrix(D,Dt)) << "Test D^T == D";
   }
 
   return suite.exit();
