@@ -15,11 +15,13 @@
 #include <dune/common/deprecated.hh>
 #include <dune/common/exceptions.hh>
 #include <dune/common/fvector.hh>
+#include <dune/common/hermitianview.hh>
 #include <dune/common/math.hh>
 #include <dune/common/precision.hh>
 #include <dune/common/simd/simd.hh>
 #include <dune/common/typetraits.hh>
 #include <dune/common/scalarvectorview.hh>
+#include <dune/common/transposedview.hh>
 
 namespace Dune
 {
@@ -391,164 +393,175 @@ namespace Dune
 
     //===== linear maps
 
+private:
+    // `y <- A x`, with an assignment operation represented
+    // by the functor `assign`
+    template<class M, class X, class Y, class Assign>
+    static void mv_impl (const M& A, const X& x, Y& y, Assign assign)
+    {
+      auto&& xx = Impl::asVector(x);
+      auto&& yy = Impl::asVector(y);
+      DUNE_ASSERT_BOUNDS((void*)(&x) != (void*)(&y));
+      DUNE_ASSERT_BOUNDS(xx.size() == A.M());
+      DUNE_ASSERT_BOUNDS(yy.size() == A.N());
+
+      using size_type = typename M::size_type;
+      for (size_type i = 0; i < A.N(); i++)
+        for (size_type j = 0; j < A.M(); j++)
+          assign(yy[i], A[i][j] * xx[j]);
+    }
+
+public:
     //! y = A x
     template<class X, class Y>
     void mv (const X& x, Y& y) const
     {
-      auto&& xx = Impl::asVector(x);
-      auto&& yy = Impl::asVector(y);
-      DUNE_ASSERT_BOUNDS((void*)(&x) != (void*)(&y));
-      DUNE_ASSERT_BOUNDS(xx.N() == M());
-      DUNE_ASSERT_BOUNDS(yy.N() == N());
-
-      using field_type = typename FieldTraits<Y>::field_type;
-      for (size_type i=0; i<rows(); ++i)
-      {
-        yy[i] = field_type(0);
-        for (size_type j=0; j<cols(); j++)
-          yy[i] += (*this)[i][j] * xx[j];
-      }
+      y = 0;
+      mv_impl(*this, x, y,
+        [](auto& yi, auto const& value) { yi = value; });
     }
 
     //! y = A^T x
-    template< class X, class Y >
-    void mtv ( const X &x, Y &y ) const
+    template<class X, class Y>
+    void mtv (const X &x, Y &y) const
     {
-      auto&& xx = Impl::asVector(x);
-      auto&& yy = Impl::asVector(y);
-      DUNE_ASSERT_BOUNDS((void*)(&x) != (void*)(&y));
-      DUNE_ASSERT_BOUNDS(xx.N() == N());
-      DUNE_ASSERT_BOUNDS(yy.N() == M());
+      y = 0;
+      mv_impl(transposedView(*this), x, y,
+        [](auto& yi, auto const& value) { yi = value; });
+    }
 
-      using field_type = typename FieldTraits<Y>::field_type;
-      for(size_type i = 0; i < cols(); ++i)
-      {
-        yy[i] = field_type(0);
-        for(size_type j = 0; j < rows(); ++j)
-          yy[i] += (*this)[j][i] * xx[j];
-      }
+    //! y = A^H x
+    template<class X, class Y>
+    void mhv (const X &x, Y &y) const
+    {
+      y = 0;
+      mv_impl(hermitianView(*this), x, y,
+        [](auto& yi, auto const& value) { yi = value; });
     }
 
     //! y += A x
     template<class X, class Y>
     void umv (const X& x, Y& y) const
     {
-      auto&& xx = Impl::asVector(x);
-      auto&& yy = Impl::asVector(y);
-      DUNE_ASSERT_BOUNDS(xx.N() == M());
-      DUNE_ASSERT_BOUNDS(yy.N() == N());
-      for (size_type i=0; i<rows(); ++i)
-        for (size_type j=0; j<cols(); j++)
-          yy[i] += (*this)[i][j] * xx[j];
+      mv_impl(*this, x, y,
+        [](auto& yi, auto const& value) { yi += value; });
     }
 
     //! y += A^T x
     template<class X, class Y>
     void umtv (const X& x, Y& y) const
     {
-      auto&& xx = Impl::asVector(x);
-      auto&& yy = Impl::asVector(y);
-      DUNE_ASSERT_BOUNDS(xx.N() == N());
-      DUNE_ASSERT_BOUNDS(yy.N() == M());
-      for(size_type i = 0; i<rows(); ++i)
-        for (size_type j=0; j<cols(); j++)
-          yy[j] += (*this)[i][j]*xx[i];
+      mv_impl(transposedView(*this), x, y,
+        [](auto& yi, auto const& value) { yi += value; });
     }
 
     //! y += A^H x
     template<class X, class Y>
     void umhv (const X& x, Y& y) const
     {
-      auto&& xx = Impl::asVector(x);
-      auto&& yy = Impl::asVector(y);
-      DUNE_ASSERT_BOUNDS(xx.N() == N());
-      DUNE_ASSERT_BOUNDS(yy.N() == M());
-      for (size_type i=0; i<rows(); i++)
-        for (size_type j=0; j<cols(); j++)
-          yy[j] += conjugateComplex((*this)[i][j])*xx[i];
+      mv_impl(hermitianView(*this), x, y,
+        [](auto& yi, auto const& value) { yi += value; });
     }
 
     //! y -= A x
     template<class X, class Y>
     void mmv (const X& x, Y& y) const
     {
-      auto&& xx = Impl::asVector(x);
-      auto&& yy = Impl::asVector(y);
-      DUNE_ASSERT_BOUNDS(xx.N() == M());
-      DUNE_ASSERT_BOUNDS(yy.N() == N());
-      for (size_type i=0; i<rows(); i++)
-        for (size_type j=0; j<cols(); j++)
-          yy[i] -= (*this)[i][j] * xx[j];
+      mv_impl(*this, x, y,
+        [](auto& yi, auto const& value) { yi -= value; });
     }
 
     //! y -= A^T x
     template<class X, class Y>
     void mmtv (const X& x, Y& y) const
     {
-      auto&& xx = Impl::asVector(x);
-      auto&& yy = Impl::asVector(y);
-      DUNE_ASSERT_BOUNDS(xx.N() == N());
-      DUNE_ASSERT_BOUNDS(yy.N() == M());
-      for (size_type i=0; i<rows(); i++)
-        for (size_type j=0; j<cols(); j++)
-          yy[j] -= (*this)[i][j]*xx[i];
+      mv_impl(transposedView(*this), x, y,
+        [](auto& yi, auto const& value) { yi -= value; });
     }
 
     //! y -= A^H x
     template<class X, class Y>
     void mmhv (const X& x, Y& y) const
     {
-      auto&& xx = Impl::asVector(x);
-      auto&& yy = Impl::asVector(y);
-      DUNE_ASSERT_BOUNDS(xx.N() == N());
-      DUNE_ASSERT_BOUNDS(yy.N() == M());
-      for (size_type i=0; i<rows(); i++)
-        for (size_type j=0; j<cols(); j++)
-          yy[j] -= conjugateComplex((*this)[i][j])*xx[i];
+      mv_impl(hermitianView(*this), x, y,
+        [](auto& yi, auto const& value) { yi -= value; });
     }
 
     //! y += alpha A x
     template<class X, class Y>
-    void usmv (const typename FieldTraits<Y>::field_type & alpha,
-      const X& x, Y& y) const
+    void usmv (typename FieldTraits<Y>::field_type alpha, const X& x, Y& y) const
     {
-      auto&& xx = Impl::asVector(x);
-      auto&& yy = Impl::asVector(y);
-      DUNE_ASSERT_BOUNDS(xx.N() == M());
-      DUNE_ASSERT_BOUNDS(yy.N() == N());
-      for (size_type i=0; i<rows(); i++)
-        for (size_type j=0; j<cols(); j++)
-          yy[i] += alpha * (*this)[i][j] * xx[j];
+      mv_impl(*this, x, y,
+        [alpha](auto& yi, auto const& value) { yi += alpha * value; });
     }
 
     //! y += alpha A^T x
     template<class X, class Y>
-    void usmtv (const typename FieldTraits<Y>::field_type & alpha,
-      const X& x, Y& y) const
+    void usmtv (typename FieldTraits<Y>::field_type alpha, const X& x, Y& y) const
     {
-      auto&& xx = Impl::asVector(x);
-      auto&& yy = Impl::asVector(y);
-      DUNE_ASSERT_BOUNDS(xx.N() == N());
-      DUNE_ASSERT_BOUNDS(yy.N() == M());
-      for (size_type i=0; i<rows(); i++)
-        for (size_type j=0; j<cols(); j++)
-          yy[j] += alpha*(*this)[i][j]*xx[i];
+      mv_impl(transposedView(*this), x, y,
+        [alpha](auto& yi, auto const& value) { yi += alpha * value; });
     }
 
     //! y += alpha A^H x
     template<class X, class Y>
-    void usmhv (const typename FieldTraits<Y>::field_type & alpha,
-      const X& x, Y& y) const
+    void usmhv (typename FieldTraits<Y>::field_type alpha, const X& x, Y& y) const
     {
-      auto&& xx = Impl::asVector(x);
-      auto&& yy = Impl::asVector(y);
-      DUNE_ASSERT_BOUNDS(xx.N() == N());
-      DUNE_ASSERT_BOUNDS(yy.N() == M());
-      for (size_type i=0; i<rows(); i++)
-        for (size_type j=0; j<cols(); j++)
-          yy[j] +=
-            alpha*conjugateComplex((*this)[i][j])*xx[i];
+      mv_impl(hermitianView(*this), x, y,
+        [alpha](auto& yi, auto const& value) { yi += alpha * value; });
     }
+
+
+    //===== matrix-matrix multiplication
+
+private:
+    // `C <- A * B`, with an assignment operation represented
+    // by the functor `assign`
+    template<class MatA, class MatB, class MatC, class Assign>
+    static void mm_impl (const MatA& A, const MatB& B, MatC& C, Assign assign)
+    {
+      DUNE_ASSERT_BOUNDS((void*)(&B) != (void*)(&C));
+      DUNE_ASSERT_BOUNDS(B.M() == A.M());
+      DUNE_ASSERT_BOUNDS(C.N() == A.N());
+
+      using size_type
+        = std::common_type_t<typename MatA::size_type, typename MatB::size_type, typename MatC::size_type>;
+      for (size_type i = 0; i < size_type(C.N()); i++)
+        for (size_type k = 0; k < size_type(A.M()); k++)
+          for (size_type j = 0; j < size_type(C.M()); j++)
+            assign(C[i][j], A[i][k] * B[k][j]);
+    }
+
+public:
+    //! C = A*B
+    template<class MatB, class MatC>
+    void mm (const MatB& B, MatC& C) const
+    {
+      C = 0;
+      mm_impl(*this,B,C, [](auto& Aij, auto const& value) { Aij = value; });
+    }
+
+    //! C += A*B
+    template<class MatB, class MatC>
+    void umm (const MatB& B, MatC& C) const
+    {
+      mm_impl(*this,B,C, [](auto& Aij, auto const& value) { Aij += value; });
+    }
+
+    //! C -= A*B
+    template<class MatB, class MatC>
+    void mmm (const MatB& B, MatC& C) const
+    {
+      mm_impl(*this,B,C, [](auto& Aij, auto const& value) { Aij -= value; });
+    }
+
+    //! C += alpha * A*B
+    template<class MatB, class MatC>
+    void usmm (typename FieldTraits<MatC>::field_type alpha, const MatB& B, MatC& C) const
+    {
+      mm_impl(*this,B,C, [alpha](auto& Aij, auto const& value) { Aij += alpha * value; });
+    }
+
 
     //===== norms
 

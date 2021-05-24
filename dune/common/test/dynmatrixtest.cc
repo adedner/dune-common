@@ -156,6 +156,7 @@ void test_mult(DynamicMatrix<K>& A,
   // test the various matrix-vector products
   A.mv(v,f);
   A.mtv(f,v);
+  A.mhv(f,v);
   A.umv(v,f);
   A.umtv(f,v);
   A.umhv(f,v);

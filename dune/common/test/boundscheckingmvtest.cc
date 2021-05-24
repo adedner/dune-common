@@ -87,6 +87,33 @@ int main() try {
               << ") All good: Exception thrown as expected." << std::endl;
   }
 
+  // Matrix-vector multiplication (mhv): Input size incorrect
+  try {
+    Dune::FieldMatrix<double, 2, 3> A = {{1, 2, 3}, {10, 20, 30}};
+    Dune::FieldVector<double, 3> x = {1, 2, 3};
+    Dune::FieldVector<double, 3> b(0);
+    A.mhv(x, b);
+    std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
+              << std::endl;
+    passed = false;
+  } catch (const Dune::RangeError&) {
+    std::cout << "(line " << __LINE__
+              << ") All good: Exception thrown as expected." << std::endl;
+  }
+  // Matrix-vector multiplication (mhv): Output size incorrect
+  try {
+    Dune::FieldMatrix<double, 2, 3> A = {{1, 2, 3}, {10, 20, 30}};
+    Dune::FieldVector<double, 2> x = {1, 2};
+    Dune::FieldVector<double, 2> b(0);
+    A.mhv(x, b);
+    std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
+              << std::endl;
+    passed = false;
+  } catch (const Dune::RangeError&) {
+    std::cout << "(line " << __LINE__
+              << ") All good: Exception thrown as expected." << std::endl;
+  }
+
   // Matrix-vector multiplication (umv): Input size incorrect
   try {
     Dune::FieldMatrix<double, 2, 3> A = {{1, 2, 3}, {10, 20, 30}};

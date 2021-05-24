@@ -202,6 +202,10 @@ dune_add_test(SOURCES genericiterator_compile_fail.cc
               EXPECT_COMPILE_FAIL
               LABELS quick)
 
+dune_add_test(SOURCES hermitianviewtest.cc
+              LINK_LIBRARIES dunecommon
+              LABELS quick)
+
 dune_add_test(SOURCES hybridutilitiestest.cc
               LINK_LIBRARIES dunecommon
               LABELS quick)
@@ -378,6 +382,10 @@ dune_add_test(SOURCES testfloatcmp.cc
               LABELS quick)
 
 dune_add_test(SOURCES transposetest.cc
+              LINK_LIBRARIES dunecommon
+              LABELS quick)
+
+dune_add_test(SOURCES transposedviewtest.cc
               LINK_LIBRARIES dunecommon
               LABELS quick)
 

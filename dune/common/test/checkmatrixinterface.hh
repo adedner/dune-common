@@ -321,6 +321,7 @@ namespace CheckMatrixInterface
 
       matrix.mv( domain, range );
       matrix.mtv( range, domain );
+      matrix.mhv( range, domain );
       matrix.umv( domain, range );
       matrix.umtv( range, domain );
       matrix.umhv( range, domain );

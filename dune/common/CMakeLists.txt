@@ -60,6 +60,7 @@ install(FILES
         genericiterator.hh
         gmpfield.hh
         hash.hh
+        hermitianview.hh
         hybridutilities.hh
         indent.hh
         indices.hh
@@ -100,6 +101,7 @@ install(FILES
         to_unique_ptr.hh
         timer.hh
         transpose.hh
+        transposedview.hh
         tupleutility.hh
         tuplevector.hh
         typelist.hh

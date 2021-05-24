@@ -224,6 +224,7 @@ void test_mult(FieldMatrix<K, n, m>& A,
   // test the various matrix-vector products
   A.mv(v,f);
   A.mtv(fT,vT);
+  A.mhv(fT,vT);
   A.umv(v,f);
   A.umtv(fT,vT);
   A.umhv(fT,vT);
