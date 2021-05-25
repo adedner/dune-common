@@ -305,6 +305,10 @@ int main()
     }
     catch (Dune::RangeError & r) {}
 
+    // test string constructor
+    auto p = Dune::ParameterTree{s.str()};
+    testmodify<Dune::ParameterTree>(p);
+
     // test for complex
     c.get<std::complex<double>>("x1");
 

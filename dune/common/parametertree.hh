@@ -48,6 +48,18 @@ namespace Dune {
      */
     ParameterTree();
 
+    /** \brief Create new ParameterTree with inline parsing
+     *
+     * \code
+     *  auto config = ParameterTree{
+     *    "[section]                \n"
+     *    "subsection.key = value   \n"
+     *  };
+     * \endcode
+     *
+     * \param str_tree parsable string with INI format
+     */
+    ParameterTree(const std::string& str_tree);
 
     /** \brief test for key
      *

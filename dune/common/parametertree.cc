@@ -16,11 +16,19 @@
 
 #include <dune/common/exceptions.hh>
 #include <dune/common/parametertree.hh>
+#include <dune/common/parametertreeparser.hh>
 
 using namespace Dune;
 
 ParameterTree::ParameterTree()
 {}
+
+ParameterTree::ParameterTree(const std::string& str_tree)
+{
+  std::stringstream ss;
+  ss << str_tree;
+  ParameterTreeParser::readINITree(ss, *this);
+}
 
 const Dune::ParameterTree Dune::ParameterTree::empty_;
 

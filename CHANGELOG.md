@@ -1,5 +1,7 @@
 # Master (will become release 2.8)
 
+- Add inline parsing of the parameter tree.
+
 - Remove the cmake check for `HAVE_MPROTECT` and also do not define this variable in the
   `config.h` file. It is defined only inside the header `debugallocator.hh`.
 
