@@ -1,4 +1,5 @@
 cmake
+mpi4py
 scikit-build
 dune-grid
 dune-localfunctions
