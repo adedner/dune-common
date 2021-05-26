@@ -1,0 +1,5 @@
+cmake
+scikit-build
+dune-grid
+dune-localfunctions
+dune-istl
