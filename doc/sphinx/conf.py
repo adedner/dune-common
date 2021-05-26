@@ -9,10 +9,14 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
+#
+# import os
+# import sys
+# sys.path.insert(0, os.path.abspath('../../python'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'dune-common'
+project = 'Dune Python Bindings'
 copyright = '2021, The DUNE Core developers'
 author = 'The DUNE Core developers'
 
@@ -28,8 +32,8 @@ release = '2.8-git'
 extensions = [
   "sphinx.ext.intersphinx",
   "sphinx.ext.napoleon",
-  "sphinx.ext.autodoc",
   "sphinx.ext.mathjax",
+  "sphinx.ext.autodoc",
   "sphinx.ext.autosummary"
 ]
 
@@ -39,26 +43,20 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', '_templates', 'Thumbs.db', '.DS_Store']
 
 # -- Options for autodoc -------------------------------------------------
 
-autodoc_mock_imports = ["dune.generator"]
-
-autodoc_default_options = {
-  'members': True,
-  'member-order': 'groupwise',
-  'undoc-members': True,
-  'imported-members': True,
-}
+autosummary_generate = True
+autosummary_imported_members = True
 
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 
-html_theme = "furo"
-html_title = "dune-common"
+html_theme = "sphinx_rtd_theme"
+html_title = "Dune Python Bindings"
 html_favicon = "_static/favicon.ico"
 html_logo = "_static/dune-logo.png"
 

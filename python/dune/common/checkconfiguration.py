@@ -45,18 +45,22 @@ def assertCMakeVariable(identifier,value,defaultFails):
             raise ConfigurationError(identifier + " dune-py wrongly configured wrt "+identifier)
 
 def preprocessorAssert(tests):
-    '''perform preprocessore checks.
-       A list of checks can be provided each should contain a pair, the
-       first being the preprocessor check to perform (e.g. #if or #ifdef)
-       and the second being the message to print if the check fails. The
-       generated code is of the form:
-          tests[i][0]
-          #else
-          test failed
-          #endif
-       so the first argument of each test has to make this piece of code
-       valid C++ code assuming config.h is included.
+    '''Perform preprocessor checks.
+
+    A list of checks can be provided each should contain a pair, the
+    first being the preprocessor check to perform (e.g. #if or #ifdef)
+    and the second being the message to print if the check fails. The
+    generated code is of the form::
+
+        tests[i][0]
+        #else
+        test failed
+        #endif
+
+    so the first argument of each test has to make this piece of code
+    valid C++ code assuming config.h is included.
     '''
+
     source = "#include <config.h>\nint main() {\n"
     i = 0
     for t in tests:
