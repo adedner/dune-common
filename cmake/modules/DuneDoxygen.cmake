@@ -1,6 +1,6 @@
 # Module for building documentation using doxygen.
 #
-# .. cmake_function:: add_doxygen_target
+# .. cmake_function:: dune_add_doxygen_target
 #
 #    .. cmake_param:: TARGET
 #       :single:
@@ -20,8 +20,8 @@
 #
 #    This macro creates a target for building (:code:`doxygen_${ProjectName}`) and installing
 #    (:code:`doxygen_install_${ProjectName}`) the generated doxygen documentation.
-#    The documentation is built during the top-level :code:`make doc` call. We have added a dependency
-#    that makes sure it is built before running :code:`make install`.
+#    The documentation is built during the top-level :code:`make doc` call. We have added a
+#    dependency that makes sure it is built before running :code:`make install`.
 #
 include_guard(GLOBAL)
 
@@ -39,38 +39,9 @@ endif()
 
 add_custom_target(doxygen_install)
 
-#
-# prepare_doxyfile()
-# This functions adds the necessary routines for the generation of the
-# Doxyfile[.in] files needed to doxygen.
-macro(prepare_doxyfile)
-  message(STATUS "using ${DOXYSTYLE_FILE} to create doxystyle file")
-  message(STATUS "using C macro definitions from ${DOXYGENMACROS_FILE} for Doxygen")
 
-  # check whether module has a Doxylocal file
-  find_file(_DOXYLOCAL Doxylocal PATHS ${CMAKE_CURRENT_SOURCE_DIR} NO_DEFAULT_PATH)
-
-  if(_DOXYLOCAL)
-    set(make_doxyfile_command ${CMAKE_COMMAND} -D DOT_TRUE=${DOT_TRUE} -D DUNE_MOD_NAME=${ProjectName} -D DUNE_MOD_VERSION=${ProjectVersion} -D DOXYSTYLE=${DOXYSTYLE_FILE} -D DOXYGENMACROS=${DOXYGENMACROS_FILE}  -D DOXYLOCAL=${CMAKE_CURRENT_SOURCE_DIR}/Doxylocal -D abs_top_srcdir=${CMAKE_SOURCE_DIR} -D srcdir=${CMAKE_CURRENT_SOURCE_DIR} -D top_srcdir=${CMAKE_SOURCE_DIR} -P ${scriptdir}/CreateDoxyFile.cmake)
-    add_custom_command(OUTPUT Doxyfile.in Doxyfile
-      COMMAND ${make_doxyfile_command}
-      COMMENT "Creating Doxyfile.in"
-      DEPENDS ${DOXYSTYLE_FILE} ${DOXYGENMACROS_FILE} ${CMAKE_CURRENT_SOURCE_DIR}/Doxylocal)
-  else()
-    set(make_doxyfile_command ${CMAKE_COMMAND} -D DOT_TRUE=${DOT_TRUE} -D DUNE_MOD_NAME=${ProjectName} -D DUNE_MOD_VERSION=${DUNE_MOD_VERSION} -D DOXYSTYLE=${DOXYSTYLE_FILE} -D DOXYGENMACROS=${DOXYGENMACROS_FILE} -D abs_top_srcdir=${CMAKE_SOURCE_DIR} -D top_srcdir=${CMAKE_SOURCE_DIR} -P ${scriptdir}/CreateDoxyFile.cmake)
-    add_custom_command(OUTPUT Doxyfile.in Doxyfile
-      COMMAND ${make_doxyfile_command}
-      COMMENT "Creating Doxyfile.in"
-      DEPENDS ${DOXYSTYLE_FILE} ${DOXYGENMACROS_FILE})
-  endif()
-  add_custom_target(doxyfile DEPENDS Doxyfile.in Doxyfile)
-endmacro(prepare_doxyfile)
-
-macro(add_doxygen_target)
-  set(options )
-  set(oneValueArgs TARGET OUTPUT)
-  set(multiValueArgs DEPENDS)
-  cmake_parse_arguments(DOXYGEN "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+function(dune_add_doxygen_target)
+  cmake_parse_arguments(DOXYGEN "" "TARGET;OUTPUT" "DEPENDS" ${ARGN} )
 
   # default target name is the module name
   if(NOT DOXYGEN_TARGET)
@@ -90,7 +61,7 @@ macro(add_doxygen_target)
   message(STATUS "Using scripts from ${scriptdir} for creating doxygen stuff.")
 
   if(DOXYGEN_FOUND)
-    prepare_doxyfile()
+    dune_prepare_doxyfile()
     # custom command that executes doxygen
     add_custom_command(OUTPUT ${DOXYGEN_OUTPUT}
       COMMAND ${CMAKE_COMMAND} -D DOXYGEN_EXECUTABLE=${DOXYGEN_EXECUTABLE} -P ${scriptdir}/RunDoxygen.cmake
@@ -125,4 +96,47 @@ macro(add_doxygen_target)
          file(INSTALL \${doxygenfiles} DESTINATION ${CMAKE_INSTALL_FULL_DOCDIR}/doxygen)
          message(STATUS \"Installed doxygen into ${CMAKE_INSTALL_FULL_DOCDIR}/doxygen\")")
   endif()
+endfunction(dune_add_doxygen_target)
+
+# deprecated
+macro(add_doxygen_target)
+  message(DEPRECATION "add_doxygen_target is deprecated. Use 'dune_add_doxygen_target' instead.")
+  dune_add_doxygen_target(${ARGN})
 endmacro(add_doxygen_target)
+
+
+# ------------------------------------------------------------------------
+# Internal macros
+# ------------------------------------------------------------------------
+
+
+# This functions adds the necessary routines for the generation of the
+# Doxyfile[.in] files needed to doxygen.
+function(dune_prepare_doxyfile)
+  message(STATUS "using ${DOXYSTYLE_FILE} to create doxystyle file")
+  message(STATUS "using C macro definitions from ${DOXYGENMACROS_FILE} for Doxygen")
+
+  # check whether module has a Doxylocal file
+  find_file(_DOXYLOCAL Doxylocal PATHS ${CMAKE_CURRENT_SOURCE_DIR} NO_DEFAULT_PATH)
+
+  if(_DOXYLOCAL)
+    set(make_doxyfile_command ${CMAKE_COMMAND} -D DOT_TRUE=${DOT_TRUE} -D DUNE_MOD_NAME=${ProjectName} -D DUNE_MOD_VERSION=${ProjectVersion} -D DOXYSTYLE=${DOXYSTYLE_FILE} -D DOXYGENMACROS=${DOXYGENMACROS_FILE}  -D DOXYLOCAL=${CMAKE_CURRENT_SOURCE_DIR}/Doxylocal -D abs_top_srcdir=${CMAKE_SOURCE_DIR} -D srcdir=${CMAKE_CURRENT_SOURCE_DIR} -D top_srcdir=${CMAKE_SOURCE_DIR} -P ${scriptdir}/CreateDoxyFile.cmake)
+    add_custom_command(OUTPUT Doxyfile.in Doxyfile
+      COMMAND ${make_doxyfile_command}
+      COMMENT "Creating Doxyfile.in"
+      DEPENDS ${DOXYSTYLE_FILE} ${DOXYGENMACROS_FILE} ${CMAKE_CURRENT_SOURCE_DIR}/Doxylocal)
+  else()
+    set(make_doxyfile_command ${CMAKE_COMMAND} -D DOT_TRUE=${DOT_TRUE} -D DUNE_MOD_NAME=${ProjectName} -D DUNE_MOD_VERSION=${DUNE_MOD_VERSION} -D DOXYSTYLE=${DOXYSTYLE_FILE} -D DOXYGENMACROS=${DOXYGENMACROS_FILE} -D abs_top_srcdir=${CMAKE_SOURCE_DIR} -D top_srcdir=${CMAKE_SOURCE_DIR} -P ${scriptdir}/CreateDoxyFile.cmake)
+    add_custom_command(OUTPUT Doxyfile.in Doxyfile
+      COMMAND ${make_doxyfile_command}
+      COMMENT "Creating Doxyfile.in"
+      DEPENDS ${DOXYSTYLE_FILE} ${DOXYGENMACROS_FILE})
+  endif()
+  add_custom_target(doxyfile DEPENDS Doxyfile.in Doxyfile)
+endfunction(dune_prepare_doxyfile)
+
+# deprecated
+macro(prepare_doxyfile)
+  message(DEPRECATION "prepare_doxyfile is deprecated. Use 'dune_prepare_doxyfile' instead.")
+  dune_prepare_doxyfile(${ARGN})
+endmacro(prepare_doxyfile)

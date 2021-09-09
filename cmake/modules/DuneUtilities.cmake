@@ -33,11 +33,11 @@ Utility functions used by multiple files.
 
   Example: ``dune-grid-howto -> DuneGridHowto``
 
-.. cmake:command:: replace_properties
+.. cmake:command:: dune_replace_properties
 
   .. code-block:: cmake
 
-    replace_properties(<replacements>...
+    dune_replace_properties(<replacements>...
       [GLOBAL]
       [DIRECTORY <dir>]
       [PROPERTY <prop>]
@@ -88,7 +88,7 @@ macro(dune_module_to_macro _macro_name _dune_module)
 endmacro(dune_module_to_macro _macro_name _dune_module)
 
 
-function(replace_properties)
+function(dune_replace_properties)
   include(CMakeParseArguments)
   set(_first_opts "GLOBAL;DIRECTORY;TARGET;SOURCE;CACHE")
   cmake_parse_arguments(REPLACE "GLOBAL"
@@ -154,14 +154,21 @@ and a replacement string. ${REPLACE_UNPARSED_ARGUMENTS}")
   endif()
 
   foreach(_target ${option_arg})
-    replace_properties_for_one()
+    dune_replace_properties_for_one()
   endforeach()
 
   list(LENGTH option_arg _length)
   if(_length EQUAL 0)
-    replace_properties_for_one()
+    dune_replace_properties_for_one()
   endif()
-endfunction(replace_properties)
+endfunction(dune_replace_properties)
+
+# deprecated
+macro(replace_properties)
+  message(DEPRECATION "replace_properties is deprecated. Use 'dune_replace_properties' instead.")
+  dune_replace_properties(${ARGN})
+endmacro(replace_properties)
+
 
 
 # ------------------------------------------------------------------------
@@ -169,7 +176,7 @@ endfunction(replace_properties)
 # ------------------------------------------------------------------------
 
 
-macro(replace_properties_for_one)
+macro(dune_replace_properties_for_one)
   get_property(properties ${option_command} ${_target}
     PROPERTY ${REPLACE_PROPERTY})
   if(NOT properties)
@@ -207,4 +214,4 @@ macro(replace_properties_for_one)
       PROPERTY ${REPLACE_PROPERTY} ${new_props})
   endif()
   get_property(properties ${option_command} ${_target} PROPERTY ${REPLACE_PROPERTY})
-endmacro(replace_properties_for_one)
+endmacro(dune_replace_properties_for_one)

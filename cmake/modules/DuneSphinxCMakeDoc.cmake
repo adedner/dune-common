@@ -47,8 +47,8 @@
 #    There are some assumptions on how the documentation in
 #    the CMake modules is written:
 #
-#    * At the beginning of each CMake module there is a comment block that is written in restructured text.
-#      The first two characters of each line (the comment character
+#    * At the beginning of each CMake module there is a comment block that is written in
+#      restructured text. The first two characters of each line (the comment character
 #      and a blank) are ignored. Any resulting content of lines most form valid rst.
 #    * TODO document more
 #

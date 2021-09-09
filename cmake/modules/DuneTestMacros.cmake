@@ -252,11 +252,12 @@ if(NOT DUNE_MAX_TEST_CORES)
   set(DUNE_MAX_TEST_CORES 2)
 endif()
 
+
 function(dune_add_test)
-  include(CMakeParseArguments)
   set(OPTIONS EXPECT_COMPILE_FAIL EXPECT_FAIL SKIP_ON_77 COMPILE_ONLY)
   set(SINGLEARGS NAME TARGET TIMEOUT)
-  set(MULTIARGS SOURCES COMPILE_DEFINITIONS COMPILE_FLAGS LINK_LIBRARIES CMD_ARGS MPI_RANKS COMMAND CMAKE_GUARD LABELS)
+  set(MULTIARGS SOURCES COMPILE_DEFINITIONS COMPILE_FLAGS LINK_LIBRARIES CMD_ARGS MPI_RANKS
+                COMMAND CMAKE_GUARD LABELS)
   cmake_parse_arguments(ADDTEST "${OPTIONS}" "${SINGLEARGS}" "${MULTIARGS}" ${ARGN})
 
   # Check whether the parser produced any errors
@@ -266,7 +267,8 @@ function(dune_add_test)
 
   # Check input for validity and apply defaults
   if(NOT ADDTEST_SOURCES AND NOT ADDTEST_TARGET)
-    message(FATAL_ERROR "You need to specify either the SOURCES or the TARGET option for dune_add_test!")
+    message(FATAL_ERROR "You need to specify either the SOURCES or the TARGET option for "
+      "dune_add_test!")
   endif()
   if(ADDTEST_SOURCES AND ADDTEST_TARGET)
     message(FATAL_ERROR "You cannot specify both SOURCES and TARGET for dune_add_test")
@@ -295,7 +297,8 @@ function(dune_add_test)
     endif()
   endif()
   if(ADDTEST_MPI_RANKS AND (NOT ADDTEST_TIMEOUT))
-    message(FATAL_ERROR "dune_add_test: You need to specify the TIMEOUT parameter if using the MPI_RANKS parameter.")
+    message(FATAL_ERROR "dune_add_test: You need to specify the TIMEOUT parameter if using the "
+      "MPI_RANKS parameter.")
   endif()
   if(NOT ADDTEST_MPI_RANKS)
     set(ADDTEST_MPI_RANKS 1)
@@ -305,11 +308,13 @@ function(dune_add_test)
   endif()
   foreach(num ${ADDTEST_MPI_RANKS})
     if(NOT "${num}" MATCHES "[1-9][0-9]*")
-      message(FATAL_ERROR "${num} was given to the MPI_RANKS arugment of dune_add_test, but it does not seem like a correct processor number")
+      message(FATAL_ERROR "${num} was given to the MPI_RANKS arugment of dune_add_test, but it "
+        "does not seem like a correct processor number")
     endif()
   endforeach()
   if(ADDTEST_SKIP_ON_77)
-    message(WARNING "The SKIP_ON_77 option for dune_add_test is obsolete, it is now enabled by default.")
+    message(WARNING "The SKIP_ON_77 option for dune_add_test is obsolete, it is now enabled by "
+      "default.")
   endif()
 
   # Discard all parallel tests if MPI was not found
@@ -324,7 +329,7 @@ function(dune_add_test)
     separate_arguments(condition)
     if(NOT (${condition}))
       set(SHOULD_SKIP_TEST TRUE)
-      set(FAILED_CONDITION_PRINTING "${FAILED_CONDITION_PRINTING}std::cout << \"  ${condition}\" << std::endl;\n")
+      string(APPEND FAILED_CONDITION_PRINTING "std::cout << \"  ${condition}\" << std::endl;\n")
     endif()
   endforeach()
 
@@ -380,7 +385,8 @@ function(dune_add_test)
       set(ACTUAL_NAME ${ADDTEST_NAME})
       set(ACTUAL_CMD_ARGS ${ADDTEST_CMD_ARGS})
       if(TARGET "${ADDTEST_COMMAND}")
-        # if the target name is specified as command, expand to full path using the TARGET_FILE generator expression
+        # if the target name is specified as command, expand to full path using the TARGET_FILE
+        # generator expression
         set(ACTUAL_TESTCOMMAND "$<TARGET_FILE:${ADDTEST_COMMAND}>")
       else()
         set(ACTUAL_TESTCOMMAND "${ADDTEST_COMMAND}")
@@ -389,7 +395,8 @@ function(dune_add_test)
       # modify test name and command for parallel tests
       if(NOT ${procnum} STREQUAL "1")
         set(ACTUAL_NAME "${ACTUAL_NAME}-mpi-${procnum}")
-        set(ACTUAL_CMD_ARGS ${MPIEXEC_PREFLAGS} ${MPIEXEC_NUMPROC_FLAG} ${procnum} "${ACTUAL_TESTCOMMAND}" ${MPIEXEC_POSTFLAGS} ${ACTUAL_CMD_ARGS})
+        set(ACTUAL_CMD_ARGS ${MPIEXEC_PREFLAGS} ${MPIEXEC_NUMPROC_FLAG} ${procnum}
+          "${ACTUAL_TESTCOMMAND}" ${MPIEXEC_POSTFLAGS} ${ACTUAL_CMD_ARGS})
         set(ACTUAL_TESTCOMMAND "${MPIEXEC}")
       endif()
 
@@ -406,7 +413,8 @@ function(dune_add_test)
 
       # Make the test depend on the existence of the target to trigger "Not Run" response
       if(NOT ADDTEST_EXPECT_COMPILE_FAIL)
-        set_tests_properties(${ACTUAL_NAME} PROPERTIES REQUIRED_FILES $<TARGET_FILE:${ADDTEST_TARGET}>)
+        set_tests_properties(${ACTUAL_NAME} PROPERTIES REQUIRED_FILES
+          $<TARGET_FILE:${ADDTEST_TARGET}>)
       endif()
       # Define the number of processors (ctest will coordinate this with the -j option)
       set_tests_properties(${ACTUAL_NAME} PROPERTIES PROCESSORS ${procnum})
@@ -428,9 +436,6 @@ function(dune_add_test)
   endforeach()
 endfunction()
 
-macro(add_directory_test_target)
-  message(FATAL_ERROR "The function add_directory_test_target has been removed alongside all testing magic in dune-common. Check dune_add_test for the new way!")
-endmacro()
 
 macro(add_test)
   if(NOT DUNE_REENABLE_ADD_TEST)

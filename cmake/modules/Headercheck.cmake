@@ -9,7 +9,7 @@ include_guard(GLOBAL)
 
 # sets up a global property with the names of all header files
 # in the module and a global target depending on all checks
-macro(setup_headercheck)
+macro(dune_setup_headercheck)
   #glob for headers
   file(GLOB_RECURSE all_headers "*.hh")
   # strip hidden files
@@ -24,11 +24,18 @@ macro(setup_headercheck)
       -P ${scriptdir}/FinalizeHeadercheck.cmake
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
   endif()
+endmacro(dune_setup_headercheck)
+
+# deprecated
+macro(setup_headercheck)
+  message(DEPRECATION "setup_headercheck is deprecated. Use 'dune_setup_headercheck' instead.")
+  dune_setup_headercheck(${ARGV})
 endmacro(setup_headercheck)
+
 
 # these macros are used to exclude headers from make headercheck
 # call this from a CMakeLists.txt file with a list of headers in that directory
-macro(exclude_from_headercheck)
+macro(dune_exclude_from_headercheck)
   #make this robust to argument being passed with or without ""
   string(REGEX REPLACE "[\ \n]+([^\ ])" ";\\1" list ${ARGV0})
   set(list "${list};${ARGV}")
@@ -37,23 +44,47 @@ macro(exclude_from_headercheck)
     list(REMOVE_ITEM headerlist "${CMAKE_CURRENT_SOURCE_DIR}/${item}")
   endforeach()
   set_property(GLOBAL PROPERTY headercheck_list ${headerlist})
+endmacro(dune_exclude_from_headercheck)
+
+# deprecated
+macro(exclude_from_headercheck)
+  message(DEPRECATION "exclude_from_headercheck is deprecated. Use 'dune_exclude_from_headercheck' "
+    "instead.")
+  dune_exclude_from_headercheck(${ARGV})
 endmacro(exclude_from_headercheck)
 
-macro(exclude_dir_from_headercheck)
+
+macro(dune_exclude_dir_from_headercheck)
   file(GLOB list RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.hh")
-  exclude_from_headercheck(${list})
+  dune_exclude_from_headercheck(${list})
+endmacro(dune_exclude_dir_from_headercheck)
+
+# deprecated
+macro(exclude_dir_from_headercheck)
+  message(DEPRECATION "exclude_dir_from_headercheck is deprecated. Use "
+    "'dune_exclude_dir_from_headercheck' instead.")
+  dune_exclude_dir_from_headercheck(${ARGV})
 endmacro(exclude_dir_from_headercheck)
 
-macro(exclude_subdir_from_headercheck DIRNAME)
+
+macro(dune_exclude_subdir_from_headercheck DIRNAME)
   file(GLOB_RECURSE exlist "${CMAKE_CURRENT_SOURCE_DIR}/${DIRNAME}/*.hh")
   get_property(headerlist GLOBAL PROPERTY headercheck_list)
   foreach(item ${exlist})
     list(REMOVE_ITEM headerlist "${item}")
   endforeach()
   set_property(GLOBAL PROPERTY headercheck_list ${headerlist})
+endmacro(dune_exclude_subdir_from_headercheck)
+
+# deprecated
+macro(exclude_subdir_from_headercheck)
+  message(DEPRECATION "exclude_subdir_from_headercheck is deprecated. Use "
+    "'dune_exclude_subdir_from_headercheck' instead.")
+  dune_exclude_subdir_from_headercheck(${ARGV})
 endmacro(exclude_subdir_from_headercheck)
 
-macro(exclude_all_but_from_headercheck)
+
+macro(dune_exclude_all_but_from_headercheck)
   file(GLOB excllist RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.hh")
   #make this robust to argument being passed with or without ""
   string(REGEX REPLACE "[\ \n]+([^\ \n])" ";\\1" list ${ARGV0})
@@ -61,11 +92,19 @@ macro(exclude_all_but_from_headercheck)
   foreach(item ${list})
     list(REMOVE_ITEM excllist ${item})
   endforeach()
-  exclude_from_headercheck(${excllist})
+  dune_exclude_from_headercheck(${excllist})
+endmacro(dune_exclude_all_but_from_headercheck)
+
+# deprecated
+macro(exclude_all_but_from_headercheck)
+  message(DEPRECATION "exclude_all_but_from_headercheck is deprecated. Use "
+    "'dune_exclude_all_but_from_headercheck' instead.")
+  dune_exclude_all_but_from_headercheck(${ARGV})
 endmacro(exclude_all_but_from_headercheck)
 
+
 # configure all headerchecks
-macro(finalize_headercheck)
+macro(dune_finalize_headercheck)
   if(ENABLE_HEADERCHECK)
     get_property(headerlist GLOBAL PROPERTY headercheck_list)
     foreach(header ${headerlist})
@@ -93,4 +132,11 @@ macro(finalize_headercheck)
       unset(headercheck_${targname}_LIB_DEPENDS CACHE)
     endforeach(header ${headerlist})
   endif()
+endmacro(dune_finalize_headercheck)
+
+# deprecated
+macro(finalize_headercheck)
+  message(DEPRECATION
+    "finalize_headercheck is deprecated. Use 'dune_finalize_headercheck' instead.")
+  dune_finalize_headercheck(${ARGV})
 endmacro(finalize_headercheck)

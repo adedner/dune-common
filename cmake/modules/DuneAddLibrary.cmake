@@ -18,7 +18,7 @@ Add a library to a Dune module.
     )
 
   Create a new library target with ``<basename>`` for the library name. On Unix
-  this created ``lib<basename>.so`` and ``lib<basename>.a``.
+  this created ``lib<basename>.so`` or ``lib<basename>.a``.
 
   ``SOURCES``
     The source files from which to build the library.
@@ -46,8 +46,8 @@ include_guard(GLOBAL)
 
 
 macro(dune_add_library basename)
-  cmake_parse_arguments(DUNE_LIB "APPEND;NO_EXPORT;OBJECT" "COMPILE_FLAGS"
-    "ADD_LIBS;SOURCES" ${ARGN})
+  cmake_parse_arguments(DUNE_LIB
+    "APPEND;NO_EXPORT;OBJECT" "COMPILE_FLAGS" "ADD_LIBS;SOURCES" ${ARGN})
   list(APPEND DUNE_LIB_SOURCES ${DUNE_LIB_UNPARSED_ARGUMENTS})
   if(DUNE_LIB_OBJECT)
     if(DUNE_LIB_${basename}_SOURCES)
@@ -76,7 +76,7 @@ macro(dune_add_library basename)
     endif()
   else(DUNE_LIB_OBJECT)
     dune_expand_object_libraries(DUNE_LIB_SOURCES DUNE_LIB_ADD_LIBS DUNE_LIB_COMPILE_FLAGS)
-    #create lib
+    # create lib
     add_library(${basename} ${DUNE_LIB_SOURCES})
     get_property(_prop GLOBAL PROPERTY DUNE_MODULE_LIBRARIES)
     set_property(GLOBAL PROPERTY DUNE_MODULE_LIBRARIES ${_prop} ${basename})
@@ -121,11 +121,11 @@ macro(dune_add_library basename)
         FILE ${PROJECT_BINARY_DIR}/${ProjectName}-targets.cmake)
     endif()
   endif()
-endmacro(dune_add_library basename sources)
+endmacro(dune_add_library)
 
 
 # ------------------------------------------------------------------------
-# Internal macros
+# Internal macros and functions
 # ------------------------------------------------------------------------
 
 

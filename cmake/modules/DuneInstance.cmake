@@ -465,16 +465,6 @@
 #    block.
 include_guard(GLOBAL)
 
-# macro to print additional information to the cmake output file.
-# Note: in cmake 3.15 this is available through the message(VERBOSE "...") function.
-macro(message_verbose TEXT)
-  if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.15")
-    message(VERBOSE "${TEXT}")
-  else()
-    file(APPEND ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeOutput.log "${TEXT}\n")
-  endif()
-endmacro(message_verbose)
-
 
 ######################################################################
 #
@@ -617,7 +607,7 @@ endfunction(dune_instance_set_generated)
 # protect against problems with empty elements and against cmakes list()
 # command butchering it's own quoting.
 function(dune_instance_parse_embedded name content_parts template_parts template_names)
-  message_verbose("Parsing ${name} for embedded templates")
+  dune_verbose_message("Parsing ${name} for embedded templates")
   file(READ "${name}" content)
   # ensure that the file content ends in a newline, which makes searching for
   # template marker easier
@@ -717,7 +707,7 @@ function(dune_instance_generate_file TEMPLATE INSTANCE)
   dune_instance_set_generated()
 
   # do the generation
-  message_verbose("Generating ${TEMPLATE} -> ${INSTANCE}")
+  dune_verbose_message("Generating ${TEMPLATE} -> ${INSTANCE}")
   file(READ "${TEMPLATE}" _content)
   string(CONFIGURE "${_content}" _content)
 
@@ -921,7 +911,7 @@ function(dune_instance_end)
     # remove the final newline that we appended when reading the template file
     string(REGEX REPLACE "\n\$" "" _content "${_content}")
 
-    message_verbose("Writing ${INSTANCE}")
+    dune_verbose_message("Writing ${INSTANCE}")
     # only write if the content changes, avoiding recompilations
     dune_write_changed_file("${BINDIR_INSTANCE}" "${_content}")
 
@@ -931,3 +921,25 @@ function(dune_instance_end)
 
   set(DUNE_INSTANCE_GENERATED "${DUNE_INSTANCE_GENERATED}" PARENT_SCOPE)
 endfunction(dune_instance_end)
+
+
+# ------------------------------------------------------------------------
+# Internal macros and functions
+# ------------------------------------------------------------------------
+
+
+# function to print additional information to the cmake output file.
+# Note: in cmake 3.15 this is available through the message(VERBOSE "...") function.
+function(dune_verbose_message TEXT)
+  if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.15")
+    message(VERBOSE "${TEXT}")
+  else()
+    file(APPEND ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeOutput.log "${TEXT}\n")
+  endif()
+endfunction(dune_verbose_message)
+
+# deprecated
+macro(message_verbose)
+  message(DEPRECATION "message_verbose is deprecated. Use 'dune_verbose_message' instead.")
+  dune_verbose_message(${ARGN})
+endmacro(message_verbose)

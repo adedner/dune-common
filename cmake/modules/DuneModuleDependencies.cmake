@@ -136,7 +136,7 @@ endmacro(dune_process_dependency_macros)
 # ------------------------------------------------------------------------
 
 
-macro(find_dune_package module)
+macro(dune_find_package module)
   include(CMakeParseArguments)
   cmake_parse_arguments(DUNE_FIND "REQUIRED" "VERSION" "" ${ARGN})
   if(DUNE_FIND_REQUIRED)
@@ -152,7 +152,7 @@ macro(find_dune_package module)
     string(REGEX REPLACE "(>=|=|<=)(.*)" "\\1" DUNE_FIND_VERSION_OP ${DUNE_FIND_VERSION})
     string(REGEX REPLACE "(>=|=|<=)(.*)" "\\2" DUNE_FIND_VERSION_NUMBER ${DUNE_FIND_VERSION})
     string(STRIP ${DUNE_FIND_VERSION_NUMBER} DUNE_FIND_VERSION_NUMBER)
-    extract_major_minor_version("${DUNE_FIND_VERSION_NUMBER}" DUNE_FIND_VERSION)
+    dune_extract_major_minor_version("${DUNE_FIND_VERSION_NUMBER}" DUNE_FIND_VERSION)
     set(DUNE_FIND_VERSION_STRING "${DUNE_FIND_VERSION_MAJOR}.${DUNE_FIND_VERSION_MINOR}.${DUNE_FIND_VERSION_REVISION}")
   else()
     set(DUNE_FIND_VERSION_STRING "0.0.0")
@@ -260,7 +260,7 @@ macro(find_dune_package module)
     endif()
   endif()
   set(DUNE_${module}_FOUND ${${module}_FOUND})
-endmacro(find_dune_package module)
+endmacro(dune_find_package module)
 
 
 macro(dune_process_dependency_leafs modules versions is_required next_level_deps next_level_sugs)
@@ -279,7 +279,7 @@ macro(dune_process_dependency_leafs modules versions is_required next_level_deps
     foreach(i RANGE 0 ${length})
       list(GET mmodules ${i} _mod)
       list(GET mversions ${i} _ver)
-      find_dune_package(${_mod} ${is_required} VERSION "${_ver}")
+      dune_find_package(${_mod} ${is_required} VERSION "${_ver}")
       set(${_mod}_SEARCHED ON)
       if(NOT "${is_required}" STREQUAL "")
         set(${_mod}_REQUIRED ON)
@@ -299,7 +299,7 @@ macro(dune_process_dependency_leafs modules versions is_required next_level_deps
 endmacro(dune_process_dependency_leafs)
 
 
-function(remove_processed_modules modules versions is_required)
+function(dune_remove_processed_modules modules versions is_required)
   list(LENGTH ${modules} mlength)
   if(mlength GREATER 0)
   math(EXPR length "${mlength}-1")
@@ -316,7 +316,7 @@ function(remove_processed_modules modules versions is_required)
   endif()
   set(${modules} ${${modules}} PARENT_SCOPE)
   set(${versions} ${${versions}} PARENT_SCOPE)
-endfunction(remove_processed_modules modules versions is_required)
+endfunction(dune_remove_processed_modules modules versions is_required)
 
 
 macro(dune_create_dependency_leafs depends depends_versions suggests suggests_versions)
@@ -330,8 +330,8 @@ macro(dune_create_dependency_leafs depends depends_versions suggests suggests_ve
   if(NOT "${suggests}" STREQUAL "")
     dune_process_dependency_leafs("${suggests}" "${suggests_versions}" "" deps sugs)
   endif()
-  split_module_version("${deps}" next_mod_depends next_depends_versions)
-  split_module_version("${sugs}" next_mod_suggests next_suggests_versions)
+  dune_split_module_version("${deps}" next_mod_depends next_depends_versions)
+  dune_split_module_version("${sugs}" next_mod_suggests next_suggests_versions)
   set(ALL_DEPENDENCIES ${ALL_DEPENDENCIES} ${next_mod_depends} ${next_mod_suggests})
   # Move to next level
   if(next_mod_suggests OR next_mod_depends)

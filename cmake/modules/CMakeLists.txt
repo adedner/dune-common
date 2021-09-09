@@ -27,7 +27,6 @@ install(FILES
   DuneMacros.cmake
   DuneModuleDependencies.cmake
   DuneModuleInformation.cmake
-  DuneMPI.cmake
   DunePathHelper.cmake
   DunePkgConfig.cmake
   DuneProject.cmake
