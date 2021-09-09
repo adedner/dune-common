@@ -11,6 +11,41 @@
 
 - Remove the variable `DUNE_DEFAULT_LIBS`
 
+- The cmake file `DuneMacros.cmake` is split up into several files that contain only a part of the
+  cmake code for specific purposes. We have for example `DuneAddLibrary.cmake` implementing
+  `dune_add_library` macro, `DuneProject.cmake` providing `dune_project` and `finalize_dune_project`.
+
+- Overwrite of `target_link_libraries` for backwards compatibility is removed in favour of the
+  default behavior. It was introduced to allow mix functions with and without `<scope>` argument.
+  A deprecation was shown before. This deprecated behavior is now removed and replaced with the
+  default behavior.
+
+- Remove cmake macro `add_directory_test_target` that was deprecated a long time ago
+
+- Remove deprecated cmake function `dune_list_filter`
+
+- Remove deprecated cmake file `DuneMPI.cmake`
+
+- Deprecate cmake file `DuneCMakeCompat.cmake` that just contained the removed function
+  `dune_list_filter`
+
+- Rename `finalize_dune_project` into `dune_finalize_project`. Note, the old name still exists as
+  an alias but should not be used anymore. It will be deprecated in the future.
+
+- Rename `target_link_dune_default_libraries` into `dune_target_link_default_libraries`.
+
+- Rename `add_dune_all_flags` into `dune_add_all_flags`.
+
+- Prefix the following cmake functions/macros with `dune_` and deprecated the old function/macro
+  name: `create_doc_install`, `prepare_doxyfile`, `add_doxygen_target`, `message_verbose`,
+  `replace_properties`, `setup_headercheck`, `finalize_headercheck`,
+  `exclude_all_but_from_headercheck`, `exclude_dir_from_headercheck`, `exclude_from_headercheck`,
+  `find_extended_unix_commands`, `initialize_compiler_script`, `finalize_compiler_script`.
+
+- Prefix the following internal cmake functions/macros with `dune_`: `replace_properties_for_one`,
+  `find_dune_package`, `remove_processed_modules`, `extract_line`,  `convert_deps_to_list`,
+  `split_module_version`, `extract_major_minor_version`.
+
 # Release 2.8
 
 - Set minimal required CMake version in cmake to >= 3.13.

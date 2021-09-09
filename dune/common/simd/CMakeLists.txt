@@ -1,7 +1,7 @@
 add_subdirectory(test)
 
 if(NOT VC_FOUND)
-  exclude_dir_from_headercheck()
+  dune_exclude_dir_from_headercheck()
 endif()
 
 #install headers

@@ -14,7 +14,7 @@
 #
 #       wrapper around add_latex_document for compatibility reasons
 #
-# .. cmake_function:: create_doc_install
+# .. cmake_function:: dune_create_doc_install
 #
 #    .. cmake_brief::
 #
@@ -58,12 +58,16 @@ endif()
 
 add_custom_target(doc)
 
-# add the Sphinx-generated build system documentation
-include(DuneSphinxCMakeDoc)
-# Support building documentation with doxygen.
-include(DuneDoxygen)
+include(DuneSphinxCMakeDoc) # add the Sphinx-generated build system documentation
+include(DuneDoxygen)        # Support building documentation with doxygen.
 
-macro(create_doc_install filename targetdir dependency)
+
+macro(dune_add_latex_document)
+  add_latex_document(${ARGN})
+endmacro(dune_add_latex_document)
+
+
+function(dune_create_doc_install filename targetdir dependency)
   if(LATEX_USABLE)
     dune_module_path(MODULE dune-common RESULT scriptdir SCRIPT_DIR)
     get_filename_component(targetfile ${filename} NAME)
@@ -77,8 +81,10 @@ macro(create_doc_install filename targetdir dependency)
     install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build \"${CMAKE_BINARY_DIR}\" --target install_${targetfile} )
               LIST(APPEND CMAKE_INSTALL_MANIFEST_FILES ${CMAKE_INSTALL_PREFIX}/${targetdir}/${targetfile})")
   endif()
-endmacro(create_doc_install)
+endfunction(dune_create_doc_install)
 
-macro(dune_add_latex_document)
-  add_latex_document(${ARGN})
-endmacro(dune_add_latex_document)
+# deprecated
+macro(create_doc_install)
+  message(DEPRECATION "create_doc_install is deprecated. Use 'dune_create_doc_install' instead.")
+  dune_create_doc_install(${ARGN})
+endmacro(create_doc_install)
