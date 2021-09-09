@@ -5,11 +5,11 @@ DuneMacros
 Core DUNE module for CMake.
 
 
-.. cmake:command:: target_link_dune_default_libraries
+.. cmake:command:: dune_target_link_default_libraries
 
   .. code-block:: cmake
 
-    target_link_dune_default_libraries(<target>)
+    dune_target_link_default_libraries(<target>)
 
   Alias for ``target_link_libraries(<target> PUBLIC ${DUNE_LIBS})``
 
@@ -27,7 +27,7 @@ Core DUNE module for CMake.
 
   .. code-block:: cmake
 
-    add_dune_all_flags(<target>)
+    dune_add_all_flags(<target>)
 
   Add the flags of all registered packages to the given ``<target>``.
   This function is superseded by :command:`dune_target_enable_all_packages`.

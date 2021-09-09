@@ -463,13 +463,13 @@
 #    :ref:`dune_instance_begin()
 #    <dune_instance_begin>`/:ref:`dune_instance_end() <dune_instance_end>`
 #    block.
+#
 include_guard(GLOBAL)
 
 
-######################################################################
-#
-#  Coping with cmake list shortcomings
-#
+# ------------------------------------------------------------------------
+# Coping with cmake list shortcomings
+# ------------------------------------------------------------------------
 
 # We use these commands internally to quote text before adding it to lists as
 # an element, and to unquote elements again after extracting them.  The quoted
@@ -494,6 +494,7 @@ function(dune_instance_quote_element VAR)
   set("${VAR}" "${content}" PARENT_SCOPE)
 endfunction(dune_instance_quote_element)
 
+
 function(dune_instance_unquote_element VAR)
   set(content "${${VAR}}")
   string(REPLACE [[$@]] [[]]  content "${content}")
@@ -503,10 +504,11 @@ function(dune_instance_unquote_element VAR)
   set("${VAR}" "${content}" PARENT_SCOPE)
 endfunction(dune_instance_unquote_element)
 
-######################################################################
-#
-#  instance name and template name manipulation
-#
+
+# ------------------------------------------------------------------------
+# Instance name and template name manipulation
+# ------------------------------------------------------------------------
+
 
 function(dune_instance_parse_file_spec spec template_var instance_var)
   string(REPLACE ":" ";" spec_items "${spec}")
@@ -541,6 +543,7 @@ function(dune_instance_parse_file_spec spec template_var instance_var)
   endif(NOT ("${instance_var}" STREQUAL ""))
 endfunction(dune_instance_parse_file_spec)
 
+
 # build output file name: parse the file_spec into a template name and a base
 # instance name.  Mangle the ID by replacing anything special with "_" and
 # intersperse the result between basename and extension of the base instance
@@ -574,6 +577,7 @@ function(dune_instance_from_id file_spec id template_var instance_var)
   endif(NOT ("${instance_var}" STREQUAL ""))
 endfunction(dune_instance_from_id)
 
+
 # mimic the behaviour of configure_file(), placing relative paths in the
 # current binary dir
 function(dune_instance_apply_bindir fname_var)
@@ -583,10 +587,10 @@ function(dune_instance_apply_bindir fname_var)
 endfunction(dune_instance_apply_bindir)
 
 
-######################################################################
-#
-#  File generation
-#
+# ------------------------------------------------------------------------
+# File generation
+# ------------------------------------------------------------------------
+
 
 function(dune_instance_set_generated)
   # prepare instance substitution variables
@@ -598,6 +602,7 @@ function(dune_instance_set_generated)
   dune_instance_apply_bindir(BINDIR_INSTANCE)
   set(BINDIR_INSTANCE "${BINDIR_INSTANCE}" PARENT_SCOPE)
 endfunction(dune_instance_set_generated)
+
 
 # Read a template file and split it into three lists
 # - content_parts contains the parts before, between, and after templates
@@ -684,6 +689,7 @@ ${name}:${lineno}: ...'${sep}' here")
   set("${template_names}" "${template_name_list}" PARENT_SCOPE)
 endfunction(dune_instance_parse_embedded)
 
+
 # Take the name of a list variable containing content parts other then
 # embedded templates and instanciate each part.  Put the result back into the
 # same variable.  List elements are quoted.
@@ -697,6 +703,7 @@ function(dune_instance_generate_parts _parts_list)
   endforeach(_part)
   set("${_parts_list}" "${_acc}" PARENT_SCOPE)
 endfunction(dune_instance_generate_parts)
+
 
 function(dune_instance_generate_file TEMPLATE INSTANCE)
   if(("${INSTANCE}" STREQUAL "") OR ("${TEMPLATE}" STREQUAL ""))
@@ -730,6 +737,7 @@ function(dune_instance_generate_file TEMPLATE INSTANCE)
   endif(_seen)
 endfunction(dune_instance_generate_file)
 
+
 # only write if the content changes, avoiding recompilations
 function(dune_write_changed_file name content)
   if(EXISTS "${name}")
@@ -741,10 +749,11 @@ function(dune_write_changed_file name content)
   file(WRITE "${name}" "${content}")
 endfunction(dune_write_changed_file)
 
-######################################################################
-#
-#  High-level interface commands
-#
+
+# ------------------------------------------------------------------------
+# High-level interface commands
+# ------------------------------------------------------------------------
+
 
 function(dune_instance_begin)
   cmake_parse_arguments(_arg
@@ -874,6 +883,7 @@ function(dune_instance_add)
   endif()
   set(DUNE_INSTANCE_GENERATED "${DUNE_INSTANCE_GENERATED}" PARENT_SCOPE)
 endfunction(dune_instance_add)
+
 
 function(dune_instance_end)
   if(ARGC GREATER 0)
