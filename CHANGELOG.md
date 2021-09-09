@@ -9,6 +9,8 @@
 
 - The cmake function `dune_require_cxx_standard()` is deprecated.
 
+- Remove the variable `DUNE_DEFAULT_LIBS`
+
 # Release 2.8
 
 - Set minimal required CMake version in cmake to >= 3.13.
