@@ -36,6 +36,8 @@
 
 - The cmake function `dune_require_cxx_standard()` is deprecated.
 
+- Remove the variable `DUNE_DEFAULT_LIBS`
+
 ## Deprecations and removals
 
 - The deprecated headers `gcd.hh` and `lcm.hh` are removed. Use `std::gcd`
