@@ -137,7 +137,6 @@ endmacro(dune_process_dependency_macros)
 
 
 macro(dune_find_package module)
-  include(CMakeParseArguments)
   cmake_parse_arguments(DUNE_FIND "REQUIRED" "VERSION" "" ${ARGN})
   if(DUNE_FIND_REQUIRED)
     set(required REQUIRED)

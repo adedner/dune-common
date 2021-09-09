@@ -278,11 +278,8 @@ endfunction(dune_target_enable_all_packages)
 
 
 function(dune_register_package_flags)
-  include(CMakeParseArguments)
-  set(OPTIONS APPEND)
-  set(SINGLEARGS)
   set(MULTIARGS COMPILE_DEFINITIONS COMPILE_OPTIONS INCLUDE_DIRS LIBRARIES)
-  cmake_parse_arguments(REGISTRY "${OPTIONS}" "${SINGLEARGS}" "${MULTIARGS}" ${ARGN})
+  cmake_parse_arguments(REGISTRY "APPEND" "" "${MULTIARGS}" ${ARGN})
 
   if(REGISTRY_UNPARSED_ARGUMENTS)
     message(WARNING "Unrecognized arguments for dune_register_package_flags!")

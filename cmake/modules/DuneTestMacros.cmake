@@ -216,11 +216,7 @@ include(CTest)
 add_custom_target(build_tests)
 
 function(dune_declare_test_label)
-  include(CMakeParseArguments)
-  set(OPTIONS)
-  set(SINGLEARGS)
-  set(MULTIARGS LABELS)
-  cmake_parse_arguments(arg "${OPTIONS}" "${SINGLEARGS}" "${MULTIARGS}" ${ARGN})
+  cmake_parse_arguments(arg "" "" "LABELS" ${ARGN})
 
   if( (DEFINED arg_UNPARSED_ARGUMENTS) AND NOT ( arg_UNPARSED_ARGUMENTS STREQUAL "" ) )
     message(FATAL_ERROR "Unhandled extra arguments given to dune_declare_test_label(): "

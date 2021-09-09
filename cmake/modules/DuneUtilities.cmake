@@ -89,7 +89,6 @@ endmacro(dune_module_to_macro _macro_name _dune_module)
 
 
 function(dune_replace_properties)
-  include(CMakeParseArguments)
   set(_first_opts "GLOBAL;DIRECTORY;TARGET;SOURCE;CACHE")
   cmake_parse_arguments(REPLACE "GLOBAL"
     "DIRECTORY;PROPERTY" "TARGET;SOURCE;TEST;CACHE" ${ARGN})
