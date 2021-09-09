@@ -1,5 +1,9 @@
 # Master (will become release 2.9)
 
+## Build System
+
+- Remove the variable `DUNE_DEFAULT_LIBS`
+
 # Release 2.8
 
 - Set minimal required CMake version in cmake to >= 3.13.
