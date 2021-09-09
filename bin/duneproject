@@ -426,7 +426,7 @@ add_subdirectory(doc)
 add_subdirectory(cmake/modules)
 
 # finalize the dune project, e.g. generating config.h etc.
-finalize_dune_project(GENERATE_CONFIG_H_CMAKE)
+dune_finalize_project(GENERATE_CONFIG_H_CMAKE)
 M_DELIM
 
 ################## PROJECT.PC.IN ##################
@@ -648,7 +648,7 @@ CC_DELIM
 echo "- $PROJECT/doc/doxygen/CMakeLists.txt"
 cat> "$PROJECT/doc/doxygen/CMakeLists.txt" << CC_DELIM
 # shortcut for creating the Doxyfile.in and Doxyfile
-add_doxygen_target()
+dune_add_doxygen_target()
 CC_DELIM
 
 #########################################################

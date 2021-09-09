@@ -38,6 +38,17 @@
 
 - Remove the variable `DUNE_DEFAULT_LIBS`
 
+- The cmake file `DuneMacros.cmake` is split up into several files that contain only a part of the
+  cmake code for specific purposes. We have for example `DuneAddLibrary.cmake` implementing
+  `dune_add_library` macro, `DuneProject.cmake` providing `dune_project` and `finalize_dune_project`.
+
+- Overwrite of `target_link_libraries` for backwards compatibility is removed in favour of the
+  default behavior. It was introduced to allow mix functions with and without `<scope>` argument.
+  A deprecation was shown before. This deprecated behavior is now removed and replaced with the
+  default behavior.
+
+- Remove cmake macro `add_directory_test_target` that was deprecated a long time ago
+
 ## Deprecations and removals
 
 - The deprecated headers `gcd.hh` and `lcm.hh` are removed. Use `std::gcd`

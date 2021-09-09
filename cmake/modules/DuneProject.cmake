@@ -21,13 +21,13 @@ Initialize and finalize a Dune module.
   at the end of that ``CMakeLists.txt`` file.
 
 
-.. cmake:command:: finalize_dune_project
+.. cmake:command:: dune_finalize_project
 
   Finalize the creation of the Dune module by creating package config files.
 
   .. code-block:: cmake
 
-    finalize_dune_project([<generate-config-h>])
+    dune_finalize_project([<generate-config-h>])
 
   This function needs to be run at the end of every top-level
   ``CMakeLists.txt`` file. Among other things it creates the cmake package
@@ -57,9 +57,8 @@ include(OverloadCompilerFlags)
 # depedencies.
 # Don't forget to call finalize_dune_project afterwards.
 macro(dune_project)
-
   # check if CXX flag overloading has been enabled (see OverloadCompilerFlags.cmake)
-  initialize_compiler_script()
+  dune_initialize_compiler_script()
 
   # extract information from dune.module
   dune_module_information(${PROJECT_SOURCE_DIR})
@@ -151,13 +150,13 @@ endmacro(dune_project)
 # macro that should be called at the end of the top level CMakeLists.txt.
 # Namely it creates config.h and the cmake-config files,
 # some install directives and exports the module.
-macro(finalize_dune_project)
+macro(dune_finalize_project)
   if(DUNE_SYMLINK_TO_SOURCE_TREE)
     dune_symlink_to_source_tree()
   endif()
 
   #configure all headerchecks
-  finalize_headercheck()
+  dune_finalize_headercheck()
 
   #create cmake-config files for installation tree
   set(DOXYSTYLE_DIR ${CMAKE_INSTALL_DATAROOTDIR}/dune-common/doc/doxygen/)
@@ -330,7 +329,13 @@ endif()
 
   # check if CXX flag overloading has been enabled
   # and write compiler script (see OverloadCompilerFlags.cmake)
-  finalize_compiler_script()
+  dune_finalize_compiler_script()
+endmacro(dune_finalize_project)
+
+
+# For backwards compatibility the old function name still exists
+macro(finalize_dune_project)
+  dune_finalize_project(${ARGN})
 endmacro(finalize_dune_project)
 
 

@@ -186,7 +186,6 @@ Carefully read the following documentation in those cases:
 
 * :ref:`dune_enable_all_packages`
 * :ref:`dune_register_package_flags`
-* :ref:`dune_library_add_sources`
 
 .. _compiler:
 

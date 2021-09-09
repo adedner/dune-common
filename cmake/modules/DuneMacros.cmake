@@ -4,7 +4,6 @@ DuneMacros
 
 Core DUNE module for CMake.
 
-.. cmake:command:: target_link_libraries
 
 .. cmake:command:: target_link_dune_default_libraries
 
