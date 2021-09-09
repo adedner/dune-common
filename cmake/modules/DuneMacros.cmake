@@ -785,7 +785,7 @@ macro(dune_regenerate_config_cmake)
 endmacro(dune_regenerate_config_cmake)
 
 # extract the required c++ standard from a given target
-macro(target_get_cxx_standard target var)
+macro(dune_target_get_cxx_standard target var)
   get_target_property(${var} ${target} CXX_STANDARD)
   if(NOT ${var})
     # detect standard version from compile features
@@ -822,16 +822,16 @@ macro(target_get_cxx_standard target var)
     unset(_options2)
     unset(_idx)
   endif()
-endmacro(target_get_cxx_standard)
+endmacro(dune_target_get_cxx_standard)
 
 # function to check whether c++ standards for all modules are the same
-function(check_compatible_cxx_standard)
-  target_get_cxx_standard(dunecommon cxx_standard_dunecommon)
+function(dune_check_compatible_cxx_standard)
+  dune_target_get_cxx_standard(dunecommon cxx_standard_dunecommon)
 
   get_property(libraries GLOBAL PROPERTY DUNE_MODULE_LIBRARIES)
   if(cxx_standard_dunecommon)
     foreach(lib ${libraries})
-      target_get_cxx_standard(${lib} cxx_standard)
+      dune_target_get_cxx_standard(${lib} cxx_standard)
       if(cxx_standard AND NOT ${cxx_standard} EQUAL ${cxx_standard_dunecommon})
         message(WARNING "Library ${lib} requests cxx_std_${cxx_standard} whereas "
                         "dunecommon requires cxx_std_${cxx_standard_dunecommon}. "
@@ -841,7 +841,7 @@ function(check_compatible_cxx_standard)
       unset(cxx_standard)
     endforeach(lib)
   endif()
-endfunction(check_compatible_cxx_standard)
+endfunction(dune_check_compatible_cxx_standard)
 
 # macro that should be called at the end of the top level CMakeLists.txt.
 # Namely it creates config.h and the cmake-config files,
@@ -855,7 +855,7 @@ macro(finalize_dune_project)
   finalize_headercheck()
 
   # check whether c++ standard flags are compatible to dunecommon
-  check_compatible_cxx_standard()
+  dune_check_compatible_cxx_standard()
 
   #create cmake-config files for installation tree
   include(CMakePackageConfigHelpers)
