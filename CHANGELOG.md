@@ -23,6 +23,10 @@
 - Rename `finalize_dune_project` into `dune_finalize_project`. Note, the old name still exists as
   an alias but should not be used anymore. It will be deprecated in the future.
 
+- Rename `target_link_dune_default_libraries` into `dune_target_link_default_libraries`.
+
+- Rename `add_dune_all_flags` into `dune_add_all_flags`.
+
 - Prefix the following cmake functions/macros with `dune_` and deprecated the old function/macro
   name: `create_doc_install`, `prepare_doxyfile`, `add_doxygen_target`, `message_verbose`,
   `replace_properties`, `setup_headercheck`, `finalize_headercheck`,
