@@ -3,9 +3,8 @@ add_subdirectory("simd")
 add_subdirectory("std")
 add_subdirectory("test")
 
-#build the library dunecommon
-
-dune_add_library("dunecommon"
+# build the library dunecommon
+target_sources(dunecommon PRIVATE
   debugalign.cc
   debugallocator.cc
   exceptions.cc
@@ -17,12 +16,6 @@ dune_add_library("dunecommon"
   simd/test.cc
   stdstreams.cc
   stdthread.cc)
-
-# minimal c++ standard required
-target_compile_features(dunecommon PUBLIC cxx_std_17)
-
-add_dune_blas_lapack_flags(dunecommon)
-add_dune_tbb_flags(dunecommon)
 
 #install headers
 install(FILES

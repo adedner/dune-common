@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(dune-common LANGUAGES C CXX)
+project("dune-common" LANGUAGES C CXX)
 
 # make sure our own modules are found
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
@@ -11,7 +11,16 @@ set(DUNE_COMMON_SCRIPT_DIR ${PROJECT_SOURCE_DIR}/cmake/scripts)
 include(DuneMacros)
 
 # start a dune project with information from dune.module
-dune_project()
+dune_project(dunecommon)
+
+# minimal c++ standard required
+target_compile_features(dunecommon PUBLIC cxx_std_17)
+
+# link against LAPACK or BLAS
+add_dune_blas_lapack_flags(dunecommon)
+
+# link against Threading Building Blocks
+add_dune_tbb_flags(dunecommon)
 
 # add subdirectories to execute CMakeLists.txt there
 add_subdirectory(bin)

@@ -23,7 +23,7 @@ Core DUNE module for CMake.
   Alias for ``target_link_libraries(<target> PUBLIC <library>)``
 
 
-.. cmake:command:: add_dune_all_flags
+.. cmake:command:: dune_add_all_flags
 
   .. code-block:: cmake
 
@@ -55,9 +55,7 @@ include(OverloadCompilerFlags)
 
 
 macro(dune_target_link_default_libraries _target)
-  foreach(_lib ${DUNE_DEFAULT_LIBS})
-    target_link_libraries(${_target} PUBLIC ${_lib})
-  endforeach()
+  target_link_libraries(${_target} PUBLIC ${DUNE_LIBS})
 endmacro(dune_target_link_default_libraries)
 
 # deprecated

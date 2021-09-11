@@ -96,11 +96,25 @@ macro(dune_project)
   include(CheckCXXFeatures)
 
   # set include path and link path for the current project.
-  include_directories("${CMAKE_BINARY_DIR}")
-  include_directories("${CMAKE_SOURCE_DIR}")
-  include_directories("${CMAKE_CURRENT_BINARY_DIR}")
-  include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
-  add_definitions(-DHAVE_CONFIG_H)
+  if(${ARGC} GREATER 0)
+    # if first argument is given, create module library
+    set(DUNE_MODULE_LIBRARY ${ARGV0})
+    dune_add_library(${DUNE_MODULE_LIBRARY})
+
+    # set include directories for module library target
+    target_include_directories(${DUNE_MODULE_LIBRARY} PUBLIC
+      $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+
+    target_compile_definitions(${DUNE_MODULE_LIBRARY} PUBLIC HAVE_CONFIG_H)
+  else()
+    # fallback for legacy cmake build system
+    include_directories(${PROJECT_BINARY_DIR})
+    include_directories(${PROJECT_SOURCE_DIR})
+    add_definitions(-DHAVE_CONFIG_H)
+  endif()
+
 
   # Create custom target for building the documentation
   # and provide macros for installing the docs and force
@@ -108,10 +122,15 @@ macro(dune_project)
   include(DuneDoc)
 
   # activate pkg-config
-  include(DunePkgConfig)
+  # include(DunePkgConfig)
 
   # Process the macros provided by the dependencies and ourself
   dune_process_dependency_macros()
+
+  # link against dependent libraries
+  if(DUNE_MODULE_LIBRARY)
+    target_link_libraries(${DUNE_MODULE_LIBRARY} PUBLIC ${DUNE_LIBS})
+  endif()
 
   # Set variable where the cmake modules will be installed.
   # Thus the user can override it and for example install
@@ -146,13 +165,23 @@ macro(dune_finalize_project)
     dune_symlink_to_source_tree()
   endif()
 
-  #configure all headerchecks
+  # configure all headerchecks
   dune_finalize_headercheck()
 
   # check whether c++ standard flags are compatible to dunecommon
   dune_check_compatible_cxx_standard()
 
-  #create cmake-config files for installation tree
+  # A fallback target source if non is given before
+  if(DUNE_MODULE_LIBRARY)
+    get_target_property(DUNE_MODULE_LIBRARY_SOURCES ${DUNE_MODULE_LIBRARY} SOURCES)
+    if(NOT DUNE_MODULE_LIBRARY_SOURCES)
+      file(TOUCH ${PROJECT_BINARY_DIR}/lib${DUNE_MODULE_LIBRARY}.cc)
+      target_sources(${DUNE_MODULE_LIBRARY} PRIVATE
+        ${PROJECT_BINARY_DIR}/lib${DUNE_MODULE_LIBRARY}.cc)
+    endif()
+  endif()
+
+  # create cmake-config files for installation tree
   set(DOXYSTYLE_DIR ${CMAKE_INSTALL_DATAROOTDIR}/dune-common/doc/doxygen/)
   set(SCRIPT_DIR ${CMAKE_INSTALL_DATAROOTDIR}/dune/cmake/scripts)
   # Set the location where the doc sources are installed.
@@ -198,7 +227,6 @@ endif()")
   else()
     set(CONFIG_SOURCE_FILE ${PROJECT_SOURCE_DIR}/cmake/pkg/${ProjectName}-config.cmake.in)
   endif()
-  get_property(DUNE_MODULE_LIBRARIES GLOBAL PROPERTY DUNE_MODULE_LIBRARIES)
 
   # compute under which libdir the package configuration files are to be installed.
   # If the module installs an object library we use CMAKE_INSTALL_LIBDIR
@@ -224,7 +252,7 @@ endif()")
     DOXYSTYLE_DIR SCRIPT_DIR)
 
 
-  #create cmake-config files for build tree
+  # create cmake-config files for build tree
   set(PACKAGE_CMAKE_INSTALL_INCLUDEDIR ${PROJECT_SOURCE_DIR})
   set(PACKAGE_CMAKE_INSTALL_DATAROOTDIR ${PROJECT_BINARY_DIR})
   set(PACKAGE_DOXYSTYLE_DIR ${PROJECT_SOURCE_DIR}/doc/doxygen)
@@ -278,7 +306,7 @@ endif()
   endif()
 
   # install pkg-config files
-  create_and_install_pkconfig(${DUNE_INSTALL_LIBDIR})
+  # create_and_install_pkconfig(${DUNE_INSTALL_LIBDIR})
 
   if("${ARGC}" EQUAL "1")
     message(STATUS "Adding custom target for config.h generation")

@@ -72,7 +72,7 @@ cover most flags. Example usage:
     add_dune_umfpack_flags(foo)
     add_dune_mpi_flags(foo)
 
-There is also the macro :ref:`add_dune_all_flags`, which uses the same flag registry mechanism as the simplified
+There is also the macro :ref:`dune_add_all_flags`, which uses the same flag registry mechanism as the simplified
 build system in section :ref:`simplified`.
 
 If you want to fully control the configuration of the targets, you can do so. Build system entities such

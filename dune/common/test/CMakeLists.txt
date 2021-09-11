@@ -239,6 +239,7 @@ dune_add_test(SOURCES mathclassifierstest.cc
               LINK_LIBRARIES dunecommon)
 
 dune_add_test(SOURCES metistest.cc
+              LINK_LIBRARIES dunecommon
               CMAKE_GUARD METIS_FOUND)
 add_dune_metis_flags(metistest)
 
@@ -286,6 +287,7 @@ dune_add_test(SOURCES parametertreetest.cc
               LABELS quick)
 
 dune_add_test(SOURCES parmetistest.cc
+              LINK_LIBRARIES dunecommon
               MPI_RANKS 3
               TIMEOUT 300
               CMAKE_GUARD ParMETIS_FOUND
