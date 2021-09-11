@@ -31,7 +31,6 @@ include(DuneEnableAllPackages)
 include(DuneModuleInformation)
 include(DuneUtilities)
 
-
 macro(dune_create_dependency_tree)
   # collect direct (and transitive) dependencies
   set(ALL_DEPENDENCIES)
@@ -52,6 +51,7 @@ macro(dune_create_dependency_tree)
 endmacro(dune_create_dependency_tree)
 
 
+# TODO: do not include <Module>Macros.cmake but use automatic <module>-config.cmake files
 macro(dune_process_dependency_macros)
   foreach(_mod ${ALL_DEPENDENCIES} ${ProjectName})
     if(NOT ${_mod}_PROCESSED)

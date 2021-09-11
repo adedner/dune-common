@@ -25,7 +25,7 @@
 #       :argname: def
 #
 #       A set of compile definitions to add to the target.
-#       Only definitions beyond the application of :ref:`add_dune_all_flags`
+#       Only definitions beyond the application of :ref:`dune_add_all_flags`
 #       have to be stated.
 #
 #    .. cmake_param:: CMAKE_GUARD
