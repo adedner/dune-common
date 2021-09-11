@@ -167,6 +167,14 @@ macro(dune_find_package module)
       message(${_warning_level} "Could not find requested version of module ${module}. "
         "Requested version was ${DUNE_FIND_VERSION}, found version is ${DUNE_FOUND_VERSION_STRING}")
       set(${module}_FOUND OFF)
+    else()
+      dune_module_to_uppercase(DUNE_MOD_NAME_UPPERCASE ${module})
+
+      # set module version
+      set(${DUNE_MOD_NAME_UPPERCASE}_VERSION          "${${module}_VERSION}")
+      set(${DUNE_MOD_NAME_UPPERCASE}_VERSION_MAJOR    "${${module}_VERSION_MAJOR}")
+      set(${DUNE_MOD_NAME_UPPERCASE}_VERSION_MINOR    "${${module}_VERSION_MINOR}")
+      set(${DUNE_MOD_NAME_UPPERCASE}_VERSION_REVISION "${${module}_VERSION_PATCH}")
     endif()
   endif()
 
