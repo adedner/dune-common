@@ -32,9 +32,9 @@ include(DuneModuleInformation)
 include(DuneUtilities)
 
 macro(dune_create_dependency_tree)
-  if(dune-common_MODULE_PATH)
-    list(REMOVE_ITEM CMAKE_MODULE_PATH "${dune-common_MODULE_PATH}")
-  endif()
+  # if(dune-common_MODULE_PATH)
+  #   list(REMOVE_ITEM CMAKE_MODULE_PATH "${dune-common_MODULE_PATH}")
+  # endif()
 
   # collect direct (and transitive) dependencies
   set(ALL_DEPENDENCIES)
@@ -52,21 +52,21 @@ macro(dune_create_dependency_tree)
     list(REVERSE ALL_DEPENDENCIES)
     list(REMOVE_DUPLICATES ALL_DEPENDENCIES)
 
-    set(ALL_MODULE_PATHS)
-    foreach(_mod ${ALL_DEPENDENCIES})
-      if(${_mod}_MODULE_PATH)
-        list(INSERT ALL_MODULE_PATHS 0 ${${_mod}_MODULE_PATH}) # prepend path to ALL_MODULE_PATHS
-      endif()
-    endforeach(_mod)
+    # set(ALL_MODULE_PATHS)
+    # foreach(_mod ${ALL_DEPENDENCIES})
+    #   if(${_mod}_MODULE_PATH)
+    #     list(INSERT ALL_MODULE_PATHS 0 ${${_mod}_MODULE_PATH}) # prepend path to ALL_MODULE_PATHS
+    #   endif()
+    # endforeach(_mod)
 
-    # insert module paths after own module dir
-    list(FIND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules start)
-    if(start EQUAL -1)
-      list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules ${ALL_MODULE_PATHS})
-    elseif(ALL_MODULE_PATHS)
-      math(EXPR start "${start}+1")
-      list(INSERT CMAKE_MODULE_PATH ${start} ${ALL_MODULE_PATHS})
-    endif()
+    # # insert module paths after own module dir
+    # list(FIND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules start)
+    # if(start EQUAL -1)
+    #   list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules ${ALL_MODULE_PATHS})
+    # elseif(ALL_MODULE_PATHS)
+    #   math(EXPR start "${start}+1")
+    #   list(INSERT CMAKE_MODULE_PATH ${start} ${ALL_MODULE_PATHS})
+    # endif()
   endif()
 endmacro(dune_create_dependency_tree)
 

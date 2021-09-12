@@ -124,6 +124,10 @@ macro(dune_project)
   # activate pkg-config
   # include(DunePkgConfig)
 
+  if(EXISTS ${PROJECT_SOURCE_DIR}/cmake/modules)
+    list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
+  endif()
+
   # Process the macros provided by the dependencies and ourself
   dune_process_dependency_macros()
 
@@ -213,6 +217,8 @@ set(${ProjectName}_DEPENDS \"@${ProjectName}_DEPENDS@\")
 set(${ProjectName}_SUGGESTS \"@${ProjectName}_SUGGESTS@\")
 set(${ProjectName}_MODULE_PATH \"@PACKAGE_DUNE_INSTALL_MODULEDIR@\")
 set(${ProjectName}_LIBRARIES \"@DUNE_MODULE_LIBRARIES@\")
+
+list(APPEND CMAKE_MODULE_PATH \${${ProjectName}_MODULE_PATH})
 
 # Lines that are set by the CMake build system via the variable DUNE_CUSTOM_PKG_CONFIG_SECTION
 ${DUNE_CUSTOM_PKG_CONFIG_SECTION}

@@ -210,7 +210,7 @@ setup_control_path() {
         fi
       done
       for i in `echo $PKG_CONFIG_PATH | tr ':' ' '`; do
-        if test -d "$i/../dunecontrol"; then 
+        if test -d "$i/../dunecontrol"; then
           DUNE_CONTROL_PATH=$DUNE_CONTROL_PATH:"$i/../dunecontrol"
         fi
       done
@@ -264,7 +264,7 @@ EOFM
         parse_control "$dir"
 	  fi
     done <<EOF
-    $(echo $DUNE_CONTROL_PATH | sed -e 's/:\+/:/g' | tr ':' '\n') 
+    $(echo $DUNE_CONTROL_PATH | sed -e 's/:\+/:/g' | tr ':' '\n')
 EOF
     export MODULES="$LOCALMODULES$INSTMODULES"
     export FOUND_MODULES="$MODULES"
@@ -398,9 +398,7 @@ _check_deps()
       # perhaps this module is installed,
       # then it should be handled via pkg-config
       if ! pkg-config $name; then
-        echo "$report: could not find module '$name'," >&2
-        echo "       module is also unknown to pkg-config." >&2
-        echo "       Maybe you need to adjust PKG_CONFIG_PATH!" >&2
+        echo "$report: could not find module '$name'." >&2
         echo "       '$name' is $required by $modname" >&2
         if test "x$mode" = "xDEPS"; then
           exit 1
@@ -438,7 +436,7 @@ _check_deps()
 # $2 parser mode:
 #    DEPS: search for dependencies
 #    SUSG: search for suggestions (DEPS of SUGS are handled as SUGS)
-#    MAIN: primary invocation of a DEPS search, 
+#    MAIN: primary invocation of a DEPS search,
 #          MAIN modules are not added to the list of DEPS/SUGS
 #
 _sort_module() {
@@ -453,7 +451,7 @@ _sort_module() {
   local ver=""
   local depver=""
   shift 1
-  if ! check_modname $module; then 
+  if ! check_modname $module; then
     echo "ERROR: invalid module name $module" >&2
     exit 1
   fi
@@ -619,7 +617,7 @@ check_version() {
   local v2=`echo "$2" | sed -e "s/$PATTERN/\2/"`
   local rest=`echo "$2" | sed -e "s/$PATTERN/\3/" -e 's/ //g'`
   local result=1
-  
+
   local rel=`compare_versions $v $v2`
 
   case $rel$op in
