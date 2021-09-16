@@ -64,7 +64,6 @@ macro(dune_module_to_export_name _output _module)
   string(REPLACE "dune_" "" ${_output} "${${_output}}")
 endmacro(dune_module_to_export_name)
 
-
 # Converts a module name given by _dune_module into a string _macro_name
 # where all dashes (-) are removed and letters after a dash are capitalized
 # Example: dune-grid-howto -> DuneGridHowto

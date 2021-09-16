@@ -4,7 +4,7 @@ add_subdirectory("std")
 add_subdirectory("test")
 
 # add some sources to the dunecommon library
-target_sources(dunecommon PRIVATE
+target_sources(dune-common PRIVATE
   debugalign.cc
   debugallocator.cc
   exceptions.cc
