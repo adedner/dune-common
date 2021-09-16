@@ -92,6 +92,13 @@ macro(dune_project)
     message(FATAL_ERROR "Module name from dune.module does not match the name given in CMakeLists.txt.")
   endif()
 
+  if(EXISTS ${PROJECT_SOURCE_DIR}/cmake/modules)
+    list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
+  endif()
+
+  # Process the macros provided by the dependencies and ourself
+  dune_process_dependency_macros()
+
   # As default request position independent code if shared libraries are built
   # This should allow DUNE modules to use CMake's object libraries.
   # This can be overwritten for targets by setting the target property
@@ -119,27 +126,29 @@ macro(dune_project)
     endif()
 
     set(_interface "")
-    set(DUNE_MODULE_TARGET_SCOPE "PUBLIC")
+    set(_scope "PUBLIC")
     if(DUNE_MODULE_INTERFACE)
       set(_interface "INTERFACE")
-      set(DUNE_MODULE_TARGET_SCOPE "INTERFACE")
+      set(_scope "INTERFACE")
     endif()
 
     dune_add_library(${DUNE_MODULE_TARGET} ${_interface}
       OUTPUT_NAME ${DUNE_MODULE_OUTPUT_NAME}
       EXPORT_NAME ${DUNE_MODULE_EXPORT_NAME})
 
-    add_library(Dune::${DUNE_MODULE_EXPORT_NAME} ALIAS ${DUNE_MODULE_TARGET})
-    set_target_properties(${DUNE_MODULE_TARGET} PROPERTIES OUTPUT_NAME ${DUNE_MODULE_OUTPUT_NAME})
-    set_target_properties(${DUNE_MODULE_TARGET} PROPERTIES EXPORT_NAME ${DUNE_MODULE_EXPORT_NAME})
-
     # set include directories for module library target
-    target_include_directories(${DUNE_MODULE_TARGET} ${DUNE_MODULE_TARGET_SCOPE}
+    target_include_directories(${DUNE_MODULE_TARGET} ${_scope}
       $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
       $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
       $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
-    target_compile_definitions(${DUNE_MODULE_TARGET} ${DUNE_MODULE_TARGET_SCOPE} HAVE_CONFIG_H)
+    target_compile_definitions(${DUNE_MODULE_TARGET} ${_scope} HAVE_CONFIG_H)
+
+    # link against dependent libraries
+    target_link_libraries(${DUNE_MODULE_TARGET} ${_scope} ${DUNE_LIBS})
+
+    unset(_interface)
+    unset(_scope)
   else()
     # fallback for legacy cmake build system
     include_directories(${PROJECT_BINARY_DIR})
@@ -155,18 +164,6 @@ macro(dune_project)
 
   # activate pkg-config
   # include(DunePkgConfig)
-
-  if(EXISTS ${PROJECT_SOURCE_DIR}/cmake/modules)
-    list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
-  endif()
-
-  # Process the macros provided by the dependencies and ourself
-  dune_process_dependency_macros()
-
-  # link against dependent libraries
-  if(DUNE_MODULE_TARGET)
-    target_link_libraries(${DUNE_MODULE_TARGET} ${DUNE_MODULE_TARGET_SCOPE} ${DUNE_LIBS})
-  endif()
 
   # Set variable where the cmake modules will be installed.
   # Thus the user can override it and for example install
