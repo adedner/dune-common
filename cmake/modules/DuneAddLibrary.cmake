@@ -99,7 +99,7 @@ macro(dune_add_library basename)
       LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib"
       ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 
-    if(DUNE_LIB_OUTPUT_NAME)
+    if(DUNE_LIB_OUTPUT_NAME AND NOT DUNE_LIB_INTERFACE)
       set_target_properties(${basename} PROPERTIES OUTPUT_NAME ${DUNE_LIB_OUTPUT_NAME})
     endif()
 
