@@ -1,11 +1,11 @@
 add_executable(poosc08 "poosc08.cc")
-target_link_libraries(poosc08 PUBLIC "dune-common")
+target_link_libraries(poosc08 PRIVATE Dune::common)
 
 add_executable(poosc08_test "poosc08_test.cc")
-target_link_libraries(poosc08_test PUBLIC "dune-common")
+target_link_libraries(poosc08_test PRIVATE Dune::common)
 
 add_executable(indexset "indexset.cc")
-target_link_libraries(indexset PUBLIC "dune-common")
+target_link_libraries(indexset PRIVATE Dune::common)
 
 add_dune_mpi_flags("poosc08;poosc08_test;indexset")
 
