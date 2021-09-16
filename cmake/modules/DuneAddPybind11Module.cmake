@@ -84,8 +84,8 @@ function(dune_add_pybind11_module)
 
   target_compile_definitions(${PYBIND11_MODULE_NAME} PRIVATE ${PYBIND11_MODULE_COMPILE_DEFINITIONS})
 
-  if(DUNE_MODULE_LIBRARY)
-    target_link_libraries(${PYBIND11_MODULE_NAME} PUBLIC ${DUNE_MODULE_LIBRARY})
+  if(DUNE_MODULE_TARGET)
+    target_link_libraries(${PYBIND11_MODULE_NAME} PUBLIC ${DUNE_MODULE_TARGET})
   else()
     target_link_libraries(${PYBIND11_MODULE_NAME} PUBLIC Dune::common)
   endif()
