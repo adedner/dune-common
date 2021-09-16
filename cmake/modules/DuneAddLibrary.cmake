@@ -95,9 +95,11 @@ macro(dune_add_library basename)
     endif()
 
     # Build library in ${PROJECT_BINARY_DIR}/lib
-    set_target_properties(${basename} PROPERTIES
-      LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib"
-      ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+    if(NOT DUNE_LIB_INTERFACE)
+      set_target_properties(${basename} PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib"
+        ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+    endif()
 
     if(DUNE_LIB_OUTPUT_NAME AND NOT DUNE_LIB_INTERFACE)
       set_target_properties(${basename} PROPERTIES OUTPUT_NAME ${DUNE_LIB_OUTPUT_NAME})
