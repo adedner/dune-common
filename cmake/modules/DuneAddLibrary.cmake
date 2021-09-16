@@ -47,7 +47,7 @@ include_guard(GLOBAL)
 
 macro(dune_add_library basename)
   cmake_parse_arguments(DUNE_LIB
-    "APPEND;NO_EXPORT;OBJECT" "COMPILE_FLAGS" "ADD_LIBS;SOURCES" ${ARGN})
+    "APPEND;NO_EXPORT;OBJECT;INTERFACE" "COMPILE_FLAGS;OUTPUT_NAME;EXPORT_NAME" "ADD_LIBS;SOURCES" ${ARGN})
   list(APPEND DUNE_LIB_SOURCES ${DUNE_LIB_UNPARSED_ARGUMENTS})
   if(DUNE_LIB_OBJECT)
     if(DUNE_LIB_${basename}_SOURCES)
@@ -76,22 +76,41 @@ macro(dune_add_library basename)
     endif()
   else(DUNE_LIB_OBJECT)
     dune_expand_object_libraries(DUNE_LIB_SOURCES DUNE_LIB_ADD_LIBS DUNE_LIB_COMPILE_FLAGS)
+
+    set(_interface "")
+    if(DUNE_LIB_INTERFACE)
+      set(_interface "INTERFACE")
+    endif()
+
     # create lib
-    add_library(${basename} ${DUNE_LIB_SOURCES})
-    get_property(_prop GLOBAL PROPERTY DUNE_MODULE_LIBRARIES)
-    set_property(GLOBAL PROPERTY DUNE_MODULE_LIBRARIES ${_prop} ${basename})
+    add_library(${basename} ${_interface} ${DUNE_LIB_SOURCES})
+
     # link with specified libraries.
     if(DUNE_LIB_ADD_LIBS)
       target_link_libraries(${basename} PUBLIC "${DUNE_LIB_ADD_LIBS}")
     endif()
+
     if(DUNE_LIB_COMPILE_FLAGS)
-      set_property(${basename} APPEND_STRING COMPILE_FLAGS
-        "${DUNE_LIB_COMPILE_FLAGS}")
+      target_compile_options(${basename} PUBLIC ${DUNE_LIB_COMPILE_FLAGS})
     endif()
+
     # Build library in ${PROJECT_BINARY_DIR}/lib
     set_target_properties(${basename} PROPERTIES
       LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib"
       ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+
+    if(DUNE_LIB_OUTPUT_NAME)
+      set_target_properties(${basename} PROPERTIES OUTPUT_NAME ${DUNE_LIB_OUTPUT_NAME})
+    endif()
+
+    if(NOT DUNE_LIB_EXPORT_NAME)
+      set(DUNE_LIB_EXPORT_NAME ${basename})
+    endif()
+
+    set_target_properties(${basename} PROPERTIES EXPORT_NAME ${DUNE_LIB_EXPORT_NAME})
+    add_library(Dune::${DUNE_LIB_EXPORT_NAME} ALIAS ${basename})
+
+    set_property(GLOBAL APPEND PROPERTY DUNE_MODULE_LIBRARIES Dune::${DUNE_LIB_EXPORT_NAME})
 
     if(NOT DUNE_LIB_NO_EXPORT)
       # The following allows for adding multiple libs in the same
@@ -118,6 +137,7 @@ macro(dune_add_library basename)
 
       # export libraries for use in build tree
       export(TARGETS ${basename} ${_append}
+        NAMESPACE Dune::
         FILE ${PROJECT_BINARY_DIR}/${ProjectName}-targets.cmake)
     endif()
   endif()

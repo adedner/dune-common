@@ -3,8 +3,8 @@ add_subdirectory("simd")
 add_subdirectory("std")
 add_subdirectory("test")
 
-# build the library dunecommon
-target_sources(dunecommon PRIVATE
+# build the library dune-common
+target_sources(dune-common PRIVATE
   debugalign.cc
   debugallocator.cc
   exceptions.cc

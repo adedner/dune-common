@@ -135,7 +135,7 @@ endmacro(dune_target_get_cxx_standard)
 
 # function to check whether c++ standards for all modules are the same
 function(dune_check_compatible_cxx_standard)
-  dune_target_get_cxx_standard(dunecommon cxx_standard_dunecommon)
+  dune_target_get_cxx_standard(Dune::common cxx_standard_dunecommon)
 
   get_property(libraries GLOBAL PROPERTY DUNE_MODULE_LIBRARIES)
   if(cxx_standard_dunecommon)

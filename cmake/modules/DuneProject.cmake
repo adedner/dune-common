@@ -97,17 +97,43 @@ macro(dune_project)
 
   # set include path and link path for the current project.
   if(${ARGC} GREATER 0)
+    cmake_parse_arguments(DUNE_MODULE "INTERFACE" "TARGET;OUTPUT_NAME;EXPORT_NAME" "" ${ARGN})
+
     # if first argument is given, create module library
-    set(DUNE_MODULE_LIBRARY ${ARGV0})
-    dune_add_library(${DUNE_MODULE_LIBRARY})
+    if(NOT DUNE_MODULE_TARGET)
+      set(DUNE_MODULE_TARGET ${DUNE_MODULE_UNPARSED_ARGUMENTS})
+    endif()
+
+    if(NOT DUNE_MODULE_OUTPUT_NAME)
+      dune_module_to_output_name(DUNE_MODULE_OUTPUT_NAME ${DUNE_MODULE_TARGET})
+    endif()
+
+    if(NOT DUNE_MODULE_EXPORT_NAME)
+      dune_module_to_export_name(DUNE_MODULE_EXPORT_NAME ${DUNE_MODULE_TARGET})
+    endif()
+
+    set(_interface "")
+    set(DUNE_MODULE_TARGET_SCOPE "PUBLIC")
+    if(DUNE_MODULE_INTERFACE)
+      set(_interface "INTERFACE")
+      set(DUNE_MODULE_TARGET_SCOPE "INTERFACE")
+    endif()
+
+    dune_add_library(${DUNE_MODULE_TARGET} ${_interface}
+      OUTPUT_NAME ${DUNE_MODULE_OUTPUT_NAME}
+      EXPORT_NAME ${DUNE_MODULE_EXPORT_NAME})
+
+    add_library(Dune::${DUNE_MODULE_EXPORT_NAME} ALIAS ${DUNE_MODULE_TARGET})
+    set_target_properties(${DUNE_MODULE_TARGET} PROPERTIES OUTPUT_NAME ${DUNE_MODULE_OUTPUT_NAME})
+    set_target_properties(${DUNE_MODULE_TARGET} PROPERTIES EXPORT_NAME ${DUNE_MODULE_EXPORT_NAME})
 
     # set include directories for module library target
-    target_include_directories(${DUNE_MODULE_LIBRARY} PUBLIC
+    target_include_directories(${DUNE_MODULE_TARGET} ${DUNE_MODULE_TARGET_SCOPE}
       $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
       $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
       $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
-    target_compile_definitions(${DUNE_MODULE_LIBRARY} PUBLIC HAVE_CONFIG_H)
+    target_compile_definitions(${DUNE_MODULE_TARGET} ${DUNE_MODULE_TARGET_SCOPE} HAVE_CONFIG_H)
   else()
     # fallback for legacy cmake build system
     include_directories(${PROJECT_BINARY_DIR})
@@ -132,8 +158,8 @@ macro(dune_project)
   dune_process_dependency_macros()
 
   # link against dependent libraries
-  if(DUNE_MODULE_LIBRARY)
-    target_link_libraries(${DUNE_MODULE_LIBRARY} PUBLIC ${DUNE_LIBS})
+  if(DUNE_MODULE_TARGET)
+    target_link_libraries(${DUNE_MODULE_TARGET} ${DUNE_MODULE_TARGET_SCOPE} ${DUNE_LIBS})
   endif()
 
   # Set variable where the cmake modules will be installed.
@@ -176,11 +202,11 @@ macro(dune_finalize_project)
   dune_check_compatible_cxx_standard()
 
   # A fallback target source if non is given before
-  if(DUNE_MODULE_LIBRARY)
-    get_target_property(DUNE_MODULE_LIBRARY_SOURCES ${DUNE_MODULE_LIBRARY} SOURCES)
-    if(NOT DUNE_MODULE_LIBRARY_SOURCES)
+  if(DUNE_MODULE_TARGET AND NOT DUNE_MODULE_INTERFACE)
+    get_target_property(DUNE_MODULE_TARGET_SOURCES ${DUNE_MODULE_TARGET} SOURCES)
+    if(NOT DUNE_MODULE_TARGET_SOURCES)
       file(TOUCH ${PROJECT_BINARY_DIR}/lib${DUNE_MODULE_LIBRARY}.cc)
-      target_sources(${DUNE_MODULE_LIBRARY} PRIVATE
+      target_sources(${DUNE_MODULE_TARGET} PRIVATE
         ${PROJECT_BINARY_DIR}/lib${DUNE_MODULE_LIBRARY}.cc)
     endif()
   endif()
