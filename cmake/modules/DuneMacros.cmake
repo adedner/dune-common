@@ -71,6 +71,7 @@ macro(dune_target_link_libraries _target _lib)
 endmacro(dune_target_link_libraries)
 
 
+# NOTE: is essentially the same as dune_target_enable_all_packages
 macro(dune_add_all_flags targets)
   get_property(incs GLOBAL PROPERTY ALL_PKG_INCS)
   get_property(defs GLOBAL PROPERTY ALL_PKG_DEFS)
