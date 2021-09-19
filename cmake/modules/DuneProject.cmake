@@ -85,6 +85,11 @@ macro(dune_project)
   define_property(GLOBAL PROPERTY ${ProjectName}_LIBRARIES
         BRIEF_DOCS "List of libraries of the module. DO NOT EDIT!"
         FULL_DOCS "List of libraries of the module. Used to generate CMake's package configuration files. DO NOT EDIT!")
+
+  define_property(GLOBAL PROPERTY DUNE_MODULE_LIBRARY_EXPORTS
+    BRIEF_DOCS "List of library exports of the module. DO NOT EDIT!"
+    FULL_DOCS "List of library export of the module. Used to generate CMake's package configuration files. DO NOT EDIT!")
+
   dune_create_dependency_tree()
 
   # assert the project names matches
@@ -134,7 +139,8 @@ macro(dune_project)
 
     dune_add_library(${DUNE_MODULE_TARGET} ${_interface}
       OUTPUT_NAME ${DUNE_MODULE_OUTPUT_NAME}
-      EXPORT_NAME ${DUNE_MODULE_EXPORT_NAME})
+      EXPORT_NAME ${DUNE_MODULE_EXPORT_NAME}
+      LINK_LIBRARIES ${DUNE_LIBS})
 
     # set include directories for module library target
     target_include_directories(${DUNE_MODULE_TARGET} ${_scope}
@@ -143,9 +149,6 @@ macro(dune_project)
       $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
     target_compile_definitions(${DUNE_MODULE_TARGET} ${_scope} HAVE_CONFIG_H)
-
-    # link against dependent libraries
-    target_link_libraries(${DUNE_MODULE_TARGET} ${_scope} ${DUNE_LIBS})
 
     unset(_interface)
     unset(_scope)
@@ -348,6 +351,16 @@ endif()
   if(EXISTS ${PROJECT_SOURCE_DIR}/config.h.cmake)
     install(FILES config.h.cmake DESTINATION share/${ProjectName})
   endif()
+
+  # install library export set
+  install(EXPORT ${ProjectName}-targets
+    NAMESPACE Dune::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${ProjectName})
+
+  # export libraries for use in build tree
+  export(EXPORT ${ProjectName}-targets
+    NAMESPACE Dune::
+    FILE ${PROJECT_BINARY_DIR}/${ProjectName}-targets.cmake)
 
   # install pkg-config files
   # create_and_install_pkconfig(${DUNE_INSTALL_LIBDIR})

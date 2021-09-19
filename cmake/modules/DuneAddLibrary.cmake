@@ -270,26 +270,48 @@ function(dune_add_library_object _name)
     "${ARG_COMPILE_OPTIONS}")
 endfunction(dune_add_library_object)
 
+  # link with specified libraries from parameter ADD_LIBS
+  target_link_libraries(${_name} PRIVATE "${DUNE_LIB_LINK_LIBRARIES}")
 
-function(dune_expand_object_libraries _SOURCES_var _ADD_LIBS_var _COMPILE_FLAGS_var)
-  set(_new_SOURCES "")
-  set(_new_ADD_LIBS "${${_ADD_LIBS_var}}")
-  set(_new_COMPILE_FLAGS "${${_COMPILE_FLAGS_var}}")
-  set(_regex "_DUNE_TARGET_OBJECTS:([a-zA-Z0-9_-]+)_")
-  foreach(_source ${${_SOURCES_var}})
-    string(REGEX MATCH ${_regex} _matched "${_source}")
-    if(_matched)
-      string(REGEX REPLACE "${_regex}" "\\1" _basename  "${_source}")
-      foreach(var _SOURCES _ADD_LIBS _COMPILE_FLAGS)
-        get_property(_prop GLOBAL PROPERTY DUNE_LIB_${_basename}${var})
-        list(APPEND _new${var} "${_prop}")
-      endforeach()
-    else()
-      list(APPEND _new_SOURCES "${_source}")
+  # set target options from COMPILE_FLAGS
+  target_compile_options(${_name} PRIVATE "${DUNE_LIB_COMPILE_OPTIONS}")
+endfunction(dune_add_library_object)
+
+
+function(dune_add_library_interface _name)
+  cmake_parse_arguments(DUNE_LIB
+    "NO_EXPORT"
+    "COMPILE_FLAGS;COMPILE_OPTIONS;EXPORT_NAME"
+    "ADD_LIBS;LINK_LIBRARIES" ${ARGN})
+  list(APPEND DUNE_LIB_LINK_LIBRARIES ${DUNE_LIB_ADD_LIBS})
+  list(APPEND DUNE_LIB_COMPILE_OPTIONS ${DUNE_LIB_COMPILE_FLAGS})
+
+  # create lib
+  add_library(${_name} INTERFACE)
+
+  # link with specified libraries from parameter ADD_LIBS
+  target_link_libraries(${_name} INTERFACE "${DUNE_LIB_LINK_LIBRARIES}")
+
+  # set target options from COMPILE_FLAGS
+  target_compile_options(${_name} INTERFACE "${DUNE_LIB_COMPILE_OPTIONS}")
+
+  # prepare the export of the library
+  if(NOT DUNE_LIB_NO_EXPORT)
+    if(NOT DUNE_LIB_EXPORT_NAME)
+      set(DUNE_LIB_EXPORT_NAME ${_name})
     endif()
-  endforeach()
 
-  foreach(var _SOURCES _ADD_LIBS _COMPILE_FLAGS)
-    set(${${var}_var} "${_new${var}}" PARENT_SCOPE)
-  endforeach()
-endfunction(dune_expand_object_libraries)
+    set_target_properties(${_name} PROPERTIES EXPORT_NAME ${DUNE_LIB_EXPORT_NAME})
+    add_library(Dune::${DUNE_LIB_EXPORT_NAME} ALIAS ${_name})
+
+    # register create library in global property DUNE_MODULE_LIBRARIES
+    set_property(GLOBAL APPEND PROPERTY DUNE_MODULE_LIBRARIES Dune::${DUNE_LIB_EXPORT_NAME})
+
+    # install targets to use the libraries in other modules.
+    install(TARGETS ${_name}
+      EXPORT ${ProjectName}-targets DESTINATION ${CMAKE_INSTALL_LIBDIR})
+  else()
+    # register create library in global property DUNE_MODULE_LIBRARIES
+    set_property(GLOBAL APPEND PROPERTY DUNE_MODULE_LIBRARIES ${_name})
+  endif()
+endfunction(dune_add_library_interface)
