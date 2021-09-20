@@ -280,7 +280,7 @@ endfunction(dune_add_library_object)
 
 function(dune_add_library_interface _name)
   cmake_parse_arguments(DUNE_LIB
-    "NO_EXPORT"
+    "NO_EXPORT;INTERFACE"
     "COMPILE_FLAGS;COMPILE_OPTIONS;EXPORT_NAME"
     "ADD_LIBS;LINK_LIBRARIES" ${ARGN})
   list(APPEND DUNE_LIB_LINK_LIBRARIES ${DUNE_LIB_ADD_LIBS})
@@ -315,3 +315,65 @@ function(dune_add_library_interface _name)
     set_property(GLOBAL APPEND PROPERTY DUNE_MODULE_LIBRARIES ${_name})
   endif()
 endfunction(dune_add_library_interface)
+
+
+### Create an object library that can be used to transport a set of sources
+### \deprecated
+function(dune_add_library_object _name)
+  message(DEPRECATION "The function dune_add_library(<obj> OBJECT ...) is deprecated. "
+    "Create a regular target in a parent scope, e.g., by dune_add_library(<target>), "
+    "and fill it with sources using target_source(<target> PRIVATE <sources>...).")
+
+  cmake_parse_arguments(DUNE_LIB
+    "OBJECT"
+    "COMPILE_FLAGS;COMPILE_OPTIONS"
+    "ADD_LIBS;LINK_LIBRARIES;SOURCES" ${ARGN})
+  list(APPEND DUNE_LIB_SOURCES ${DUNE_LIB_UNPARSED_ARGUMENTS})
+  list(APPEND DUNE_LIB_LINK_LIBRARIES ${DUNE_LIB_ADD_LIBS})
+  list(APPEND DUNE_LIB_COMPILE_OPTIONS ${DUNE_LIB_COMPILE_FLAGS})
+
+  foreach(source ${DUNE_LIB_SOURCES})
+    list(APPEND full_path_sources ${CMAKE_CURRENT_SOURCE_DIR}/${source})
+  endforeach()
+
+  # register sources, libs and flags for building the library later
+  define_property(GLOBAL PROPERTY DUNE_LIB_${_name}_SOURCES
+    BRIEF_DOCS "Convenience property with sources for library ${_name}. DO NOT EDIT!"
+    FULL_DOCS "Convenience property with sources for library ${_name}. DO NOT EDIT!")
+  set_property(GLOBAL PROPERTY DUNE_LIB_${_name}_SOURCES
+    "${full_path_sources}")
+  define_property(GLOBAL PROPERTY DUNE_LIB_${_name}_ADD_LIBS
+    BRIEF_DOCS "Convenience property with libraries for library ${_name}. DO NOT EDIT!"
+    FULL_DOCS "Convenience property with libraries for library ${_name}. DO NOT EDIT!")
+  set_property(GLOBAL PROPERTY DUNE_LIB_${_name}_ADD_LIBS
+    "${DUNE_LIB_LINK_LIBRARIES}")
+  define_property(GLOBAL PROPERTY DUNE_LIB_${_name}_COMPILE_FLAGS
+    BRIEF_DOCS "Convenience property with compile flags for library ${_name}. DO NOT EDIT!"
+    FULL_DOCS "Convenience property with compile flags for library ${_name}. DO NOT EDIT!")
+  set_property(GLOBAL PROPERTY DUNE_LIB_${_name}_COMPILE_FLAGS
+    "${DUNE_LIB_COMPILE_OPTIONS}")
+endfunction(dune_add_library_object)
+
+
+function(dune_expand_object_libraries _SOURCES_var _ADD_LIBS_var _COMPILE_FLAGS_var)
+  set(_new_SOURCES "")
+  set(_new_ADD_LIBS "${${_ADD_LIBS_var}}")
+  set(_new_COMPILE_FLAGS "${${_COMPILE_FLAGS_var}}")
+  set(_regex "_DUNE_TARGET_OBJECTS:([a-zA-Z0-9_-]+)_")
+  foreach(_source ${${_SOURCES_var}})
+    string(REGEX MATCH ${_regex} _matched "${_source}")
+    if(_matched)
+      string(REGEX REPLACE "${_regex}" "\\1" _basename  "${_source}")
+      foreach(var _SOURCES _ADD_LIBS _COMPILE_FLAGS)
+        get_property(_prop GLOBAL PROPERTY DUNE_LIB_${_basename}${var})
+        list(APPEND _new${var} "${_prop}")
+      endforeach()
+    else()
+      list(APPEND _new_SOURCES "${_source}")
+    endif()
+  endforeach()
+
+  foreach(var _SOURCES _ADD_LIBS _COMPILE_FLAGS)
+    set(${${var}_var} "${_new${var}}" PARENT_SCOPE)
+  endforeach()
+endfunction(dune_expand_object_libraries)
