@@ -114,7 +114,7 @@ endmacro(dune_process_dependency_macros)
 # Internal macros
 # ------------------------------------------------------------------------
 
-macro(dune_find_package module)
+macro(dune_find_module module)
   cmake_parse_arguments(DUNE_FIND "REQUIRED" "VERSION" "" ${ARGN})
   if(DUNE_FIND_REQUIRED)
     set(required REQUIRED)
@@ -137,7 +137,7 @@ macro(dune_find_package module)
     set(DUNE_FIND_VERSION_STRING "0.0.0")
   endif()
 
-  # search for dune module only of not found or provided otherwise
+  # search for dune module only if not found or provided otherwise
   if(NOT ${module}_FOUND)
     if(NOT (${module}_DIR OR ${module}_ROOT OR "${CMAKE_PREFIX_PATH}" MATCHES ".*${module}.*"))
       string(REPLACE  ${ProjectName} ${module} ${module}_DIR ${PROJECT_BINARY_DIR})
@@ -182,7 +182,7 @@ macro(dune_find_package module)
     message(FATAL_ERROR "Could not find required module ${module}.")
   endif()
   set(DUNE_${module}_FOUND ${${module}_FOUND})
-endmacro(dune_find_package module)
+endmacro(dune_find_module module)
 
 
 macro(dune_process_dependency_leafs modules versions is_required next_level_deps next_level_sugs)
@@ -201,7 +201,7 @@ macro(dune_process_dependency_leafs modules versions is_required next_level_deps
     foreach(i RANGE 0 ${length})
       list(GET mmodules ${i} _mod)
       list(GET mversions ${i} _ver)
-      dune_find_package(${_mod} ${is_required} VERSION "${_ver}")
+      dune_find_module(${_mod} ${is_required} VERSION "${_ver}")
       set(${_mod}_SEARCHED ON)
       if(NOT "${is_required}" STREQUAL "")
         set(${_mod}_REQUIRED ON)

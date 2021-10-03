@@ -95,6 +95,8 @@ dune_add_test(NAME debugalignsimdtest
 
 dune_add_test(SOURCES densematrixassignmenttest.cc
               LABELS quick)
+add_dune_gmp_flags(densematrixassignmenttest)
+
 dune_add_test(NAME densematrixassignmenttest_fail0
               SOURCES densematrixassignmenttest.cc
               COMPILE_DEFINITIONS "FAILURE0"
@@ -246,6 +248,7 @@ dune_add_test(SOURCES powertest.cc
 
 dune_add_test(SOURCES quadmathtest.cc
               CMAKE_GUARD HAVE_QUADMATH)
+add_dune_quadmath_flags(quadmathtest)
 
 dune_add_test(SOURCES rangeutilitiestest.cc
               LABELS quick)
@@ -256,6 +259,7 @@ dune_add_test(SOURCES reservedvectortest.cc
 dune_add_test(SOURCES scotchtest.cc
               CMAKE_GUARD PTScotch_FOUND
               LABELS quick)
+add_dune_ptscotch_flags(scotchtest)
 
 dune_add_test(SOURCES shared_ptrtest.cc
               LABELS quick)
@@ -335,6 +339,7 @@ dune_add_test(SOURCES utilitytest.cc
 dune_add_test(SOURCES eigenvaluestest.cc
               CMAKE_GUARD LAPACK_FOUND
               LABELS quick)
+add_dune_blas_lapack_flags(eigenvaluestest)
 
 dune_add_test(SOURCES versiontest.cc
               LABELS quick)

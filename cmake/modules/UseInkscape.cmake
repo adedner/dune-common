@@ -38,14 +38,19 @@ function(inkscape_generate_png_from_svg)
 
   foreach(pic ${INKSCAPE_UNPARSED_ARGUMENTS})
     string(REGEX REPLACE "\\.[a-zA-Z]+" ".svg" input ${pic})
-    if( INKSCAPE_NEW_VERSION )
-      execute_process(
-        COMMAND ${INKSCAPE} --export-dpi=${INKSCAPE_DPI} --export-type=png --export-filename=${pic} ${CMAKE_CURRENT_SOURCE_DIR}/${input}
-        WORKING_DIRECTORY  ${INKSCAPE_OUTPUT_DIR})
-    else()
-      execute_process(
-        COMMAND ${INKSCAPE} -z --export-dpi=${INKSCAPE_DPI} -e ${pic} ${CMAKE_CURRENT_SOURCE_DIR}/${input}
-        WORKING_DIRECTORY  ${INKSCAPE_OUTPUT_DIR})
+
+    if(NOT EXISTS ${INKSCAPE_OUTPUT_DIR}/${pic})
+      if( INKSCAPE_NEW_VERSION )
+        execute_process(
+          COMMAND ${INKSCAPE} --export-dpi=${INKSCAPE_DPI} --export-type=png --export-filename=${pic} ${CMAKE_CURRENT_SOURCE_DIR}/${input}
+          WORKING_DIRECTORY  ${INKSCAPE_OUTPUT_DIR}
+          OUTPUT_QUIET)
+      else()
+        execute_process(
+          COMMAND ${INKSCAPE} -z --export-dpi=${INKSCAPE_DPI} -e ${pic} ${CMAKE_CURRENT_SOURCE_DIR}/${input}
+          WORKING_DIRECTORY  ${INKSCAPE_OUTPUT_DIR}
+          OUTPUT_QUIET)
+      endif()
     endif()
   endforeach()
 endfunction()

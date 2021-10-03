@@ -12,7 +12,7 @@
 include_guard(GLOBAL)
 
 # set HAVE_QUADMATH for config.h
-set(HAVE_QUADMATH ${QuadMath_FOUND})
+set(HAVE_QUADMATH ${QuadMath_FOUND} CACHE INTERNAL "")
 
 # register the QuadMath imported target
 if(QuadMath_FOUND)
@@ -26,8 +26,13 @@ endif()
 function(add_dune_quadmath_flags _targets)
   if(QuadMath_FOUND)
     foreach(_target ${_targets})
-      target_link_libraries(${_target} PUBLIC QuadMath::QuadMath)
-      target_compile_definitions(${_target} PUBLIC ENABLE_QUADMATH=1)
+      get_target_property(_type ${_target} TYPE)
+      set(_scope "PUBLIC")
+      if (${_type} STREQUAL "INTERFACE_LIBRARY")
+        set(_scope "INTERFACE")
+      endif()
+      target_link_libraries(${_target} ${_scope} QuadMath::QuadMath)
+      target_compile_definitions(${_target} ${_scope} ENABLE_QUADMATH=1)
     endforeach(_target ${_targets})
   endif()
 endfunction(add_dune_quadmath_flags)

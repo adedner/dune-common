@@ -36,4 +36,4 @@ if(Vc_FOUND)
                               LIBRARIES "${Vc_LIBRARIES}"
                               INCLUDE_DIRS "${Vc_INCLUDE_DIR}")
 endif(Vc_FOUND)
-set(HAVE_VC ${Vc_FOUND})
+set(HAVE_VC ${Vc_FOUND} CACHE INTERNAL "")

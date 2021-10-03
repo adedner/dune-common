@@ -19,19 +19,22 @@ find_package(Threads)
 include(AddThreadsFlags)
 
 # find the MPI library
-find_package(MPI 3.0 COMPONENTS C)
+enable_language(C)
+dune_find_package(MPI 3.0 COMPONENTS C TARGET MPI::MPI_C)
 include(AddMPIFlags)
 
 # find library for Threading Building Blocks
-find_package(TBB)
+dune_find_package(TBB TARGET TBB:tbb)
 include(AddTBBFlags)
 
 # find libraries for graph partitioning
-find_package(PTScotch)
+dune_find_package(PTScotch TARGET PTScotch::Scotch)
 include(AddPTScotchFlags)
-find_package(METIS)
+
+dune_find_package(METIS TARGET METIS::METIS)
 include(AddMETISFlags)
-find_package(ParMETIS 4.0)
+
+dune_find_package(ParMETIS 4.0 TARGET ParMETIS::ParMETIS)
 include(AddParMETISFlags)
 
 # try to find the Vc library
