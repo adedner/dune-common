@@ -1,4 +1,6 @@
-add_subdirectory(test)
+if(NOT DUNE_DISABLE_SIMD_TESTS)
+  add_subdirectory(test)
+endif()
 
 if(NOT VC_FOUND)
   dune_exclude_dir_from_headercheck()

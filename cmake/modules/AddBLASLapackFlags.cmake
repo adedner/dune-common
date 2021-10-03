@@ -18,8 +18,8 @@ set_package_properties("LAPACK" PROPERTIES
   DESCRIPTION "fast linear algebra routines")
 
 # register HAVE_BLAS and HAVE_LAPACK for config.h
-set(HAVE_BLAS ${BLAS_FOUND})
-set(HAVE_LAPACK ${LAPACK_FOUND})
+set(HAVE_BLAS ${BLAS_FOUND} CACHE INTERNAL "")
+set(HAVE_LAPACK ${LAPACK_FOUND} CACHE INTERNAL "")
 
 # register Lapack library as dune package
 if(HAVE_LAPACK)
@@ -37,10 +37,15 @@ endif()
 # add function to link against the BLAS/Lapack library
 function(add_dune_blas_lapack_flags _targets)
   foreach(_target ${_targets})
+    get_target_property(_type ${_target} TYPE)
+    set(_scope "PUBLIC")
+    if (${_type} STREQUAL "INTERFACE_LIBRARY")
+      set(_scope "INTERFACE")
+    endif()
     if(LAPACK_FOUND)
-      target_link_libraries(${_target} PUBLIC ${LAPACK_LIBRARIES})
+      target_link_libraries(${_target} ${_scope} ${LAPACK_LIBRARIES})
     elseif(BLAS_FOUND)
-      target_link_libraries(${_target} PUBLIC ${BLAS_LIBRARIES})
+      target_link_libraries(${_target} ${_scope} ${BLAS_LIBRARIES})
     endif()
   endforeach(_target)
 endfunction(add_dune_blas_lapack_flags)

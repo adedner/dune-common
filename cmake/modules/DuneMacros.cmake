@@ -84,6 +84,12 @@ macro(add_dune_all_flags targets)
   endforeach()
 endmacro(add_dune_all_flags targets)
 
+macro(dune_find_package _name)
+  cmake_parse_arguments(DUNE_PKG "" "TARGET" "" ${ARGN})
+  if(NOT ${_name}_FOUND AND (NOT DUNE_PKG_TARGET OR NOT TARGET ${DUNE_PKG_TARGET}))
+    find_package(${_name} ${DUNE_PKG_UNPARSED_ARGUMENTS})
+  endif()
+endmacro(dune_find_package)
 
 # find a package if not already found
 macro(dune_find_package _name)

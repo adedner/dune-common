@@ -12,7 +12,7 @@
 include_guard(GLOBAL)
 
 # set variable for config.h
-set(HAVE_TBB ${TBB_FOUND})
+set(HAVE_TBB ${TBB_FOUND} CACHE INTERNAL "")
 
 # perform DUNE-specific setup tasks
 if (TBB_FOUND)
@@ -26,8 +26,13 @@ endif()
 function(add_dune_tbb_flags _targets)
   if(TBB_FOUND)
     foreach(_target ${_targets})
-      target_link_libraries(${_target} PUBLIC TBB::tbb)
-      target_compile_definitions(${_target} PUBLIC ENABLE_TBB=1)
+      get_target_property(_type ${_target} TYPE)
+      set(_scope "PUBLIC")
+      if (${_type} STREQUAL "INTERFACE_LIBRARY")
+        set(_scope "INTERFACE")
+      endif()
+      target_link_libraries(${_target} ${_scope} TBB::tbb)
+      target_compile_definitions(${_target} ${_scope} ENABLE_TBB=1)
     endforeach(_target)
   endif()
 endfunction(add_dune_tbb_flags)

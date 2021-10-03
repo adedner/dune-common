@@ -19,7 +19,7 @@ set_package_properties("MPI" PROPERTIES
   PURPOSE "Parallel programming on multiple processors")
 
 if(MPI_C_FOUND)
-  set(HAVE_MPI ${MPI_C_FOUND})
+  set(HAVE_MPI ${MPI_C_FOUND} CACHE INTERNAL "")
 
   dune_register_package_flags(COMPILE_DEFINITIONS "ENABLE_MPI=1"
                               LIBRARIES MPI::MPI_C)
@@ -27,13 +27,18 @@ endif()
 
 # adds MPI flags to the targets
 function(add_dune_mpi_flags)
-  cmake_parse_arguments(ADD_MPI "SOURCE_ONLY;OBJECT" "" "" ${ARGN}) # ignored
-  set(targets ${ADD_MPI_UNPARSED_ARGUMENTS})
+  cmake_parse_arguments(ADD_MPI "SOURCE_ONLY;OBJECT;INTERFACE" "" "" ${ARGN}) # ignored
+  set(_targets ${ADD_MPI_UNPARSED_ARGUMENTS})
 
   if(MPI_C_FOUND)
-    foreach(target ${targets})
-      target_link_libraries(${target} PUBLIC MPI::MPI_C)
-      target_compile_definitions(${target} PUBLIC "ENABLE_MPI=1")
-    endforeach(target)
+    foreach(_target ${_targets})
+      get_target_property(_type ${_target} TYPE)
+      set(_scope "PUBLIC")
+      if (${_type} STREQUAL "INTERFACE_LIBRARY")
+        set(_scope "INTERFACE")
+      endif()
+      target_link_libraries(${_target} ${_scope} MPI::MPI_C)
+      target_compile_definitions(${_target} ${_scope} "ENABLE_MPI=1")
+    endforeach(_target)
   endif()
 endfunction(add_dune_mpi_flags)

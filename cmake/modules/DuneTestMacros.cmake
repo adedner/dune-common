@@ -342,7 +342,7 @@ function(dune_add_test)
   if(ADDTEST_SOURCES)
     add_executable(${ADDTEST_NAME} ${ADDTEST_SOURCES})
     # add all flags to the target!
-    dune_add_all_flags(${ADDTEST_NAME})
+    # dune_add_all_flags(${ADDTEST_NAME}) # TODO: remove all-flags
     # This is just a placeholder
     target_compile_definitions(${ADDTEST_NAME} PUBLIC ${ADDTEST_COMPILE_DEFINITIONS})
     target_compile_options(${ADDTEST_NAME} PUBLIC ${ADDTEST_COMPILE_FLAGS})

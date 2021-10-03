@@ -12,8 +12,8 @@
 include_guard(GLOBAL)
 
 # set HAVE_SUITESPARSE for config.h
-set(HAVE_SUITESPARSE ${SuiteSparse_FOUND})
-set(HAVE_UMFPACK ${SuiteSparse_UMFPACK_FOUND})
+set(HAVE_SUITESPARSE ${SuiteSparse_FOUND} CACHE INTERNAL "")
+set(HAVE_UMFPACK ${SuiteSparse_UMFPACK_FOUND} CACHE INTERNAL "")
 
 # register all SuiteSparse related flags
 if(SuiteSparse_FOUND)
@@ -26,8 +26,13 @@ endif()
 function(add_dune_suitesparse_flags _targets)
   if(SuiteSparse_FOUND)
     foreach(_target ${_targets})
-      target_link_libraries(${_target} PUBLIC SuiteSparse::SuiteSparse)
-      target_compile_definitions(${_target} PUBLIC ENABLE_SUITESPARSE=1)
+      get_target_property(_type ${_target} TYPE)
+      set(_scope "PUBLIC")
+      if (${_type} STREQUAL "INTERFACE_LIBRARY")
+        set(_scope "INTERFACE")
+      endif()
+      target_link_libraries(${_target} ${_scope} SuiteSparse::SuiteSparse)
+      target_compile_definitions(${_target} ${_scope} ENABLE_SUITESPARSE=1)
     endforeach(_target)
   endif()
 endfunction(add_dune_suitesparse_flags)

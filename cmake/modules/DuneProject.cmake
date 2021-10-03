@@ -259,7 +259,9 @@ ${DUNE_CUSTOM_PKG_CONFIG_SECTION}
 #import the target
 if(${ProjectName}_LIBRARIES)
   get_filename_component(_dir \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)
-  include(\"\${_dir}/${ProjectName}-targets.cmake\")
+  if(EXISTS \"\${_dir}/${ProjectName}-targets.cmake\")
+    include(\"\${_dir}/${ProjectName}-targets.cmake\")
+  endif()
 endif()
 endif()")
       set(CONFIG_SOURCE_FILE ${PROJECT_BINARY_DIR}/CMakeFiles/${ProjectName}-config.cmake.in)

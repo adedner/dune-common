@@ -22,32 +22,34 @@ given C++ source compiles and links into an executable.
 #]=======================================================================]
 
 macro(dune_check_cxx_source_compiles SOURCE VAR)
-  message(STATUS "Performing Test ${VAR}")
-  file(WRITE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src_${VAR}.cxx" "${SOURCE}\n")
+  if(NOT DEFINED ${VAR})
+    message(STATUS "Performing Test ${VAR}")
+    file(WRITE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src_${VAR}.cxx" "${SOURCE}\n")
 
-  try_compile(${VAR} ${CMAKE_BINARY_DIR}
-      ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src_${VAR}.cxx
-    CXX_STANDARD 17
-    OUTPUT_VARIABLE OUTPUT)
+    try_compile(${VAR} ${CMAKE_BINARY_DIR}
+        ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src_${VAR}.cxx
+      CXX_STANDARD 17
+      OUTPUT_VARIABLE OUTPUT)
 
-  file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeOutput.log
-    "Performing C++ SOURCE FILE Test ${VAR} succeeded with the following output:\n"
-    "${OUTPUT}\n"
-    "Source file was:\n${SOURCE}\n")
-  if(${VAR})
-    message(STATUS "Performing Test ${VAR} - Success")
-    set(${VAR} 1 CACHE INTERNAL "Test ${VAR}")
     file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeOutput.log
       "Performing C++ SOURCE FILE Test ${VAR} succeeded with the following output:\n"
       "${OUTPUT}\n"
       "Source file was:\n${SOURCE}\n")
-  else()
-    message(STATUS "Performing Test ${VAR} - Failed")
-    set(${VAR} "" CACHE INTERNAL "Test ${VAR}")
-    file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeError.log
-      "Performing C++ SOURCE FILE Test ${VAR} failed with the following output:\n"
-      "${OUTPUT}\n"
-      "Source file was:\n${SOURCE}\n")
+    if(${VAR})
+      message(STATUS "Performing Test ${VAR} - Success")
+      set(${VAR} 1 CACHE INTERNAL "Test ${VAR}")
+      file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeOutput.log
+        "Performing C++ SOURCE FILE Test ${VAR} succeeded with the following output:\n"
+        "${OUTPUT}\n"
+        "Source file was:\n${SOURCE}\n")
+    else()
+      message(STATUS "Performing Test ${VAR} - Failed")
+      set(${VAR} "" CACHE INTERNAL "Test ${VAR}")
+      file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeError.log
+        "Performing C++ SOURCE FILE Test ${VAR} failed with the following output:\n"
+        "${OUTPUT}\n"
+        "Source file was:\n${SOURCE}\n")
+    endif()
   endif()
 endmacro(dune_check_cxx_source_compiles)
 

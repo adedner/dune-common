@@ -11,8 +11,10 @@
 #
 include_guard(GLOBAL)
 
+include(AddMPIFlags)
+
 # set HAVE_PARMETIS for config.h
-set(HAVE_PARMETIS ${ParMETIS_FOUND})
+set(HAVE_PARMETIS ${ParMETIS_FOUND} CACHE INTERNAL "")
 
 # register all ParMETIS related flags
 if(ParMETIS_FOUND)
@@ -23,7 +25,13 @@ endif()
 function(add_dune_parmetis_flags _targets)
   if(ParMETIS_FOUND)
     foreach(_target ${_targets})
-      target_link_libraries(${_target} PUBLIC ParMETIS::ParMETIS)
+      get_target_property(_type ${_target} TYPE)
+      set(_scope "PUBLIC")
+      if (${_type} STREQUAL "INTERFACE_LIBRARY")
+        set(_scope "INTERFACE")
+      endif()
+      target_link_libraries(${_target} ${_scope} ParMETIS::ParMETIS)
     endforeach(_target)
+    add_dune_mpi_flags(${ARGV})
   endif()
 endfunction(add_dune_parmetis_flags)

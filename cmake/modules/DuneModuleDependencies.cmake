@@ -91,7 +91,6 @@ endmacro(dune_process_dependency_macros)
 # Internal macros
 # ------------------------------------------------------------------------
 
-
 macro(dune_find_module module)
   cmake_parse_arguments(DUNE_FIND "REQUIRED" "VERSION" "" ${ARGN})
   if(DUNE_FIND_REQUIRED)
@@ -180,7 +179,7 @@ macro(dune_process_dependency_leafs modules versions is_required next_level_deps
     foreach(i RANGE 0 ${length})
       list(GET mmodules ${i} _mod)
       list(GET mversions ${i} _ver)
-      dune_find_package(${_mod} ${is_required} VERSION "${_ver}")
+      dune_find_module(${_mod} ${is_required} VERSION "${_ver}")
       set(${_mod}_SEARCHED ON)
       if(NOT "${is_required}" STREQUAL "")
         set(${_mod}_REQUIRED ON)

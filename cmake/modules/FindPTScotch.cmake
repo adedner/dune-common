@@ -77,7 +77,9 @@ set_package_properties("PTScotch" PROPERTIES
 
 # find dependency for PTScotch
 include(CMakeFindDependencyMacro)
-find_package(MPI QUIET)
+if(NOT TARGET MPI::MPIT_C)
+  find_package(MPI QUIET)
+endif()
 
 # search directory might have the PATH_SUFFIX scotch-SUFFIX
 if(PTSCOTCH_SUFFIX)
