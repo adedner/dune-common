@@ -259,7 +259,7 @@ ${DUNE_CUSTOM_PKG_CONFIG_SECTION}
 #import the target
 if(${ProjectName}_LIBRARIES)
   get_filename_component(_dir \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)
-  if(EXISTS \"\${_dir}/${ProjectName}-targets.cmake\")
+  if(NOT TARGET \"Dune::${DUNE_MODULE_EXPORT_NAME}\")
     include(\"\${_dir}/${ProjectName}-targets.cmake\")
   endif()
 endif()
