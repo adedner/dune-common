@@ -139,6 +139,7 @@ macro(dune_find_module module)
 
   # search for dune module only if not found or provided otherwise
   if(NOT ${module}_FOUND)
+    FetchContent_GetProperties(${module} BINARY_DIR ${module}_DIR)
     if(NOT (${module}_DIR OR ${module}_ROOT OR "${CMAKE_PREFIX_PATH}" MATCHES ".*${module}.*"))
       string(REPLACE  ${ProjectName} ${module} ${module}_DIR ${PROJECT_BINARY_DIR})
     endif()
