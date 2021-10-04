@@ -22,6 +22,7 @@ install(FILES
   DuneDoc.cmake
   DuneDoxygen.cmake
   DuneEnableAllPackages.cmake
+  DuneFindOrFetchPackage.cmake
   DuneExecuteProcess.cmake
   DuneInstance.cmake
   DuneMacros.cmake
