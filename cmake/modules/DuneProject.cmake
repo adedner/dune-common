@@ -88,7 +88,7 @@ macro(dune_project)
 
   # assert the project names matches
   if(NOT (ProjectName STREQUAL PROJECT_NAME))
-    message(FATAL_ERROR "Module name from dune.module does not match the name given in CMakeLists.txt.")
+    message(FATAL_ERROR "Module name from dune.module '${ProjectName}' does not match the name given in CMakeLists.txt '${PROJECT_NAME}'.")
   endif()
 
   if(EXISTS ${PROJECT_SOURCE_DIR}/cmake/modules)
@@ -261,7 +261,7 @@ ${DUNE_CUSTOM_PKG_CONFIG_SECTION}
 #import the target
 if(${ProjectName}_LIBRARIES)
   get_filename_component(_dir \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)
-  if(EXISTS \"\${_dir}/${ProjectName}-targets.cmake\")
+  if(NOT TARGET \"${DUNE_MODULE_TARGET}\")
     include(\"\${_dir}/${ProjectName}-targets.cmake\")
   endif()
 endif()

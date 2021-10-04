@@ -3,7 +3,7 @@ if(NOT @DUNE_MOD_NAME@_FOUND)
 
 #import the target
 get_filename_component(_dir "${CMAKE_CURRENT_LIST_FILE}" PATH)
-if(EXISTS "${_dir}/@DUNE_MOD_NAME@-targets.cmake")
+if(NOT TARGET Dune::common)
   include("${_dir}/@DUNE_MOD_NAME@-targets.cmake")
 endif()
 
