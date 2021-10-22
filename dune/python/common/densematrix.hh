@@ -10,6 +10,8 @@
 #include <dune/python/pybind11/operators.h>
 #include <dune/python/pybind11/pybind11.h>
 
+#include <dune/common/docheader.hh>
+
 namespace Dune
 {
 
@@ -22,6 +24,7 @@ namespace Dune
     template< class Matrix >
     void registerDenseMatrix ( pybind11::class_< Matrix > cls )
     {
+      cls.doc() = DOC(Dune,DenseMatrix);
       typedef typename Matrix::field_type field_type;
       typedef typename Matrix::row_type row_type;
       typedef typename Matrix::row_reference row_reference;
@@ -48,7 +51,8 @@ namespace Dune
 
       cls.def( "__len__", [] ( const Matrix &self ) -> std::size_t { return self.size(); } );
 
-      cls.def( "invert", [] ( Matrix &self ) { self.invert(); } );
+      cls.def( "invert", [] ( Matrix &self ) { self.invert(); },
+                 DOC(Dune,DenseMatrix,invert) );
 
       cls.def( pybind11::self += pybind11::self );
       cls.def( pybind11::self -= pybind11::self );
@@ -58,13 +62,17 @@ namespace Dune
       cls.def( pybind11::self == pybind11::self );
       cls.def( pybind11::self != pybind11::self );
 
-      cls.def_property_readonly( "frobenius_norm", [] ( const Matrix &self ) { return self.frobenius_norm(); } );
-      cls.def_property_readonly( "frobenius_norm2", [] ( const Matrix &self ) { return self.frobenius_norm2(); } );
+      cls.def_property_readonly( "frobenius_norm", [] ( const Matrix &self) { return self.frobenius_norm(); },
+                 DOC(Dune,DenseMatrix,frobenius_norm) );
+      cls.def_property_readonly( "frobenius_norm2", [] ( const Matrix &self) { return self.frobenius_norm2(); },
+                 DOC(Dune,DenseMatrix,frobenius_norm2) );
       cls.def_property_readonly( "infinity_norm", [] ( const Matrix &self ) { return self.infinity_norm(); } );
       cls.def_property_readonly( "infinity_norm_real", [] ( const Matrix &self ) { return self.infinity_norm_real(); } );
 
-      cls.def_property_readonly( "rows", [] ( const Matrix &self ) { return self.mat_rows(); } );
-      cls.def_property_readonly( "cols", [] ( const Matrix &self ) { return self.mat_cols(); } );
+      cls.def_property_readonly( "rows", [] ( const Matrix &self ) { return self.mat_rows(); },
+                 DOC(Dune,DenseMatrix,rows) );
+      cls.def_property_readonly( "cols", [] ( const Matrix &self ) { return self.mat_cols(); },
+                 DOC(Dune,DenseMatrix,cols) );
     }
 
   } // namespace Python

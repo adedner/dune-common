@@ -1,3 +1,7 @@
+"""
+Basic infrastructure for all Dune modules.
+"""
+
 import logging
 import os
 
