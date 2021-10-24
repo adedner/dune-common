@@ -12,7 +12,30 @@
 #include <complex>
 #include <vector>
 
+#include <dune/common/typetraits.hh>
+
 namespace Dune {
+
+#ifndef DOXYGEN
+
+namespace Impl {
+
+  template<class T, bool isNumber>
+  struct FieldTraitsDefault {};
+
+  template<class T>
+  struct FieldTraitsDefault<T, true>
+  {
+    typedef T field_type;
+    typedef T real_type;
+  };
+} // namespace Impl
+
+  template<class T>
+  struct FieldTraits : public Impl::FieldTraitsDefault<T, Dune::IsNumber<T>::value>
+  {};
+
+#else
 
   /**
      @addtogroup DenseMatVec
@@ -29,6 +52,8 @@ namespace Dune {
     //! export the type representing the real type of the field
     typedef T real_type;
   };
+
+#endif
 
   template<class T>
   struct FieldTraits<const T>
