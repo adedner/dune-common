@@ -33,58 +33,21 @@ include(DuneUtilities)
 
 
 macro(dune_create_dependency_tree)
-  if(dune-common_MODULE_PATH)
-    list(REMOVE_ITEM CMAKE_MODULE_PATH "${dune-common_MODULE_PATH}")
-  endif()
-  list(FIND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules start)
-  set(ALL_DEPENDENCIES "")
+  # collect direct (and transitive) dependencies
+  set(ALL_DEPENDENCIES)
   if(${ProjectName}_DEPENDS_MODULE OR ${ProjectName}_SUGGESTS_MODULE)
     set(ALL_DEPENDENCIES ${${ProjectName}_DEPENDS_MODULE} ${${ProjectName}_SUGGESTS_MODULE})
-    dune_create_dependency_leafs("${${ProjectName}_DEPENDS_MODULE}" "${${ProjectName}_DEPENDS_VERSION}"
-      "${${ProjectName}_SUGGESTS_MODULE}" "${${ProjectName}_SUGGESTS_VERSION}")
+    dune_create_dependency_leafs(
+      "${${ProjectName}_DEPENDS_MODULE}"
+      "${${ProjectName}_DEPENDS_VERSION}"
+      "${${ProjectName}_SUGGESTS_MODULE}"
+      "${${ProjectName}_SUGGESTS_VERSION}")
   endif()
-  set(_my_path "")
+
+  # process list of dependencies
   if(ALL_DEPENDENCIES)
-    # Reverse the order of the modules and remove duplicates
-    # At end of this clause we have have a list modules
-    # where for each entry all dependencies are before the
-    # module in the list.
-    set(NEW_ALL_DEPS "")
-    list(LENGTH ALL_DEPENDENCIES length)
-    if(length GREATER 0)
-      math(EXPR length "${length}-1")
-      list(GET ALL_DEPENDENCIES ${length} _mod)
-      set(${_mod}_cmake_path_processed 1)
-      set(_my_path ${${_mod}_MODULE_PATH})
-      list(APPEND NEW_ALL_DEPS ${_mod})
-      if(length GREATER 0)
-        math(EXPR length "${length}-1")
-        foreach(i RANGE ${length} 0 -1)
-          list(GET ALL_DEPENDENCIES ${i} _mod)
-          if(NOT ${_mod}_cmake_path_processed)
-            set(${_mod}_cmake_path_processed 1)
-            if(${_mod}_MODULE_PATH)
-              list(INSERT _my_path 0 ${${_mod}_MODULE_PATH})
-            endif()
-            list(APPEND NEW_ALL_DEPS ${_mod})
-          endif()
-        endforeach()
-      endif()
-      list(LENGTH CMAKE_MODULE_PATH length)
-      math(EXPR length "${length}-1")
-      if(start EQUAL -1)
-        list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules ${_my_path})
-      else()
-        if(start EQUAL ${length})
-          list(APPEND CMAKE_MODULE_PATH ${_my_path})
-        else()
-          if(_my_path)
-            list(INSERT CMAKE_MODULE_PATH ${start} ${_my_path})
-          endif()
-        endif()
-      endif()
-    endif()
-    set(ALL_DEPENDENCIES ${NEW_ALL_DEPS})
+    list(REVERSE ALL_DEPENDENCIES)
+    list(REMOVE_DUPLICATES ALL_DEPENDENCIES)
   endif()
 endmacro(dune_create_dependency_tree)
 
