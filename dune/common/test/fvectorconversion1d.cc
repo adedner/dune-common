@@ -35,6 +35,10 @@ namespace Dune
     using size_type = std::size_t;
   };
 
+  template<class Component, std::size_t Dim >
+  struct FieldTraits< MyVector<Component, Dim> > : public FieldTraits<DenseVector<MyVector<Component, Dim>>>
+  {};
+
   template<class Component, std::size_t Dim, int Size>
   struct IsFieldVectorSizeCorrect<MyVector<Component, Dim>, Size>
     : std::integral_constant<bool, Dim == Size>
