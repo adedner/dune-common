@@ -83,6 +83,25 @@ namespace Impl {
     typedef typename FieldTraits<T>::real_type real_type;
   };
 
+namespace Impl {
+
+  // This traits class allows to check if FieldTraits is empty
+  // This may be helful when constraining overloads, because
+  // any overload incorporation FieldTraits<T>::field_type
+  // in some enable_if check will be rules out due to SFINAE.
+  //
+  // This can be circumvented using FieldTraitsEmpty which
+  // would e.g. catch GMPField expression templates.
+  template<class T, class=void>
+  struct FieldTraitsEmpty : public std::true_type
+  {};
+
+  template<class T>
+  struct FieldTraitsEmpty<T, std::void_t<typename FieldTraits<T>::field_type>> : public std::false_type
+  {};
+
+}
+
 } // end namespace Dune
 
 #endif // DUNE_FTRAITS_HH
