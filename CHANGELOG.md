@@ -1,15 +1,12 @@
 # Master (will become release 2.9)
 
+## Added
+
 - Add `pragma omp simd` annotations in the LoopSIMD class to improve compiler optimizations
 
-## Build System
+## Fixed
 
-- Remove the variable `DUNE_DEFAULT_LIBS`
-
-- Deprecate cmake file `DuneCMakeCompat.cmake` that just contained the removed function
-  `dune_list_filter`
-
-- Remove deprecated cmake file `DuneMPI.cmake`
+## Changed
 
 - Overhaul of the handling of Dune python packages:
   python bindings are now enabled by default. Packages are automatically installed
@@ -18,6 +15,22 @@
   See https://gitlab.dune-project.org/core/dune-common/-/merge_requests/960
   which also contains a detailed set of instructions on how to update
   existing python bindings.
+
+## Deprecated
+
+- Deprecate cmake file `DuneCMakeCompat.cmake` that just contained the removed function
+  `dune_list_filter`
+
+## Removed
+
+- Remove the cmake variable `DUNE_DEFAULT_LIBS`
+
+- Remove deprecated cmake file `DuneMPI.cmake`
+
+## Performance
+
+## Other
+
 
 # Release 2.8
 
