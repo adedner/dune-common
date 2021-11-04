@@ -71,6 +71,15 @@ function(dune_python_install_package)
       string(APPEND ProjectPythonRequires " ${${mod}_PYTHONREQUIRES}")
     endif()
   endforeach()
+  
+  # if MPI is found dune-common will be linked to MPI
+  # in that case we require mpi4py
+  # for MPI support from the Python side
+  if(MPI_FOUND)
+    message(STATUS "Adding mpi4py to the Python requirements")
+    string(APPEND ProjectPythonRequires " mpi4py")
+    string(APPEND RequiredPythonModules " mpi4py")
+  endif()
 
   set(PYINST_FULLPATH ${CMAKE_CURRENT_SOURCE_DIR}/${PYINST_PATH})
   if(EXISTS ${PYINST_FULLPATH})
