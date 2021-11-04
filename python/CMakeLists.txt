@@ -1,11 +1,5 @@
 add_subdirectory(dune)
 
-# installing the python package mpi4py fails if mpi is not available on the
-# system so we only add it here to the python requires in setup.py if mpi was found
-# if(MPI_C_FOUND)
-#     set(ProjectPythonRequires "${ProjectPythonRequires} mpi4py")
-# endif()
-
 configure_file(MANIFEST.in MANIFEST.in)
 configure_file(pyproject.toml.in pyproject.toml)
 
