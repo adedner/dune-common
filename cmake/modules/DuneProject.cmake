@@ -194,6 +194,9 @@ set(${ProjectName}_LIBRARIES \"@${ProjectName}_LIBRARIES@\")
 set(${ProjectName}_HASPYTHON @DUNE_MODULE_HASPYTHON@)
 set(${ProjectName}_PYTHONREQUIRES \"@DUNE_MODULE_PYTHONREQUIRES@\")
 
+# Include the CMake modules provided in MODULE_PATH
+list(APPEND CMAKE_MODULE_PATH \${${ProjectName}_MODULE_PATH})
+
 # Lines that are set by the CMake build system via the variable DUNE_CUSTOM_PKG_CONFIG_SECTION
 ${DUNE_CUSTOM_PKG_CONFIG_SECTION}
 
