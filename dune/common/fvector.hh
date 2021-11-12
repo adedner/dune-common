@@ -64,7 +64,7 @@ namespace Dune {
   {
     enum {
       /**
-         *@param True if C is not of type FieldVector or its dimension
+       *@param True if C is not of type FieldVector or its dimension
        * is not equal SIZE.
        */
       value = true

@@ -36,18 +36,18 @@ namespace Dune {
 
 
   /**
-    *  This class specifies a vector-like type deriving from std::array
-    *  for memory management and basic accessibility.
-    *  This type is capable of dealing with all (well-defined) operators
-    *  and is usable with the SIMD-interface.
-    *
-    *  @tparam T Base type. Could also be vectorized type.
-    *  @tparam S Size
-    *  @tparam minimum alignment. It is inherited to rebound types.
-    */
+   *  This class specifies a vector-like type deriving from std::array
+   *  for memory management and basic accessibility.
+   *  This type is capable of dealing with all (well-defined) operators
+   *  and is usable with the SIMD-interface.
+   *
+   *  @tparam T Base type. Could also be vectorized type.
+   *  @tparam S Size
+   *  @tparam minimum alignment. It is inherited to rebound types.
+   */
 
   template<class T, std::size_t S, std::size_t A = 0>
-  class alignas(A==0?alignof(T):A) LoopSIMD : public std::array<T,S> {
+  class alignas(A==0?alignof(T) : A) LoopSIMD : public std::array<T,S> {
 
   public:
 
@@ -594,8 +594,7 @@ namespace Dune {
 
   template<class T, std::size_t S, std::size_t A>
   struct IsNumber<LoopSIMD<T,S,A>> :
-          public std::integral_constant<bool, IsNumber<T>::value>{
-  };
+    public std::integral_constant<bool, IsNumber<T>::value> {};
 
 #  pragma GCC diagnostic pop
 

@@ -206,7 +206,7 @@ namespace Dune
 
 #if HAVE_VC
   /*
-    Add Vc specializations for the SimdScalarTypeTraits trais class
+     Add Vc specializations for the SimdScalarTypeTraits trais class
    */
   template<typename T, typename A>
   struct SimdScalarTypeTraits< Vc::Vector<T,A> >
@@ -449,8 +449,8 @@ namespace Dune
 
 #if HAVE_VC
   /*
-    Add Vc specializations for masked assignment
-  */
+     Add Vc specializations for masked assignment
+   */
   template<class T, class A>
   void assign(Vc::Vector<T, A> &dst, const Vc::Vector<T, A> &src,
               typename Vc::Vector<T, A>::mask_type mask)
@@ -475,8 +475,8 @@ namespace Dune
 
 #if HAVE_VC
   /*
-    Add Vc specializations for masked swap
-  */
+     Add Vc specializations for masked swap
+   */
   template<class T, class A>
   void swap(Vc::Vector<T, A> &v1, Vc::Vector<T, A> &v2,
             typename Vc::Vector<T, A>::mask_type mask)

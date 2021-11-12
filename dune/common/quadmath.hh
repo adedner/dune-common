@@ -402,7 +402,7 @@ namespace Dune
 
   template <>
   struct IsNumber<Impl::Float128>
-      : public std::true_type {};
+    : public std::true_type {};
 
 } // end namespace Dune
 

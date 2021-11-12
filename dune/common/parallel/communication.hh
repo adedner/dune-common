@@ -45,8 +45,8 @@ namespace Dune
 
   /*! @brief Comparison operator for MPI compatibility
 
-    Always returns true.
-  */
+     Always returns true.
+   */
   inline bool operator==(const No_Comm&, const No_Comm&)
   {
     return true;
@@ -54,8 +54,8 @@ namespace Dune
 
   /*! @brief Comparison operator for MPI compatibility
 
-    Always returns false.
-  */
+     Always returns false.
+   */
   inline bool operator!=(const No_Comm&, const No_Comm&)
   {
     return false;
@@ -437,7 +437,7 @@ namespace Dune
 
     /**
      * @brief Gathers data from all tasks and distribute it to all nonblocking.
-     @returns Future<TOUT, TIN> containing the distributed data
+       @returns Future<TOUT, TIN> containing the distributed data
      */
     template<class TIN, class TOUT = TIN>
     PseudoFuture<TOUT> iallgather(TIN&& data_in, TOUT&& data_out){
@@ -488,7 +488,7 @@ namespace Dune
 
     /**
      * @brief Compute something over all processes nonblocking
-     @return Future<TOUT, TIN> containing the computed something
+       @return Future<TOUT, TIN> containing the computed something
      */
     template<class BinaryFunction, class TIN, class TOUT = TIN>
     PseudoFuture<TOUT> iallreduce(TIN&& data_in, TOUT&& data_out){
@@ -498,7 +498,7 @@ namespace Dune
 
     /**
      * @brief Compute something over all processes nonblocking and in-place
-     @return Future<T> containing the computed something
+       @return Future<T> containing the computed something
      */
     template<class BinaryFunction, class T>
     PseudoFuture<T> iallreduce(T&& data){
@@ -532,7 +532,7 @@ namespace Dune
   using CollectiveCommunication
   // Will be deprecated after the 2.7 release
   //[[deprecated("CollectiveCommunication is deprecated. Use Communication instead.")]]
-  = Communication<T>;
+    = Communication<T>;
 }
 
 #endif

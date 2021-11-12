@@ -12,7 +12,7 @@ int main()
              the dune.common module can also be used to register additional
              types - although a 'dummy' scope can also be used, i.e.,
              pybind11::handle scope;
-  */
+   */
   pybind11::scoped_interpreter guard{};
   pybind11::module dcommon = pybind11::module::import("dune.common");
   auto global = pybind11::dict(pybind11::module::import("__main__").attr("__dict__"));
@@ -25,7 +25,7 @@ int main()
       Dune::Python::addToTypeRegistry<double>(Dune::Python::GenerateTypeName("double"));
       // now we want to pass a FV<double,2> to Python so need to register that
       Dune::Python::registerFieldVector<double,2> ( scope );
-  */
+   */
 
   // first set of tests
   {

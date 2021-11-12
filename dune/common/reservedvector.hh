@@ -78,7 +78,7 @@ namespace Dune
 
     /** @} */
 
-    bool operator == (const ReservedVector & other) const
+    bool operator== (const ReservedVector & other) const
     {
       bool eq = (sz == other.sz);
       for (size_type i=0; i<sz && eq; ++i)

@@ -38,7 +38,7 @@ namespace Dune {
    */
 
   /**
-     *@brief A diagonal matrix of static size.
+   *@brief A diagonal matrix of static size.
    *
    * This is meant to be a replacement of FieldMatrix for the case that
    * it is a diagonal matrix.
@@ -727,7 +727,7 @@ namespace Dune {
     // since this is a proxy class we need to check equality of the stored pointer
     bool identical(const DiagonalRowVectorConst<K,n>& other) const
     {
-      return ((p_ == other.p_)and (row_ == other.row_));
+      return ((p_ == other.p_) and (row_ == other.row_));
     }
 
     //! ConstIterator class for sequential access
@@ -764,7 +764,7 @@ namespace Dune {
     //! Binary vector comparison
     bool operator== (const DiagonalRowVectorConst& y) const
     {
-      return ((p_==y.p_)and (row_==y.row_));
+      return ((p_==y.p_) and (row_==y.row_));
     }
 
     //===== sizes

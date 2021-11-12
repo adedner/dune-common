@@ -97,7 +97,7 @@ namespace Dune {
    */
   /**
      \addtogroup DebugOut
-     \{
+   \{
    */
   /*! \file
 

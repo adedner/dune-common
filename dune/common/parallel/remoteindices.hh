@@ -100,7 +100,7 @@ namespace Dune {
      * @brief The type of the index pair.
      */
     typedef IndexPair<GlobalIndex,ParallelLocalIndex<Attribute> >
-    PairType;
+      PairType;
 
     /**
      * @brief Get the attribute of the index on the remote process.
@@ -236,11 +236,11 @@ namespace Dune {
 
     /** @brief The type of the remote index list. */
     typedef Dune::SLList<RemoteIndex,Allocator>
-    RemoteIndexList;
+      RemoteIndexList;
 
     /** @brief The type of the map from rank to remote index list. */
     typedef std::map<int, std::pair<RemoteIndexList*,RemoteIndexList*> >
-    RemoteIndexMap;
+      RemoteIndexMap;
 
     typedef typename RemoteIndexMap::const_iterator const_iterator;
 
@@ -452,7 +452,7 @@ namespace Dune {
 
     /** @brief The index pair type. */
     typedef IndexPair<GlobalIndex, LocalIndex>
-    PairType;
+      PairType;
 
     /**
      * @brief The remote indices.
@@ -599,7 +599,7 @@ namespace Dune {
 
     /** @brief The type of the remote index list. */
     typedef Dune::SLList<RemoteIndex,Allocator>
-    RemoteIndexList;
+      RemoteIndexList;
 
     /**
      * @brief The type of the modifying iterator of the remote index list.
@@ -745,7 +745,7 @@ namespace Dune {
 
     /** @brief The type of the map from rank to remote index list. */
     typedef std::map<int, std::pair<RemoteIndexList*,RemoteIndexList*> >
-    RemoteIndexMap;
+      RemoteIndexMap;
 
     /**
      * @brief Constructor.

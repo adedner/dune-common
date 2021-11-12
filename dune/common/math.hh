@@ -311,7 +311,7 @@ namespace Dune
 
        This actually declares a different name in each translation unit, but
        they all resolve to the same lvalue.
-    */
+     */
 
     //! check wether the argument is NaN
     /**

@@ -4,7 +4,7 @@
 #include <dune/python/common/fvector.hh>
 #include <dune/python/pybind11/embed.h>
 
-#include<Python.h>
+#include <Python.h>
 int main()
 {
   const wchar_t* path = L"/home/domse/buildsytem/build/common-build/dune-python-env/bin/python";

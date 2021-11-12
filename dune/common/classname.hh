@@ -47,13 +47,13 @@ namespace Dune {
     typedef typename std::remove_reference<T>::type TR;
     std::string className = Impl::demangle( typeid( TR ).name() );
     if (std::is_const<TR>::value)
-        className += " const";
+      className += " const";
     if (std::is_volatile<TR>::value)
-        className += " volatile";
+      className += " volatile";
     if (std::is_lvalue_reference<T>::value)
-        className += "&";
+      className += "&";
     else if (std::is_rvalue_reference<T>::value)
-        className += "&&";
+      className += "&&";
     return className;
   }
 
@@ -67,9 +67,9 @@ namespace Dune {
     typedef typename std::remove_reference<T>::type TR;
     std::string className = Impl::demangle( typeid(v).name() );
     if (std::is_const<TR>::value)
-        className += " const";
+      className += " const";
     if (std::is_volatile<TR>::value)
-        className += " volatile";
+      className += " volatile";
     return className;
   }
 } // namespace Dune

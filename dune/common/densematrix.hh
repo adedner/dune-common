@@ -37,12 +37,12 @@ namespace Dune
   template<class K, int N> class FieldVector;
   namespace {
     /**
-      work around a problem of FieldMatrix/FieldVector,
-      there is no unique way to obtain the size of a class
+       work around a problem of FieldMatrix/FieldVector,
+       there is no unique way to obtain the size of a class
 
-      \deprecated VectorSize is deprecated; please call the 'size()' method directly instead.
-      This will be removed after Dune 2.8.
-      */
+       \deprecated VectorSize is deprecated; please call the 'size()' method directly instead.
+       This will be removed after Dune 2.8.
+     */
     template<class V>
     struct [[deprecated("VectorSize is deprecated; please call the 'size()' method directly instead")]] VectorSize
     {

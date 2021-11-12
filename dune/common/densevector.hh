@@ -271,7 +271,7 @@ namespace Dune {
       return asImp();
     }
 
-     //===== assignment from other DenseVectors
+    //===== assignment from other DenseVectors
   protected:
     //! Assignment operator for other DenseVector of same type
     DenseVector& operator=(const DenseVector&) = default;
@@ -476,7 +476,7 @@ namespace Dune {
     typename std::enable_if<
       std::is_convertible<ValueType, value_type>::value,
       derived_type
-    >::type&
+      >::type&
     operator+= (const ValueType& kk)
     {
       const value_type& k = kk;
@@ -498,7 +498,7 @@ namespace Dune {
     typename std::enable_if<
       std::is_convertible<ValueType, value_type>::value,
       derived_type
-    >::type&
+      >::type&
     operator-= (const ValueType& kk)
     {
       const value_type& k = kk;
@@ -520,7 +520,7 @@ namespace Dune {
     typename std::enable_if<
       std::is_convertible<FieldType, field_type>::value,
       derived_type
-    >::type&
+      >::type&
     operator*= (const FieldType& kk)
     {
       const field_type& k = kk;
@@ -542,7 +542,7 @@ namespace Dune {
     typename std::enable_if<
       std::is_convertible<FieldType, field_type>::value,
       derived_type
-    >::type&
+      >::type&
     operator/= (const FieldType& kk)
     {
       const field_type& k = kk;

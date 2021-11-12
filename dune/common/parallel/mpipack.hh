@@ -43,9 +43,9 @@ namespace Dune {
 
     // Its not valid to copy a MPIPack but you can move it
     MPIPack(const MPIPack&) = delete;
-    MPIPack& operator = (const MPIPack& other) = delete;
+    MPIPack& operator= (const MPIPack& other) = delete;
     MPIPack(MPIPack&&) = default;
-    MPIPack& operator = (MPIPack&& other) = default;
+    MPIPack& operator= (MPIPack&& other) = default;
 
     /** @brief Packs the data into the object. Enlarges the internal buffer if
      * necessary.
@@ -107,14 +107,14 @@ namespace Dune {
 
     //! @copydoc pack
     template<typename T>
-    friend MPIPack& operator << (MPIPack& p, const T& t){
+    friend MPIPack& operator<< (MPIPack& p, const T& t){
       p.pack(t);
       return p;
     }
 
     //! @copydoc unpack
     template<typename T>
-    friend MPIPack& operator >> (MPIPack& p, T& t){
+    friend MPIPack& operator>> (MPIPack& p, T& t){
       p.unpack(t);
       return p;
     }
@@ -182,7 +182,7 @@ namespace Dune {
     }
 
     friend bool operator==(const MPIPack& a, const MPIPack& b) {
-      return  a._buffer == b._buffer && a._comm == b._comm;
+      return a._buffer == b._buffer && a._comm == b._comm;
     }
     friend bool operator!=(const MPIPack& a, const MPIPack& b) {
       return !(a==b);

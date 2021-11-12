@@ -52,7 +52,7 @@ namespace Dune
   bool operator<=(const IndexPair<TG,TL>&, const IndexPair<TG,TL>&);
 
   template<class TG, class TL>
-  bool operator >=(const IndexPair<TG,TL>&, const IndexPair<TG,TL>&);
+  bool operator>=(const IndexPair<TG,TL>&, const IndexPair<TG,TL>&);
 
   template<class TG, class TL>
   bool operator==(const IndexPair<TG,TL>&, const TG&);
@@ -70,7 +70,7 @@ namespace Dune
   bool operator<=(const IndexPair<TG,TL>&, const TG&);
 
   template<class TG, class TL>
-  bool operator >=(const IndexPair<TG,TL>&, const TG&);
+  bool operator>=(const IndexPair<TG,TL>&, const TG&);
 
   template<typename T>
   struct MPITraits;
@@ -256,7 +256,7 @@ namespace Dune
       public ArrayList<IndexPair,N>::iterator
     {
       typedef typename ArrayList<IndexPair,N>::iterator
-      Father;
+        Father;
       friend class ParallelIndexSet<GlobalIndex,LocalIndex,N>;
     public:
       iterator(ParallelIndexSet<TG,TL,N>& indexSet, const Father& father)
@@ -292,8 +292,8 @@ namespace Dune
 
     /** @brief The constant iterator over the pairs. */
     typedef typename
-    ArrayList<IndexPair,N>::const_iterator
-    const_iterator;
+      ArrayList<IndexPair,N>::const_iterator
+      const_iterator;
 
     /**
      * @brief Constructor.
@@ -683,7 +683,7 @@ namespace Dune
   }
 
   template<class TG, class TL>
-  inline bool operator >=(const IndexPair<TG,TL>& a, const IndexPair<TG,TL>& b)
+  inline bool operator>=(const IndexPair<TG,TL>& a, const IndexPair<TG,TL>& b)
   {
     return a.global_>=b.global_;
   }
@@ -719,7 +719,7 @@ namespace Dune
   }
 
   template<class TG, class TL>
-  inline bool operator >=(const IndexPair<TG,TL>& a, const TG& b)
+  inline bool operator>=(const IndexPair<TG,TL>& a, const TG& b)
   {
     return a.global_>=b;
   }

@@ -4,8 +4,8 @@
 
 namespace Dune {
   /*
-    static member of Dune::Exception
-  */
+     static member of Dune::Exception
+   */
   ExceptionHook * Exception::_hook = 0;
 
   /*

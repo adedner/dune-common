@@ -28,7 +28,7 @@ namespace Dune
      \brief compute the maximum value over a range
 
      overloads for scalar values, and ranges exist
-  */
+   */
   template <typename T,
             typename std::enable_if<IsIterable<T>::value, int>::type = 0>
   typename T::value_type

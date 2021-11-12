@@ -417,7 +417,7 @@ namespace Dune
 
     //===== solve
 
-        /** \brief Matrix-matrix multiplication
+    /** \brief Matrix-matrix multiplication
      */
     template <class OtherScalar, int otherCols>
     friend auto operator* ( const FieldMatrix& matrixA,

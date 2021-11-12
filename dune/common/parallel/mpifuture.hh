@@ -32,7 +32,7 @@ namespace Dune{
       operator bool () const {
         return (bool)value;
       }
-      T& operator *() const{
+      T& operator*() const{
         return *value;
       }
     };
@@ -57,7 +57,7 @@ namespace Dune{
       operator bool () const{
         return (bool)value;
       }
-      T& operator *() const{
+      T& operator*() const{
         return *value;
       }
     };
@@ -76,8 +76,8 @@ namespace Dune{
   }
 
   /*! \brief Provides a future-like object for MPI communication.  It contains
-    the object that will be received and might contain also a sending object,
-    which must be hold (keep alive) until the communication has been completed.
+     the object that will be received and might contain also a sending object,
+     which must be hold (keep alive) until the communication has been completed.
    */
   template<class R, class S = void>
   class MPIFuture{

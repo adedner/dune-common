@@ -165,7 +165,7 @@ namespace Dune
      * @brief The type of the iterator of GlobalIndexList
      */
     typedef typename SLList<GlobalIndex, typename RemoteIndices::Allocator>::iterator
-    GlobalIndexIterator;
+      GlobalIndexIterator;
 
     /** @brief Type of the map of ranks onto GlobalIndexLists. */
     typedef std::map<int, GlobalIndexList> GlobalIndicesMap;
