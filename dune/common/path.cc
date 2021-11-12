@@ -180,7 +180,7 @@ namespace Dune {
 
     // count the number of components in mybase
     typedef std::iterator_traits<std::string::iterator>::difference_type
-    count_t;
+      count_t;
     count_t count = std::count(mybase.begin(), mybase.end(), '/');
 
     std::string result;

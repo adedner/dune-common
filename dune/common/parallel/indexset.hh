@@ -1057,7 +1057,7 @@ namespace Dune
   GlobalLookupIndexSet<I>::GlobalLookupIndexSet(const I& indexset,
                                                 std::size_t size)
     : indexSet_(indexset), size_(size),
-      indices_(size_, static_cast<const IndexPair*>(0))
+    indices_(size_, static_cast<const IndexPair*>(0))
   {
     const_iterator end_ = indexSet_.end();
 

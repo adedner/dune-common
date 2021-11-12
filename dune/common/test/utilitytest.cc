@@ -51,10 +51,10 @@ int main(int, char**)
   typedef std::tuple<int&,char&,long&,char&> RefTuple1;
   typedef std::tuple<int*,char*,long*,char*> PointerTuple1;
   static_assert((std::is_same<PointerTuple1,
-                          Dune::ForEachType<Dune::AddPtrTypeEvaluator,
-                              RefTuple1>::Type>::value),
-                     "RefTuple1 with added pointers should be the same as "
-                     "PointerTuple1, but it isn't!");
+                              Dune::ForEachType<Dune::AddPtrTypeEvaluator,
+                                                RefTuple1>::Type>::value),
+                "RefTuple1 with added pointers should be the same as "
+                "PointerTuple1, but it isn't!");
 
   Tuple1 t1(i,c,l,c);
   RefTuple1 refs(i, c, l, c);
@@ -77,7 +77,7 @@ int main(int, char**)
 
   [[maybe_unused]] typedef Dune::ForEachType<Eval,PointerTuple1>::Type ConvertedType;
   Dune::PointerPairDeletor<PointerTuple1>::apply(p);
-  if(p != PointerTuple1(nullptr,nullptr,nullptr,nullptr)){
+  if(p != PointerTuple1(nullptr,nullptr,nullptr,nullptr)) {
     ret+=20;
     std::cerr<<"PointerPairDeletor not working!"<<std::endl;
   }

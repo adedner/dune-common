@@ -52,7 +52,7 @@ namespace Dune
      @brief Create a shared_ptr for a stack-allocated object
      @relatesalso null_deleter
      @code
-          #include <dune/common/shared_ptr.hh>
+   #include <dune/common/shared_ptr.hh>
      @endcode
 
      Usage:

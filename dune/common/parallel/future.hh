@@ -155,7 +155,7 @@ namespace Dune{
   };
 
   template<>
-  class PseudoFuture<void>{
+  class PseudoFuture<void> {
     bool valid_;
   public:
     PseudoFuture(bool valid = false) :

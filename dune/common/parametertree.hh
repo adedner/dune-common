@@ -172,15 +172,15 @@ namespace Dune {
     T get(const std::string& key) const {
       if(not hasKey(key))
         DUNE_THROW(Dune::RangeError, "Key '" << key
-          << "' not found in ParameterTree (prefix " + prefix_ + ")");
+                                             << "' not found in ParameterTree (prefix " + prefix_ + ")");
       try {
         return Parser<T>::parse((*this)[key]);
       }
       catch(const RangeError& e) {
         // rethrow the error and add more information
         DUNE_THROW(RangeError, "Cannot parse value \"" << (*this)[key]
-          << "\" for key \"" << prefix_ << "." << key << "\""
-          << e.what());
+                                                       << "\" for key \"" << prefix_ << "." << key << "\""
+                                                       << e.what());
       }
     }
 
@@ -233,16 +233,16 @@ namespace Dune {
         s >> *it;
         if(!s)
           DUNE_THROW(RangeError, "as a range of items of type "
-            << className<Value>()
-            << " (" << n << " items were extracted successfully)");
+                     << className<Value>()
+                     << " (" << n << " items were extracted successfully)");
       }
       Value dummy;
       s >> dummy;
       // now extraction should have failed, and eof should be set
       if(not s.fail() or not s.eof())
         DUNE_THROW(RangeError, "as a range of "
-          << n << " items of type "
-          << className<Value>() << " (more items than the range can hold)");
+                   << n << " items of type "
+                   << className<Value>() << " (more items than the range can hold)");
     }
   };
 
@@ -331,7 +331,7 @@ namespace Dune {
       std::vector<std::string> sub = split(str);
       if (sub.size() != n)
         DUNE_THROW(RangeError, "as a bitset<" << n << "> "
-          << "because of unmatching size " << sub.size());
+                                              << "because of unmatching size " << sub.size());
       for (std::size_t i=0; i<n; ++i) {
         val[i] = ParameterTree::Parser<bool>::parse(sub[i]);
       }

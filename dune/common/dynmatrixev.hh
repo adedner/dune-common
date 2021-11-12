@@ -37,7 +37,7 @@ namespace Dune {
     static void eigenValuesNonSym(const DynamicMatrix<K>& matrix,
                                   DynamicVector<C>& eigenValues,
                                   std::vector<DynamicVector<K>>* eigenVectors = nullptr
-      )
+                                  )
     {
 
 #if HAVE_LAPACK

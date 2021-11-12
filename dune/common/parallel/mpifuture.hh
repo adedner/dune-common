@@ -38,7 +38,7 @@ namespace Dune{
     };
 
     template<class T>
-    struct Buffer<T&>{
+    struct Buffer<T&> {
       Buffer(bool valid = false)
       {
         if(valid)
@@ -63,7 +63,7 @@ namespace Dune{
     };
 
     template<>
-    struct Buffer<void>{
+    struct Buffer<void> {
       bool valid_;
       Buffer(bool valid = false)
         : valid_(valid)
@@ -108,12 +108,11 @@ namespace Dune{
     {}
 
     ~MPIFuture() {
-      if(req_ != MPI_REQUEST_NULL){
+      if(req_ != MPI_REQUEST_NULL) {
         try{ // might fail when it is a collective communication
           MPI_Cancel(&req_);
           MPI_Request_free(&req_);
-        }catch(...){
-        }
+        }catch(...) {}
       }
     }
 

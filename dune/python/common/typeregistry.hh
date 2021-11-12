@@ -71,9 +71,9 @@ namespace Dune
 
       template< class T >
       inline static auto insertIntoTypeRegistry (
-          const std::string &name,
-          const std::string &pyName,
-          std::vector< std::string > includes )
+        const std::string &name,
+        const std::string &pyName,
+        std::vector< std::string > includes )
       {
         auto ret = typeRegistry().emplace( typeid(T), Entry() );
         if( ret.second )
@@ -103,13 +103,13 @@ namespace Dune
       {
         template <class... Templ>
         GenerateTypeName(const std::string &main, Templ... templ)
-        : main_(main)
+          : main_(main)
         {
           templates(templ...);
         }
         template <class T, class... options, class... Templ>
         GenerateTypeName(const std::string &outer, const std::string &main, Templ... templ)
-        : main_(outer+"::"+main)
+          : main_(outer+"::"+main)
         {
           templates(templ...);
         }
@@ -128,7 +128,7 @@ namespace Dune
           const auto& outerEntry = findInTypeRegistry<Outer>();
           if (outerEntry.second)
             throw std::invalid_argument( (std::string("couldn't find outer class ") +
-                  typeid(Outer).name() + " in type registry").c_str() );
+                                          typeid(Outer).name() + " in type registry").c_str() );
           main_ = outerEntry.first->second.name + "::" + main;
           includes_.push_back(outerEntry.first->second.includes);
           std::sort( includes_.begin(), includes_.end() );
@@ -136,7 +136,7 @@ namespace Dune
           templates(templ...);
         }
         GenerateTypeName(const std::string &main, pybind11::args args)
-        : main_(main)
+          : main_(main)
         {
           const std::size_t sz = args.size();
           for( std::size_t i = 0; i < sz; ++i )
@@ -209,7 +209,7 @@ namespace Dune
           auto entry = detail::findInTypeRegistry<T>();
           if (entry.second)
             throw std::invalid_argument( (std::string("couldn't find requested type ") +
-                  typeid(T).name() + " in type registry").c_str() );
+                                          typeid(T).name() + " in type registry").c_str() );
           return entry.first->second.name;
         }
         template <class T>
@@ -233,7 +233,7 @@ namespace Dune
           auto entry = detail::findInTypeRegistry<T>();
           if (entry.second)
             throw std::invalid_argument( (std::string("couldn't find requested type ") +
-                typeid(T).name() + " in type registry").c_str() );
+                                          typeid(T).name() + " in type registry").c_str() );
           return entry.first->second.includes;
         }
         template <class T>
@@ -255,7 +255,7 @@ namespace Dune
       {
         template <class... Args>
         IncludeFiles(Args... args)
-        : std::vector<std::string>({args...}) {}
+          : std::vector<std::string>({args...}) {}
       };
 
 
@@ -276,18 +276,18 @@ namespace Dune
       template <std::size_t I, std::size_t... Is,
                 std::size_t... Js, std::size_t... Ks>
       struct filter<std::index_sequence<I, Is...>, std::index_sequence<0, Js...>,
-             std::index_sequence<Ks...>>
-          : filter<std::index_sequence<Is...>, std::index_sequence<Js...>,
-                   std::index_sequence<Ks...>> {};
+                    std::index_sequence<Ks...>>
+        : filter<std::index_sequence<Is...>, std::index_sequence<Js...>,
+                 std::index_sequence<Ks...>> {};
       template <std::size_t I, std::size_t... Is, std::size_t... Js,
                 std::size_t... Ks>
       struct filter<std::index_sequence<I, Is...>, std::index_sequence<1, Js...>,
                     std::index_sequence<Ks...>>
-          : filter<std::index_sequence<Is...>, std::index_sequence<Js...>,
-                   std::index_sequence<Ks..., I>> {};
+        : filter<std::index_sequence<Is...>, std::index_sequence<Js...>,
+                 std::index_sequence<Ks..., I>> {};
 
       template< template< class T> class F, class... Args >
-      using Filter = filter< std::index_sequence_for< Args... >, std::index_sequence< F< Args >{}... > >;
+      using Filter = filter< std::index_sequence_for< Args... >, std::index_sequence< F< Args > {} ... >>;
 
       template< class DuneType >
       inline static auto
@@ -372,7 +372,7 @@ namespace Dune
     template <class DuneType>
     inline static void addToTypeRegistry ( const GenerateTypeName &typeName,
                                            const std::vector< std::string > &inc = {}
-                                         )
+                                           )
     {
       std::vector<std::string> includes = typeName.includes();
       includes.insert(includes.end(), inc.begin(), inc.end());
@@ -464,9 +464,9 @@ namespace Dune
       scope.attr( "typeRegistry" ) = pybind11::cast( std::make_unique< detail::TypeRegistry >() );
 
       scope.def( "generateTypeName", []( std::string className, pybind11::args targs ) {
-          GenerateTypeName gtn( className, targs );
-          return std::make_pair( gtn.name(), gtn.includes() );
-        }, "className"_a );
+        GenerateTypeName gtn( className, targs );
+        return std::make_pair( gtn.name(), gtn.includes() );
+      }, "className"_a );
     }
 
   } // namespace Python

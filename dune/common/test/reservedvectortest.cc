@@ -34,10 +34,10 @@ int main() {
   // check copy constructor
   Dune::ReservedVector<unsigned int, 8> rv2 = rv;
   test.check(rv2[0] == 1 &&
-    rv2[1] == 2 &&
-    rv2[2] == 3 &&
-    rv2[3] == 4 &&
-    rv2[4] == 5);
+             rv2[1] == 2 &&
+             rv2[2] == 3 &&
+             rv2[3] == 4 &&
+             rv2[4] == 5);
 
   // check pop_back
   rv2.pop_back();

@@ -26,7 +26,7 @@ namespace Dune
     // registerFieldMatrix
     // -------------------
 
-    template< class K, int m, int n, class ...options >
+    template< class K, int m, int n, class... options >
     void registerFieldMatrix ( pybind11::handle scope, pybind11::class_<Dune::FieldMatrix<K,m,n>, options...> cls )
     {
       typedef Dune::FieldMatrix< K, m, n > FM;
@@ -44,45 +44,45 @@ namespace Dune
       cls.def( pybind11::init( [] () { return new FM( K( 0 ) ); } ) );
 
       cls.def( pybind11::init( [] ( pybind11::list rows ) {
-          FM *self = new FM( K( 0 ) );
+        FM *self = new FM( K( 0 ) );
 
-          const std::size_t numRows = std::min( static_cast< std::size_t >( m ), rows.size() );
-          for( std::size_t i = 0; i < numRows; ++i )
-            (*self)[ i ] = pybind11::cast< Dune::FieldVector< K, n > >( rows[ i ] );
-          return self;
-        } ) );
+        const std::size_t numRows = std::min( static_cast< std::size_t >( m ), rows.size() );
+        for( std::size_t i = 0; i < numRows; ++i )
+          (*self)[ i ] = pybind11::cast< Dune::FieldVector< K, n > >( rows[ i ] );
+        return self;
+      } ) );
 
       pybind11::implicitly_convertible< pybind11::list, FM >();
 
       cls.def( "__str__", [] ( const FM &self ) {
-            std::string s = "(";
-            for( int i = 0; i < m; ++i )
-            {
-              s += (i > 0 ? "\n(" : "(");
-              for( int j = 0; j < n; ++j )
-                s += (j > 0 ? ", " : "") + std::to_string( self[ i ][ j ] );
-              s += std::string( ") ");
-            }
-            return s += ")";
-          });
+        std::string s = "(";
+        for( int i = 0; i < m; ++i )
+        {
+          s += (i > 0 ? "\n(" : "(");
+          for( int j = 0; j < n; ++j )
+            s += (j > 0 ? ", " : "") + std::to_string( self[ i ][ j ] );
+          s += std::string( ") ");
+        }
+        return s += ")";
+      });
       cls.def( "__repr__", [] ( const FM &self ) {
-          return "Dune::FieldMatrix<"+to_string(m)+","+to_string(n)+">(...)";
-          } );
+        return "Dune::FieldMatrix<"+to_string(m)+","+to_string(n)+">(...)";
+      } );
 
       cls.def_buffer( [] ( FM &self ) -> pybind11::buffer_info {
-          return pybind11::buffer_info(
-              &self[ 0 ][ 0 ],                          /* Pointer to buffer */
-              sizeof( K ),                              /* Size of one scalar */
-              pybind11::format_descriptor< K >::value,  /* Python struct-style format descriptor */
-              2,                                        /* Number of dimensions */
-              { m, n },                                 /* Buffer dimensions */
-              /* Strides (in bytes) for each index */
-              {
-                static_cast< std::size_t >( reinterpret_cast< char * >( &self[ 1 ][ 0 ] ) - reinterpret_cast< char * >( &self[ 0 ][ 0 ] ) ),
-                static_cast< std::size_t >( reinterpret_cast< char * >( &self[ 0 ][ 1 ] ) - reinterpret_cast< char * >( &self[ 0 ][ 0 ] ) )
-              }
-            );
-        } );
+        return pybind11::buffer_info(
+          &self[ 0 ][ 0 ],                              /* Pointer to buffer */
+          sizeof( K ),                                  /* Size of one scalar */
+          pybind11::format_descriptor< K >::value,      /* Python struct-style format descriptor */
+          2,                                            /* Number of dimensions */
+          { m, n },                                     /* Buffer dimensions */
+          /* Strides (in bytes) for each index */
+        {
+          static_cast< std::size_t >( reinterpret_cast< char * >( &self[ 1 ][ 0 ] ) - reinterpret_cast< char * >( &self[ 0 ][ 0 ] ) ),
+          static_cast< std::size_t >( reinterpret_cast< char * >( &self[ 0 ][ 1 ] ) - reinterpret_cast< char * >( &self[ 0 ][ 0 ] ) )
+        }
+          );
+      } );
 
       registerDenseMatrix< FM >( cls );
     }
@@ -93,8 +93,8 @@ namespace Dune
       typedef Dune::FieldMatrix< K, m, n > FM;
 
       auto entry = insertClass<FM>( scope, "FieldMatrix_"+std::to_string(m)+"_"+std::to_string(n), pybind11::buffer_protocol(),
-          GenerateTypeName("Dune::FieldMatrix",Dune::MetaType<K>(),m,n), IncludeFiles{"dune/common/fmatrix.hh"}
-        );
+                                    GenerateTypeName("Dune::FieldMatrix",Dune::MetaType<K>(),m,n), IncludeFiles{"dune/common/fmatrix.hh"}
+                                    );
       if (!entry.second)
         return;
       registerFieldMatrix( scope, entry.first );

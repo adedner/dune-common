@@ -23,7 +23,7 @@ namespace Dune {
        hide the default traits in an empty namespace
      */
     template <typename Key, typename Tp,
-        typename Alloc = std::allocator<Tp> >
+              typename Alloc = std::allocator<Tp> >
     struct _lru_default_traits
     {
       typedef Key key_type;
@@ -32,7 +32,7 @@ namespace Dune {
       typedef typename list_type::iterator iterator;
       typedef typename std::less<key_type> cmp;
       typedef std::map< key_type, iterator, cmp,
-          typename std::allocator_traits<allocator>::template rebind_alloc<std::pair<const key_type, iterator> > > map_type;
+                        typename std::allocator_traits<allocator>::template rebind_alloc<std::pair<const key_type, iterator> > > map_type;
     };
 
   } // end empty namespace
@@ -45,7 +45,7 @@ namespace Dune {
       http://aim.adc.rmit.edu.au/phd/sgreuter/papers/graphite2003.pdf
    */
   template <typename Key, typename Tp,
-      typename Traits = _lru_default_traits<Key, Tp> >
+            typename Traits = _lru_default_traits<Key, Tp> >
   class lru
   {
     typedef typename Traits::list_type list_type;
@@ -186,8 +186,8 @@ namespace Dune {
       map_iterator it = _index.find(key);
       if (it == _index.end())
         DUNE_THROW(Dune::RangeError,
-          "Failed to touch key " << key << ", it is not in the lru container");
-       /* update _data
+                   "Failed to touch key " << key << ", it is not in the lru container");
+      /* update _data
          move it to the front
        */
       _data.splice(_data.begin(), _data, it->second);

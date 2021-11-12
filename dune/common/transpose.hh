@@ -10,46 +10,46 @@
 
 namespace Dune {
 
-namespace Impl {
+  namespace Impl {
 
-  // Wrapper representing the transposed of a matrix.
-  // Creating the wrapper does not compute anything
-  // but only serves for tagging the wrapped matrix
-  // for transposition.
-  template<class M>
-  class TransposedMatrixWrapper
-  {
-  public:
+    // Wrapper representing the transposed of a matrix.
+    // Creating the wrapper does not compute anything
+    // but only serves for tagging the wrapped matrix
+    // for transposition.
+    template<class M>
+    class TransposedMatrixWrapper
+    {
+    public:
 
-    enum {
-      //! The number of rows.
-      rows = M::cols,
-      //! The number of columns.
-      cols = M::rows
+      enum {
+        //! The number of rows.
+        rows = M::cols,
+        //! The number of columns.
+        cols = M::rows
+      };
+
+      TransposedMatrixWrapper(const M& matrix) : matrix_(matrix) {}
+      TransposedMatrixWrapper(const TransposedMatrixWrapper&) = delete;
+      TransposedMatrixWrapper(TransposedMatrixWrapper&&) = delete;
+
+      template<class OtherField, int otherRows>
+      friend auto operator* (const FieldMatrix<OtherField, otherRows, rows>& matrixA,
+                             const TransposedMatrixWrapper& matrixB)
+      {
+        using ThisField = typename FieldTraits<M>::field_type;
+        using Field = typename PromotionTraits<ThisField, OtherField>::PromotedType;
+        FieldMatrix<Field, otherRows, cols> result;
+        for (std::size_t j=0; j<otherRows; ++j)
+          matrixB.matrix_.mv(matrixA[j], result[j]);
+        return result;
+      }
+
+    private:
+
+      const M& matrix_;
     };
 
-    TransposedMatrixWrapper(const M& matrix) : matrix_(matrix) {}
-    TransposedMatrixWrapper(const TransposedMatrixWrapper&) = delete;
-    TransposedMatrixWrapper(TransposedMatrixWrapper&&) = delete;
-
-    template<class OtherField, int otherRows>
-    friend auto operator* (const FieldMatrix<OtherField, otherRows, rows>& matrixA,
-                            const TransposedMatrixWrapper& matrixB)
-    {
-      using ThisField = typename FieldTraits<M>::field_type;
-      using Field = typename PromotionTraits<ThisField, OtherField>::PromotedType;
-      FieldMatrix<Field, otherRows, cols> result;
-      for (std::size_t j=0; j<otherRows; ++j)
-        matrixB.matrix_.mv(matrixA[j], result[j]);
-      return result;
-    }
-
-  private:
-
-    const M& matrix_;
-  };
-
-} // namespace Impl
+  } // namespace Impl
 
 /**
  * \brief Create a wrapper modelling the transposed matrix
@@ -66,10 +66,10 @@ namespace Impl {
  * to the wrapped matrix, it cannot be modified and
  * should not be stored but used directly.
  */
-template<class Matrix>
-auto transpose(const Matrix& matrix) {
-  return Impl::TransposedMatrixWrapper<Matrix>(matrix);
-}
+  template<class Matrix>
+  auto transpose(const Matrix& matrix) {
+    return Impl::TransposedMatrixWrapper<Matrix>(matrix);
+  }
 
 
 } // namespace Dune

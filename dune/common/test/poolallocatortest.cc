@@ -109,7 +109,7 @@ int testPool()
   int ret=0;
 
   std::cout<<"Checking "<<typeid(T).name()<<" sizeof="<<sizeof(T)<<" with size "<< size<<
-  " alignment="<< alignof(T) <<std::endl;
+    " alignment="<< alignof(T) <<std::endl;
 
   ret += testPoolMain<0,T>::test();
   ret += testPoolMain<size,T>::test();

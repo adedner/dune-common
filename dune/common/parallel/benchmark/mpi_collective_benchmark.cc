@@ -77,39 +77,39 @@
 
 Dune::ParameterTree options;
 std::vector<std::string> all_methods = {"allreduce",
-                         "barrier",
-                         "broadcast",
-                         "gather",
-                         "allgather",
-                         "scatter"};
+                                        "barrier",
+                                        "broadcast",
+                                        "gather",
+                                        "allgather",
+                                        "scatter"};
 
 template<class CC>
 void communicate(CC& cc){
   auto method = options.get("method", "allreduce");
   std::vector<int> data(1, 42);
-  if(method == "allreduce"){
+  if(method == "allreduce") {
     cc.template allreduce<std::plus<int>>(data);
     return;
   }
-  if(method == "barrier"){
+  if(method == "barrier") {
     cc.barrier();
     return;
   }
-  if(method == "broadcast"){
+  if(method == "broadcast") {
     cc.broadcast(data.data(), data.size(), 0);
     return;
   }
-  if(method == "gather"){
+  if(method == "gather") {
     std::vector<int> recv_data(cc.size(), 0);
     cc.gather(data.data(), recv_data.data(), 1, 0);
     return;
   }
-  if(method == "allgather"){
+  if(method == "allgather") {
     std::vector<int> recv_data(cc.size(), 0);
     cc.allgather(data.data(), 1, recv_data.data());
     return;
   }
-  if(method == "scatter"){
+  if(method == "scatter") {
     std::vector<int> send_data(cc.size(), 42);
     cc.scatter(send_data.data(), data.data(), 1, 0);
     return;
@@ -120,22 +120,22 @@ void communicate(CC& cc){
 template<class CC>
 Dune::Future<void> startCommunication(CC& cc){
   auto method = options.get("method", "allreduce");
-  if(method == "allreduce"){
+  if(method == "allreduce") {
     return cc.template iallreduce<std::plus<char>>(42);
   }
-  if(method == "barrier"){
+  if(method == "barrier") {
     return cc.ibarrier();
   }
-  if(method == "broadcast"){
+  if(method == "broadcast") {
     return cc.ibroadcast(42, 0);
   }
-  if(method == "gather"){
+  if(method == "gather") {
     return cc.igather(42, std::vector<int>(cc.size()), 0);
   }
-  if(method == "allgather"){
+  if(method == "allgather") {
     return cc.iallgather(42, std::vector<int>(cc.size()));
   }
-  if(method == "scatter"){
+  if(method == "scatter") {
     return cc.iscatter(std::vector<int>(cc.size(), 42), 0, 0);
   }
   DUNE_THROW(Dune::Exception, "Unknown method");
@@ -146,7 +146,7 @@ double runBlocking(CC& cc){
   std::vector<char> answer(1, 42);
   int iterations = options.get("iterations", 1000);
   Dune::Timer watch;
-  for(int i = 0; i < iterations; i++){
+  for(int i = 0; i < iterations; i++) {
     cc.barrier();
     watch.start();
     communicate(cc);
@@ -160,7 +160,7 @@ double runNonblockingWait(CC& cc){
   std::vector<char> answer(1, 42);
   Dune::Timer watch;
   int iterations = options.get("iterations", 1000);
-  for(int i = 0; i < iterations; i++){
+  for(int i = 0; i < iterations; i++) {
     cc.barrier();
     watch.start();
     auto f = startCommunication(cc);
@@ -174,7 +174,7 @@ std::tuple<double, double> runNonblockingSleep(decltype(Dune::MPIHelper::getComm
   std::vector<char> answer(1, 42);
   Dune::Timer watch, watch_work;
   int iterations = options.get("iterations", 1000);
-  for(int i = 0; i < iterations; i++){
+  for(int i = 0; i < iterations; i++) {
     cc.barrier();
     watch.start();
     auto f = startCommunication(cc);
@@ -193,7 +193,7 @@ std::tuple<double, double> runNonblockingActive(decltype(Dune::MPIHelper::getCom
   std::vector<char> answer(1, 42);
   int iterations = options.get("iterations", 1000);
   Dune::Timer watch, watch_work;
-  for(int i = 0; i < iterations; i++){
+  for(int i = 0; i < iterations; i++) {
     cc.barrier();
     watch.start();
     auto f = startCommunication(cc);
@@ -224,7 +224,7 @@ std::tuple<double, double> determineOverlap(std::function<std::tuple<double, dou
   double work_t = 0;
   int i = 1;
   double iter_t_threshold = options.get("threshold", 2.0);
-  for(double work = 0.25*base_t; iter_t < iter_t_threshold*base_t; work *= 2, i++){
+  for(double work = 0.25*base_t; iter_t < iter_t_threshold*base_t; work *= 2, i++) {
     std::tie(iter_t, work_t) = fun(std::chrono::duration<double>(work));
     if(options.get("verbose", 0))
       std::cout << i << std::setw(12) << " iter_t:" << std::setw(12) << iter_t
@@ -239,7 +239,7 @@ std::tuple<double, double> determineOverlap(std::function<std::tuple<double, dou
 }
 
 void printHeader(){
-  if(options.get("nohdr", 0) == 0){
+  if(options.get("nohdr", 0) == 0) {
     std::cout << "Method: " << options.get("method", "allreduce") << std::endl;
     std::cout << std::scientific;
     std::cout << std::setw(10) << "commsize"
@@ -260,7 +260,7 @@ void run(int s){
   #if HAVE_MPI
   MPI_Comm_split(comm_world, comm_world.rank() < s, comm_world.rank(), &comm);
   #endif
-  if(comm_world.rank() < s){
+  if(comm_world.rank() < s) {
     Dune::Communication<Dune::MPIHelper::MPICommunicator> cc(comm);
     std::cout << std::setw(10) << cc.size()
               << std::setw(12) << options.get("iterations", 1000) << std::flush;
@@ -301,12 +301,12 @@ int main(int argc, char** argv){
   std::vector<std::string> methods = {options.get("method", "allreduce")};
   if(options.get("allMethods", 0) == 1)
     methods = std::vector<std::string>(all_methods);
-  for(std::string method : methods){
+  for(std::string method : methods) {
     options["method"] = method;
     std::cout << std::left << std::scientific;
     printHeader();
     int s = options.get("startSize", mpihelper.size());
-    while(s < mpihelper.size()){
+    while(s < mpihelper.size()) {
       run(s);
       s *= 2;
     }

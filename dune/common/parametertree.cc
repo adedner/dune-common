@@ -60,14 +60,14 @@ bool ParameterTree::hasKey(const std::string& key) const
     return s.hasKey(key.substr(dot+1));
   }
   else
-    if (values_.count(key) != 0)
-      {
-        if (subs_.count(key) > 0)
-          DUNE_THROW(RangeError,"key " << key << " occurs as value and as subtree");
-        return true;
-      }
-    else
-      return false;
+  if (values_.count(key) != 0)
+  {
+    if (subs_.count(key) > 0)
+      DUNE_THROW(RangeError,"key " << key << " occurs as value and as subtree");
+    return true;
+  }
+  else
+    return false;
 
 }
 
@@ -88,14 +88,14 @@ bool ParameterTree::hasSub(const std::string& key) const
     return s.hasSub(key.substr(dot+1));
   }
   else
-    if (subs_.count(key) != 0)
-      {
-        if (values_.count(key) > 0)
-          DUNE_THROW(RangeError,"key " << key << " occurs as value and as subtree");
-        return true;
-      }
-    else
-      return false;
+  if (subs_.count(key) != 0)
+  {
+    if (values_.count(key) > 0)
+      DUNE_THROW(RangeError,"key " << key << " occurs as value and as subtree");
+    return true;
+  }
+  else
+    return false;
 }
 
 ParameterTree& ParameterTree::sub(const std::string& key)
@@ -132,15 +132,15 @@ const ParameterTree& ParameterTree::sub(const std::string& key, bool fail_if_mis
     if (values_.count(key) > 0)
       DUNE_THROW(RangeError,"key " << key << " occurs as value and as subtree");
     if (subs_.count(key) == 0)
+    {
+      if (fail_if_missing)
       {
-        if (fail_if_missing)
-          {
-            DUNE_THROW(Dune::RangeError, "SubTree '" << key
-                       << "' not found in ParameterTree (prefix " + prefix_ + ")");
-          }
-        else
-          return empty_;
+        DUNE_THROW(Dune::RangeError, "SubTree '" << key
+                                                 << "' not found in ParameterTree (prefix " + prefix_ + ")");
       }
+      else
+        return empty_;
+    }
     return subs_.find(key)->second;
   }
 }
@@ -175,7 +175,7 @@ const std::string& ParameterTree::operator[] (const std::string& key) const
   {
     if (! hasKey(key))
       DUNE_THROW(Dune::RangeError, "Key '" << key
-        << "' not found in ParameterTree (prefix " + prefix_ + ")");
+                                           << "' not found in ParameterTree (prefix " + prefix_ + ")");
     return values_.find(key)->second;
   }
 }

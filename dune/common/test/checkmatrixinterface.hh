@@ -284,7 +284,7 @@ namespace CheckMatrixInterface
     {
       const size_type size = matrix.size();
       for( size_type i = size_type( 0 ); i < size; ++i )
-        [[maybe_unused]] const_row_reference row = matrix[ i ];
+      [[maybe_unused]] const_row_reference row = matrix[ i ];
 
       const size_type rows = MatrixSizeHelper< Matrix >::rows( matrix );
       const size_type cols = MatrixSizeHelper< Matrix >::cols( matrix );
@@ -337,7 +337,7 @@ namespace CheckMatrixInterface
     {
       const ConstIterator end = matrix.end();
       for( ConstIterator it = matrix.begin(); it != end; ++it )
-        [[maybe_unused]] const_row_reference row = *it;
+      [[maybe_unused]] const_row_reference row = *it;
     }
   };
 

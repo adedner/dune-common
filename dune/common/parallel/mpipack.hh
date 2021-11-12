@@ -61,7 +61,7 @@ namespace Dune {
         size += getPackSize(1, _comm, MPI_INT);
       if (_position + size > 0 && size_t(_position + size) > _buffer.size()) // resize buffer if necessary
         _buffer.resize(_position + size);
-      if(!has_static_size){
+      if(!has_static_size) {
         int size = mpidata.size();
         MPI_Pack(&size, 1, MPI_INT, _buffer.data(), _buffer.size(),
                  &_position, _comm);
@@ -77,7 +77,7 @@ namespace Dune {
      */
     template<class T>
     auto /*void*/ unpack(T& data)
-      -> std::enable_if_t<decltype(getMPIData(data))::static_size, void>
+    -> std::enable_if_t<decltype(getMPIData(data))::static_size, void>
     {
       auto mpidata = getMPIData(data);
       MPI_Unpack(_buffer.data(), _buffer.size(), &_position,
@@ -91,7 +91,7 @@ namespace Dune {
      */
     template<class T>
     auto /*void*/ unpack(T& data)
-      -> std::enable_if_t<!decltype(getMPIData(data))::static_size, void>
+    -> std::enable_if_t<!decltype(getMPIData(data))::static_size, void>
     {
       auto mpidata = getMPIData(data);
       int size = 0;

@@ -31,7 +31,7 @@ namespace Dune
 
       explicit Logger ( const std::string &name )
         : logging_( pybind11::module::import( "logging" ) ),
-          logger_( logging_.attr( "getLogger" )( name ) )
+        logger_( logging_.attr( "getLogger" )( name ) )
       {}
 
       template< class... Args >

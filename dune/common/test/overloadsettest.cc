@@ -24,9 +24,9 @@ int main()
 
   {
     auto foo = Dune::overload(
-            [](double /*i*/) { return 0; },
-            [](int /*i*/) { return 1; },
-            [](long /*i*/) { return 2; });
+      [](double /*i*/) { return 0; },
+      [](int /*i*/) { return 1; },
+      [](long /*i*/) { return 2; });
 
     test.check(foo(3.14) == 0)
       << "incorrect overload selected from OverloadSet";
@@ -38,9 +38,9 @@ int main()
 
   {
     auto foo = Dune::orderedOverload(
-            [](double /*i*/) { return 0; },
-            [](int /*i*/) { return 1; },
-            [](long /*i*/) { return 2; });
+      [](double /*i*/) { return 0; },
+      [](int /*i*/) { return 1; },
+      [](long /*i*/) { return 2; });
 
     test.check(foo(3.14) == 0)
       << "incorrect overload selected from OverloadSet";
@@ -52,8 +52,8 @@ int main()
 
   {
     auto foo = Dune::overload(
-            [](const int& /*i*/) { return 0; },
-            [](int&& /*i*/) { return 1; });
+      [](const int& /*i*/) { return 0; },
+      [](int&& /*i*/) { return 1; });
 
     int i = 0;
     test.check(foo(long(42)) == 1)
@@ -66,8 +66,8 @@ int main()
 
   {
     auto foo = Dune::orderedOverload(
-            [](const int& /*i*/) { return 0; },
-            [](int&& /*i*/) { return 1; });
+      [](const int& /*i*/) { return 0; },
+      [](int&& /*i*/) { return 1; });
 
     int i = 0;
     test.check(foo(long(42)) == 0)
@@ -82,11 +82,11 @@ int main()
     auto t = std::make_tuple(42, "foo", 3.14);
 
     auto typeToName = Dune::overload(
-            [](int) { return "int"; },
-            [](long) { return "long"; },
-            [](std::string) { return "string"; },
-            [](float) { return "float"; },
-            [](double) { return "double"; });
+      [](int) { return "int"; },
+      [](long) { return "long"; },
+      [](std::string) { return "string"; },
+      [](float) { return "float"; },
+      [](double) { return "double"; });
 
     std::string tupleTypes;
     Dune::Hybrid::forEach(t, [&](auto&& ti) {
@@ -101,8 +101,8 @@ int main()
     // Check if templated and non-templed overloads work
     // nicely together.
     auto f = Dune::overload(
-        [](const int& t) { (void) t;},
-        [](const auto& t) { t.bar();});
+      [](const int& t) { (void) t;},
+      [](const auto& t) { t.bar();});
     f(0);
   }
 

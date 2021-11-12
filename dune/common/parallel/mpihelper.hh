@@ -240,7 +240,7 @@ namespace Dune
     DUNE_EXPORT static MPIHelper& instance(int& argc, char**& argv)
     {
       // create singleton instance
-      if (!instance_){
+      if (!instance_) {
         static std::mutex mutex;
         std::lock_guard<std::mutex> guard(mutex);
         if(!instance_)
@@ -287,7 +287,7 @@ namespace Dune
 
     //! \brief calls MPI_Init with argc and argv as parameters
     MPIHelper(int& argc, char**& argv)
-    : initializedHere_(false)
+      : initializedHere_(false)
     {
       int wasInitialized = -1;
       MPI_Initialized( &wasInitialized );

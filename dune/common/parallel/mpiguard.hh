@@ -175,7 +175,7 @@ namespace Dune
     {}
 
 #if HAVE_MPI
-     MPIGuard (const MPI_Comm & comm, bool active=true) :
+    MPIGuard (const MPI_Comm & comm, bool active=true) :
       comm_(GuardCommunicator::create(comm)),
       active_(active)
     {}

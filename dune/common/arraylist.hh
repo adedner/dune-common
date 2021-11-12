@@ -209,7 +209,7 @@ namespace Dune
 
     /** @brief the data chunks of our list. */
     std::vector<std::shared_ptr<std::array<MemberType,chunkSize_> >,
-        SmartPointerAllocator> chunks_;
+                SmartPointerAllocator> chunks_;
     /** @brief The current data capacity.
      * This is the capacity that the list could have theoretically
      * with this number of chunks. That is chunks * chunkSize.
@@ -250,9 +250,9 @@ namespace Dune
    */
   template<class T, int N, class A>
   class ArrayListIterator : public RandomAccessIteratorFacade<ArrayListIterator<T,N,A>,
-                                typename A::value_type,
-                                typename A::value_type &,
-                                typename A::difference_type>
+                                                              typename A::value_type,
+                                                              typename A::value_type &,
+                                                              typename A::difference_type>
   {
 
     friend class ArrayList<T,N,A>;
@@ -371,9 +371,9 @@ namespace Dune
   template<class T, int N, class A>
   class ConstArrayListIterator
     : public RandomAccessIteratorFacade<ConstArrayListIterator<T,N,A>,
-          const typename A::value_type,
-          typename A::value_type const&,
-          typename A::difference_type>
+                                        const typename A::value_type,
+                                        typename A::value_type const&,
+                                        typename A::difference_type>
   {
 
     friend class ArrayList<T,N,A>;

@@ -106,7 +106,7 @@ namespace Dune
 
       template< class T, class... options >
       inline static auto registerOneTensorInterface ( pybind11::class_< T, options... > cls, PriorityTag< 1 > )
-        -> std::enable_if_t< IsOneTensor< T >::value >
+      -> std::enable_if_t< IsOneTensor< T >::value >
       {
         cls.def( "__mul__", [] ( const T &self, const T &other ) { return self * other; } );
         cls.def( "__rmul__", [] ( const T &self, const T &other ) { return self * other; } );
@@ -164,9 +164,9 @@ namespace Dune
 
     template< std::size_t... i, class T, class... X >
     inline static constexpr auto extendArray ( std::index_sequence< i... >, const std::array< T, sizeof...( i ) > &array, X &&... x )
-      -> std::enable_if_t< std::conjunction< std::is_convertible< X, T >... >::value, std::array< T, sizeof...( i )+sizeof...( X ) > >
+    -> std::enable_if_t< std::conjunction< std::is_convertible< X, T >... >::value, std::array< T, sizeof...( i )+sizeof...( X ) > >
     {
-      return {{ array[ i ]..., std::forward< X >( x )... }};
+      return {{ array[ i ] ..., std::forward< X >( x )... }};
     }
 
     template< class T, std::size_t n, class... X >
@@ -182,14 +182,14 @@ namespace Dune
 
     template< std::size_t... k, class X, class Y, std::size_t n, class... I >
     inline static auto getFixedTensor ( std::index_sequence< k... >, X &x, const Y &y, std::array< ssize_t, n > j, I... i )
-      -> std::enable_if_t< (sizeof...( k ) == n) >
+    -> std::enable_if_t< (sizeof...( k ) == n) >
     {
-      x = y( j[ k ]..., i... );
+      x = y( j[ k ] ..., i... );
     }
 
     template< std::size_t... k, class X, class Y, std::size_t n, class... I >
     inline static auto getFixedTensor ( std::index_sequence< k... >, X &x, const Y &y, std::array< ssize_t, n > j, I... i )
-      -> std::enable_if_t< (sizeof...( k ) < n) >
+    -> std::enable_if_t< (sizeof...( k ) < n) >
     {
       ssize_t &it = j[ sizeof...( k ) ];
       ssize_t end = it;
@@ -210,14 +210,14 @@ namespace Dune
 
     template< std::size_t... k, class X, class Y, std::size_t n, class... I >
     inline static auto setFixedTensor ( std::index_sequence< k... >, const X &x, Y &y, std::array< ssize_t, n > j, I... i )
-      -> std::enable_if_t< (sizeof...( k ) == n) >
+    -> std::enable_if_t< (sizeof...( k ) == n) >
     {
-      y( j[ k ]..., i... ) = x;
+      y( j[ k ] ..., i... ) = x;
     }
 
     template< std::size_t... k, class X, class Y, std::size_t n, class... I >
     inline static auto setFixedTensor ( std::index_sequence< k... >, const X &x, Y &y, std::array< ssize_t, n > j, I... i )
-      -> std::enable_if_t< (sizeof...( k ) < n) >
+    -> std::enable_if_t< (sizeof...( k ) < n) >
     {
       ssize_t &it = j[ sizeof...( k ) ];
       ssize_t end = it;
@@ -278,7 +278,7 @@ namespace Dune
 
     template< class F, class X >
     inline static auto vectorize ( F &&f, pybind11::array_t< X > xArray )
-      -> decltype( vectorize( std::forward< F >( f ), static_cast< pybind11::detail::function_signature_t< F > * >( nullptr ), std::move( xArray ) ) )
+    -> decltype( vectorize( std::forward< F >( f ), static_cast< pybind11::detail::function_signature_t< F > * >( nullptr ), std::move( xArray ) ) )
     {
       return vectorize( std::forward< F >( f ), static_cast< pybind11::detail::function_signature_t< F > * >( nullptr ), std::move( xArray ) );
     }

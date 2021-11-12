@@ -14,121 +14,121 @@
 
 namespace Dune {
 
-namespace Impl {
+  namespace Impl {
 
-  /** @addtogroup DenseMatVec
-      @{
-   */
+    /** @addtogroup DenseMatVec
+        @{
+     */
 
-  /*! \file
-   * \brief Implements a scalar vector view wrapper around an existing scalar.
-   */
+    /*! \file
+     * \brief Implements a scalar vector view wrapper around an existing scalar.
+     */
 
-  /** \brief A wrapper making a scalar look like a vector
-   *
-   * This stores a pointer to a scalar of type K and
-   * provides the interface of a vector with a single
-   * entry represented by the data behind the pointer.
-   */
-  template<class K>
-  class ScalarVectorView :
-    public DenseVector<ScalarVectorView<K>>
-  {
-    K* dataP_;
-    using Base = DenseVector<ScalarVectorView<K>>;
-
-    template <class>
-    friend class ScalarVectorView;
-  public:
-
-    //! export size
-    enum {
-      //! The size of this vector.
-      dimension = 1
-    };
-
-    /** \brief The type used for array indices and sizes */
-    using size_type = typename Base::size_type;
-
-    /** \brief The type used for references to the vector entry */
-    using reference = std::decay_t<K>&;
-
-    /** \brief The type used for const references to the vector entry */
-    using const_reference = const K&;
-
-    //===== construction
-
-    /** \brief Default constructor */
-    constexpr ScalarVectorView ()
-      : dataP_(nullptr)
-    {}
-
-    /** \brief Construct from a pointer to a scalar */
-    ScalarVectorView (K* p) :
-      dataP_(p)
-    {}
-
-    //! Copy constructor
-    ScalarVectorView (const ScalarVectorView &other) :
-      Base(),
-      dataP_(other.dataP_)
-    {}
-
-    //! Move constructor
-    ScalarVectorView (ScalarVectorView &&other) :
-      Base(),
-      dataP_( other.dataP_ )
-    {}
-
-    //! Copy assignment operator
-    ScalarVectorView& operator= (const ScalarVectorView& other)
+    /** \brief A wrapper making a scalar look like a vector
+     *
+     * This stores a pointer to a scalar of type K and
+     * provides the interface of a vector with a single
+     * entry represented by the data behind the pointer.
+     */
+    template<class K>
+    class ScalarVectorView :
+      public DenseVector<ScalarVectorView<K>>
     {
-      assert(dataP_);
-      assert(other.dataP_);
-      *dataP_ = *(other.dataP_);
-      return *this;
-    }
+      K* dataP_;
+      using Base = DenseVector<ScalarVectorView<K>>;
 
-    template<class KK>
-    ScalarVectorView& operator= (const ScalarVectorView<KK>& other)
-    {
-      assert(dataP_);
-      assert(other.dataP_);
-      *dataP_ = *(other.dataP_);
-      return *this;
-    }
+      template <class>
+      friend class ScalarVectorView;
+    public:
 
-    //! Assignment operator from a scalar
-    template<typename T,
-      std::enable_if_t<std::is_convertible<T, K>::value, int> = 0>
-    inline ScalarVectorView& operator= (const T& k)
-    {
-      *dataP_ = k;
-      return *this;
-    }
+      //! export size
+      enum {
+        //! The size of this vector.
+        dimension = 1
+      };
 
-    /** \brief Container size -- this is always 1 */
-    static constexpr size_type size ()
-    {
-      return 1;
-    }
+      /** \brief The type used for array indices and sizes */
+      using size_type = typename Base::size_type;
 
-    /** \brief Random access operator, actually disregards its argument */
-    K& operator[] ([[maybe_unused]] size_type i)
-    {
-      DUNE_ASSERT_BOUNDS(i == 0);
-      return *dataP_;
-    }
+      /** \brief The type used for references to the vector entry */
+      using reference = std::decay_t<K>&;
 
-    /** \brief Const random access operator, actually disregards its argument */
-    const K& operator[] ([[maybe_unused]] size_type i) const
-    {
-      DUNE_ASSERT_BOUNDS(i == 0);
-      return *dataP_;
-    }
-  }; // class ScalarVectorView
+      /** \brief The type used for const references to the vector entry */
+      using const_reference = const K&;
 
-} // namespace Impl
+      //===== construction
+
+      /** \brief Default constructor */
+      constexpr ScalarVectorView ()
+        : dataP_(nullptr)
+      {}
+
+      /** \brief Construct from a pointer to a scalar */
+      ScalarVectorView (K* p) :
+        dataP_(p)
+      {}
+
+      //! Copy constructor
+      ScalarVectorView (const ScalarVectorView &other) :
+        Base(),
+        dataP_(other.dataP_)
+      {}
+
+      //! Move constructor
+      ScalarVectorView (ScalarVectorView &&other) :
+        Base(),
+        dataP_( other.dataP_ )
+      {}
+
+      //! Copy assignment operator
+      ScalarVectorView& operator= (const ScalarVectorView& other)
+      {
+        assert(dataP_);
+        assert(other.dataP_);
+        *dataP_ = *(other.dataP_);
+        return *this;
+      }
+
+      template<class KK>
+      ScalarVectorView& operator= (const ScalarVectorView<KK>& other)
+      {
+        assert(dataP_);
+        assert(other.dataP_);
+        *dataP_ = *(other.dataP_);
+        return *this;
+      }
+
+      //! Assignment operator from a scalar
+      template<typename T,
+               std::enable_if_t<std::is_convertible<T, K>::value, int> = 0>
+      inline ScalarVectorView& operator= (const T& k)
+      {
+        *dataP_ = k;
+        return *this;
+      }
+
+      /** \brief Container size -- this is always 1 */
+      static constexpr size_type size ()
+      {
+        return 1;
+      }
+
+      /** \brief Random access operator, actually disregards its argument */
+      K& operator[] ([[maybe_unused]] size_type i)
+      {
+        DUNE_ASSERT_BOUNDS(i == 0);
+        return *dataP_;
+      }
+
+      /** \brief Const random access operator, actually disregards its argument */
+      const K& operator[] ([[maybe_unused]] size_type i) const
+      {
+        DUNE_ASSERT_BOUNDS(i == 0);
+        return *dataP_;
+      }
+    }; // class ScalarVectorView
+
+  } // namespace Impl
 
 
   template< class K>
@@ -148,62 +148,62 @@ namespace Impl {
     using type = FieldVector<std::remove_const_t<K>,1>;
   };
 
-namespace Impl {
+  namespace Impl {
 
-  /** \brief Read a ScalarVectorView from an input stream
-   *  \relates ScalarVectorView
-   *
-   *  \note This operator is STL compliant, i.e., the content of v is only
-   *        changed if the read operation is successful.
-   *
-   *  \param[in]  in  std :: istream to read from
-   *  \param[out] v   ScalarVectorView to be read
-   *
-   *  \returns the input stream (in)
-   */
-  template<class K>
-  inline std::istream &operator>> ( std::istream &in, ScalarVectorView<K> &v )
-  {
-    K w;
-    if(in >> w)
-      v = w;
-    return in;
-  }
+    /** \brief Read a ScalarVectorView from an input stream
+     *  \relates ScalarVectorView
+     *
+     *  \note This operator is STL compliant, i.e., the content of v is only
+     *        changed if the read operation is successful.
+     *
+     *  \param[in]  in  std :: istream to read from
+     *  \param[out] v   ScalarVectorView to be read
+     *
+     *  \returns the input stream (in)
+     */
+    template<class K>
+    inline std::istream &operator>> ( std::istream &in, ScalarVectorView<K> &v )
+    {
+      K w;
+      if(in >> w)
+        v = w;
+      return in;
+    }
 
 
-  /** \brief Wrap a scalar as a 1-vector */
-  template<class T,
-    std::enable_if_t<IsNumber<T>::value, int> = 0>
-  auto asVector(T& t)
-  {
-    return ScalarVectorView<T>{&t};
-  }
+    /** \brief Wrap a scalar as a 1-vector */
+    template<class T,
+             std::enable_if_t<IsNumber<T>::value, int> = 0>
+    auto asVector(T& t)
+    {
+      return ScalarVectorView<T>{&t};
+    }
 
-  /** \brief Wrap a const scalar as a const 1-vector */
-  template<class T,
-    std::enable_if_t<IsNumber<T>::value, int> = 0>
-  auto asVector(const T& t)
-  {
-    return ScalarVectorView<const T>{&t};
-  }
+    /** \brief Wrap a const scalar as a const 1-vector */
+    template<class T,
+             std::enable_if_t<IsNumber<T>::value, int> = 0>
+    auto asVector(const T& t)
+    {
+      return ScalarVectorView<const T>{&t};
+    }
 
-  /** \brief Non-scalar types are assumed to be arrays, and simply forwarded */
-  template<class T,
-    std::enable_if_t<not IsNumber<T>::value, int> = 0>
-  T& asVector(T& t)
-  {
-    return t;
-  }
+    /** \brief Non-scalar types are assumed to be arrays, and simply forwarded */
+    template<class T,
+             std::enable_if_t<not IsNumber<T>::value, int> = 0>
+    T& asVector(T& t)
+    {
+      return t;
+    }
 
-  /** \brief Non-scalar types are assumed to be arrays, and simply forwarded */
-  template<class T,
-    std::enable_if_t<not IsNumber<T>::value, int> = 0>
-  const T& asVector(const T& t)
-  {
-    return t;
-  }
+    /** \brief Non-scalar types are assumed to be arrays, and simply forwarded */
+    template<class T,
+             std::enable_if_t<not IsNumber<T>::value, int> = 0>
+    const T& asVector(const T& t)
+    {
+      return t;
+    }
 
-} // end namespace Impl
+  } // end namespace Impl
 
 } // end namespace Dune
 

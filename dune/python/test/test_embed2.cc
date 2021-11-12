@@ -24,14 +24,14 @@ int main()
     // now execute Python code
     auto local = pybind11::dict();
     local["call_test"] = pybind11::cpp_function([&]() -> auto
-        { return Dune::FieldVector<double,2>{4,2}; });
+                                                { return Dune::FieldVector<double,2>{4,2}; });
     auto result = pybind11::eval<pybind11::eval_statements>(
-           "print('Hello World!');\n"
-           "x = call_test();\n"
-           "norm2_x = x.two_norm2;\n"
-           "print(x);",
-       global, local
-    );
+      "print('Hello World!');\n"
+      "x = call_test();\n"
+      "norm2_x = x.two_norm2;\n"
+      "print(x);",
+      global, local
+      );
     auto x = local["x"].cast<Dune::FieldVector<double,2>>();
     if( !result.is( pybind11::none() ) || (x != Dune::FieldVector<double,2>{4,2}) )
       std::cout << "Test 1 failed" << std::endl;

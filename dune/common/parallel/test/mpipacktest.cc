@@ -19,12 +19,12 @@ int main(int argc, char** argv){
   auto comm = helper.getCommunication();
   Dune::MPIPack pack(comm);
 
-  if(helper.rank() == 0){
+  if(helper.rank() == 0) {
     pack << 3 << helper.rank();
     pack << std::vector<int>{4711, 42};
     comm.send(pack, 1, TAG);
   }
-  if(helper.rank() == 1){
+  if(helper.rank() == 1) {
     Dune::MPIPack pack = comm.rrecv(Dune::MPIPack(comm), 0, TAG);
     int drei; pack >> drei;
     int rank_0; pack >> rank_0;

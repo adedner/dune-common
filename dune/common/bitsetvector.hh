@@ -327,10 +327,10 @@ namespace Dune {
 
     static bool xor_helper(bool a, bool b)
 #if defined(__GNUC__) && ! defined(__clang__) && __GNUC__ == 6 && __GNUC_MINOR__ == 3 && __cplusplus \
-  == 201402L
-      __attribute__((noinline))
+    == 201402L
+    __attribute__((noinline))
 #endif
-      ;
+    ;
 
   public:
 

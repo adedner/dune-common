@@ -146,12 +146,12 @@ void testmodify(P parameterSet)
 }
 
 void testOptionsParserResults(std::vector<std::string> args,
-  const std::vector<std::string> & keywords,
-  unsigned int required,
-  bool allow_more,
-  bool overwrite,
-  std::string foo, std::string bar,
-  const std::string referr = "")
+                              const std::vector<std::string> & keywords,
+                              unsigned int required,
+                              bool allow_more,
+                              bool overwrite,
+                              std::string foo, std::string bar,
+                              const std::string referr = "")
 {
   Dune::ParameterTree pt;
   try {
@@ -170,10 +170,10 @@ void testOptionsParserResults(std::vector<std::string> args,
   }
   if (foo != "" && foo != pt.get<std::string>("foo"))
     DUNE_THROW(Dune::Exception, "Options parser failed... foo = "
-      << pt.get<std::string>("foo") << " != " << foo);
+               << pt.get<std::string>("foo") << " != " << foo);
   if (bar != "" && bar != pt.get<std::string>("bar"))
     DUNE_THROW(Dune::Exception, "Options parser failed... bar = "
-      << pt.get<std::string>("bar") << " != " << bar);
+               << pt.get<std::string>("bar") << " != " << bar);
 }
 
 void testOptionsParser()
@@ -183,49 +183,49 @@ void testOptionsParser()
   {
     std::vector<std::string> args = { "progname", "--bar=ligapokal", "peng", "--bar=ligapokal", "--argh=other"};
     testOptionsParserResults(args,keywords,keywords.size(),true,true,"peng","ligapokal",
-      "" /* no error */ );
+                             "" /* no error */ );
   }
   // bail out on overwrite
   {
     std::vector<std::string> args = { "progname", "--bar=ligapokal", "peng", "--bar=ligapokal", "--argh=other"};
     testOptionsParserResults(args,keywords,keywords.size(),true,false,"peng","ligapokal",
-      "parameter bar already specified");
+                             "parameter bar already specified");
   }
   // bail out on unknown options
   {
     std::vector<std::string> args = { "progname", "--bar=ligapokal", "peng", "--bar=ligapokal", "--argh=other"};
     testOptionsParserResults(args,keywords,keywords.size(),false,true,"peng","ligapokal",
-      "unknown parameter argh");
+                             "unknown parameter argh");
   }
   // bail out on missing parameter
   {
     std::vector<std::string> args = { "progname", "--bar=ligapokal"};
     testOptionsParserResults(args,keywords,keywords.size(),true,true,"","ligapokal",
-      "missing parameter(s) ...  foo");
+                             "missing parameter(s) ...  foo");
   }
   // check optional parameter
   {
     std::vector<std::string> args = { "progname", "--foo=peng"};
     testOptionsParserResults(args,keywords,1,true,true,"peng","",
-      "" /* no error */);
+                             "" /* no error */);
   }
   // check optional parameter, but bail out on missing parameter
   {
     std::vector<std::string> args = { "progname", "--bar=ligapokal"};
     testOptionsParserResults(args,keywords,1,true,true,"","ligapokal",
-      "missing parameter(s) ...  foo");
+                             "missing parameter(s) ...  foo");
   }
   // bail out on too many parameters
   {
     std::vector<std::string> args = { "progname", "peng", "ligapokal", "hurz"};
     testOptionsParserResults(args,keywords,keywords.size(),true,true,"peng","ligapokal",
-      "superfluous unnamed parameter");
+                             "superfluous unnamed parameter");
   }
   // bail out on missing value
   {
     std::vector<std::string> args = { "progname", "--foo=peng", "--bar=ligapokal", "--hurz"};
     testOptionsParserResults(args,keywords,keywords.size(),true,true,"peng","ligapokal",
-      "value missing for parameter --hurz");
+                             "value missing for parameter --hurz");
   }
 }
 
@@ -259,7 +259,7 @@ void testFS1523()
 }
 
 void check_recursiveTreeCompare(const Dune::ParameterTree & p1,
-  const Dune::ParameterTree & p2)
+                                const Dune::ParameterTree & p2)
 {
   check_assert(p1.getValueKeys() == p2.getValueKeys());
   check_assert(p1.getSubKeys() == p2.getSubKeys());

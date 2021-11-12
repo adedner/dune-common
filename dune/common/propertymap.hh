@@ -99,8 +99,8 @@ namespace Dune
    * @brief Adapter to turn a random access iterator into a property map.
    */
   template<class RAI, class IM,
-      class T = typename std::iterator_traits<RAI>::value_type,
-      class R = typename std::iterator_traits<RAI>::reference>
+           class T = typename std::iterator_traits<RAI>::value_type,
+           class R = typename std::iterator_traits<RAI>::reference>
   class IteratorPropertyMap
     : public RAPropertyMapHelper<R,IteratorPropertyMap<RAI,IM,T,R> >
   {
@@ -174,7 +174,7 @@ namespace Dune
   template<typename T>
   class AssociativePropertyMap
     : RAPropertyMapHelper<typename T::value_type::second_type&,
-          AssociativePropertyMap<T> >
+                          AssociativePropertyMap<T> >
   {
     /**
      * @brief The type of the unique associative container.
@@ -185,13 +185,13 @@ namespace Dune
      * @brief The key type of the property map.
      */
     typedef typename UniqueAssociativeContainer::value_type::first_type
-    KeyType;
+      KeyType;
 
     /**
      * @brief The value type of the property map.
      */
     typedef typename UniqueAssociativeContainer::value_type::second_type
-    ValueType;
+      ValueType;
 
     /**
      * @brief The reference type of the property map.
@@ -232,7 +232,7 @@ namespace Dune
   template<typename T>
   class ConstAssociativePropertyMap
     : RAPropertyMapHelper<const typename T::value_type::second_type&,
-          ConstAssociativePropertyMap<T> >
+                          ConstAssociativePropertyMap<T> >
   {
     /**
      * @brief The type of the unique associative container.
@@ -243,13 +243,13 @@ namespace Dune
      * @brief The key type of the property map.
      */
     typedef typename UniqueAssociativeContainer::value_type::first_type
-    KeyType;
+      KeyType;
 
     /**
      * @brief The value type of the property map.
      */
     typedef typename UniqueAssociativeContainer::value_type::second_type
-    ValueType;
+      ValueType;
 
     /**
      * @brief The reference type of the property map.

@@ -17,13 +17,13 @@ int main(int argc, char** argv){
 
   if(mpihelper.rank() == 0)
     std::cout << "Test 1: static data (int)" << std::endl;
-  if(mpihelper.rank() == 0){
+  if(mpihelper.rank() == 0) {
     cc.send<int>(42, 1, 0);
     int i = 42;
     const int& j = i;
     cc.send(j, 1, 0);
   }
-  else if(mpihelper.rank() == 1){
+  else if(mpihelper.rank() == 1) {
     std::cout << "receive: " << cc.recv<int>(0, 0, 0) << std::endl;
     int i = 0;
     cc.recv(i, 0, 0);
@@ -32,14 +32,14 @@ int main(int argc, char** argv){
 
   if(mpihelper.rank() == 0)
     std::cout << "Test 2: dynamic data (std::vector<double>)" << std::endl;
-  if(mpihelper.rank() == 0){
+  if(mpihelper.rank() == 0) {
     cc.send(std::vector<double>{ 42.0, 43.0, 4711}, 1, 0);
     std::vector<double> vec{ 42.0, 43.0, 4711};
     const std::vector<double>& vec_ref = vec;
     cc.send(vec_ref, 1, 0);
     cc.send(std::move(vec), 1, 0);
   }
-  else if(mpihelper.rank() == 1){
+  else if(mpihelper.rank() == 1) {
     auto vec = cc.recv(std::vector<double>{0,0,0}, 0, 0);
     std::cout << "receive: ";
     for(double d : vec)
@@ -63,14 +63,14 @@ int main(int argc, char** argv){
 
   if(mpihelper.rank() == 0)
     std::cout << "Test 3: DynamicVector" << std::endl;
-  if(mpihelper.rank() == 0){
+  if(mpihelper.rank() == 0) {
     cc.send(DynamicVector<double>{ 42.0, 43.0, 4711}, 1, 0);
     DynamicVector<double> vec{ 42.0, 43.0, 4711};
     const DynamicVector<double>& vec_ref = vec;
     cc.send(vec_ref, 1, 0);
     cc.send(std::move(vec), 1, 0);
   }
-  else if(mpihelper.rank() == 1){
+  else if(mpihelper.rank() == 1) {
     auto vec = cc.recv(DynamicVector<double>{0,0,0}, 0, 0);
     std::cout << "receive: ";
     for(double d : vec)
@@ -95,14 +95,14 @@ int main(int argc, char** argv){
 
   if(mpihelper.rank() == 0)
     std::cout << "Test 3: DynamicVector (resize receive)" << std::endl;
-  if(mpihelper.rank() == 0){
+  if(mpihelper.rank() == 0) {
     cc.send(DynamicVector<double>{ 42.0, 43.0, 4711}, 1, 0);
     DynamicVector<double> vec{ 42.0, 43.0, 4711};
     const DynamicVector<double>& vec_ref = vec;
     cc.send(vec_ref, 1, 0);
     cc.send(std::move(vec), 1, 0);
   }
-  else if(mpihelper.rank() == 1){
+  else if(mpihelper.rank() == 1) {
     auto vec = cc.rrecv(DynamicVector<double>{}, 0, 0);
     std::cout << "receive: ";
     for(double d : vec)

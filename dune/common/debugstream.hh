@@ -184,9 +184,9 @@ namespace Dune {
      \todo Fix visibility of internal data
    */
   template <DebugLevel thislevel = 1,
-      DebugLevel dlevel = 1,
-      DebugLevel alevel = 1,
-      template<DebugLevel, DebugLevel> class activator = greater_or_equal>
+            DebugLevel dlevel = 1,
+            DebugLevel alevel = 1,
+            template<DebugLevel, DebugLevel> class activator = greater_or_equal>
   class DebugStream : public DebugStreamState {
   public:
     /*! \brief Create a DebugStream and set initial output stream

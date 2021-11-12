@@ -16,12 +16,12 @@
 
 struct Foo {
 
-    template< class ...Args, Dune::disableCopyMove< Foo, Args ... > = 0 >
-    Foo( Args&& ... )
-    {}
+  template< class... Args, Dune::disableCopyMove< Foo, Args ... > = 0 >
+  Foo( Args&& ... )
+  {}
 
-    Foo( const Foo& ) = delete;
-    Foo( Foo&& ) = delete;
+  Foo( const Foo& ) = delete;
+  Foo( Foo&& ) = delete;
 };
 
 static_assert( std::is_default_constructible< Foo >::value, "Foo is not default constructible." );

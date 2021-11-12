@@ -16,42 +16,42 @@
 
 
 namespace Dune {
-namespace Hybrid {
+  namespace Hybrid {
 
-namespace Impl {
+    namespace Impl {
 
-  // Try if tuple_size is implemented for class
-  template<class T, int i>
-  constexpr auto size(const Dune::FieldVector<T, i>&, const PriorityTag<5>&)
-    -> decltype(std::integral_constant<std::size_t,i>())
-  {
-    return {};
-  }
+      // Try if tuple_size is implemented for class
+      template<class T, int i>
+      constexpr auto size(const Dune::FieldVector<T, i>&, const PriorityTag<5>&)
+      -> decltype(std::integral_constant<std::size_t,i>())
+      {
+        return {};
+      }
 
-  // Try if tuple_size is implemented for class
-  template<class T>
-  constexpr auto size(const T&, const PriorityTag<3>&)
-    -> decltype(std::integral_constant<std::size_t,std::tuple_size<T>::value>())
-  {
-    return {};
-  }
+      // Try if tuple_size is implemented for class
+      template<class T>
+      constexpr auto size(const T&, const PriorityTag<3>&)
+      -> decltype(std::integral_constant<std::size_t,std::tuple_size<T>::value>())
+      {
+        return {};
+      }
 
-  // Try if there's a static constexpr size()
-  template<class T>
-  constexpr auto size(const T&, const PriorityTag<1>&)
-    -> decltype(std::integral_constant<std::size_t,T::size()>())
-  {
-    return {};
-  }
+      // Try if there's a static constexpr size()
+      template<class T>
+      constexpr auto size(const T&, const PriorityTag<1>&)
+      -> decltype(std::integral_constant<std::size_t,T::size()>())
+      {
+        return {};
+      }
 
-  // As a last resort try if there's a static constexpr size()
-  template<class T>
-  constexpr auto size(const T& t, const PriorityTag<0>&)
-  {
-    return t.size();
-  }
+      // As a last resort try if there's a static constexpr size()
+      template<class T>
+      constexpr auto size(const T& t, const PriorityTag<0>&)
+      {
+        return t.size();
+      }
 
-} // namespace Impl
+    } // namespace Impl
 
 
 
@@ -76,36 +76,36 @@ namespace Impl {
  * * all typed that have a static method ::size()
  * * instances of Dune::FieldVector
  */
-template<class T>
-constexpr auto size(const T& t)
-{
-  return Impl::size(t, PriorityTag<42>());
-}
+    template<class T>
+    constexpr auto size(const T& t)
+    {
+      return Impl::size(t, PriorityTag<42>());
+    }
 
 
 
-namespace Impl {
+    namespace Impl {
 
-  template<class Container, class Index,
-    std::enable_if_t<IsTuple<std::decay_t<Container>>::value, int> = 0>
-  constexpr decltype(auto) elementAt(Container&& c, Index&&, PriorityTag<2>)
-  {
-    return std::get<std::decay_t<Index>::value>(c);
-  }
+      template<class Container, class Index,
+               std::enable_if_t<IsTuple<std::decay_t<Container>>::value, int> = 0>
+      constexpr decltype(auto) elementAt(Container&& c, Index&&, PriorityTag<2>)
+      {
+        return std::get<std::decay_t<Index>::value>(c);
+      }
 
-  template<class T, T... t, class Index>
-  constexpr decltype(auto) elementAt(std::integer_sequence<T, t...> c, Index, PriorityTag<1>)
-  {
-    return Dune::integerSequenceEntry(c, std::integral_constant<std::size_t, Index::value>());
-  }
+      template<class T, T... t, class Index>
+      constexpr decltype(auto) elementAt(std::integer_sequence<T, t...> c, Index, PriorityTag<1>)
+      {
+        return Dune::integerSequenceEntry(c, std::integral_constant<std::size_t, Index::value>());
+      }
 
-  template<class Container, class Index>
-  constexpr decltype(auto) elementAt(Container&& c, Index&& i, PriorityTag<0>)
-  {
-    return c[i];
-  }
+      template<class Container, class Index>
+      constexpr decltype(auto) elementAt(Container&& c, Index&& i, PriorityTag<0>)
+      {
+        return c[i];
+      }
 
-} // namespace Impl
+    } // namespace Impl
 
 
 
@@ -129,35 +129,35 @@ namespace Impl {
  * * std::tuple<...>
  * * std::integer_sequence
  */
-template<class Container, class Index>
-constexpr decltype(auto) elementAt(Container&& c, Index&& i)
-{
-  return Impl::elementAt(std::forward<Container>(c), std::forward<Index>(i), PriorityTag<42>());
-}
+    template<class Container, class Index>
+    constexpr decltype(auto) elementAt(Container&& c, Index&& i)
+    {
+      return Impl::elementAt(std::forward<Container>(c), std::forward<Index>(i), PriorityTag<42>());
+    }
 
 
 
-namespace Impl {
+    namespace Impl {
 
-  template<class Begin, class End,
-    std::enable_if_t<IsIntegralConstant<Begin>::value and IsIntegralConstant<End>::value, int> = 0>
-  constexpr auto integralRange(const Begin& /*begin*/, const End& /*end*/, const PriorityTag<1>&)
-  {
-    static_assert(Begin::value <= End::value, "You cannot create an integralRange where end<begin");
-    return Dune::StaticIntegralRange<std::size_t, End::value, Begin::value>();
-  }
+      template<class Begin, class End,
+               std::enable_if_t<IsIntegralConstant<Begin>::value and IsIntegralConstant<End>::value, int> = 0>
+      constexpr auto integralRange(const Begin& /*begin*/, const End& /*end*/, const PriorityTag<1>&)
+      {
+        static_assert(Begin::value <= End::value, "You cannot create an integralRange where end<begin");
+        return Dune::StaticIntegralRange<std::size_t, End::value, Begin::value>();
+      }
 
-  // This should be constexpr but gcc-4.9 does not support
-  // the relaxed constexpr requirements. Hence for being
-  // constexpr the function body can only contain a return
-  // statement and no assertion before this.
-  template<class Begin, class End>
-  constexpr auto integralRange(const Begin& begin, const End& end, const PriorityTag<0>&)
-  {
-    return DUNE_ASSERT_AND_RETURN(begin<=end, Dune::IntegralRange<End>(begin, end));
-  }
+      // This should be constexpr but gcc-4.9 does not support
+      // the relaxed constexpr requirements. Hence for being
+      // constexpr the function body can only contain a return
+      // statement and no assertion before this.
+      template<class Begin, class End>
+      constexpr auto integralRange(const Begin& begin, const End& end, const PriorityTag<0>&)
+      {
+        return DUNE_ASSERT_AND_RETURN(begin<=end, Dune::IntegralRange<End>(begin, end));
+      }
 
-} // namespace Impl
+    } // namespace Impl
 
 
 
@@ -178,11 +178,11 @@ namespace Impl {
  * std::integral_constant, the returned range
  * encodes begin and end statically.
  */
-template<class Begin, class End>
-constexpr auto integralRange(const Begin& begin, const End& end)
-{
-  return Impl::integralRange(begin, end, PriorityTag<42>());
-}
+    template<class Begin, class End>
+    constexpr auto integralRange(const Begin& begin, const End& end)
+    {
+      return Impl::integralRange(begin, end, PriorityTag<42>());
+    }
 
 /**
  * \brief Create an integral range starting from 0
@@ -197,50 +197,50 @@ constexpr auto integralRange(const Begin& begin, const End& end)
  *
  * This is a short cut for integralRange(_0, end).
  */
-template<class End>
-constexpr auto integralRange(const End& end)
-{
-  return Impl::integralRange(Dune::Indices::_0, end, PriorityTag<42>());
-}
+    template<class End>
+    constexpr auto integralRange(const End& end)
+    {
+      return Impl::integralRange(Dune::Indices::_0, end, PriorityTag<42>());
+    }
 
 
 
-namespace Impl {
+    namespace Impl {
 
-  template<class T>
-  constexpr void evaluateFoldExpression(std::initializer_list<T>&&)
-  {}
+      template<class T>
+      constexpr void evaluateFoldExpression(std::initializer_list<T>&&)
+      {}
 
-  template<class Range, class F, class Index, Index... i>
-  constexpr void forEachIndex(Range&& range, F&& f, std::integer_sequence<Index, i...>)
-  {
-    evaluateFoldExpression<int>({(f(Hybrid::elementAt(range, std::integral_constant<Index,i>())), 0)...});
-  }
+      template<class Range, class F, class Index, Index... i>
+      constexpr void forEachIndex(Range&& range, F&& f, std::integer_sequence<Index, i...>)
+      {
+        evaluateFoldExpression<int>({(f(Hybrid::elementAt(range, std::integral_constant<Index,i>())), 0)...});
+      }
 
-  template<class F, class Index, Index... i>
-  constexpr void forEach(std::integer_sequence<Index, i...> /*range*/, F&& f, PriorityTag<2>)
-  {
-    evaluateFoldExpression<int>({(f(std::integral_constant<Index,i>()), 0)...});
-  }
+      template<class F, class Index, Index... i>
+      constexpr void forEach(std::integer_sequence<Index, i...> /*range*/, F&& f, PriorityTag<2>)
+      {
+        evaluateFoldExpression<int>({(f(std::integral_constant<Index,i>()), 0)...});
+      }
 
 
-  template<class Range, class F,
-    std::enable_if_t<IsIntegralConstant<decltype(Hybrid::size(std::declval<Range>()))>::value, int> = 0>
-  constexpr void forEach(Range&& range, F&& f, PriorityTag<1>)
-  {
-    auto size = Hybrid::size(range);
-    auto indices = std::make_index_sequence<size>();
-    (forEachIndex)(std::forward<Range>(range), std::forward<F>(f), indices);
-  }
+      template<class Range, class F,
+               std::enable_if_t<IsIntegralConstant<decltype(Hybrid::size(std::declval<Range>()))>::value, int> = 0>
+      constexpr void forEach(Range&& range, F&& f, PriorityTag<1>)
+      {
+        auto size = Hybrid::size(range);
+        auto indices = std::make_index_sequence<size>();
+        (forEachIndex)(std::forward<Range>(range), std::forward<F>(f), indices);
+      }
 
-  template<class Range, class F>
-  constexpr void forEach(Range&& range, F&& f, PriorityTag<0>)
-  {
-      for(auto&& e : range)
-        f(e);
-  }
+      template<class Range, class F>
+      constexpr void forEach(Range&& range, F&& f, PriorityTag<0>)
+      {
+        for(auto&& e : range)
+          f(e);
+      }
 
-} // namespace Impl
+    } // namespace Impl
 
 
 
@@ -262,11 +262,11 @@ namespace Impl {
  * This especially included instances of std::integer_sequence,
  * std::tuple, Dune::TupleVector, and Dune::MultiTypeBlockVector.
  */
-template<class Range, class F>
-constexpr void forEach(Range&& range, F&& f)
-{
-  Impl::forEach(std::forward<Range>(range), std::forward<F>(f), PriorityTag<42>());
-}
+    template<class Range, class F>
+    constexpr void forEach(Range&& range, F&& f)
+    {
+      Impl::forEach(std::forward<Range>(range), std::forward<F>(f), PriorityTag<42>());
+    }
 
 
 
@@ -285,48 +285,48 @@ constexpr void forEach(Range&& range, F&& f)
  *
  * This supports looping over the same ranges as Hybrid::forEach
  */
-template<class Range, class T, class F>
-constexpr T accumulate(Range&& range, T value, F&& f)
-{
-  forEach(std::forward<Range>(range), [&](auto&& entry) {
-    value = f(value, entry);
-  });
-  return value;
-}
-
-
-
-namespace Impl {
-
-  struct Id {
-    template<class T>
-    constexpr T operator()(T&& x) const {
-      return std::forward<T>(x);
+    template<class Range, class T, class F>
+    constexpr T accumulate(Range&& range, T value, F&& f)
+    {
+      forEach(std::forward<Range>(range), [&](auto&& entry) {
+        value = f(value, entry);
+      });
+      return value;
     }
-  };
 
-  template<class IfFunc, class ElseFunc>
-  constexpr decltype(auto) ifElse(std::true_type, IfFunc&& ifFunc, ElseFunc&& /*elseFunc*/)
-  {
-    return ifFunc(Id{});
-  }
 
-  template<class IfFunc, class ElseFunc>
-  constexpr decltype(auto) ifElse(std::false_type, IfFunc&& /*ifFunc*/, ElseFunc&& elseFunc)
-  {
-    return elseFunc(Id{});
-  }
 
-  template<class IfFunc, class ElseFunc>
-  decltype(auto) ifElse(const bool& condition, IfFunc&& ifFunc, ElseFunc&& elseFunc)
-  {
-    if (condition)
-      return ifFunc(Id{});
-    else
-      return elseFunc(Id{});
-  }
+    namespace Impl {
 
-} // namespace Impl
+      struct Id {
+        template<class T>
+        constexpr T operator()(T&& x) const {
+          return std::forward<T>(x);
+        }
+      };
+
+      template<class IfFunc, class ElseFunc>
+      constexpr decltype(auto) ifElse(std::true_type, IfFunc&& ifFunc, ElseFunc&& /*elseFunc*/)
+      {
+        return ifFunc(Id{});
+      }
+
+      template<class IfFunc, class ElseFunc>
+      constexpr decltype(auto) ifElse(std::false_type, IfFunc&& /*ifFunc*/, ElseFunc&& elseFunc)
+      {
+        return elseFunc(Id{});
+      }
+
+      template<class IfFunc, class ElseFunc>
+      decltype(auto) ifElse(const bool& condition, IfFunc&& ifFunc, ElseFunc&& elseFunc)
+      {
+        if (condition)
+          return ifFunc(Id{});
+        else
+          return elseFunc(Id{});
+      }
+
+    } // namespace Impl
 
 
 
@@ -350,11 +350,11 @@ namespace Impl {
  * std::integral_constant<bool,*> this allows to emulate
  * a static if statement.
  */
-template<class Condition, class IfFunc, class ElseFunc>
-decltype(auto) ifElse(const Condition& condition, IfFunc&& ifFunc, ElseFunc&& elseFunc)
-{
-  return Impl::ifElse(condition, std::forward<IfFunc>(ifFunc), std::forward<ElseFunc>(elseFunc));
-}
+    template<class Condition, class IfFunc, class ElseFunc>
+    decltype(auto) ifElse(const Condition& condition, IfFunc&& ifFunc, ElseFunc&& elseFunc)
+    {
+      return Impl::ifElse(condition, std::forward<IfFunc>(ifFunc), std::forward<ElseFunc>(elseFunc));
+    }
 
 /**
  * \brief A conditional expression
@@ -363,27 +363,27 @@ decltype(auto) ifElse(const Condition& condition, IfFunc&& ifFunc, ElseFunc&& el
  *
  * This provides an ifElse conditional with empty else clause.
  */
-template<class Condition, class IfFunc>
-void ifElse(const Condition& condition, IfFunc&& ifFunc)
-{
-  ifElse(condition, std::forward<IfFunc>(ifFunc), [](auto&&) {});
-}
+    template<class Condition, class IfFunc>
+    void ifElse(const Condition& condition, IfFunc&& ifFunc)
+    {
+      ifElse(condition, std::forward<IfFunc>(ifFunc), [](auto&&) {});
+    }
 
 
 
-namespace Impl {
+    namespace Impl {
 
-  template<class T1, class T2>
-  constexpr auto equals(const T1& /*t1*/, const T2& /*t2*/, PriorityTag<1>) -> decltype(T1::value, T2::value, std::integral_constant<bool,T1::value == T2::value>())
-  { return {}; }
+      template<class T1, class T2>
+      constexpr auto equals(const T1& /*t1*/, const T2& /*t2*/, PriorityTag<1>) -> decltype(T1::value, T2::value, std::integral_constant<bool,T1::value == T2::value>())
+      { return {}; }
 
-  template<class T1, class T2>
-  constexpr auto equals(const T1& t1, const T2& t2, PriorityTag<0>)
-  {
-    return t1==t2;
-  }
+      template<class T1, class T2>
+      constexpr auto equals(const T1& t1, const T2& t2, PriorityTag<0>)
+      {
+        return t1==t2;
+      }
 
-} // namespace Impl
+    } // namespace Impl
 
 
 
@@ -396,35 +396,35 @@ namespace Impl {
  * these is returned as std::integral_constant<bool, *>. Otherwise
  * the result of a runtime comparison of t1 and t2 is directly returned.
  */
-template<class T1, class T2>
-constexpr auto equals(T1&& t1,  T2&& t2)
-{
-  return Impl::equals(std::forward<T1>(t1), std::forward<T2>(t2), PriorityTag<1>());
-}
+    template<class T1, class T2>
+    constexpr auto equals(T1&& t1,  T2&& t2)
+    {
+      return Impl::equals(std::forward<T1>(t1), std::forward<T2>(t2), PriorityTag<1>());
+    }
 
 
 
-namespace Impl {
+    namespace Impl {
 
-  template<class Result, class T, class Value, class Branches, class ElseBranch>
-  constexpr Result switchCases(std::integer_sequence<T>, const Value& /*value*/, Branches&& /*branches*/, ElseBranch&& elseBranch)
-  {
-    return elseBranch();
-  }
+      template<class Result, class T, class Value, class Branches, class ElseBranch>
+      constexpr Result switchCases(std::integer_sequence<T>, const Value& /*value*/, Branches&& /*branches*/, ElseBranch&& elseBranch)
+      {
+        return elseBranch();
+      }
 
-  template<class Result, class T, T t0, T... tt, class Value, class Branches, class ElseBranch>
-  constexpr Result switchCases(std::integer_sequence<T, t0, tt...>, const Value& value, Branches&& branches, ElseBranch&& elseBranch)
-  {
-    return ifElse(
-        Hybrid::equals(std::integral_constant<T, t0>(), value),
-      [&](auto id) -> decltype(auto) {
-        return id(branches)(std::integral_constant<T, t0>());
-      }, [&](auto id) -> decltype(auto) {
-        return Impl::switchCases<Result>(id(std::integer_sequence<T, tt...>()), value, branches, elseBranch);
-    });
-  }
+      template<class Result, class T, T t0, T... tt, class Value, class Branches, class ElseBranch>
+      constexpr Result switchCases(std::integer_sequence<T, t0, tt...>, const Value& value, Branches&& branches, ElseBranch&& elseBranch)
+      {
+        return ifElse(
+          Hybrid::equals(std::integral_constant<T, t0>(), value),
+          [&](auto id) -> decltype(auto) {
+          return id(branches)(std::integral_constant<T, t0>());
+        }, [&](auto id) -> decltype(auto) {
+          return Impl::switchCases<Result>(id(std::integer_sequence<T, tt...>()), value, branches, elseBranch);
+        });
+      }
 
-} // namespace Impl
+    } // namespace Impl
 
 
 
@@ -455,11 +455,11 @@ namespace Impl {
  *
  * The return value will be deduced from the else branch.
  */
-template<class Cases, class Value, class Branches, class ElseBranch>
-constexpr decltype(auto) switchCases(const Cases& cases, const Value& value, Branches&& branches, ElseBranch&& elseBranch)
-{
-  return Impl::switchCases<decltype(elseBranch())>(cases, value, std::forward<Branches>(branches), std::forward<ElseBranch>(elseBranch));
-}
+    template<class Cases, class Value, class Branches, class ElseBranch>
+    constexpr decltype(auto) switchCases(const Cases& cases, const Value& value, Branches&& branches, ElseBranch&& elseBranch)
+    {
+      return Impl::switchCases<decltype(elseBranch())>(cases, value, std::forward<Branches>(branches), std::forward<ElseBranch>(elseBranch));
+    }
 
 /**
  * \brief Switch statement
@@ -481,14 +481,14 @@ constexpr decltype(auto) switchCases(const Cases& cases, const Value& value, Bra
  * If non of the entries matches, then elseBranch is executed
  * without any argument.
  */
-template<class Cases, class Value, class Branches>
-constexpr void switchCases(const Cases& cases, const Value& value, Branches&& branches)
-{
-  Impl::switchCases<void>(cases, value, std::forward<Branches>(branches), []() {});
-}
+    template<class Cases, class Value, class Branches>
+    constexpr void switchCases(const Cases& cases, const Value& value, Branches&& branches)
+    {
+      Impl::switchCases<void>(cases, value, std::forward<Branches>(branches), []() {});
+    }
 
 
-} // namespace Hybrid
+  } // namespace Hybrid
 } // namespace Dune
 
 

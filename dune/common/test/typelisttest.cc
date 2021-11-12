@@ -25,8 +25,8 @@ struct IsTypeListByOverload : std::false_type {};
 
 template<class T>
 struct IsTypeListByOverload
-  <T, std::void_t<decltype(isTypeListByOverload(std::declval<const T*>()))> >
-: std::true_type {};
+<T, std::void_t<decltype(isTypeListByOverload(std::declval<const T*>()))> >
+  : std::true_type {};
 
 template<class T>
 struct IsTypeListBySpecialization : std::false_type {};

@@ -82,7 +82,7 @@ namespace Dune {
       \brief stream for very verbose output.
 
       \code
-     #include <dune/common/stdstreams.hh>
+   #include <dune/common/stdstreams.hh>
       \endcode
 
       Information on the lowest
@@ -108,7 +108,7 @@ namespace Dune {
      @brief Singleton of verbose debug stream.
 
      \code
-     #include <dune/common/stdstreams.hh>
+   #include <dune/common/stdstreams.hh>
      \endcode
    */
   extern DVerbType dverb;
@@ -129,7 +129,7 @@ namespace Dune {
       @brief Stream for informative output.
 
       \code
-     #include <dune/common/stdstreams.hh>
+   #include <dune/common/stdstreams.hh>
       \endcode
 
       Summary infos on what a module
@@ -153,7 +153,7 @@ namespace Dune {
      @brief Stream for warnings indicating problems.
 
      \code
-     #include <dune/common/stdstreams.hh>
+   #include <dune/common/stdstreams.hh>
      \endcode
    */
   extern DWarnType dwarn;
@@ -171,7 +171,7 @@ namespace Dune {
      @brief Stream for warnings indicating fatal errors.
 
      \code
-     #include <dune/common/stdstreams.hh>
+   #include <dune/common/stdstreams.hh>
      \endcode
    */
   extern DGraveType dgrave;
@@ -183,7 +183,7 @@ namespace Dune {
      @brief Stream for error messages.
 
      \code
-     #include <dune/common/stdstreams.hh>
+   #include <dune/common/stdstreams.hh>
      \endcode
 
      Only packages integrating Dune

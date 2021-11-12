@@ -145,7 +145,7 @@ namespace Dune {
    * are a mutable iterator.
    */
   template<class C, class T, class R=T&, class D = std::ptrdiff_t,
-      template<class,class,class,class> class IteratorFacade=RandomAccessIteratorFacade>
+           template<class,class,class,class> class IteratorFacade=RandomAccessIteratorFacade>
   class GenericIterator :
     public IteratorFacade<GenericIterator<C,T,R,D,IteratorFacade>,T,R,D>
   {

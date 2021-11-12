@@ -17,7 +17,7 @@ extern "C" {
 }
 
 #if HAVE_SCOTCH_METIS && !defined(SCOTCH_METIS_RETURN)
-  // NOTE: scotchmetis does not define a return type for METIS functions
+// NOTE: scotchmetis does not define a return type for METIS functions
   #define METIS_OK 1
 #endif
 
@@ -67,8 +67,8 @@ int main()
 
   idx_t objval;
   int err = METIS_PartGraphKway(&nVertices, &nCon, xadj.data(), adjncy.data(),
-      vwgt.data(), nullptr, nullptr, &nParts, nullptr,
-      ubvec.data(), nullptr, &objval, part.data());
+                                vwgt.data(), nullptr, nullptr, &nParts, nullptr,
+                                ubvec.data(), nullptr, &objval, part.data());
 
 #elif METIS_API_VERSION >= 3
 
@@ -81,11 +81,11 @@ int main()
   int edgecut;
 #if HAVE_SCOTCH_METIS && ! defined(SCOTCH_METIS_RETURN)
   METIS_PartGraphKway(&nVertices, xadj.data(), adjncy.data(), vwgt.data(),
-    nullptr, &wgtflag, &numflag, &nParts, &options, &edgecut, part.data());
+                      nullptr, &wgtflag, &numflag, &nParts, &options, &edgecut, part.data());
   int err = METIS_OK;
 #else
   int err = METIS_PartGraphKway(&nVertices, xadj.data(), adjncy.data(), vwgt.data(),
-    nullptr, &wgtflag, &numflag, &nParts, &options, &edgecut, part.data());
+                                nullptr, &wgtflag, &numflag, &nParts, &options, &edgecut, part.data());
 #endif
 
 #endif // METIS_API_VERSION
@@ -96,7 +96,7 @@ int main()
   for (std::size_t part_i = 0; part_i < part.size(); ++part_i) {
     // partition index must be in range [0,nParts)
     if (part[part_i] >= nParts)
-     return 2;
+      return 2;
 
     std::cout << part_i << " " << part[part_i] << std::endl;
   }

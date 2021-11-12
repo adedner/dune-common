@@ -76,9 +76,9 @@ namespace Dune {
         ++failedChecks_;
 
       return CollectorStream([condition, name, this](std::string reason) {
-          if (not condition)
-            this->announceCheckResult(throwPolicy_, "CHECK  ", name, reason);
-        });
+        if (not condition)
+          this->announceCheckResult(throwPolicy_, "CHECK  ", name, reason);
+      });
     }
 
     /**
@@ -97,9 +97,9 @@ namespace Dune {
         ++failedChecks_;
 
       return CollectorStream([condition, name, this](std::string reason) {
-          if (not condition)
-            this->announceCheckResult(true, "REQUIRED CHECK", name, reason);
-        });
+        if (not condition)
+          this->announceCheckResult(true, "REQUIRED CHECK", name, reason);
+      });
     }
 
     /**

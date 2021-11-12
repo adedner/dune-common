@@ -95,15 +95,15 @@ void Dune::ParameterTreeParser::readINITree(std::istream& in,
     case '#' :
       break;
     case '[' :
-      {
-        size_t pos = line.find(']');
-        if (pos != std::string::npos) {
-          prefix = rtrim(ltrim(line.substr(1, pos-1)));
-          if (prefix != "")
-            prefix += ".";
-        }
+    {
+      size_t pos = line.find(']');
+      if (pos != std::string::npos) {
+        prefix = rtrim(ltrim(line.substr(1, pos-1)));
+        if (prefix != "")
+          prefix += ".";
       }
-      break;
+    }
+    break;
     default :
       std::string::size_type comment = line.find("#");
       line = line.substr(0,comment);
@@ -163,7 +163,7 @@ void Dune::ParameterTreeParser::readOptions(int argc, char* argv [],
     {
       if(argv[i+1] == NULL)
         DUNE_THROW(RangeError, "last option on command line (" << argv[i]
-                   << ") does not have an argument");
+                                                               << ") does not have an argument");
       pt[argv[i]+1] = argv[i+1];
       ++i; // skip over option argument
     }
@@ -194,18 +194,18 @@ void Dune::ParameterTreeParser::readNamedOptions(int argc, char* argv[],
       size_t pos = opt.find('=',2);
       if (pos == std::string::npos)
         DUNE_THROW(ParameterTreeParserError,
-          "value missing for parameter " << opt << "\n" << helpstr);
+                   "value missing for parameter " << opt << "\n" << helpstr);
       std::string key = opt.substr(2,pos-2);
       std::string value = opt.substr(pos+1,opt.size()-pos-1);
       auto it = std::find(keywords.begin(), keywords.end(), key);
       // is this param in the keywords?
       if (!allow_more && it == keywords.end())
-          DUNE_THROW(ParameterTreeParserError,
-            "unknown parameter " << key << "\n" << helpstr);
+        DUNE_THROW(ParameterTreeParserError,
+                   "unknown parameter " << key << "\n" << helpstr);
       // do we overwrite an existing entry?
       if (!overwrite && pt[key] != "")
         DUNE_THROW(ParameterTreeParserError,
-          "parameter " << key << " already specified" << "\n" << helpstr);
+                   "parameter " << key << " already specified" << "\n" << helpstr);
       pt[key] = value;
       if(it != keywords.end())
         done[std::distance(keywords.begin(),it)] = true; // mark key as stored
@@ -216,11 +216,11 @@ void Dune::ParameterTreeParser::readNamedOptions(int argc, char* argv[],
       // are there keywords left?
       if (current >= done.size())
         DUNE_THROW(ParameterTreeParserError,
-          "superfluous unnamed parameter" << "\n" << helpstr);
+                   "superfluous unnamed parameter" << "\n" << helpstr);
       // do we overwrite an existing entry?
       if (!overwrite && pt[keywords[current]] != "")
         DUNE_THROW(ParameterTreeParserError,
-          "parameter " << keywords[current] << " already specified" << "\n" << helpstr);
+                   "parameter " << keywords[current] << " already specified" << "\n" << helpstr);
       pt[keywords[current]] = opt;
       done[current] = true; // mark key as stored
     }
@@ -232,7 +232,7 @@ void Dune::ParameterTreeParser::readNamedOptions(int argc, char* argv[],
       missing += std::string(" ") + keywords[i];
   if (missing.size())
     DUNE_THROW(ParameterTreeParserError,
-      "missing parameter(s) ... " << missing << "\n" << helpstr);
+               "missing parameter(s) ... " << missing << "\n" << helpstr);
 }
 
 std::string Dune::ParameterTreeParser::generateHelpString(
@@ -245,17 +245,17 @@ std::string Dune::ParameterTreeParser::generateHelpString(
   {
     bool req = (i < required);
     helpstr = helpstr +
-      " " + braces[req*2] +
-      keywords[i] +braces[req*2+1];
+              " " + braces[req*2] +
+              keywords[i] +braces[req*2+1];
   }
   helpstr = helpstr + "\n"
-    "Options:\n"
-    "-h / --help: this help\n";
+            "Options:\n"
+            "-h / --help: this help\n";
   for (std::size_t i=0; i<std::min(keywords.size(),help.size()); i++)
   {
     if (help[i] != "")
       helpstr = helpstr + "-" +
-        keywords[i] + ":\t" + help[i] + "\n";
+                keywords[i] + ":\t" + help[i] + "\n";
   }
   return helpstr;
 }

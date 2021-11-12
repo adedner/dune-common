@@ -85,8 +85,8 @@ int main(int argc, char **argv)
   std::vector<idx_t> part(xadj.size()-1, 0);
 
   ParMETIS_V3_PartKway(vtxdist.data(), xadj.data(), adjncy.data(),
-    nullptr, nullptr, &wgtflag, &numflag, &ncon, &nparts, tpwgts.data(),
-    ubvec.data(), options.data(), &edgecut, part.data(), &comm);
+                       nullptr, nullptr, &wgtflag, &numflag, &ncon, &nparts, tpwgts.data(),
+                       ubvec.data(), options.data(), &edgecut, part.data(), &comm);
 
   for (std::size_t part_i = 0; part_i < part.size(); ++part_i) {
     std::cout << "[" << rank << "] " << part_i << " => " << part[part_i] << std::endl;

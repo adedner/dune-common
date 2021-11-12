@@ -281,20 +281,20 @@ namespace Dune
 
 #if HAVE_VC
   /*
-    Add Vc specializations for cond(), see conditional.hh
+     Add Vc specializations for cond(), see conditional.hh
    */
   template<typename T, typename A>
   Vc::Vector<T,A> cond(const Vc::Mask<T,A> & b,
-    const Vc::Vector<T,A> & v1,
-    const Vc::Vector<T,A> & v2)
+                       const Vc::Vector<T,A> & v1,
+                       const Vc::Vector<T,A> & v2)
   {
     return std::move(Vc::iif(b, v1, v2));
   }
 
   template<typename T, std::size_t N, typename V, std::size_t M>
   Vc::SimdArray<T,N,V,M> cond(const typename Vc::SimdArray<T,N,V,M>::mask_type & b,
-    const Vc::SimdArray<T,N,V,M> & v1,
-    const Vc::SimdArray<T,N,V,M> & v2)
+                              const Vc::SimdArray<T,N,V,M> & v1,
+                              const Vc::SimdArray<T,N,V,M> & v2)
   {
     return std::move(Vc::iif(b, v1, v2));
   }
@@ -302,9 +302,9 @@ namespace Dune
 
 #if HAVE_VC
   /*
-    Add Vc specializations for several boolean operations, see rangeutitlities.hh:
+     Add Vc specializations for several boolean operations, see rangeutitlities.hh:
 
-    max_value, min_value, any_true, all_true
+     max_value, min_value, any_true, all_true
    */
   template<typename T, typename A>
   T max_value(const Vc::Vector<T,A> & v)

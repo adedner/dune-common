@@ -9,25 +9,25 @@
 
 namespace Dune {
 
-namespace Impl {
+  namespace Impl {
 
-  template<typename... F>
-  class OverloadSet
-    : public F...
-  {
+    template<typename... F>
+    class OverloadSet
+      : public F...
+    {
 
-  public:
+    public:
 
-    template<typename... FF>
-    OverloadSet(FF&&... ff)
-      : F(std::forward<FF>(ff))...
-    {}
+      template<typename... FF>
+      OverloadSet(FF&&... ff)
+        : F(std::forward<FF>(ff))...
+      {}
 
-    using F::operator()...;
+      using F::operator() ...;
 
-  };
+    };
 
-} // end namespace Impl
+  } // end namespace Impl
 
 
 
@@ -55,70 +55,70 @@ namespace Impl {
  *
  * \ingroup CxxUtilities
  */
-template<class... F>
-auto overload(F&&... f)
-{
-  return Impl::OverloadSet<std::decay_t<F>...>(std::forward<F>(f)...);
-}
-
-
-
-namespace Impl {
-
-  template<class F0, class... F>
-  class OrderedOverloadSet: public OrderedOverloadSet<F...>, F0
+  template<class... F>
+  auto overload(F&&... f)
   {
-    using Base = OrderedOverloadSet<F...>;
-  public:
+    return Impl::OverloadSet<std::decay_t<F>...>(std::forward<F>(f)...);
+  }
 
-    template<class FF0, class... FF>
-    OrderedOverloadSet(FF0&& f0, FF&&... ff) :
-      Base(std::forward<FF>(ff)...),
-      F0(std::forward<FF0>(f0))
-    {}
 
-    // Forward to operator() of F0 if it can be called with the given arguments.
-    template<class...  Args,
-        std::enable_if_t<IsCallable<F0(Args&&...)>::value, int> = 0>
-    decltype(auto) operator()(Args&&... args)
+
+  namespace Impl {
+
+    template<class F0, class... F>
+    class OrderedOverloadSet: public OrderedOverloadSet<F...>, F0
     {
-      return F0::operator()(std::forward<Args>(args)...);
-    }
+      using Base = OrderedOverloadSet<F...>;
+    public:
 
-    // Forward to operator() of base class if F0 cannot be called with the given
-    // arguments. In this case the base class will successively try operator()
-    // of all F... .
-    template<class...  Args,
-        std::enable_if_t<not IsCallable<F0(Args&&...)>::value, int> = 0>
-    decltype(auto) operator()(Args&&... args)
+      template<class FF0, class... FF>
+      OrderedOverloadSet(FF0&& f0, FF&&... ff) :
+        Base(std::forward<FF>(ff)...),
+        F0(std::forward<FF0>(f0))
+      {}
+
+      // Forward to operator() of F0 if it can be called with the given arguments.
+      template<class... Args,
+               std::enable_if_t<IsCallable<F0(Args&&...)>::value, int> = 0>
+      decltype(auto) operator()(Args&&... args)
+      {
+        return F0::operator()(std::forward<Args>(args)...);
+      }
+
+      // Forward to operator() of base class if F0 cannot be called with the given
+      // arguments. In this case the base class will successively try operator()
+      // of all F... .
+      template<class... Args,
+               std::enable_if_t<not IsCallable<F0(Args&&...)>::value, int> = 0>
+      decltype(auto) operator()(Args&&... args)
+      {
+        return Base::operator()(std::forward<Args>(args)...);
+      }
+
+    };
+
+    template<class F0>
+    class OrderedOverloadSet<F0>: public F0
     {
-      return Base::operator()(std::forward<Args>(args)...);
-    }
+    public:
 
-  };
+      template<class FF0>
+      OrderedOverloadSet(FF0&& f0) :
+        F0(std::forward<FF0>(f0))
+      {}
 
-  template<class F0>
-  class OrderedOverloadSet<F0>: public F0
-  {
-  public:
-
-    template<class FF0>
-    OrderedOverloadSet(FF0&& f0) :
-      F0(std::forward<FF0>(f0))
-    {}
-
-    // Forward to operator() of F0. If it cannot be called with
-    // the given arguments a static assertion will fail.
-    template<class...  Args>
-    decltype(auto) operator()(Args&&... args)
-    {
-      static_assert(IsCallable<F0(Args&&...)>::value,
+      // Forward to operator() of F0. If it cannot be called with
+      // the given arguments a static assertion will fail.
+      template<class... Args>
+      decltype(auto) operator()(Args&&... args)
+      {
+        static_assert(IsCallable<F0(Args&&...)>::value,
                       "No matching overload found in OrderedOverloadSet");
-      return F0::operator()(std::forward<Args>(args)...);
-    }
-  };
+        return F0::operator()(std::forward<Args>(args)...);
+      }
+    };
 
-} // end namespace Impl
+  } // end namespace Impl
 
 
 
@@ -144,11 +144,11 @@ namespace Impl {
  *
  * \ingroup CxxUtilities
  */
-template<class... F>
-auto orderedOverload(F&&... f)
-{
-  return Impl::OrderedOverloadSet<std::decay_t<F>...>(std::forward<F>(f)...);
-}
+  template<class... F>
+  auto orderedOverload(F&&... f)
+  {
+    return Impl::OrderedOverloadSet<std::decay_t<F>...>(std::forward<F>(f)...);
+  }
 
 
 

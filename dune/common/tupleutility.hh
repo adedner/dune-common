@@ -122,21 +122,21 @@ namespace Dune {
 #ifndef DOXYGEN
   template<class Tuple, class Functor, std::size_t... I>
   inline auto genericTransformTupleBackendImpl(Tuple& t, Functor& f, const std::index_sequence<I...>& )
-    -> std::tuple<decltype(f(std::get<I>(t)))...>
+  -> std::tuple<decltype(f(std::get<I>(t)))...>
   {
     return std::tuple<decltype(f(std::get<I>(t)))...>(f(std::get<I>(t))...);
   }
 
   template<class... Args, class Functor>
   auto genericTransformTupleBackend(std::tuple<Args...>& t, Functor& f) ->
-    decltype(genericTransformTupleBackendImpl(t, f,std::index_sequence_for<Args...>{}))
+  decltype(genericTransformTupleBackendImpl(t, f,std::index_sequence_for<Args...> {}))
   {
     return genericTransformTupleBackendImpl(t, f,std::index_sequence_for<Args...>{});
   }
 
   template<class... Args, class Functor>
   auto genericTransformTupleBackend(const std::tuple<Args...>& t, Functor& f) ->
-    decltype(genericTransformTupleBackendImpl(t, f, std::index_sequence_for<Args...>{}))
+  decltype(genericTransformTupleBackendImpl(t, f, std::index_sequence_for<Args...> {}))
   {
     return genericTransformTupleBackendImpl(t, f, std::index_sequence_for<Args...>{});
   }
@@ -182,7 +182,7 @@ namespace Dune {
    */
   template<class Tuple, class Functor>
   auto genericTransformTuple(Tuple&& t, Functor&& f) ->
-    decltype(genericTransformTupleBackend(t, f))
+  decltype(genericTransformTupleBackend(t, f))
   {
     return genericTransformTupleBackend(t, f);
   }
@@ -226,7 +226,7 @@ namespace Dune {
 
     template<class T, std::size_t... I>
     inline auto apply(T&& t, const std::index_sequence<I...>& ) ->
-      decltype(TE<T>::apply(t,std::get<I>(tup)...)) const
+    decltype(TE<T>::apply(t,std::get<I>(tup)...)) const
     {
       return TE<T>::apply(t,std::get<I>(tup)...);
     }
@@ -242,7 +242,7 @@ namespace Dune {
 
     template<class T>
     inline auto operator()(T&& t) ->
-      decltype(this->apply(t,std::index_sequence_for<Args...>{})) const
+    decltype(this->apply(t,std::index_sequence_for<Args...> {})) const
     {
       return apply(t,std::index_sequence_for<Args...>{});
     }
@@ -288,7 +288,7 @@ namespace Dune {
    */
   template<template<class> class TypeEvaluator, class Tuple, class... Args>
   auto transformTuple(Tuple&& orig, Args&&... args) ->
-    decltype(genericTransformTuple(orig, makeTransformTupleFunctor<TypeEvaluator>(args...)))
+  decltype(genericTransformTuple(orig, makeTransformTupleFunctor<TypeEvaluator>(args...)))
   {
     return genericTransformTuple(orig, makeTransformTupleFunctor<TypeEvaluator>(args...));
   }
@@ -407,17 +407,17 @@ namespace Dune {
    * of the types are accepted by the predicate, a static_assert is triggered.
    */
   template<class Tuple, template<class> class Predicate, std::size_t start = 0,
-      std::size_t size = std::tuple_size<Tuple>::value>
+           std::size_t size = std::tuple_size<Tuple>::value>
   class FirstPredicateIndex :
     public std::conditional<Predicate<typename std::tuple_element<start,
-                Tuple>::type>::value,
-        std::integral_constant<std::size_t, start>,
-        FirstPredicateIndex<Tuple, Predicate, start+1> >::type
+                                                                  Tuple>::type>::value,
+                            std::integral_constant<std::size_t, start>,
+                            FirstPredicateIndex<Tuple, Predicate, start+1> >::type
   {
     static_assert(std::tuple_size<Tuple>::value == size, "The \"size\" "
-                       "template parameter of FirstPredicateIndex is an "
-                       "implementation detail and should never be set "
-                       "explicitly!");
+                  "template parameter of FirstPredicateIndex is an "
+                  "implementation detail and should never be set "
+                  "explicitly!");
   };
 
 #ifndef DOXYGEN
@@ -425,7 +425,7 @@ namespace Dune {
   class FirstPredicateIndex<Tuple, Predicate, size, size>
   {
     static_assert(AlwaysFalse<Tuple>::value, "None of the std::tuple element "
-                       "types matches the predicate!");
+                  "types matches the predicate!");
   };
 #endif // !DOXYGEN
 
@@ -507,10 +507,10 @@ namespace Dune {
    * \tparam N Reduce the first N std::tuple elements
    */
   template<
-      template <class, class> class F,
-      class Tuple,
-      class Seed=std::tuple<>,
-      int N=std::tuple_size<Tuple>::value>
+    template <class, class> class F,
+    class Tuple,
+    class Seed=std::tuple<>,
+    int N=std::tuple_size<Tuple>::value>
   struct ReduceTuple
   {
     typedef typename ReduceTuple<F, Tuple, Seed, N-1>::type Accumulated;
@@ -531,9 +531,9 @@ namespace Dune {
    * \tparam Seed Initial value for reduce operation
    */
   template<
-      template <class, class> class F,
-      class Tuple,
-      class Seed>
+    template <class, class> class F,
+    class Tuple,
+    class Seed>
   struct ReduceTuple<F, Tuple, Seed, 0>
   {
     //! Result of the reduce operation

@@ -19,7 +19,7 @@ namespace Dune
 
     template< class Formatter, class Iterator >
     inline static auto join ( const std::string &delimiter, Formatter &&formatter, Iterator begin, Iterator end )
-      -> std::enable_if_t< std::is_same< std::decay_t< decltype( formatter( *begin ) ) >, std::string >::value, std::string >
+    -> std::enable_if_t< std::is_same< std::decay_t< decltype( formatter( *begin ) ) >, std::string >::value, std::string >
     {
       std::string s;
       if( begin != end )
@@ -32,7 +32,7 @@ namespace Dune
 
     template< class Iterator >
     inline static auto join ( const std::string &delimiter, Iterator begin, Iterator end )
-      -> std::enable_if_t< std::is_same< std::decay_t< decltype( *begin ) >, std::string >::value, std::string >
+    -> std::enable_if_t< std::is_same< std::decay_t< decltype( *begin ) >, std::string >::value, std::string >
     {
       return join( delimiter, [] ( decltype( *begin ) s ) -> decltype( *begin ) { return s; }, begin, end );
     }

@@ -73,7 +73,7 @@ namespace Dune{
 
   // dummy implementation for void
   template<>
-  struct MPIData<void>{
+  struct MPIData<void> {
   protected:
     MPIData() {}
 
@@ -95,7 +95,7 @@ namespace Dune{
   template<class T>
   struct MPIData<T, std::void_t<std::tuple<decltype(std::declval<T>().data()),
                                            decltype(std::declval<T>().size()),
-                                           typename std::decay_t<T>::value_type>>>{
+                                           typename std::decay_t<T>::value_type>>> {
   private:
     template<class U>
     using hasResizeOp = decltype(std::declval<U>().resize(0));
@@ -119,7 +119,7 @@ namespace Dune{
 
     template<class S = T>
     auto /*void*/ resize(int size)
-      -> std::enable_if_t<!std::is_const<S>::value || !Std::is_detected_v<hasResizeOp, S>>
+    -> std::enable_if_t<!std::is_const<S>::value || !Std::is_detected_v<hasResizeOp, S>>
     {
       data_.resize(size);
     }

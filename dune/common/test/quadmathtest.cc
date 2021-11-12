@@ -103,7 +103,7 @@ int main()
   test.check(cmp(fma(T{0.5},T{0.4},T{1.8}),(T{0.5} * T{0.4}) + T{1.8}), "fma");
   test.check(cmp(fmax(T{0.6},T{0.4}),T{0.6}), "fmax");
   test.check(cmp(fmin(T{0.6},T{0.4}),T{0.4}), "fmin");
-  test.check(cmp(hypot(T{1.6}, T{2.3}), sqrt(T{1.6}*T{1.6} + T{2.3}*T{2.3})), "hypot");
+  test.check(cmp(hypot(T{1.6}, T{2.3}), sqrt(T{1.6} *T{1.6} + T{2.3} *T{2.3})), "hypot");
   // ilogb
   test.check(cmp(llrint(T{2.3}),(long long int)(2)), "llrint");
   test.check(cmp(lrint(T{2.3}),(long int)(2)), "lrint");

@@ -11,7 +11,7 @@ int main()
 {
   // check that the id argument is a constexpr functor
   Dune::Hybrid::ifElse(std::true_type{}, [](auto id) {
-      static_assert(id(true),
-        "id() argument of ifElse() branches should be a constexpr functor");
-    });
+    static_assert(id(true),
+                  "id() argument of ifElse() branches should be a constexpr functor");
+  });
 }

@@ -16,7 +16,7 @@ using Dune::TestSuite;
 
 template<class T, T n>
 constexpr inline static auto next(std::integral_constant<T, n>)
-  -> std::integral_constant<T, n+1>
+-> std::integral_constant<T, n+1>
 {
   return {};
 }

@@ -12,7 +12,7 @@ namespace Dune {
 
   /*! \defgroup Exceptions Exception handling
      \ingroup Common
-     \{
+   \{
 
      The Dune-exceptions are designed to allow a simple derivation of subclasses
      and to accept a text written in the '<<' syntax.
@@ -20,7 +20,7 @@ namespace Dune {
      Example of usage:
 
      \code
-     #include <dune/common/exceptions.hh>
+   #include <dune/common/exceptions.hh>
 
      ...
 
@@ -189,7 +189,7 @@ namespace Dune {
   /*! Macro to throw an exception
 
      \code
-     #include <dune/common/exceptions.hh>
+   #include <dune/common/exceptions.hh>
      \endcode
 
      \param E exception class derived from Dune::Exception
