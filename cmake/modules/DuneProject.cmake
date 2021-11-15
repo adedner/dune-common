@@ -114,6 +114,9 @@ macro(dune_project)
   # activate pkg-config
   include(DunePkgConfig)
 
+  # check for C++ features, set compiler flags for C++14 or C++11 mode
+  include(CheckCXXFeatures)
+
   # Process the macros provided by the dependencies and ourself
   dune_process_dependency_macros()
 
@@ -123,9 +126,6 @@ macro(dune_project)
   # POSITION_INDEPENDENT_CODE to false/OFF
   include(CMakeDependentOption)
   cmake_dependent_option(CMAKE_POSITION_INDEPENDENT_CODE "Build position independent code" ON "NOT BUILD_SHARED_LIBS" ON)
-
-  # check for C++ features, set compiler flags for C++14 or C++11 mode
-  include(CheckCXXFeatures)
 
   # if first argument is given, create module library
   if(${ARGC} GREATER 0)
