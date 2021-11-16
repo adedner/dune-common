@@ -18,7 +18,6 @@ dune_add_library(dunecommon)
 
 # Set properties to the dunecommon target
 add_dune_blas_lapack_flags(dunecommon)
-add_dune_tbb_flags(dunecommon)
 
 # add subdirectories to execute CMakeLists.txt there
 add_subdirectory(bin)
