@@ -44,6 +44,12 @@ namespace Impl {
       return result;
     }
 
+    // Obtain wrapped, untransposed matrix
+    const M& wrappedMatrix() const
+    {
+      return matrix_;
+    }
+
   private:
 
     const M& matrix_;
@@ -70,6 +76,19 @@ template<class Matrix>
 auto transpose(const Matrix& matrix) {
   return Impl::TransposedMatrixWrapper<Matrix>(matrix);
 }
+
+/**
+ * \brief transpose() overload for a transposed matrix wrapper.
+ *
+ * This will un-transpose (i.e. double transpose) the passed
+ * transposed matrix by returning a reference to the un-wrapped
+ * original matrix.
+ */
+template<class Matrix>
+decltype(auto) transpose(const Impl::TransposedMatrixWrapper<Matrix>& matrix) {
+  return matrix.wrappedMatrix();
+}
+
 
 
 } // namespace Dune
