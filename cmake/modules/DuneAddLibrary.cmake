@@ -7,7 +7,7 @@ the standard cmake signatures.
 
 Normal Libraries
 ^^^^^^^^^^^^^^^^
-
+.. cmake:command:: dune_add_library
 .. code-block:: cmake
 
   dune_add_library(<basename> [STATIC|SHARED|MODULE]
@@ -27,18 +27,22 @@ are automatically filled with the given (optional) arguments.
 A dune library is (by default) exported into the ``<export-set>`` given by the
 global name ``${ProjectName}-targets`` if the parameter ``NO_EXPORT`` is not
 given. This ``<export-set>`` is automatically installed and exported in the
-``dune_finalize_project()`` function.
+:cmake:command:`finalize_dune_project()` function.
 
 ``SOURCES``
   The source files from which to build the library.
 
 ``LINK_LIBRARIES`` (or ``ADD_LIBS``)
-  A list of dependency the libraries is explicitly linked against. The parameter ``ADD_LIBS``
-  is deprecated in version 2.9.
+  A list of dependency the libraries is explicitly linked against.
+
+  .. versionchanged:: 2.9
+    The parameter ``ADD_LIBS`` is deprecated.
 
 ``COMPILE_OPTIONS`` (or ``COMPILE_FLAGS``)
-  Any additional compile flags for building the library. The parameter ``COMPILE_FLAGS``
-  is deprecated in version 2.9.
+  Any additional compile flags for building the library.
+
+  .. versionchanged:: 2.9
+    The parameter ``COMPILE_FLAGS`` is deprecated.
 
 ``NO_EXPORT``
   If omitted the library is exported for usage in other modules.
@@ -74,12 +78,16 @@ An interface target does not contain any sources but my contain flags and
 dependencies.
 
 ``LINK_LIBRARIES`` (or ``ADD_LIBS``)
-  A list of dependency the libraries is explicitly linked against. The parameter ``ADD_LIBS``
-  is deprecated in version 2.9.
+  A list of dependency the libraries is explicitly linked against.
+
+  .. versionchanged:: 2.9
+    The parameter ``ADD_LIBS`` is deprecated.
 
 ``COMPILE_OPTIONS`` (or ``COMPILE_FLAGS``)
-  Any additional compile flags for building the library. The parameter ``COMPILE_FLAGS``
-  is deprecated in version 2.9.
+  Any additional compile flags for building the library.
+
+  .. versionchanged:: 2.9
+    The parameter ``COMPILE_FLAGS`` is deprecated.
 
 ``NO_EXPORT``
   If omitted the library is exported for usage in other modules.
@@ -105,7 +113,7 @@ Object Libraries
 Create an object library target ``<basename>`` to collect multiple sources
 to be added to a library target later. Note, this utility is deprecated.
 Create a regular library target in a parent scope and add the sources
-directly using ``target_sources(<target> PRIVATE <sources>...)`` instead.
+directly using ``target_sources`(<target> PRIVATE <sources>...)`` instead.
 
 ``SOURCES``
   The source files from which to build the library.
