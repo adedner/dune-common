@@ -121,7 +121,7 @@ class Builder:
             # configure dune-py
             logger.debug("Configuring dune-py with CMake")
             cmake = subprocess.Popen(
-                ["cmake", "."],
+                ["cmake", "-GNinja", "."],
                 cwd=dunepy_dir,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
