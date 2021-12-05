@@ -16,7 +16,8 @@ from dune.packagemetadata import (
     getBuildMetaData, getCMakeFlags, getExternalPythonModules
 )
 
-from dune.common import comm
+from mpi4py import MPI
+
 from dune.common.locking import Lock, LOCK_EX, LOCK_SH
 from dune.common.utility import buffer_to_str, isString, reload_module
 
@@ -153,6 +154,8 @@ class Builder:
         self.generated_dir = os.path.join(self.dune_py_dir, 'python', 'dune', 'generated')
         self.initialized = False
         self.externalPythonModules = copy.deepcopy(getExternalPythonModules())
+        self.comm = MPI.COMM_WORLD.Dup()
+        self.rank = self.comm.Get_rank()
 
     def cacheExternalModules(self):
         """Store external modules in dune-py"""
@@ -164,7 +167,7 @@ class Builder:
     def initialize(self):
         self.externalPythonModules = copy.deepcopy(getExternalPythonModules())
 
-        if comm.rank == 0:
+        if self.rank == 0:
             logger.debug("(Re-)Initializing JIT compilation module")
             os.makedirs(self.dune_py_dir, exist_ok=True)
             # need to lock here so that multiple processes don't try to
@@ -185,7 +188,7 @@ class Builder:
                     logger.debug('Using existing dune-py module in ' + self.dune_py_dir)
                     self.compile(verbose=True)
 
-        comm.barrier()
+        self.comm.Barrier()
         try:
             dune.__path__._path.insert(0,os.path.join(self.dune_py_dir, 'python', 'dune'))
         except:
@@ -255,7 +258,7 @@ class Builder:
         # this is the first call to load or because an external module with metadata has been registered
         if not self.initialized or not self.externalPythonModules == getExternalPythonModules():
             self.initialize()
-        if comm.rank == 0:
+        if self.rank == 0:
             module = sys.modules.get("dune.generated." + moduleName)
             if module is None:
                 logger.debug("Module {} not loaded".format(moduleName))
@@ -338,7 +341,9 @@ class Builder:
                             self.compile(target=moduleName)
 
         ## TODO remove barrier here
-        comm.barrier()
+        print(moduleName,"pre barrier",self.rank,flush=True)
+        self.comm.Barrier()
+        print(moduleName,"post barrier",self.rank,flush=True)
 
         logger.debug("Loading " + moduleName)
         module = importlib.import_module("dune.generated." + moduleName)
