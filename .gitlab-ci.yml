@@ -64,25 +64,25 @@ incremental-step0:
 incremental-step1:
   extends: .incremental
   before_script:
-    - sudo apt install --yes --no-download --ignore-missing --no-install-recommends python3
+    - apt install --yes --no-download --ignore-missing --no-install-recommends python3
   needs: ["incremental-step0"]
 
 incremental-step2:
   extends: .incremental
   before_script:
-    - sudo apt install --yes --no-download --ignore-missing --no-install-recommends python3 python3-dev
+    - apt install --yes --no-download --ignore-missing --no-install-recommends python3 python3-dev
   needs: ["incremental-step1"]
 
 incremental-step3:
   extends: .incremental
   before_script:
-    - sudo apt install --yes --no-download --ignore-missing --no-install-recommends python3 python3-dev python3-venv
+    - apt install --yes --no-download --ignore-missing --no-install-recommends python3 python3-dev python3-venv
   needs: ["incremental-step2"]
 
 incremental-step4:
   extends: .incremental
   before_script:
-    - sudo apt install --yes --no-download --ignore-missing --no-install-recommends python3 python3-dev python3-venv python3-pip
+    - apt install --yes --no-download --ignore-missing --no-install-recommends python3 python3-dev python3-venv python3-pip
   needs: ["incremental-step3"]
 
 
