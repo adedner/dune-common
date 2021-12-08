@@ -59,7 +59,7 @@ ubuntu-20.04-clang-10-20-nobindings:
 incremental-step0:
   extends: .incremental
   script:
-    - dunecontrol --opts=/duneci/dune.opts --current all
+    - bin/dunecontrol --opts=/duneci/dune.opts --current all
 
 incremental-step1:
   extends: .incremental
