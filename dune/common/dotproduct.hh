@@ -3,94 +3,72 @@
 #ifndef DUNE_DOTPRODUCT_HH
 #define DUNE_DOTPRODUCT_HH
 
-#include "ftraits.hh"
-#include "typetraits.hh"
+#include <type_traits>
+#include <dune/common/conj.hh>
+#include <dune/common/typetraits.hh>
+#include <dune/common/std/type_traits.hh>
 
 namespace Dune {
-  /**
-   * @file
-   * @brief  Provides the functions dot(a,b) := \f$a^H \cdot b \f$ and dotT(a,b) := \f$a^T \cdot b \f$
-   *
-   * The provided dot products dot,dotT are used to compute (indefinite) dot products for fundamental types as well as DUNE vector types, such as DenseVector, FieldVector, ISTLVector.
-   * Note that the definition of dot(a,b) conjugates the first argument. This agrees with the behaviour of Matlab and Petsc, but not with BLAS.
-   * @author Jö Fahlke, Matthias Wohlmuth
-   */
+namespace Impl {
 
-  /** @addtogroup Common
-   *
-   * @{
-   */
-
-  template<class T, class = void>
-  struct IsVector : std::false_type {};
-
-  template<class T>
-  struct IsVector<T, std::void_t<typename T::field_type> >
-    : std::true_type {};
-
-  /** @brief computes the dot product for fundamental data types according to Petsc's VectDot function: dot(a,b) := std::conj(a)*b
-   *
-   * @see http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/Vec/VecDot.html#VecDot
-   * @param a
-   * @param b
-   * @return conj(a)*b
-   */
-  template<class A, class B>
-  auto
-  dot(const A & a, const B & b) -> typename std::enable_if<!IsVector<A>::value && !std::is_same<typename FieldTraits<A>::field_type,typename FieldTraits<A>::real_type> ::value, decltype(conj(a)*b)>::type
-  {
-    return conj(a)*b;
-  }
-
-  /**
-   * @brief computes the dot product for fundamental data types according to Petsc's VectDot function: dot(a,b) := std::conj(a)*b
-   *
-   * Specialization for real first arguments which replaces conj(a) by a.
-   * @see http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/Vec/VecTDot.html#VecTDot
-   * @param a
-   * @param b
-   * @return a*b (which is the same as conj(a)*b in this case)
-   */
-  // fundamental type with A being a real type
-  template<class A, class B>
-  auto
-  dot(const A & a, const B & b) -> typename std::enable_if<!IsVector<A>::value && std::is_same<typename FieldTraits<A>::field_type,typename FieldTraits<A>::real_type>::value, decltype(a*b)>::type
-  {
-    return a*b;
-  }
-
-  /**
-   * @brief computes the dot product for various dune vector types according to Petsc's VectDot function: dot(a,b) := std::conj(a)*b
-   *
-   * Specialization for real first arguments which replaces conj(a) by a.
-   * @see http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/Vec/VecTDot.html#VecTDot
-   * @param a
-   * @param b
-   * @return dot(a,b)
-   */
-  template<typename A, typename B>
-  auto
-  dot(const A & a, const B & b) -> typename std::enable_if<IsVector<A>::value, decltype(a.dot(b))>::type
+template <class A, class B, bool with_conj = true>
+struct DotImpl
+{
+private:
+  template <class A_, class B_>
+  static auto applyImpl (const A_& a, const B_& b, std::true_type, Dune::PriorityTag<3>)
+    -> decltype(a.dot(b))
   {
     return a.dot(b);
   }
-  /** @} */
 
-  /**
-   * @brief Computes an indefinite vector dot product for fundamental data types according to Petsc's VectTDot function: dotT(a,b) := a*b
-   * @see http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/Vec/VecTDot.html#VecTDot
-   * @param a
-   * @param b
-   * @return a*b
-   */
-  template<class A, class B>
-  auto
-  dotT(const A & a, const B & b) -> decltype(a*b)
+  template <class A_, class B_>
+  static auto applyImpl (const A_& a, const B_& b, std::false_type, Dune::PriorityTag<2>)
+    -> decltype(a.dotT(b))
   {
-    return a*b;
+    return a.dotT(b);
   }
 
-  /** @} */
-} // end namespace DUNE
+  template <class A_, class B_, class WithConj>
+  static auto applyImpl (const A_& a, const B_& b, WithConj, Dune::PriorityTag<1>)
+    -> decltype(a*b)
+  {
+    using Dune::conj;
+    if constexpr(WithConj::value && Dune::IsNumber<A_>::value)
+      return conj(a) * b;
+    else
+      return a * b;
+  }
+
+public:
+  static auto apply (const A& a, const B& b)
+  {
+    return applyImpl(a,b,std::bool_constant<with_conj>{},Dune::PriorityTag<5>{});
+  }
+};
+
+} // end namespace Impl
+
+//! Computes the dot product for various vector types according to Petsc's VecDot function
+/**
+ * dot(a,b) := \f$a^H \cdot b \f$
+ **/
+template <class A, class B>
+auto dot (const A& a, const B& b) -> decltype(Impl::DotImpl<A,B>::apply(a,b))
+{
+  return Impl::DotImpl<A,B>::apply(a,b);
+}
+
+//! Computes the dot product for various vector types according to Petsc's VecTDot function
+/**
+ * dotT(a,b) := \f$a^T \cdot b \f$
+ **/
+template <class A, class B>
+auto dotT (const A& a, const B& b) -> decltype(Impl::DotImpl<A,B,false>::apply(a,b))
+{
+  return Impl::DotImpl<A,B,false>::apply(a,b);
+}
+
+} // end namespace Dune
 
 #endif // DUNE_DOTPRODUCT_HH
