@@ -180,6 +180,19 @@ namespace Dune {
       bool overwrite = true,
       std::vector<std::string> help = std::vector<std::string>());
 
+    /** \brief parse Python script as ParameterTree
+     *
+     *  Evaluates the python script and converts the variables into a ParameterTree
+     *
+     * \param file filename
+     * \param[out] pt The parameter tree to store the config structure.
+     * \parem overwrite Whether to overwrite already existing values,
+     *                  If false, values in the stream will be ignored
+     *                  if the key is already present.
+     */
+    static void readPythonTree(std::string file, ParameterTree& pt, bool overwrite = true);
+
+
   private:
     static std::string generateHelpString(std::string progname, std::vector<std::string> keywords, unsigned int required, std::vector<std::string> help);
   };

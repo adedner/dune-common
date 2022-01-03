@@ -272,6 +272,11 @@ dune_add_test(SOURCES parametertreetest.cc
               LINK_LIBRARIES dunecommon
               LABELS quick)
 
+dune_add_test(SOURCES readPythonParameterTreeTest.cc
+              LINK_LIBRARIES dunecommon
+              LABELS quick
+              CMAKE_GUARD HAVE_PYTHON3_EMBED)
+
 dune_add_test(SOURCES parmetistest.cc
               MPI_RANKS 3
               TIMEOUT 300

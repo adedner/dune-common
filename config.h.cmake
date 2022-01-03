@@ -62,6 +62,9 @@
 /* Define to 1 if you have the Threading Building Blocks (TBB) library */
 #cmakedefine HAVE_TBB 1
 
+/* Define to 1 if you have python */
+#cmakedefine HAVE_PYTHON3_EMBED 1
+
 /* begin private */
 
 /* Name of package */

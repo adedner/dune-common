@@ -11,6 +11,8 @@ In order to build the DUNE core modules you need at least the following software
 ## Changelog
 - Add helper function `resolveRef()` to transparently use `std::reference_wrapper`.
 
+- Add `ParameterTreeParser::readPythonTree` to parse a python script as ParameterTree
+
 - Add `pragma omp simd` annotations in the LoopSIMD class to improve compiler optimizations
 
 - deprecate Factorial in common/math.hh (use factorial function)

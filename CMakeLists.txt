@@ -12,6 +12,10 @@ dune_project()
 
 # Create the module library for dune-common
 dune_add_library(dunecommon)
+if(HAVE_PYTHON3_EMBED)
+  dune_target_link_libraries(dunecommon ${Python3_LIBRARIES})
+  target_include_directories(dunecommon PRIVATE ${Python3_INCLUDE_DIRS})
+endif()
 
 # Set properties to the dunecommon target
 add_dune_blas_lapack_flags(dunecommon)
