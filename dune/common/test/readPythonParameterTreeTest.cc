@@ -11,11 +11,11 @@ int main(){
   std::ofstream pyfile;
   std::string filename = "parametertree.py";
   pyfile.open(filename);
-  pyfile << "test = 'test'" << std::endl
-         << "test_dict = {'a': 1, 'b':2}" << std::endl;
+  pyfile << "foo = {'test': 'test', " << std::endl
+         << "  'test_dict': {'a': 1, 'b':2}}" << std::endl;
   pyfile.close();
   ParameterTree ptree;
-  ParameterTreeParser::readPythonTree(filename, ptree);
+  ParameterTreeParser::readPythonTree(filename, ptree,true,"foo");
   ptree.report();
   assert(ptree.get("test", "foo") == "test");
   assert(ptree.sub("test_dict").get("b", -1) == 2);

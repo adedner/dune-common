@@ -186,11 +186,13 @@ namespace Dune {
      *
      * \param file filename
      * \param[out] pt The parameter tree to store the config structure.
-     * \parem overwrite Whether to overwrite already existing values,
+     * \param overwrite Whether to overwrite already existing values,
      *                  If false, values in the stream will be ignored
      *                  if the key is already present.
+     * \param dict name of the variable to be parsed. Default is "__dict__" which
+     *             means that the dict of the global scope is parsed.
      */
-    static void readPythonTree(std::string file, ParameterTree& pt, bool overwrite = true);
+    static void readPythonTree(std::string file, ParameterTree& pt, bool overwrite = true, const char* dict = "__dict__");
 
 
   private:

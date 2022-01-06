@@ -300,12 +300,13 @@ namespace {
 
 void Dune::ParameterTreeParser::readPythonTree(std::string file,
                                                ParameterTree& pt,
-                                               bool overwrite)
+                                               bool overwrite,
+                                               const char* dict)
 {
 #if HAVE_PYTHON3_EMBED
   py::scoped_interpreter guard{};
-  py::dict scope = py::module_::import("__main__").attr("__dict__");
   py::eval_file(file);
+  py::dict scope = py::module_::import("__main__").attr(dict);
   std::vector<PyObject*> anchestors = {scope.ptr()};
   addPythonDict(scope, pt, overwrite, anchestors);
 #else
