@@ -310,6 +310,6 @@ void Dune::ParameterTreeParser::readPythonTree(std::string file,
   std::vector<PyObject*> anchestors = {scope.ptr()};
   addPythonDict(scope, pt, overwrite, anchestors);
 #else
-  DUNE_THROW(Dune::NotImplemented, "Python needs to be installed to parse a python script as ParameterTree.");
+  DUNE_THROW(Dune::Exception, "Python needs to be installed to parse a python script as ParameterTree.");
 #endif
 }
