@@ -270,9 +270,6 @@ void Dune::ParameterTreeParser::readPythonDict(const pybind11::dict& scope,
                                                bool overwrite){
   for (const auto& [key, value] : scope){
     const std::string& key_str = key.cast<std::string>();
-    // ignore entry if the key starts with __
-    if(key_str[0] == '_' && key_str[1] == '_')
-      continue;
     // if the value is a dict create a sub-ParameterTree
     if(pybind11::isinstance<pybind11::dict>(value)){
       const pybind11::dict& dict = value.cast<pybind11::dict>();
