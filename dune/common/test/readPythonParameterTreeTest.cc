@@ -1,3 +1,7 @@
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <iostream>
 #include <fstream>
 
@@ -15,7 +19,7 @@ int main(){
          << "  'test_dict': {'a': 1, 'b':2}}" << std::endl;
   pyfile.close();
   ParameterTree ptree;
-  ParameterTreeParser::readPythonTree(filename, ptree,true,"foo");
+  ParameterTreeParser::readPythonFile(filename, ptree,true,"foo");
   ptree.report();
   assert(ptree.get("test", "foo") == "test");
   assert(ptree.sub("test_dict").get("b", -1) == 2);

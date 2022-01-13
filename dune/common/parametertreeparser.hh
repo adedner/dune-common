@@ -14,6 +14,10 @@
 #include <dune/common/parametertree.hh>
 #include <dune/common/exceptions.hh>
 
+#if HAVE_PYTHON3_DEV
+#include <dune/python/pybind11/pybind11.h>
+#endif
+
 namespace Dune {
 
   /** \brief report parser error while reading ParameterTree */
@@ -180,6 +184,28 @@ namespace Dune {
       bool overwrite = true,
       std::vector<std::string> help = std::vector<std::string>());
 
+#if HAVE_PYTHON3_DEV
+    /** \brief parse Python dict as ParameterTree
+     *
+     *  converts the python dictionary into a ParameterTree.
+     *
+     * \param dict python dict to be read
+     * \param[out] pt The parameter tree to store the config structure.
+     * \param overwrite Whether to overwrite already existing values,
+     *                  If false, values in the stream will be ignored
+     *                  if the key is already present.
+     * \param anchestors PyObject* to anchestor dictionaries. Used to detect cycles.
+     *
+     * \throws Dune::Exception Python is not found by the build system
+     * \throws std::runtime_error the Python interpreter was initialized before
+     */
+    static void readPythonDict(const pybind11::dict& dict,
+                               Dune::ParameterTree& pt,
+                               bool overwrite,
+                               std::vector<PyObject*> ancestors = {});
+#endif
+
+#if HAVE_PYTHON3_EMBED
     /** \brief parse Python script as ParameterTree
      *
      *  Evaluates the python script and converts the variables into a ParameterTree.
@@ -200,7 +226,11 @@ namespace Dune {
      * \throws Dune::Exception Python is not found by the build system
      * \throws std::runtime_error the Python interpreter was initialized before
      */
-    static void readPythonTree(std::string file, ParameterTree& pt, bool overwrite = true, const char* dict = "__dict__");
+    static void readPythonFile(std::string file,
+                               ParameterTree& pt,
+                               bool overwrite = true,
+                               const char* dict = "__dict__");
+#endif
 
 
   private:

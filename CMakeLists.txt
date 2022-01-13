@@ -12,7 +12,7 @@ dune_project()
 
 # Create the module library for dune-common
 dune_add_library(dunecommon)
-if(HAVE_PYTHON3_EMBED)
+if(HAVE_PYTHON3_DEV)
   dune_target_link_libraries(dunecommon ${Python3_LIBRARIES})
   target_include_directories(dunecommon PRIVATE ${Python3_INCLUDE_DIRS})
 endif()

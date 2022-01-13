@@ -17,12 +17,11 @@
 #include <map>
 #include <algorithm>
 
+#include <dune/common/exceptions.hh>
+
 #if HAVE_PYTHON3_EMBED
 #include <dune/python/pybind11/embed.h>
-namespace py = pybind11;
 #endif
-
-#include <dune/common/exceptions.hh>
 
 std::string Dune::ParameterTreeParser::ltrim(const std::string& s)
 {
@@ -265,51 +264,47 @@ std::string Dune::ParameterTreeParser::generateHelpString(
   return helpstr;
 }
 
-#if HAVE_PYTHON3_EMBED
-namespace {
-  void addPythonDict(const py::dict& scope,
-                     Dune::ParameterTree& pt,
-                     bool overwrite,
-                     std::vector<PyObject*>& ancestors){
-    for (const auto& [key, value] : scope){
-      const std::string& key_str = key.cast<std::string>();
-      // ignore entry if the key starts with __
-      if(key_str[0] == '_' && key_str[1] == '_')
-        continue;
-      // if the value is a dict create a sub-ParameterTree
-      if(py::isinstance<py::dict>(value)){
-        if (std::find(ancestors.begin(), ancestors.end(), value.ptr()) != ancestors.end()){
-          DUNE_THROW(Dune::Exception, "Cannot parse python dictionary as ParameterTree: Cycle detected!");
-        }
-        ancestors.push_back(value.ptr());
-        const py::dict& dict = value.cast<py::dict>();
-        addPythonDict(dict, pt.sub(key_str), overwrite, ancestors);
-        ancestors.pop_back();
-        continue;
+#if HAVE_PYTHON3_DEV
+void Dune::ParameterTreeParser::readPythonDict(const pybind11::dict& scope,
+                                               Dune::ParameterTree& pt,
+                                               bool overwrite,
+                                               std::vector<PyObject*> ancestors){
+  for (const auto& [key, value] : scope){
+    const std::string& key_str = key.cast<std::string>();
+    // ignore entry if the key starts with __
+    if(key_str[0] == '_' && key_str[1] == '_')
+      continue;
+    // if the value is a dict create a sub-ParameterTree
+    if(pybind11::isinstance<pybind11::dict>(value)){
+      if (std::find(ancestors.begin(), ancestors.end(), value.ptr()) != ancestors.end()){
+        DUNE_THROW(Dune::Exception, "Cannot parse python dictionary as ParameterTree: Cycle detected!");
       }
-      // skip if overwrite is false and key is already contained in the ParameterTree
-      if(!overwrite and pt.hasKey(key_str))
-        continue;
-      // otherwise add the python string representation as value
-      std::string val_str = py::str(value);
-      pt[key_str] = val_str;
+      ancestors.push_back(value.ptr());
+      const pybind11::dict& dict = value.cast<pybind11::dict>();
+      readPythonDict(dict, pt.sub(key_str), overwrite, ancestors);
+      ancestors.pop_back();
+      continue;
     }
+    // skip if overwrite is false and key is already contained in the ParameterTree
+    if(!overwrite and pt.hasKey(key_str))
+      continue;
+    // otherwise add the python string representation as value
+    std::string val_str = pybind11::str(value);
+    pt[key_str] = val_str;
   }
 }
 #endif
 
-void Dune::ParameterTreeParser::readPythonTree(std::string file,
+#if HAVE_PYTHON3_EMBED
+void Dune::ParameterTreeParser::readPythonFile(std::string file,
                                                ParameterTree& pt,
                                                bool overwrite,
                                                const char* dict)
 {
-#if HAVE_PYTHON3_EMBED
-  py::scoped_interpreter guard{};
-  py::eval_file(file);
-  py::dict scope = py::module_::import("__main__").attr(dict);
+  pybind11::scoped_interpreter guard{};
+  pybind11::eval_file(file);
+  pybind11::dict scope = pybind11::module_::import("__main__").attr(dict);
   std::vector<PyObject*> anchestors = {scope.ptr()};
-  addPythonDict(scope, pt, overwrite, anchestors);
-#else
-  DUNE_THROW(Dune::Exception, "Python needs to be installed to parse a python script as ParameterTree.");
-#endif
+  readPythonDict(scope, pt, overwrite, anchestors);
 }
+#endif

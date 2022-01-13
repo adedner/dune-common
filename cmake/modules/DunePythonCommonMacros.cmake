@@ -72,6 +72,7 @@ include(DunePythonTestCommand)
 # Find the Python Interpreter and libraries
 find_package(Python3 COMPONENTS Interpreter Development)
 
+set(HAVE_PYTHON3_DEV ${Python3_Development_FOUND})
 set(HAVE_PYTHON3_EMBED ${Python3_Development.Embed_FOUND})
 
 if(Python3_Interpreter_FOUND)
