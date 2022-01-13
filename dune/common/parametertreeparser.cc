@@ -295,7 +295,6 @@ void Dune::ParameterTreeParser::readPythonFile(std::string file,
   pybind11::scoped_interpreter guard{};
   pybind11::eval_file(file);
   pybind11::dict scope = pybind11::module_::import("__main__").attr(dict);
-  std::vector<PyObject*> anchestors = {scope.ptr()};
-  readPythonDict(scope, pt, overwrite, anchestors);
+  readPythonDict(scope, pt, overwrite);
 }
 #endif
