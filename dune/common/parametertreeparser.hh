@@ -210,7 +210,7 @@ namespace Dune {
      *  Evaluates the python script and converts the variables into a ParameterTree.
      *
      *  This function uses `pybind11::scoped_interpreter`, meaning the Python
-     *  interpreter needs not to be running. Furthermore, depending on
+     *  interpreter must not to be running. Furthermore, depending on
      *  third-party modules and global-user data, it may leak memory. For further
      *  information see pybind11 or CPython documentation.
      *
@@ -222,7 +222,7 @@ namespace Dune {
      * \param dict name of the variable to be parsed. Default is "__dict__" which
      *             means that the dict of the global scope is parsed.
      *
-     * \throws std::runtime_error the Python interpreter was initialized before
+     * \throws std::runtime_error is thrown if the Python interpreter was initialized before
      */
     static void readPythonFile(std::string file,
                                ParameterTree& pt,
