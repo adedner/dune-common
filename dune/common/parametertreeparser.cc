@@ -267,8 +267,7 @@ std::string Dune::ParameterTreeParser::generateHelpString(
 #if HAVE_PYTHON3_DEV
 void Dune::ParameterTreeParser::readPythonDict(const pybind11::dict& scope,
                                                Dune::ParameterTree& pt,
-                                               bool overwrite,
-                                               std::vector<PyObject*> ancestors){
+                                               bool overwrite){
   for (const auto& [key, value] : scope){
     const std::string& key_str = key.cast<std::string>();
     // ignore entry if the key starts with __
@@ -276,13 +275,8 @@ void Dune::ParameterTreeParser::readPythonDict(const pybind11::dict& scope,
       continue;
     // if the value is a dict create a sub-ParameterTree
     if(pybind11::isinstance<pybind11::dict>(value)){
-      if (std::find(ancestors.begin(), ancestors.end(), value.ptr()) != ancestors.end()){
-        DUNE_THROW(Dune::Exception, "Cannot parse python dictionary as ParameterTree: Cycle detected!");
-      }
-      ancestors.push_back(value.ptr());
       const pybind11::dict& dict = value.cast<pybind11::dict>();
-      readPythonDict(dict, pt.sub(key_str), overwrite, ancestors);
-      ancestors.pop_back();
+      readPythonDict(dict, pt.sub(key_str), overwrite);
       continue;
     }
     // skip if overwrite is false and key is already contained in the ParameterTree

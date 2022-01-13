@@ -194,15 +194,14 @@ namespace Dune {
      * \param overwrite Whether to overwrite already existing values,
      *                  If false, values in the stream will be ignored
      *                  if the key is already present.
-     * \param anchestors PyObject* to anchestor dictionaries. Used to detect cycles.
      *
-     * \throws Dune::Exception Python is not found by the build system
-     * \throws std::runtime_error the Python interpreter was initialized before
+     * \warning If there are cycles in the dictionary-tree, meaning a
+     * sub-dictionary contains itself, this function leads to an infinite
+     * recurison.
      */
     static void readPythonDict(const pybind11::dict& dict,
                                Dune::ParameterTree& pt,
-                               bool overwrite,
-                               std::vector<PyObject*> ancestors = {});
+                               bool overwrite);
 #endif
 
 #if HAVE_PYTHON3_EMBED
@@ -223,7 +222,6 @@ namespace Dune {
      * \param dict name of the variable to be parsed. Default is "__dict__" which
      *             means that the dict of the global scope is parsed.
      *
-     * \throws Dune::Exception Python is not found by the build system
      * \throws std::runtime_error the Python interpreter was initialized before
      */
     static void readPythonFile(std::string file,
