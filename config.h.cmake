@@ -63,7 +63,7 @@
 #cmakedefine HAVE_TBB 1
 
 /* Define to 1 if you have python */
-#cmakedefine HAVE_PYTHON3_DEV 1
+#cmakedefine HAVE_PYTHON3_DEV ENABLE_PYTHON3_DEV
 #cmakedefine HAVE_PYTHON3_EMBED 1
 
 /* begin private */
