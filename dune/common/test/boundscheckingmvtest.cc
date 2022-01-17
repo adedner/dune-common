@@ -370,7 +370,7 @@ int main() try {
   // left multiplication: Incorrect number of rows
   try {
     Dune::FieldMatrix<double, 3, 3> A = {
-        {1, 2, 3}, {10, 20, 30}, {100, 200, 300}};
+      {1, 2, 3}, {10, 20, 30}, {100, 200, 300}};
     Dune::FieldMatrix<double, 3, 2> const B = {{1, 2}, {10, 20}, {100, 200}};
     A.leftmultiply(B);
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
@@ -382,7 +382,8 @@ int main() try {
   }
 
   return passed ? 0 : 1;
-} catch (Dune::Exception &e) {
+}
+catch (Dune::Exception &e) {
   std::cerr << e << std::endl;
   return 1;
 } catch (std::exception &e) {

@@ -29,7 +29,7 @@ int main(int argc, char** argv){
 
   cc.iscatter(gathered, data, 0).get();
   if(data[0] != 2+rank ||
-     data[1] != 3+rank){
+     data[1] != 3+rank) {
     DUNE_THROW(Exception, "Wrong result after gather - scatter");
   }
 

@@ -290,7 +290,8 @@ int main() try {
               << ") All good: Exception thrown as expected." << std::endl;
   }
   return passed ? 0 : 1;
-} catch (Dune::Exception &e) {
+}
+catch (Dune::Exception &e) {
   std::cerr << e << std::endl;
   return 1;
 } catch (std::exception &e) {

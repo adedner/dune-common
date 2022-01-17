@@ -30,7 +30,7 @@ using namespace Dune;
  * A zero eigenvalue
  * A small, nonzero eigenvalue
 
-*/
+ */
 template<typename ft>
 void testRosserMatrix()
 {
@@ -58,14 +58,14 @@ void testRosserMatrix()
 
    */
   std::vector<ft> reference = {
-          -1.02004901843000e+03,
-          -4.14362871168386e-14,
-           9.80486407214362e-02,
-           1.00000000000000e+03,
-           1.00000000000000e+03,
-           1.01990195135928e+03,
-           1.02000000000000e+03,
-           1.02004901843000e+03
+    -1.02004901843000e+03,
+    -4.14362871168386e-14,
+    9.80486407214362e-02,
+    1.00000000000000e+03,
+    1.00000000000000e+03,
+    1.01990195135928e+03,
+    1.02000000000000e+03,
+    1.02004901843000e+03
   };
 
   std::vector<ft> eigenRealParts(8);
@@ -106,14 +106,14 @@ void testSymmetricFieldMatrix()
 
     // Make sure the compute numbers really are the eigenvalues
     /*for (int j=0; j<dim; j++)
-    {
-      FieldMatrix<field_type,dim,dim> copy = testMatrix;
-      for (int k=0; k<dim; k++)
+       {
+       FieldMatrix<field_type,dim,dim> copy = testMatrix;
+       for (int k=0; k<dim; k++)
         copy[k][k] -= eigenValues[j];
 
-      if (std::fabs(copy.determinant()) > 1e-8)
+       if (std::fabs(copy.determinant()) > 1e-8)
         DUNE_THROW(MathError, "Value computed by FMatrixHelp::eigenValues is not an eigenvalue, Determinant: "+std::to_string(std::fabs(copy.determinant())));
-    }*/
+       }*/
 
     // Make sure eigenvalues and eigenvectors are not NaN (the subsequent tests do not find this!)
     for (int j=0; j<dim; j++)
@@ -154,8 +154,8 @@ void testSymmetricFieldMatrix()
 
 template<typename field_type, int dim>
 void compareEigenvectorSets(FieldMatrix<field_type,dim,dim> evec,
-                              FieldVector<field_type,dim> refEval,
-                              FieldMatrix<field_type,dim,dim> refEvec)
+                            FieldVector<field_type,dim> refEval,
+                            FieldMatrix<field_type,dim,dim> refEvec)
 {
   field_type th = dim*std::sqrt(std::numeric_limits<field_type>::epsilon());
 
@@ -182,7 +182,7 @@ void compareEigenvectorSets(FieldMatrix<field_type,dim,dim> evec,
       }
       if(!found)
         DUNE_THROW(MathError, "Eigenvector [" << evec[j] << "] for eigenvalue "
-                   << currentEval << " not found within the reference solutions [" << refEvec << "]");
+                                              << currentEval << " not found within the reference solutions [" << refEvec << "]");
     }
     refEvecList.clear();
   }
@@ -256,60 +256,60 @@ void checkMultiplicity()
 
   // check 2x2 zero matrix
   checkMatrixWithReference<FT,2>({{ 0, 0},
-                                  { 0, 0}},
-    {{1,0}, {0,1}},
-    {0, 0});
+                                   { 0, 0}},
+                                 {{1,0}, {0,1}},
+                                 {0, 0});
 
   //--3d--
   //repeated eigenvalue (x3)
   checkMatrixWithReference<FT,3>({{  1,   0,   0},
-                                      {  0,   1,   0},
-                                      {  0,   0,   1}},
-    {{1,0,0}, {0,1,0}, {0,0,1}},
-    {1, 1, 1});
+                                   {  0,   1,   0},
+                                   {  0,   0,   1}},
+                                 {{1,0,0}, {0,1,0}, {0,0,1}},
+                                 {1, 1, 1});
 
   //eigenvalues with same magnitude (x2)
   checkMatrixWithReference<FT,3>({{  0,   1,   0},
-                                      {  1,   0,   0},
-                                      {  0,   0,   5}},
-    {{-1,1,0}, {1,1,0}, {0,0,1}},
-    {-1, 1, 5});
+                                   {  1,   0,   0},
+                                   {  0,   0,   5}},
+                                 {{-1,1,0}, {1,1,0}, {0,0,1}},
+                                 {-1, 1, 5});
 
   //repeated eigenvalue (x2)
   checkMatrixWithReference<FT,3>({{  3,  -2,   0},
-                                      { -2,   3,   0},
-                                      {  0,   0,   5}},
-    {{1,1,0}, {0,0,1}, {1,-1,0}},
-    {1, 5, 5});
+                                   { -2,   3,   0},
+                                   {  0,   0,   5}},
+                                 {{1,1,0}, {0,0,1}, {1,-1,0}},
+                                 {1, 5, 5});
 
   // singular non-diagonal matrix
   checkMatrixWithReference<FT,3>({{  0,   0,   0},
-                                  {  0,   1,   1},
-                                  {  0,   1,   1}},
-    {{1,0,0}, {0,FT(-1.0/std::sqrt(2.0)),FT(1.0/std::sqrt(2.0))}, {0,FT(1.0/std::sqrt(2.0)),FT(1.0/std::sqrt(2.0))}},
-    {0, 0, 2});
+                                   {  0,   1,   1},
+                                   {  0,   1,   1}},
+                                 {{1,0,0}, {0,FT(-1.0/std::sqrt(2.0)),FT(1.0/std::sqrt(2.0))}, {0,FT(1.0/std::sqrt(2.0)),FT(1.0/std::sqrt(2.0))}},
+                                 {0, 0, 2});
 
   // singular diagonal matrix (that's a different code path again)
   checkMatrixWithReference<FT,3>({{  0,   0,   0},
-                                  {  0,   1,   0},
-                                  {  0,   0,   0}},
-    {{1,0,0}, {0,0,1}, {0,1,0}},
-    {0, 0, 1});
+                                   {  0,   1,   0},
+                                   {  0,   0,   0}},
+                                 {{1,0,0}, {0,0,1}, {0,1,0}},
+                                 {0, 0, 1});
 
   // diagonal matrix whose largest eigenvalue is not 1
   // this tests the matrix scaling employed by the eigenvector code.
   checkMatrixWithReference<FT,3>({{  3,   0,   0},
-                                  {  0,   2,   0},
-                                  {  0,   0,   4}},
-    {{0,1,0}, {1,0,0}, {0,0,1}},
-    {2, 3, 4});
+                                   {  0,   2,   0},
+                                   {  0,   0,   4}},
+                                 {{0,1,0}, {1,0,0}, {0,0,1}},
+                                 {2, 3, 4});
 
   // check 3x3 zero matrix
   checkMatrixWithReference<FT,3>({{  0,   0,   0},
-                                  {  0,   0,   0},
-                                  {  0,   0,   0}},
-    {{1,0,0}, {0,1,0}, {0,0,1}},
-    {0, 0, 0});
+                                   {  0,   0,   0},
+                                   {  0,   0,   0}},
+                                 {{1,0,0}, {0,1,0}, {0,0,1}},
+                                 {0, 0, 0});
 
   //repeat tests with LAPACK (if found)
 #if HAVE_LAPACK

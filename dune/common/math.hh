@@ -186,15 +186,15 @@ namespace Dune
     // real() and imag() are defined
     template<class T>
     struct isComplexLike {
-      private:
-        template<class U>
-        static auto test(U* u) -> decltype(u->real(), u->imag(), std::true_type());
+    private:
+      template<class U>
+      static auto test(U* u) -> decltype(u->real(), u->imag(), std::true_type());
 
-        template<class U>
-        static auto test(...) -> decltype(std::false_type());
+      template<class U>
+      static auto test(...) -> decltype(std::false_type());
 
-      public:
-        static const bool value = decltype(test<T>(0))::value;
+    public:
+      static const bool value = decltype(test<T>(0))::value;
     };
   } // namespace Impl
 
@@ -221,7 +221,7 @@ namespace Dune
          the namespace `std`.
 
      Any higher priority up to 10 can be used by other overloads.
-    */
+   */
   namespace MathOverloads {
 
     //! Tag to make sure the functions in this namespace can be found by ADL.
@@ -247,7 +247,7 @@ namespace Dune
 
     template<class T>
     auto isUnordered(const T &t1, const T &t2, PriorityTag<1>, ADLTag)
-                  -> decltype(isUnordered(t1, t2)) {
+    -> decltype(isUnordered(t1, t2)) {
       return isUnordered(t1, t2);
     }
 
@@ -311,7 +311,7 @@ namespace Dune
 
        This actually declares a different name in each translation unit, but
        they all resolve to the same lvalue.
-    */
+     */
 
     //! check wether the argument is NaN
     /**

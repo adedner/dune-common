@@ -7,7 +7,7 @@
 #include <dune/common/typetraits.hh>
 
 template<class T,
-    template<class,class,class,class> class IteratorFacade=Dune::RandomAccessIteratorFacade>
+         template<class,class,class,class> class IteratorFacade=Dune::RandomAccessIteratorFacade>
 class TestContainer {
 public:
   typedef Dune::GenericIterator<TestContainer<T,IteratorFacade>,T,T&,std::ptrdiff_t,IteratorFacade> iterator;

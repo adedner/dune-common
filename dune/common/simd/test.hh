@@ -46,7 +46,7 @@ namespace Dune {
       struct LessThenComparable : std::false_type {};
       template<class T>
       struct LessThenComparable<T, std::void_t<decltype(std::declval<T>()
-                                                   < std::declval<T>())> > :
+                                                        < std::declval<T>())>> :
         std::true_type
       {};
 
@@ -330,34 +330,34 @@ namespace Dune {
       void checkRebindOf(Recurse recurse)
       {
         Hybrid::forEach(Rebinds{}, [this,recurse](auto target) {
-            using T = typename decltype(target)::type;
+          using T = typename decltype(target)::type;
 
-            // check that the rebound type exists
-            using W = Rebind<T, V>;
-            log_ << "Type " << className<V>() << " rebound to "
-                 << className<T>() << " is " << className<W>() << std::endl;
+          // check that the rebound type exists
+          using W = Rebind<T, V>;
+          log_ << "Type " << className<V>() << " rebound to "
+               << className<T>() << " is " << className<W>() << std::endl;
 
-            static_assert(std::is_same<W, std::decay_t<W> >::value, "Rebound "
-                          "types must not be references, and must not include "
-                          "cv-qualifiers");
-            static_assert(lanes<V>() == lanes<W>(), "Rebound types must have "
-                          "the same number of lanes as the original vector "
-                          "types");
-            static_assert(std::is_same<T, Scalar<W> >::value, "Rebound types "
-                          "must have the bound-to scalar type");
+          static_assert(std::is_same<W, std::decay_t<W> >::value, "Rebound "
+                        "types must not be references, and must not include "
+                        "cv-qualifiers");
+          static_assert(lanes<V>() == lanes<W>(), "Rebound types must have "
+                        "the same number of lanes as the original vector "
+                        "types");
+          static_assert(std::is_same<T, Scalar<W> >::value, "Rebound types "
+                        "must have the bound-to scalar type");
 
-            if constexpr (RebindPrune<W>{}) {
-              log_ << "Pruning check of Simd type " << className<W>()
-                   << std::endl;
-            }
-            else {
-              using Impl::debugTypes;
-              static_assert(debugTypes<T, V, W>(RebindAccept<W>{}),
-                            "Rebind<T, V> is W, but that is not accepted "
-                            "by RebindAccept");
-              recurse(MetaType<W>{});
-            }
-          });
+          if constexpr (RebindPrune<W>{}) {
+            log_ << "Pruning check of Simd type " << className<W>()
+                 << std::endl;
+          }
+          else {
+            using Impl::debugTypes;
+            static_assert(debugTypes<T, V, W>(RebindAccept<W>{}),
+                          "Rebind<T, V> is W, but that is not accepted "
+                          "by RebindAccept");
+            recurse(MetaType<W>{});
+          }
+        });
 
         static_assert(std::is_same<Rebind<Scalar<V>, V>, V>::value, "A type "
                       "rebound to its own scalar type must be the same type "
@@ -467,13 +467,13 @@ namespace Dune {
 
         // copy constructors
         {       V ref(make123<V>());     V vec   (ref);
-          DUNE_SIMD_CHECK(is123(vec)); DUNE_SIMD_CHECK(is123(ref)); }
+                DUNE_SIMD_CHECK(is123(vec)); DUNE_SIMD_CHECK(is123(ref)); }
         {       V ref(make123<V>());     V vec =  ref ;
-          DUNE_SIMD_CHECK(is123(vec)); DUNE_SIMD_CHECK(is123(ref)); }
+                DUNE_SIMD_CHECK(is123(vec)); DUNE_SIMD_CHECK(is123(ref)); }
         {       V ref(make123<V>());     V vec   {ref};
-          DUNE_SIMD_CHECK(is123(vec)); DUNE_SIMD_CHECK(is123(ref)); }
+                DUNE_SIMD_CHECK(is123(vec)); DUNE_SIMD_CHECK(is123(ref)); }
         {       V ref(make123<V>());     V vec = {ref};
-          DUNE_SIMD_CHECK(is123(vec)); DUNE_SIMD_CHECK(is123(ref)); }
+                DUNE_SIMD_CHECK(is123(vec)); DUNE_SIMD_CHECK(is123(ref)); }
         { const V ref(make123<V>());     V vec   (ref);
           DUNE_SIMD_CHECK(is123(vec)); }
         { const V ref(make123<V>());     V vec =  ref ;
@@ -499,9 +499,9 @@ namespace Dune {
       {
         // broadcast copy constructors
         {       Scalar<V> ref = 42;      V vec   (ref);
-          DUNE_SIMD_CHECK(is42(vec)); DUNE_SIMD_CHECK(ref == Scalar<V>(42)); }
+                DUNE_SIMD_CHECK(is42(vec)); DUNE_SIMD_CHECK(ref == Scalar<V>(42)); }
         {       Scalar<V> ref = 42;      V vec =  ref ;
-          DUNE_SIMD_CHECK(is42(vec)); DUNE_SIMD_CHECK(ref == Scalar<V>(42)); }
+                DUNE_SIMD_CHECK(is42(vec)); DUNE_SIMD_CHECK(ref == Scalar<V>(42)); }
         // {       Scalar<V> ref = 42;      V vec   {ref};
         //   DUNE_SIMD_CHECK(is42(vec)); DUNE_SIMD_CHECK(ref == Scalar<V>(42)); }
         // {       Scalar<V> ref = 42;      V vec = {ref};
@@ -531,11 +531,11 @@ namespace Dune {
       {
         // broadcast copy constructors
         {       Scalar<V> ref = 42;      V vec   (ref);
-          DUNE_SIMD_CHECK(is42(vec)); DUNE_SIMD_CHECK(ref == Scalar<V>(42)); }
+                DUNE_SIMD_CHECK(is42(vec)); DUNE_SIMD_CHECK(ref == Scalar<V>(42)); }
         // {       Scalar<V> ref = 42;      V vec =  ref ;
         //   DUNE_SIMD_CHECK(is42(vec)); DUNE_SIMD_CHECK(ref == Scalar<V>(42)); }
         {       Scalar<V> ref = 42;      V vec   {ref};
-          DUNE_SIMD_CHECK(is42(vec)); DUNE_SIMD_CHECK(ref == Scalar<V>(42)); }
+                DUNE_SIMD_CHECK(is42(vec)); DUNE_SIMD_CHECK(ref == Scalar<V>(42)); }
         // {       Scalar<V> ref = 42;      V vec = {ref};
         //   DUNE_SIMD_CHECK(is42(vec)); DUNE_SIMD_CHECK(ref == Scalar<V>(42)); }
         { const Scalar<V> ref = 42;      V vec   (ref);
@@ -753,7 +753,7 @@ namespace Dune {
           // `==` to the scalar type before comparing.
           DUNE_SIMD_CHECK_OP
             (lane(l, result)
-               == static_cast<T>(op(lane(l, static_cast<V>(val)))));
+            == static_cast<T>(op(lane(l, static_cast<V>(val)))));
         }
         // op might modify val, verify that any such modification also happens
         // in the vector case
@@ -845,7 +845,7 @@ namespace Dune {
       DUNE_SIMD_INFIX_OP(Plus,             +  );
       DUNE_SIMD_INFIX_OP(Minus,            -  );
 
-      DUNE_SIMD_INFIX_OP(LeftShift,        << );
+      DUNE_SIMD_INFIX_OP(LeftShift, << );
       DUNE_SIMD_INFIX_OP(RightShift,       >> );
 
       DUNE_SIMD_INFIX_OP(Less,             <  );
@@ -985,8 +985,8 @@ namespace Dune {
           // `static_cast` around the `op()` is necessary
           DUNE_SIMD_CHECK_OP
             (lane(l, vopres)
-               == static_cast<T>(op(lane(l, static_cast<V1>(vref1)),
-                                    lane(l, static_cast<V2>(vref2)))));
+            == static_cast<T>(op(lane(l, static_cast<V1>(vref1)),
+                                 lane(l, static_cast<V2>(vref2)))));
         }
 
         // check 3.  lane(l, vop1)   == aref1[l]    foreach l
@@ -1060,7 +1060,7 @@ namespace Dune {
       {
 #define DUNE_SIMD_OPNAME (className<Op(V1, T2)>())
         static_assert(std::is_same<Scalar<std::decay_t<V1> >,
-                      std::decay_t<T2> >::value,
+                                   std::decay_t<T2> >::value,
                       "Internal testsystem error: called with a scalar that "
                       "does not match the vector type.");
 
@@ -1096,8 +1096,8 @@ namespace Dune {
           // `static_cast` around the `op()` is necessary
           DUNE_SIMD_CHECK_OP
             (lane(l, vopres)
-               == static_cast<T>(op(lane(l, static_cast<V1>(vref1)),
-                                            static_cast<T2>(sref2) )));
+            == static_cast<T>(op(lane(l, static_cast<V1>(vref1)),
+                                 static_cast<T2>(sref2) )));
           // check 5.  sref2 is never modified
           DUNE_SIMD_CHECK_OP(sref2 == sinit2);
         }
@@ -1123,7 +1123,7 @@ namespace Dune {
       void checkBinaryOpVS(MetaType<V1>, MetaType<T2>, OpInfixComma)
       {
         static_assert(std::is_same<Scalar<std::decay_t<V1> >,
-                      std::decay_t<T2> >::value,
+                                   std::decay_t<T2> >::value,
                       "Internal testsystem error: called with a scalar that "
                       "does not match the vector type.");
 
@@ -1163,7 +1163,7 @@ namespace Dune {
       {
 #define DUNE_SIMD_OPNAME (className<Op(V1, T2)>())
         static_assert(std::is_same<Scalar<std::decay_t<V1> >,
-                      std::decay_t<T2> >::value,
+                                   std::decay_t<T2> >::value,
                       "Internal testsystem error: called with a scalar that "
                       "does not match the vector type.");
 
@@ -1278,8 +1278,8 @@ namespace Dune {
           // `static_cast` around the `op()` is necessary
           DUNE_SIMD_CHECK_OP
             (lane(l, vopres)
-               == static_cast<T>(op(lane(l, static_cast<V1>(vref1)),
-                                            static_cast<T2>(sref2) )));
+            == static_cast<T>(op(lane(l, static_cast<V1>(vref1)),
+                                 static_cast<T2>(sref2) )));
           // check 5.  sref2 is never modified
           DUNE_SIMD_CHECK_OP(sref2 == sinit2);
         }
@@ -1324,7 +1324,7 @@ namespace Dune {
         }
         template<class S1, class S2>
         auto scalar(S1&& s1, S2&& s2) const
-          -> decltype(orig.scalar(std::forward<S2>(s2), std::forward<S1>(s1)));
+        -> decltype(orig.scalar(std::forward<S2>(s2), std::forward<S1>(s1)));
       };
 
       template<class T1, class V2, class Op>
@@ -1337,7 +1337,7 @@ namespace Dune {
       void checkBinaryOpSV(MetaType<T1>, MetaType<V2>, OpInfixComma)
       {
         static_assert(std::is_same<std::decay_t<T1>,
-                      Scalar<std::decay_t<V2> > >::value,
+                                   Scalar<std::decay_t<V2> > >::value,
                       "Internal testsystem error: called with a scalar that "
                       "does not match the vector type.");
 
@@ -1582,19 +1582,19 @@ namespace Dune {
         static_assert
           (std::is_same<decltype(cond(std::declval<M>(), std::declval<V>(),
                                       std::declval<V>())), V>::value,
-           "The result of cond(M, V, V) should have exactly the type V");
+          "The result of cond(M, V, V) should have exactly the type V");
 
         static_assert
           (std::is_same<decltype(cond(std::declval<const M&>(),
                                       std::declval<const V&>(),
                                       std::declval<const V&>())), V>::value,
-           "The result of cond(const M&, const V&, const V&) should have "
-           "exactly the type V");
+          "The result of cond(const M&, const V&, const V&) should have "
+          "exactly the type V");
 
         static_assert
           (std::is_same<decltype(cond(std::declval<M&>(), std::declval<V&>(),
                                       std::declval<V&>())), V>::value,
-           "The result of cond(M&, V&, V&) should have exactly the type V");
+          "The result of cond(M&, V&, V&) should have exactly the type V");
 
         V vec1 = leftVector<V>();
         V vec2 = rightVector<V>();
@@ -1619,20 +1619,20 @@ namespace Dune {
         static_assert
           (std::is_same<decltype(cond(std::declval<bool>(), std::declval<V>(),
                                       std::declval<V>())), V>::value,
-           "The result of cond(bool, V, V) should have exactly the type V");
+          "The result of cond(bool, V, V) should have exactly the type V");
 
         static_assert
           (std::is_same<decltype(cond(std::declval<const bool&>(),
                                       std::declval<const V&>(),
                                       std::declval<const V&>())), V>::value,
-           "The result of cond(const bool&, const V&, const V&) should have "
-           "exactly the type V");
+          "The result of cond(const bool&, const V&, const V&) should have "
+          "exactly the type V");
 
         static_assert
           (std::is_same<decltype(cond(std::declval<bool&>(),
                                       std::declval<V&>(),
                                       std::declval<V&>())), V>::value,
-           "The result of cond(bool&, V&, V&) should have exactly the type V");
+          "The result of cond(bool&, V&, V&) should have exactly the type V");
 
         V vec1 = leftVector<V>();
         V vec2 = rightVector<V>();
@@ -1651,19 +1651,19 @@ namespace Dune {
       {
         static_assert
           (std::is_same<decltype(max(std::declval<V>())), Scalar<V> >::value,
-           "The result of max(V) should be exactly Scalar<V>");
+          "The result of max(V) should be exactly Scalar<V>");
 
         static_assert
           (std::is_same<decltype(min(std::declval<V>())), Scalar<V> >::value,
-           "The result of min(V) should be exactly Scalar<V>");
+          "The result of min(V) should be exactly Scalar<V>");
 
         static_assert
           (std::is_same<decltype(max(std::declval<V&>())), Scalar<V> >::value,
-           "The result of max(V) should be exactly Scalar<V>");
+          "The result of max(V) should be exactly Scalar<V>");
 
         static_assert
           (std::is_same<decltype(min(std::declval<V&>())), Scalar<V> >::value,
-           "The result of min(V) should be exactly Scalar<V>");
+          "The result of min(V) should be exactly Scalar<V>");
 
         const V vec1 = leftVector<V>();
 
@@ -1685,20 +1685,20 @@ namespace Dune {
         static_assert
           (std::is_same<decltype(Simd::max(std::declval<V>(),
                                            std::declval<V>())), V>::value,
-           "The result of Simd::max(V, V) should be exactly V");
+          "The result of Simd::max(V, V) should be exactly V");
         static_assert
           (std::is_same<decltype(Simd::min(std::declval<V>(),
                                            std::declval<V>())), V>::value,
-           "The result of Simd::min(V, V) should be exactly V");
+          "The result of Simd::min(V, V) should be exactly V");
 
         static_assert
           (std::is_same<decltype(Simd::max(std::declval<V&>(),
                                            std::declval<V&>())), V>::value,
-           "The result of Simd::max(V&, V&) should be exactly V");
+          "The result of Simd::max(V&, V&) should be exactly V");
         static_assert
           (std::is_same<decltype(Simd::min(std::declval<V&>(),
                                            std::declval<V&>())), V>::value,
-           "The result of Simd::min(V&, V&) should be exactly V");
+          "The result of Simd::min(V&, V&) should be exactly V");
 
         const V arg1 = leftVector<V>();
         const V arg2 = rightVector<V>();
@@ -1857,9 +1857,9 @@ namespace Dune {
         // do these first so everything that appears after "Checking SIMD type
         // ..." really pertains to that type
         auto recurse = [this](auto w) {
-          using W = typename decltype(w)::type;
-          this->template check<W, Rebinds, RebindPrune, RebindAccept>();
-        };
+                         using W = typename decltype(w)::type;
+                         this->template check<W, Rebinds, RebindPrune, RebindAccept>();
+                       };
         checkRebindOf<V, Rebinds, RebindPrune, RebindAccept>(recurse);
 
         checkType<V>();
@@ -1921,8 +1921,8 @@ namespace Dune {
       if constexpr (std::is_same_v<Scalar<V>, bool>) {
         // check mask
         auto check = [this](auto op) {
-          this->template checkUnaryOpsV<V>(op);
-        };
+                       this->template checkUnaryOpsV<V>(op);
+                     };
 
         // postfix
         // check(OpPostfixDecrement{});
@@ -1942,8 +1942,8 @@ namespace Dune {
       else {
         // check vector
         auto check = [this](auto op) {
-          this->template checkUnaryOpsV<V>(op);
-        };
+                       this->template checkUnaryOpsV<V>(op);
+                     };
 
         // postfix
         // check(OpPostfixDecrement{});
@@ -1970,61 +1970,61 @@ namespace Dune {
     template<class V> void UnitTest::checkBinaryOpsVectorVector()
     {
       auto checker = [this](auto doSV, auto doVV, auto doVS, auto op) {
-        auto check = [this,op](auto t1, auto t2) {
-          this->checkBinaryOpVV(t1, t2, op);
-        };
-        this->checkBinaryRefQual<V, V, doVV>(check);
-      };
+                       auto check = [this,op](auto t1, auto t2) {
+                                      this->checkBinaryOpVV(t1, t2, op);
+                                    };
+                       this->checkBinaryRefQual<V, V, doVV>(check);
+                     };
       checkBinaryOps<V>(checker);
     }
     template<class V> void UnitTest::checkBinaryOpsScalarVector()
     {
       auto checker = [this](auto doSV, auto doVV, auto doVS, auto op) {
-        auto check = [this,op](auto t1, auto t2) {
-          this->checkBinaryOpSV(t1, t2, op);
-        };
-        this->checkBinaryRefQual<Scalar<V>, V, doSV>(check);
+                       auto check = [this,op](auto t1, auto t2) {
+                                      this->checkBinaryOpSV(t1, t2, op);
+                                    };
+                       this->checkBinaryRefQual<Scalar<V>, V, doSV>(check);
 
-        auto crossCheck = [this,op](auto t1, auto t2) {
-          this->checkBinaryOpVVAgainstSV(t1, t2, op);
-        };
-        this->checkBinaryRefQual<Scalar<V>, V, doSV && doVV>(crossCheck);
-      };
+                       auto crossCheck = [this,op](auto t1, auto t2) {
+                                           this->checkBinaryOpVVAgainstSV(t1, t2, op);
+                                         };
+                       this->checkBinaryRefQual<Scalar<V>, V, doSV && doVV>(crossCheck);
+                     };
       checkBinaryOps<V>(checker);
     }
     template<class V> void UnitTest::checkBinaryOpsVectorScalar()
     {
       auto checker = [this](auto doSV, auto doVV, auto doVS, auto op) {
-        auto check = [this,op](auto t1, auto t2) {
-          this->checkBinaryOpVS(t1, t2, op);
-        };
-        this->checkBinaryRefQual<V, Scalar<V>, doVS>(check);
+                       auto check = [this,op](auto t1, auto t2) {
+                                      this->checkBinaryOpVS(t1, t2, op);
+                                    };
+                       this->checkBinaryRefQual<V, Scalar<V>, doVS>(check);
 
-        auto crossCheck = [this,op](auto t1, auto t2) {
-          this->checkBinaryOpVVAgainstVS(t1, t2, op);
-        };
-        this->checkBinaryRefQual<V, Scalar<V>, doVV && doVS>(crossCheck);
-      };
+                       auto crossCheck = [this,op](auto t1, auto t2) {
+                                           this->checkBinaryOpVVAgainstVS(t1, t2, op);
+                                         };
+                       this->checkBinaryRefQual<V, Scalar<V>, doVV && doVS>(crossCheck);
+                     };
       checkBinaryOps<V>(checker);
     }
     template<class V> void UnitTest::checkBinaryOpsProxyVector()
     {
       auto checker = [this](auto doSV, auto doVV, auto doVS, auto op) {
-        auto check = [this,op](auto t1, auto t2) {
-          this->checkBinaryOpPV(t1, t2, op);
-        };
-        this->checkBinaryRefQual<V, V, doSV>(check);
-      };
+                       auto check = [this,op](auto t1, auto t2) {
+                                      this->checkBinaryOpPV(t1, t2, op);
+                                    };
+                       this->checkBinaryRefQual<V, V, doSV>(check);
+                     };
       checkBinaryOps<V>(checker);
     }
     template<class V> void UnitTest::checkBinaryOpsVectorProxy()
     {
       auto checker = [this](auto doSV, auto doVV, auto doVS, auto op) {
-        auto check = [this,op](auto t1, auto t2) {
-          this->checkBinaryOpVP(t1, t2, op);
-        };
-        this->checkBinaryRefQual<V, V, doVS>(check);
-      };
+                       auto check = [this,op](auto t1, auto t2) {
+                                      this->checkBinaryOpVP(t1, t2, op);
+                                    };
+                       this->checkBinaryRefQual<V, V, doVS>(check);
+                     };
       checkBinaryOps<V>(checker);
     }
 

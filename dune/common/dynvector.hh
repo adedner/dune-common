@@ -107,7 +107,7 @@ namespace Dune {
     {
       const size_type n = x.size();
       _data.reserve(n);
-      for( size_type i =0; i<n ;++i)
+      for( size_type i =0; i<n ; ++i)
         _data.push_back( x[ i ] );
     }
 

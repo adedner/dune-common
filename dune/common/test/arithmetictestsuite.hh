@@ -71,13 +71,13 @@ namespace Dune {
     {
       return
         Cond<std::is_convertible<T, Arithmetic>, T,
-        Cond<std::is_floating_point<T>,          Floating,
-        Cond<std::is_integral<T>,
-             Cond<std::is_same<bool, T>,         Boolean,
-             Cond<std::is_signed<T>,             Signed,
-             Cond<std::is_unsigned<T>,           Unsigned
-                  > > >
-             > > >{};
+             Cond<std::is_floating_point<T>,          Floating,
+                  Cond<std::is_integral<T>,
+                       Cond<std::is_same<bool, T>,         Boolean,
+                            Cond<std::is_signed<T>,             Signed,
+                                 Cond<std::is_unsigned<T>,           Unsigned
+                                      > > >
+                       > > >{};
     }
 
 #define DUNE_TEST_FUNCTION(T, tag)                                      \

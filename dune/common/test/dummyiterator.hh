@@ -11,7 +11,7 @@
 template<typename T>
 class dummyiterator
   : public Dune::BidirectionalIteratorFacade<dummyiterator<T>, T, T&,
-        std::ptrdiff_t>
+                                             std::ptrdiff_t>
 {
   friend class dummyiterator<const typename std::remove_const<T>::type>;
 

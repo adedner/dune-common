@@ -43,9 +43,9 @@ namespace Dune {
 
     // Its not valid to copy a MPIPack but you can move it
     MPIPack(const MPIPack&) = delete;
-    MPIPack& operator = (const MPIPack& other) = delete;
+    MPIPack& operator= (const MPIPack& other) = delete;
     MPIPack(MPIPack&&) = default;
-    MPIPack& operator = (MPIPack&& other) = default;
+    MPIPack& operator= (MPIPack&& other) = default;
 
     /** @brief Packs the data into the object. Enlarges the internal buffer if
      * necessary.
@@ -61,7 +61,7 @@ namespace Dune {
         size += getPackSize(1, _comm, MPI_INT);
       if (_position + size > 0 && size_t(_position + size) > _buffer.size()) // resize buffer if necessary
         _buffer.resize(_position + size);
-      if(!has_static_size){
+      if(!has_static_size) {
         int size = mpidata.size();
         MPI_Pack(&size, 1, MPI_INT, _buffer.data(), _buffer.size(),
                  &_position, _comm);
@@ -77,7 +77,7 @@ namespace Dune {
      */
     template<class T>
     auto /*void*/ unpack(T& data)
-      -> std::enable_if_t<decltype(getMPIData(data))::static_size, void>
+    -> std::enable_if_t<decltype(getMPIData(data))::static_size, void>
     {
       auto mpidata = getMPIData(data);
       MPI_Unpack(_buffer.data(), _buffer.size(), &_position,
@@ -91,7 +91,7 @@ namespace Dune {
      */
     template<class T>
     auto /*void*/ unpack(T& data)
-      -> std::enable_if_t<!decltype(getMPIData(data))::static_size, void>
+    -> std::enable_if_t<!decltype(getMPIData(data))::static_size, void>
     {
       auto mpidata = getMPIData(data);
       int size = 0;
@@ -107,14 +107,14 @@ namespace Dune {
 
     //! @copydoc pack
     template<typename T>
-    friend MPIPack& operator << (MPIPack& p, const T& t){
+    friend MPIPack& operator<< (MPIPack& p, const T& t){
       p.pack(t);
       return p;
     }
 
     //! @copydoc unpack
     template<typename T>
-    friend MPIPack& operator >> (MPIPack& p, T& t){
+    friend MPIPack& operator>> (MPIPack& p, T& t){
       p.unpack(t);
       return p;
     }
@@ -182,7 +182,7 @@ namespace Dune {
     }
 
     friend bool operator==(const MPIPack& a, const MPIPack& b) {
-      return  a._buffer == b._buffer && a._comm == b._comm;
+      return a._buffer == b._buffer && a._comm == b._comm;
     }
     friend bool operator!=(const MPIPack& a, const MPIPack& b) {
       return !(a==b);

@@ -29,7 +29,7 @@ int testDeleteIndices()
   indexSet1.endResize();
 
   typedef Dune::ParallelIndexSet<int,Dune::LocalIndex,15>::iterator
-  Iterator;
+    Iterator;
 
   Iterator entry = indexSet.begin();
   indexSet.beginResize();

@@ -102,7 +102,7 @@ namespace Dune
           if (it->not_free)
           {
             std::cerr << "ERROR: found memory chunk still in use: " <<
-            it->capacity << " bytes at " << it->ptr << std::endl;
+              it->capacity << " bytes at " << it->ptr << std::endl;
             error = true;
           }
           munmap(it->page_ptr, it->pages * page_size);
@@ -285,7 +285,7 @@ namespace Dune
     }
 
     //! construct an object of type T from variadic parameters
-    template<typename ... Args>
+    template<typename... Args>
     void construct(pointer p, Args&&... args)
     {
       ::new((void *)p)T(std::forward<Args>(args) ...);

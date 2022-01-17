@@ -38,7 +38,7 @@ namespace Dune {
    */
 
   /**
-     *@brief A diagonal matrix of static size.
+   *@brief A diagonal matrix of static size.
    *
    * This is meant to be a replacement of FieldMatrix for the case that
    * it is a diagonal matrix.
@@ -120,7 +120,7 @@ namespace Dune {
     {
       std::copy_n(l.begin(), std::min(static_cast<std::size_t>(rows),
                                       l.size()),
-                 diag_.begin());
+                  diag_.begin());
     }
 
     /** \brief Assignment from a scalar */
@@ -365,7 +365,7 @@ namespace Dune {
     //! y += alpha A x
     template<class X, class Y>
     void usmv (const typename FieldTraits<Y>::field_type & alpha,
-      const X& x, Y& y) const
+               const X& x, Y& y) const
     {
 #ifdef DUNE_FMatrix_WITH_CHECKING
       if (x.N()!=M()) DUNE_THROW(FMatrixError,"index out of range");
@@ -378,7 +378,7 @@ namespace Dune {
     //! y += alpha A^T x
     template<class X, class Y>
     void usmtv (const typename FieldTraits<Y>::field_type & alpha,
-      const X& x, Y& y) const
+                const X& x, Y& y) const
     {
 #ifdef DUNE_FMatrix_WITH_CHECKING
       if (x.N()!=N()) DUNE_THROW(FMatrixError,"index out of range");
@@ -391,7 +391,7 @@ namespace Dune {
     //! y += alpha A^H x
     template<class X, class Y>
     void usmhv (const typename FieldTraits<Y>::field_type & alpha,
-      const X& x, Y& y) const
+                const X& x, Y& y) const
     {
 #ifdef DUNE_FMatrix_WITH_CHECKING
       if (x.N()!=N()) DUNE_THROW(FMatrixError,"index out of range");
@@ -727,7 +727,7 @@ namespace Dune {
     // since this is a proxy class we need to check equality of the stored pointer
     bool identical(const DiagonalRowVectorConst<K,n>& other) const
     {
-      return ((p_ == other.p_)and (row_ == other.row_));
+      return ((p_ == other.p_) and (row_ == other.row_));
     }
 
     //! ConstIterator class for sequential access
@@ -764,7 +764,7 @@ namespace Dune {
     //! Binary vector comparison
     bool operator== (const DiagonalRowVectorConst& y) const
     {
-      return ((p_==y.p_)and (row_==y.row_));
+      return ((p_==y.p_) and (row_==y.row_));
     }
 
     //===== sizes

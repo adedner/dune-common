@@ -198,7 +198,7 @@ namespace Dune {
        This is only a Proxy class, you can't get the address of the
        object it references
      */
-    void operator & () = delete;
+    void operator& () = delete;
 
     friend class BitSetVectorReference<block_size, Alloc>;
   };
@@ -327,10 +327,10 @@ namespace Dune {
 
     static bool xor_helper(bool a, bool b)
 #if defined(__GNUC__) && ! defined(__clang__) && __GNUC__ == 6 && __GNUC_MINOR__ == 3 && __cplusplus \
-  == 201402L
-      __attribute__((noinline))
+    == 201402L
+    __attribute__((noinline))
 #endif
-      ;
+    ;
 
   public:
 

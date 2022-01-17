@@ -56,11 +56,11 @@ int main()
 
   // fill dense matrix with test data
   auto testFillDense = [](auto& matrix) {
-    std::size_t k=0;
-    for(std::size_t i=0; i<matrix.N(); ++i)
-      for(std::size_t j=0; j<matrix.M(); ++j)
-        matrix[i][j] = k++;
-  };
+                         std::size_t k=0;
+                         for(std::size_t i=0; i<matrix.N(); ++i)
+                           for(std::size_t j=0; j<matrix.M(); ++j)
+                             matrix[i][j] = k++;
+                       };
 
   {
     auto a = Dune::FieldMatrix<double,3,4>{};

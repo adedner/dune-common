@@ -48,7 +48,7 @@ namespace Dune
 
       // constructor from any floating-point or integer type
       template <class T,
-        std::enable_if_t<std::is_arithmetic<T>::value, int> = 0>
+                std::enable_if_t<std::is_arithmetic<T>::value, int> = 0>
       constexpr Float128(const T& value) noexcept
         : value_(value)
       {}
@@ -84,7 +84,7 @@ namespace Dune
         CharT buf[128];
 
         std::string format = "%." + std::to_string(out.precision()) + "Q" +
-                              ((out.flags() | std::ios_base::scientific) ? "e" : "f");
+                             ((out.flags() | std::ios_base::scientific) ? "e" : "f");
         const int numChars = quadmath_snprintf(buf, bufSize, format.c_str(), x.value());
         if (std::size_t(numChars) >= bufSize) {
           DUNE_THROW(Dune::RangeError, "Failed to print Float128 value: buffer overflow");
@@ -351,7 +351,7 @@ namespace Dune
     //   distributed under the Boost Software License, Version 1.0
     //   (See http://www.boost.org/LICENSE_1_0.txt)
     template <class Int,
-      std::enable_if_t<std::is_integral<Int>::value, int> = 0>
+              std::enable_if_t<std::is_integral<Int>::value, int> = 0>
     inline Float128 pow(const Float128& x, const Int p)
     {
       static const Float128 max_value = FLT128_MAX;
@@ -402,7 +402,7 @@ namespace Dune
 
   template <>
   struct IsNumber<Impl::Float128>
-      : public std::true_type {};
+    : public std::true_type {};
 
 } // end namespace Dune
 

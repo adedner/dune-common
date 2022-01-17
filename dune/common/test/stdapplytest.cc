@@ -26,17 +26,17 @@ int main()
   Dune::TestSuite test;
 
   auto concat = [](auto&&... args) {
-            bool first = true;
-            std::stringstream stream;
-            nop({(stream << (first ? "":",") << args, first = false)...});
-            return stream.str();
-          };
+                  bool first = true;
+                  std::stringstream stream;
+                  nop({(stream << (first ? "":",") << args, first = false)...});
+                  return stream.str();
+                };
 
   test.check(Dune::Std::apply(concat, test_args) == "1,2,3,abc") << "Dune::Std::apply failed with concat lambda";
 
   auto makeTuple = [](auto&&... args) {
-            return std::make_tuple(args...);
-          };
+                     return std::make_tuple(args...);
+                   };
 
   test.check(Dune::Std::apply(makeTuple, test_args) == test_args) << "Dune::Std::apply failed with makeTuple lambda";
 
@@ -48,10 +48,10 @@ int main()
 
   // transformTuple implemented using Std::apply
   auto transformTuple = [](auto&& t, auto&& f) {
-    return Dune::Std::apply([&](auto&&... args) {
+                          return Dune::Std::apply([&](auto&&... args) {
       return std::make_tuple((f(std::forward<decltype(args)>(args)))...);
     }, t);
-  };
+                        };
 
   auto t1 = std::make_tuple(1, 0.2);
   auto t2 = transformTuple(t1, [](auto&& x) { return 1.0/x; });

@@ -16,7 +16,7 @@ namespace Dune {
 
   ios_base_all_saver::ios_base_all_saver(state_type& ios_)
     : ios(ios_), oldflags(ios.flags()), oldprec(ios.precision()),
-      oldwidth(ios.width())
+    oldwidth(ios.width())
   {}
 
   ios_base_all_saver::~ios_base_all_saver()

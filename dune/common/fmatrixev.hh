@@ -91,15 +91,15 @@ namespace Dune {
       }
 
       /*
-        This implementation was adapted from the pseudo-code (Python?) implementation found on
-        http://en.wikipedia.org/wiki/Eigenvalue_algorithm  (retrieved late August 2014).
-        Wikipedia claims to have taken it from
+         This implementation was adapted from the pseudo-code (Python?) implementation found on
+         http://en.wikipedia.org/wiki/Eigenvalue_algorithm  (retrieved late August 2014).
+         Wikipedia claims to have taken it from
           Smith, Oliver K. (April 1961), Eigenvalues of a symmetric 3 × 3 matrix.,
           Communications of the ACM 4 (4): 168, doi:10.1145/355578.366316
-      */
+       */
       template <typename K>
       static K eigenValues3dImpl(const FieldMatrix<K, 3, 3>& matrix,
-                                FieldVector<K, 3>& eigenvalues)
+                                 FieldVector<K, 3>& eigenvalues)
       {
         using std::sqrt;
         using std::acos;
@@ -134,10 +134,10 @@ namespace Dune {
           K r = B.determinant() / 2.0;
 
           /*In exact arithmetic for a symmetric matrix  -1 <= r <= 1
-          but computation error can leave it slightly outside this range.
-          acos(z) function requires |z| <= 1, but will fail silently
-          and return NaN if the input is larger than 1 in magnitude.
-          Thus r is clamped to [-1,1].*/
+             but computation error can leave it slightly outside this range.
+             acos(z) function requires |z| <= 1, but will fail silently
+             and return NaN if the input is larger than 1 in magnitude.
+             Thus r is clamped to [-1,1].*/
           r = std::min<K>(std::max<K>(r, -1.0), 1.0);
           K phi = acos(r) / 3.0;
 
@@ -173,10 +173,10 @@ namespace Dune {
       template<typename K>
       void eig0(const FieldMatrix<K,3,3>& matrix, K eval0, FieldVector<K,3>& evec0) {
         /* Compute a unit-length eigenvector for eigenvalue[i0].  The
-        matrix is rank 2, so two of the rows are linearly independent.
-        For a robust computation of the eigenvector, select the two
-        rows whose cross product has largest length of all pairs of
-        rows. */
+           matrix is rank 2, so two of the rows are linearly independent.
+           For a robust computation of the eigenvector, select the two
+           rows whose cross product has largest length of all pairs of
+           rows. */
         using Vector = FieldVector<K,3>;
         Vector row0 = {matrix[0][0]-eval0, matrix[0][1], matrix[0][2]};
         Vector row1 = {matrix[1][0], matrix[1][1]-eval0, matrix[1][2]};
@@ -216,22 +216,22 @@ namespace Dune {
         orthoComp(evec0, u, v);
 
         /* Let e be eval1 and let E be a corresponding eigenvector which
-        is a solution to the linear system (A - e*I)*E = 0.  The matrix
-        (A - e*I) is 3x3, not invertible (so infinitely many
-        solutions), and has rank 2 when eval1 and eval are different.
-        It has rank 1 when eval1 and eval2 are equal.  Numerically, it
-        is difficult to compute robustly the rank of a matrix.  Instead,
-        the 3x3 linear system is reduced to a 2x2 system as follows.
-        Define the 3x2 matrix J = [u,v] whose columns are the u and v
-        computed previously.  Define the 2x1 vector X = J*E.  The 2x2
-        system is 0 = M * X = (J^T * (A - e*I) * J) * X where J^T is
-        the transpose of J and M = J^T * (A - e*I) * J is a 2x2 matrix.
-        The system may be written as
-            +-                        -++-  -+       +-  -+
-            | U^T*A*U - e  U^T*A*V     || x0 | = e * | x0 |
-            | V^T*A*U      V^T*A*V - e || x1 |       | x1 |
-            +-                        -++   -+       +-  -+
-        where X has row entries x0 and x1. */
+           is a solution to the linear system (A - e*I)*E = 0.  The matrix
+           (A - e*I) is 3x3, not invertible (so infinitely many
+           solutions), and has rank 2 when eval1 and eval are different.
+           It has rank 1 when eval1 and eval2 are equal.  Numerically, it
+           is difficult to compute robustly the rank of a matrix.  Instead,
+           the 3x3 linear system is reduced to a 2x2 system as follows.
+           Define the 3x2 matrix J = [u,v] whose columns are the u and v
+           computed previously.  Define the 2x1 vector X = J*E.  The 2x2
+           system is 0 = M * X = (J^T * (A - e*I) * J) * X where J^T is
+           the transpose of J and M = J^T * (A - e*I) * J is a 2x2 matrix.
+           The system may be written as
+         +-                        -++-  -+       +-  -+
+         | U^T*A*U - e  U^T*A*V     || x0 | = e * | x0 |
+         | V^T*A*U      V^T*A*V - e || x1 |       | x1 |
+         +-                        -++   -+       +-  -+
+           where X has row entries x0 and x1. */
 
         Vector Au, Av;
         matrix.mv(u, Au);
@@ -242,10 +242,10 @@ namespace Dune {
         auto m11 = v.dot(Av) - eval1;
 
         /* For robustness, choose the largest-length row of M to compute
-        the eigenvector.  The 2-tuple of coefficients of U and V in the
-        assignments to eigenvector[1] lies on a circle, and U and V are
-        unit length and perpendicular, so eigenvector[1] is unit length
-        (within numerical tolerance). */
+           the eigenvector.  The 2-tuple of coefficients of U and V in the
+           assignments to eigenvector[1] lies on a circle, and U and V are
+           unit length and perpendicular, so eigenvector[1] is unit length
+           (within numerical tolerance). */
         auto absM00 = std::abs(m00);
         auto absM01 = std::abs(m01);
         auto absM11 = std::abs(m11);
@@ -290,8 +290,8 @@ namespace Dune {
       // 1d specialization
       template<Jobs Tag, typename K>
       static void eigenValuesVectorsImpl(const FieldMatrix<K, 1, 1>& matrix,
-                                     FieldVector<K, 1>& eigenValues,
-                                     FieldMatrix<K, 1, 1>& eigenVectors)
+                                         FieldVector<K, 1>& eigenValues,
+                                         FieldMatrix<K, 1, 1>& eigenVectors)
       {
         eigenValues[0] = matrix[0][0];
         if constexpr(Tag==EigenvaluesEigenvectors)
@@ -302,8 +302,8 @@ namespace Dune {
       // 2d specialization
       template <Jobs Tag, typename K>
       static void eigenValuesVectorsImpl(const FieldMatrix<K, 2, 2>& matrix,
-                                     FieldVector<K, 2>& eigenValues,
-                                     FieldMatrix<K, 2, 2>& eigenVectors)
+                                         FieldVector<K, 2>& eigenValues,
+                                         FieldMatrix<K, 2, 2>& eigenVectors)
       {
         // Compute eigen values
         Impl::eigenValues2dImpl(matrix, eigenValues);
@@ -344,16 +344,16 @@ namespace Dune {
       // 3d specialization
       template <Jobs Tag, typename K>
       static void eigenValuesVectorsImpl(const FieldMatrix<K, 3, 3>& matrix,
-                                     FieldVector<K, 3>& eigenValues,
-                                     FieldMatrix<K, 3, 3>& eigenVectors)
+                                         FieldVector<K, 3>& eigenValues,
+                                         FieldMatrix<K, 3, 3>& eigenVectors)
       {
         using Vector = FieldVector<K,3>;
         using Matrix = FieldMatrix<K,3,3>;
 
         //compute eigenvalues
         /* Precondition the matrix by factoring out the maximum absolute
-        value of the components.  This guards against floating-point
-        overflow when computing the eigenvalues.*/
+           value of the components.  This guards against floating-point
+           overflow when computing the eigenvalues.*/
         using std::isnormal;
         K maxAbsElement = (isnormal(matrix.infinity_norm())) ? matrix.infinity_norm() : K(1.0);
         Matrix scaledMatrix = matrix / maxAbsElement;
@@ -386,8 +386,8 @@ namespace Dune {
           }
           else {
             /*Compute the eigenvectors so that the set
-            [evec[0], evec[1], evec[2]] is right handed and
-            orthonormal. */
+               [evec[0], evec[1], evec[2]] is right handed and
+               orthonormal. */
 
             Matrix evec(0.0);
             Vector eval(eigenValues);
@@ -407,8 +407,8 @@ namespace Dune {
             for(std::size_t i=0; i<=2; ++i)
               pairs.push_back(EVPair(eval[i], evec[i]));
             auto comp = [](EVPair x, EVPair y){ return x.first < y.first; };
-                                       std::sort(pairs.begin(), pairs.end(), comp);
-            for(std::size_t i=0; i<=2; ++i){
+            std::sort(pairs.begin(), pairs.end(), comp);
+            for(std::size_t i=0; i<=2; ++i) {
               eigenValues[i] = pairs[i].first;
               eigenVectors[i] = pairs[i].second;
             }
@@ -427,7 +427,7 @@ namespace Dune {
         {
 #if HAVE_LAPACK
           /*Lapack uses a proprietary tag to determine whether both eigenvalues and
-            -vectors ('v') or only eigenvalues ('n') should be calculated */
+             -vectors ('v') or only eigenvalues ('n') should be calculated */
           const char jobz = "nv"[Tag];
 
           const long int N = dim ;
@@ -458,7 +458,7 @@ namespace Dune {
           // return value information
           long int info = 0;
           LapackNumType* ev;
-          if constexpr (isKLapackType){
+          if constexpr (isKLapackType) {
             ev = &eigenValues[0];
           }else{
             ev = new LapackNumType[dim];
@@ -468,14 +468,14 @@ namespace Dune {
           eigenValuesLapackCall(&jobz, &uplo, &N, &matrixVector[0], &N,
                                 ev, &workSpace[0], &lwork, &info);
 
-          if constexpr (!isKLapackType){
-              for(size_t i=0;i<dim;++i)
-                eigenValues[i] = ev[i];
-              delete[] ev;
+          if constexpr (!isKLapackType) {
+            for(size_t i=0; i<dim; ++i)
+              eigenValues[i] = ev[i];
+            delete[] ev;
           }
 
           // restore eigenvectors matrix
-          if (Tag==Jobs::EigenvaluesEigenvectors){
+          if (Tag==Jobs::EigenvaluesEigenvectors) {
             row = 0;
             for(int i=0; i<dim; ++i)
             {
@@ -547,7 +547,7 @@ namespace Dune {
      */
     template <int dim, typename K>
     static void eigenValuesLapack(const FieldMatrix<K, dim, dim>& matrix,
-                                         FieldVector<K, dim>& eigenValues)
+                                  FieldVector<K, dim>& eigenValues)
     {
       Impl::EVDummy<K,dim> dummy;
       Impl::eigenValuesVectorsLapackImpl<Impl::Jobs::EigenvaluesEigenvectors>(matrix, eigenValues, dummy);

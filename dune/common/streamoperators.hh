@@ -29,7 +29,7 @@ namespace Dune
     if(sizeof...(Ts)>0)
     {
       Hybrid::forEach(std::make_index_sequence<sizeof...(Ts)-1>{},
-        [&](auto i){stream<<std::get<i>(t)<<",";});
+                      [&](auto i){stream<<std::get<i>(t)<<",";});
       stream<<std::get<sizeof...(Ts)-1>(t);
     }
     stream<<"]";
@@ -41,7 +41,7 @@ namespace Dune
   inline Stream& operator>>(Stream& stream, std::tuple<Ts...>& t)
   {
     Hybrid::forEach(std::make_index_sequence<sizeof...(Ts)>{},
-      [&](auto i){stream>>std::get<i>(t);});
+                    [&](auto i){stream>>std::get<i>(t);});
     return stream;
   }
 

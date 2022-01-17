@@ -35,7 +35,7 @@ namespace Dune
   std::ostream& operator<<(std::ostream& os, const ParallelLocalIndex<T>& index)
   {
     os<<"{local="<<index.localIndex_<<", attr="<<T(index.attribute_)<<", public="
-    <<(index.public_ ? true : false)<<"}";
+      <<(index.public_ ? true : false)<<"}";
     return os;
   }
 
@@ -215,20 +215,20 @@ namespace Dune
   template<class T>
   ParallelLocalIndex<T>::ParallelLocalIndex(const T& attribute, bool isPublic)
     : localIndex_(0), attribute_(static_cast<char>(attribute)),
-      public_(static_cast<char>(isPublic)), state_(static_cast<char>(VALID))
+    public_(static_cast<char>(isPublic)), state_(static_cast<char>(VALID))
   {}
 
 
   template<class T>
   ParallelLocalIndex<T>::ParallelLocalIndex(size_t local, const T& attribute, bool isPublic)
     : localIndex_(local), attribute_(static_cast<char>(attribute)),
-      public_(static_cast<char>(isPublic)), state_(static_cast<char>(VALID))
+    public_(static_cast<char>(isPublic)), state_(static_cast<char>(VALID))
   {}
 
   template<class T>
   ParallelLocalIndex<T>::ParallelLocalIndex()
     : localIndex_(0), attribute_(), public_(static_cast<char>(false)),
-      state_(static_cast<char>(VALID))
+    state_(static_cast<char>(VALID))
   {}
 
   template<class T>

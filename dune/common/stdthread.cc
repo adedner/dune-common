@@ -47,31 +47,31 @@ namespace Dune
     }
     catch(...) {
       printCallOnceError(file, line, function,
-"std::call_once() throws an exception.  This suggests that the program was\n"
-"linked without a threading library.  Common ways to link to a threading\n"
-"library is to specify one of the following during linking: -pthread, \n"
-"-lpthread, or -pthreads.  The build system should have tried various of\n"
-"these options, but unfortunately that is only a guess and we cannot verify\n"
-"that we found a working configuration until runtime.\n"
-"\n"
-"Going to rethrow the exception now to give the system library a chance to\n"
-"print more information about it, just in case that helps with debugging.\n"
+                         "std::call_once() throws an exception.  This suggests that the program was\n"
+                         "linked without a threading library.  Common ways to link to a threading\n"
+                         "library is to specify one of the following during linking: -pthread, \n"
+                         "-lpthread, or -pthreads.  The build system should have tried various of\n"
+                         "these options, but unfortunately that is only a guess and we cannot verify\n"
+                         "that we found a working configuration until runtime.\n"
+                         "\n"
+                         "Going to rethrow the exception now to give the system library a chance to\n"
+                         "print more information about it, just in case that helps with debugging.\n"
                          );
       throw;
     }
     if(!works)
     {
       printCallOnceError(file, line, function,
-"std::call_once() never calls the function.  This suggests that your\n"
-"libctdc++ or your gcc built without threading support (--disable-threads,\n"
-"see https://gcc.gnu.org/install/configure.html).  This is probably a bug in\n"
-"__gthread_once() in /usr/include/c++/4.7/x86_64-linux-gnu/bits/gthr-single.h\n"
-"(which should not silently return success without doing anything, but\n"
-"apparently does so in some versions).\n"
-"\n"
-"To fix the issue, either recompile gcc with a working threading\n"
-"implementation, or file a bug for gthr-single.h, or file a bug at\n"
-"https://dune-project.org/flyspray/ and request a workaround at the dune-side."
+                         "std::call_once() never calls the function.  This suggests that your\n"
+                         "libctdc++ or your gcc built without threading support (--disable-threads,\n"
+                         "see https://gcc.gnu.org/install/configure.html).  This is probably a bug in\n"
+                         "__gthread_once() in /usr/include/c++/4.7/x86_64-linux-gnu/bits/gthr-single.h\n"
+                         "(which should not silently return success without doing anything, but\n"
+                         "apparently does so in some versions).\n"
+                         "\n"
+                         "To fix the issue, either recompile gcc with a working threading\n"
+                         "implementation, or file a bug for gthr-single.h, or file a bug at\n"
+                         "https://dune-project.org/flyspray/ and request a workaround at the dune-side."
                          );
       std::abort();
     }

@@ -23,7 +23,7 @@ int main() {
   std::complex<double> complex_inf3(inf, inf);
 
   std::cout << std::boolalpha
-            //check isNaN()
+    //check isNaN()
             << "isNaN(int): " << Dune::isNaN(a) << "\n"
             << "isNaN(const int): " << Dune::isNaN(b) << "\n"
             << "isNaN(42): " << Dune::isNaN(42) << "\n"
@@ -37,7 +37,7 @@ int main() {
             << Dune::isNaN(complex_nan2) << " "
             << Dune::isNaN(complex_nan3) << "\n"
 
-            //check isInf()
+    //check isInf()
             << "isInf(int): " << Dune::isInf(a) << "\n"
             << "isInf(const int): " << Dune::isInf(b) << "\n"
             << "isInf(42): " << Dune::isInf(42) << "\n"
@@ -50,7 +50,7 @@ int main() {
             << Dune::isInf(complex_inf2) << " "
             << Dune::isInf(complex_inf3) << "\n"
 
-            //check isFinite()
+    //check isFinite()
             << "isFinite(int): " << Dune::isFinite(a) << "\n"
             << "isFinite(const int): " << Dune::isFinite(b) << "\n"
             << "isFinite(42): " << Dune::isFinite(42) << "\n"
@@ -63,5 +63,5 @@ int main() {
             << Dune::isFinite(complex_inf2) << " "
             << Dune::isFinite(complex_inf3) << "\n"
 
-  << std::endl;
+            << std::endl;
 }

@@ -23,9 +23,9 @@ int main(int argc, char **argv)
     float, double, long double>;
 
   Dune::Hybrid::forEach(ArithmeticTypes(), [&](auto val) {
-      using T = decltype(val);
-      test.checkArithmetic<T, T>();
-    });
+    using T = decltype(val);
+    test.checkArithmetic<T, T>();
+  });
 
   return test.exit();
 }

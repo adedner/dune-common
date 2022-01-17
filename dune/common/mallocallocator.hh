@@ -81,7 +81,7 @@ namespace Dune
     }
 
     //! construct an object of type T from variadic parameters
-    template<typename ... Args>
+    template<typename... Args>
     void construct(pointer p, Args&&... args)
     {
       ::new((void *)p)T(std::forward<Args>(args) ...);

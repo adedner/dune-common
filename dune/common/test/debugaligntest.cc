@@ -99,12 +99,12 @@ int main(int argc, char **argv)
     float, double, long double>;
 
   Dune::Hybrid::forEach(ArithmeticTypes(), [&](auto val) {
-      using T = decltype(val);
-      using Aligned = Dune::AlignedNumber<T>;
-      test.checkArithmetic<Aligned, T>();
+    using T = decltype(val);
+    using Aligned = Dune::AlignedNumber<T>;
+    test.checkArithmetic<Aligned, T>();
 
-      checkAlignmentViolation<Aligned>(test);
-    });
+    checkAlignmentViolation<Aligned>(test);
+  });
 
   return test.exit();
 }

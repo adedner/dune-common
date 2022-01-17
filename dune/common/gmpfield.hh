@@ -71,8 +71,7 @@ namespace Dune
 
   template <unsigned int precision>
   struct IsNumber<GMPField<precision>>
-    : public std::integral_constant<bool, true> {
-  };
+    : public std::integral_constant<bool, true> {};
 
   template< unsigned int precision1, unsigned int precision2 >
   struct PromotionTraits<GMPField<precision1>, GMPField<precision2>>

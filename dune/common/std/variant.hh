@@ -4,21 +4,21 @@
 #define DUNE_COMMON_STD_VARIANT_HH
 
 #warning dune/common/std/variant.hh is deprecated and will be removed after Dune 2.8.\
- Include <variant> instead
+  Include <variant> instead
 
 #include <variant>
 
 namespace Dune {
-namespace Std {
-  using std::variant;
-  using std::visit;
-  using std::variant_size;
-  using std::variant_size_v;
-  using std::get;
-  using std::get_if;
-  using std::holds_alternative;
-  using std::monostate;
-}
+  namespace Std {
+    using std::variant;
+    using std::visit;
+    using std::variant_size;
+    using std::variant_size_v;
+    using std::get;
+    using std::get_if;
+    using std::holds_alternative;
+    using std::monostate;
+  }
 }
 
 #endif

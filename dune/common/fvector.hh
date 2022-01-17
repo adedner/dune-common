@@ -64,7 +64,7 @@ namespace Dune {
   {
     enum {
       /**
-         *@param True if C is not of type FieldVector or its dimension
+       *@param True if C is not of type FieldVector or its dimension
        * is not equal SIZE.
        */
       value = true
@@ -137,7 +137,7 @@ namespace Dune {
       assert(l.size() == dimension);// Actually, this is not needed any more!
       std::copy_n(l.begin(), std::min(static_cast<std::size_t>(dimension),
                                       l.size()),
-                 _data.begin());
+                  _data.begin());
     }
 
     //! copy assignment operator

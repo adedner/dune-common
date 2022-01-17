@@ -167,10 +167,10 @@ namespace Dune
    */
   template<typename R, typename F, typename... Args>
   struct IsCallable<F(Args...), R>
-  : public std::bool_constant<
+    : public std::bool_constant<
       std::is_invocable_r_v<R, F, Args...>
-        && !std::is_member_pointer_v<std::decay_t<F>>
-    > {};
+      && !std::is_member_pointer_v<std::decay_t<F>>
+      > {};
 
   //! \brief Whether this type acts as a scalar in the context of
   //!        (hierarchically blocked) containers
@@ -191,15 +191,13 @@ namespace Dune
    */
   template <typename T>
   struct IsNumber
-    : public std::integral_constant<bool, std::is_arithmetic<T>::value> {
-  };
+    : public std::integral_constant<bool, std::is_arithmetic<T>::value> {};
 
 #ifndef DOXYGEN
 
   template <typename T>
   struct IsNumber<std::complex<T>>
-    : public std::integral_constant<bool, IsNumber<T>::value> {
-  };
+    : public std::integral_constant<bool, IsNumber<T>::value> {};
 
 #endif // DOXYGEN
 
@@ -209,15 +207,13 @@ namespace Dune
    */
   template <typename T>
   struct HasNaN
-      : public std::integral_constant<bool, std::is_floating_point<T>::value> {
-  };
+    : public std::integral_constant<bool, std::is_floating_point<T>::value> {};
 
 #ifndef DOXYGEN
 
   template <typename T>
   struct HasNaN<std::complex<T>>
-      : public std::integral_constant<bool, std::is_floating_point<T>::value> {
-  };
+    : public std::integral_constant<bool, std::is_floating_point<T>::value> {};
 
 #endif // DOXYGEN
 
@@ -256,7 +252,7 @@ namespace Dune
     // By passing expressions to this function one can avoid
     // "value computed is not used" warnings that may show up
     // in a comma expression.
-    template<class...T>
+    template<class... T>
     void ignore(T&&... /*t*/)
     {}
   }
@@ -276,14 +272,14 @@ namespace Dune
   // version for types with begin() and end()
   template<typename T>
   struct IsIterable<T, decltype(Impl::ignore(
-      std::declval<T>().begin(),
-      std::declval<T>().end(),
-      std::declval<T>().begin() != std::declval<T>().end(),
-      decltype(std::declval<T>().begin()){std::declval<T>().end()},
-      ++(std::declval<std::add_lvalue_reference_t<decltype(std::declval<T>().begin())>>()),
-      *(std::declval<T>().begin())
-      ))>
-    : public std::true_type
+                                  std::declval<T>().begin(),
+                                  std::declval<T>().end(),
+                                  std::declval<T>().begin() != std::declval<T>().end(),
+                                  decltype(std::declval<T>().begin()){std::declval<T>().end()},
+                                  ++(std::declval<std::add_lvalue_reference_t<decltype(std::declval<T>().begin())>>()),
+                                  *(std::declval<T>().begin())
+                                  ))>
+  : public std::true_type
   {};
 #endif
 
@@ -306,13 +302,13 @@ namespace Dune
   // Implementation of IsTuple
   namespace Impl {
 
-  template<class T>
-  struct IsTuple : public std::false_type
-  {};
+    template<class T>
+    struct IsTuple : public std::false_type
+    {};
 
-  template<class... T>
-  struct IsTuple<std::tuple<T...>> : public std::true_type
-  {};
+    template<class... T>
+    struct IsTuple<std::tuple<T...>> : public std::true_type
+    {};
 
   } // namespace Impl
 
@@ -334,13 +330,13 @@ namespace Dune
   // Implementation of IsTupleOrDerived
   namespace Impl {
 
-  template<class... T, class Dummy>
-  std::true_type isTupleOrDerived(const std::tuple<T...>*, Dummy)
-  { return {}; }
+    template<class... T, class Dummy>
+    std::true_type isTupleOrDerived(const std::tuple<T...>*, Dummy)
+    { return {}; }
 
-  template<class Dummy>
-  std::false_type isTupleOrDerived(const void*, Dummy)
-  { return {}; }
+    template<class Dummy>
+    std::false_type isTupleOrDerived(const void*, Dummy)
+    { return {}; }
 
   } // namespace Impl
 
@@ -362,13 +358,13 @@ namespace Dune
   // Implementation of is IsIntegralConstant
   namespace Impl {
 
-  template<class T>
-  struct IsIntegralConstant : public std::false_type
-  {};
+    template<class T>
+    struct IsIntegralConstant : public std::false_type
+    {};
 
-  template<class T, T t>
-  struct IsIntegralConstant<std::integral_constant<T, t>> : public std::true_type
-  {};
+    template<class T, T t>
+    struct IsIntegralConstant<std::integral_constant<T, t>> : public std::true_type
+    {};
 
   } // namespace Impl
 
@@ -408,41 +404,41 @@ namespace Dune
 
   namespace Impl {
 
-  template<class T, T...>
-  struct IntegerSequenceHelper;
+    template<class T, T...>
+    struct IntegerSequenceHelper;
 
-  // Helper struct to compute the i-th entry of a std::integer_sequence
-  //
-  // This could also be implemented using std::get<index>(std::make_tuple(t...)).
-  // However, the gcc-6 implementation of std::make_tuple increases the instantiation
-  // depth by 15 levels for each argument, such that the maximal instantiation depth
-  // is easily hit, especially with clang where it is set to 256.
-  template<class T, T head, T... tail>
-  struct IntegerSequenceHelper<T, head, tail...>
-  {
-
-    // get first entry
-    static constexpr auto get(std::integral_constant<std::size_t, 0>)
+    // Helper struct to compute the i-th entry of a std::integer_sequence
+    //
+    // This could also be implemented using std::get<index>(std::make_tuple(t...)).
+    // However, the gcc-6 implementation of std::make_tuple increases the instantiation
+    // depth by 15 levels for each argument, such that the maximal instantiation depth
+    // is easily hit, especially with clang where it is set to 256.
+    template<class T, T head, T... tail>
+    struct IntegerSequenceHelper<T, head, tail...>
     {
-      return std::integral_constant<T, head>();
-    }
 
-    // call get with first entry cut off and decremented index
-    template<std::size_t index,
-      std::enable_if_t<(index > 0) and (index < sizeof...(tail)+1), int> = 0>
-    static constexpr auto get(std::integral_constant<std::size_t, index>)
-    {
-      return IntegerSequenceHelper<T, tail...>::get(std::integral_constant<std::size_t, index-1>());
-    }
+      // get first entry
+      static constexpr auto get(std::integral_constant<std::size_t, 0>)
+      {
+        return std::integral_constant<T, head>();
+      }
 
-    // use static assertion if index exceeds size
-    template<std::size_t index,
-      std::enable_if_t<(index >= sizeof...(tail)+1), int> = 0>
-    static constexpr auto get(std::integral_constant<std::size_t, index>)
-    {
-      static_assert(index < sizeof...(tail)+1, "index used in IntegerSequenceEntry exceed size");
-    }
-  };
+      // call get with first entry cut off and decremented index
+      template<std::size_t index,
+               std::enable_if_t<(index > 0) and (index < sizeof...(tail)+1), int> = 0>
+      static constexpr auto get(std::integral_constant<std::size_t, index>)
+      {
+        return IntegerSequenceHelper<T, tail...>::get(std::integral_constant<std::size_t, index-1>());
+      }
+
+      // use static assertion if index exceeds size
+      template<std::size_t index,
+               std::enable_if_t<(index >= sizeof...(tail)+1), int> = 0>
+      static constexpr auto get(std::integral_constant<std::size_t, index>)
+      {
+        static_assert(index < sizeof...(tail)+1, "index used in IntegerSequenceEntry exceed size");
+      }
+    };
 
   } // end namespace Impl
 

@@ -479,7 +479,7 @@ namespace Dune
 
     char* start = chunks_->chunk_;
     char* last  = &start[elements*alignedSize];
-    Reference* ref = new (start) (Reference);
+    Reference* ref = new (start)(Reference);
 
     // grow is only called if head==0,
     assert(!head_);
@@ -487,7 +487,7 @@ namespace Dune
     head_ = ref;
 
     for(char* element=start+alignedSize; element<last; element=element+alignedSize) {
-      Reference* next = new (element) (Reference);
+      Reference* next = new (element)(Reference);
       ref->next_ = next;
       ref = next;
     }

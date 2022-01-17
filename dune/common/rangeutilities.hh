@@ -28,7 +28,7 @@ namespace Dune
      \brief compute the maximum value over a range
 
      overloads for scalar values, and ranges exist
-  */
+   */
   template <typename T,
             typename std::enable_if<IsIterable<T>::value, int>::type = 0>
   typename T::value_type
@@ -251,7 +251,7 @@ namespace Dune
     /** \brief access specified element (static version) **/
     template <class U, U i>
     constexpr auto operator[](const std::integral_constant<U, i> &) const noexcept
-      -> std::integral_constant<value_type, from + static_cast<value_type>(i)>
+    -> std::integral_constant<value_type, from + static_cast<value_type>(i)>
     {
       return {};
     }
@@ -662,7 +662,7 @@ namespace Dune
       f_(f)
     {
       static_assert(std::is_same_v<T, ValueTransformationTag> or std::is_same_v<T, IteratorTransformationTag>,
-          "The TransformationType passed to TransformedRangeView has to be either ValueTransformationTag or IteratorTransformationTag.");
+                    "The TransformationType passed to TransformedRangeView has to be either ValueTransformationTag or IteratorTransformationTag.");
     }
 
     /**
@@ -708,7 +708,7 @@ namespace Dune
      * They are only used to implement SFINAE.
      */
     template<class Dummy=R,
-      class = std::void_t<decltype(std::declval<Dummy>().size())>>
+             class = std::void_t<decltype(std::declval<Dummy>().size())>>
     auto size() const
     {
       return rawRange_.size();
@@ -818,7 +818,7 @@ namespace Dune
   template<class Range>
   auto sparseRange(Range&& range) {
     return Dune::iteratorTransformedRangeView(std::forward<Range>(range), [](auto&& it) {
-        return std::tuple<decltype(*it), decltype(it.index())>(*it, it.index());
+      return std::tuple<decltype(*it), decltype(it.index())>(*it, it.index());
     });
   }
 

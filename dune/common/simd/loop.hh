@@ -36,18 +36,18 @@ namespace Dune {
 
 
   /**
-    *  This class specifies a vector-like type deriving from std::array
-    *  for memory management and basic accessibility.
-    *  This type is capable of dealing with all (well-defined) operators
-    *  and is usable with the SIMD-interface.
-    *
-    *  @tparam T Base type. Could also be vectorized type.
-    *  @tparam S Size
-    *  @tparam minimum alignment. It is inherited to rebound types.
-    */
+   *  This class specifies a vector-like type deriving from std::array
+   *  for memory management and basic accessibility.
+   *  This type is capable of dealing with all (well-defined) operators
+   *  and is usable with the SIMD-interface.
+   *
+   *  @tparam T Base type. Could also be vectorized type.
+   *  @tparam S Size
+   *  @tparam minimum alignment. It is inherited to rebound types.
+   */
 
   template<class T, std::size_t S, std::size_t A = 0>
-  class alignas(A==0?alignof(T):A) LoopSIMD : public std::array<T,S> {
+  class alignas(A==0?alignof(T) : A) LoopSIMD : public std::array<T,S> {
 
   public:
 
@@ -62,7 +62,7 @@ namespace Dune {
     }
 
     template<std::size_t OA>
-      explicit LoopSIMD(const LoopSIMD<T,S,OA>& other)
+    explicit LoopSIMD(const LoopSIMD<T,S,OA>& other)
       : std::array<T,S>(other)
     {
       assert(reinterpret_cast<uintptr_t>(this) % std::min(alignof(LoopSIMD<T,S,A>),alignof(std::max_align_t)) == 0);
@@ -106,7 +106,7 @@ namespace Dune {
     auto operator!() const {
       Simd::Mask<LoopSIMD<T,S,A>> out;
       DUNE_PRAGMA_OMP_SIMD
-      for(std::size_t i=0; i<S; i++){
+      for(std::size_t i=0; i<S; i++) {
         out[i] = !((*this)[i]);
       }
       return out;
@@ -122,8 +122,8 @@ namespace Dune {
     }                                            \
     static_assert(true, "expecting ;")
 
-   DUNE_SIMD_LOOP_POSTFIX_OP(++);
-   DUNE_SIMD_LOOP_POSTFIX_OP(--);
+    DUNE_SIMD_LOOP_POSTFIX_OP(++);
+    DUNE_SIMD_LOOP_POSTFIX_OP(--);
 #undef DUNE_SIMD_LOOP_POSTFIX_OP
 
     //Assignment operators
@@ -341,21 +341,21 @@ namespace Dune {
 
       template<class T, std::size_t S, std::size_t A>
       auto lane(ADLTag<5>, std::size_t l, LoopSIMD<T,S,A> &&v)
-        -> decltype(std::move(Simd::lane(l%lanes<T>(), v[l/lanes<T>()])))
+      -> decltype(std::move(Simd::lane(l%lanes<T>(), v[l/lanes<T>()])))
       {
         return std::move(Simd::lane(l%lanes<T>(), v[l/lanes<T>()]));
       }
 
       template<class T, std::size_t S, std::size_t A>
       auto lane(ADLTag<5>, std::size_t l, const LoopSIMD<T,S,A> &v)
-        -> decltype(Simd::lane(l%lanes<T>(), v[l/lanes<T>()]))
+      -> decltype(Simd::lane(l%lanes<T>(), v[l/lanes<T>()]))
       {
         return Simd::lane(l%lanes<T>(), v[l/lanes<T>()]);
       }
 
       template<class T, std::size_t S, std::size_t A>
       auto lane(ADLTag<5>, std::size_t l, LoopSIMD<T,S,A> &v)
-        -> decltype(Simd::lane(l%lanes<T>(), v[l/lanes<T>()]))
+      -> decltype(Simd::lane(l%lanes<T>(), v[l/lanes<T>()]))
       {
         return Simd::lane(l%lanes<T>(), v[l/lanes<T>()]);
       }
@@ -372,7 +372,7 @@ namespace Dune {
 
       template<class M, class T, std::size_t S, std::size_t A>
       auto cond(ADLTag<5, std::is_same<bool, Simd::Scalar<M> >::value
-                && Simd::lanes<M>() == Simd::lanes<LoopSIMD<T,S,A> >()>,
+                       && Simd::lanes<M>() == Simd::lanes<LoopSIMD<T,S,A> >()>,
                 M mask, LoopSIMD<T,S,A> ifTrue, LoopSIMD<T,S,A> ifFalse)
       {
         LoopSIMD<T,S,A> out;
@@ -594,8 +594,7 @@ namespace Dune {
 
   template<class T, std::size_t S, std::size_t A>
   struct IsNumber<LoopSIMD<T,S,A>> :
-          public std::integral_constant<bool, IsNumber<T>::value>{
-  };
+    public std::integral_constant<bool, IsNumber<T>::value> {};
 
 #  pragma GCC diagnostic pop
 

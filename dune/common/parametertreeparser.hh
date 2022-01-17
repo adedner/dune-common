@@ -171,14 +171,14 @@ namespace Dune {
      * \param allow_more allow more options than these listed in keywords (default = true)
      * \param overwrite  allow to overwrite existing options (default = true)
      * \param help vector containing help strings
-    */
+     */
     static void readNamedOptions(int argc, char* argv[],
-      ParameterTree& pt,
-      std::vector<std::string> keywords,
-      unsigned int required = std::numeric_limits<unsigned int>::max(),
-      bool allow_more = true,
-      bool overwrite = true,
-      std::vector<std::string> help = std::vector<std::string>());
+                                 ParameterTree& pt,
+                                 std::vector<std::string> keywords,
+                                 unsigned int required = std::numeric_limits<unsigned int>::max(),
+                                 bool allow_more = true,
+                                 bool overwrite = true,
+                                 std::vector<std::string> help = std::vector<std::string>());
 
   private:
     static std::string generateHelpString(std::string progname, std::vector<std::string> keywords, unsigned int required, std::vector<std::string> help);

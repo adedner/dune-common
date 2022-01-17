@@ -26,14 +26,14 @@ bool run()
   for (size_t i = 0; i < 3; ++i) {
     if (fvec2[i] != dynvec1[i]) {
       std::cerr << "Assigning a DynamicVector to a FieldVector as DenseVectors does not work!"
-      << std::endl << i << "-th entry after assignment is " << fvec2[i] << ", should be "
-      << i+1 << "!" << std::endl;
+                << std::endl << i << "-th entry after assignment is " << fvec2[i] << ", should be "
+                << i+1 << "!" << std::endl;
       passed = false;
     }
     if (dynvec1[i] != dynvec2[i]) {
       std::cerr << "Assigning a FieldVector to a DynamicVector as DenseVectors does not work"
-      << std::endl << i << "-th entry after assignment is " << dynvec1[i] << ", should be "
-      << i+1 << "!" << std::endl;
+                << std::endl << i << "-th entry after assignment is " << dynvec1[i] << ", should be "
+                << i+1 << "!" << std::endl;
       passed = false;
     }
   }

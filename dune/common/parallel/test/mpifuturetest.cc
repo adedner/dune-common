@@ -23,14 +23,14 @@ int main(int argc, char** argv){
   auto cc = mpihelper.getCommunication();
 
   // p2p
-  if(mpihelper.size() > 1){
-    if(mpihelper.rank() == 0){
+  if(mpihelper.size() > 1) {
+    if(mpihelper.rank() == 0) {
       Dune::Future<int> f = cc.isend(42, 1, 0);
       f.wait();
       int i = 42;
       Dune::Future<const int&> f2 = cc.isend<const int&>(i, 1, 0);
       f2.wait();
-    }else if(mpihelper.rank() == 1){
+    }else if(mpihelper.rank() == 1) {
       Dune::Future<int> f = cc.irecv(41, 0, 0);
       std::cout << "Rank 1 received " << f.get() << std::endl;
       int j = 41;
@@ -40,7 +40,7 @@ int main(int argc, char** argv){
   }
 
   int answer;
-  if(mpihelper.rank() == 0){
+  if(mpihelper.rank() == 0) {
     std::cout << "Broadcast lvalue-reference" << std::endl;
     answer = 42;
   }
@@ -53,7 +53,7 @@ int main(int argc, char** argv){
   std::cout << "Rank " << mpihelper.rank() << " knows: The answer is " << f2.get() << std::endl;
 
   Dune::DynamicVector<double> vec(3);
-  if(mpihelper.rank() == 0){
+  if(mpihelper.rank() == 0) {
     std::cout << "Broadcast vector" << std::endl;
     std::iota(vec.begin(), vec.end(), 41);
   }
@@ -66,7 +66,7 @@ int main(int argc, char** argv){
   Dune::Future<void> f4 = cc.ibarrier();
   f4.wait();
 
-  if(mpihelper.rank() == 0){
+  if(mpihelper.rank() == 0) {
     std::cout << "nonb gather ===========================" << std::endl;
     Dune::Future<Dune::DynamicVector<int>> f = cc.igather(mpihelper.rank() + 42, Dune::DynamicVector<int>(mpihelper.size()), 0);
     std::cout << "Gather result: " << f.get() << std::endl;
@@ -74,7 +74,7 @@ int main(int argc, char** argv){
     cc.igather(mpihelper.rank(), {}, 0).wait();
   }
 
-  if(mpihelper.rank() == 0){
+  if(mpihelper.rank() == 0) {
     std::cout << "nonb scatter ===========================" << std::endl;
     std::vector<int> my_buddies(mpihelper.size());
     std::iota(my_buddies.begin(), my_buddies.end(), 42);

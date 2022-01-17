@@ -175,24 +175,24 @@ auto testSparseRange()
   Dune::TestSuite suite("Check sparseRange()");
 
   auto checkWithMatrix = [&suite](auto&& M) {
-    for(std::size_t i=0; i<M.size(); ++i)
-    {
-      auto it = M[i].begin();
-      auto end = M[i].end();
-      for(auto&& [M_ij, j] : Dune::sparseRange(M[i]))
-      {
-        suite.check(it!=end)
-          << "sparseRange() contains more entries than the original range";
-        suite.check(&M_ij == &M[i][j])
-          << "Entry obtained by sparseRange() does not point to actual range entry";
-        suite.check(&M_ij == &(*it))
-          << "Entry obtained by sparseRange() does not point to actual range entry";
-        ++it;
-      }
-      suite.check(it==end)
-        << "sparseRange() contains less entries than the original range";
-    }
-  };
+                           for(std::size_t i=0; i<M.size(); ++i)
+                           {
+                             auto it = M[i].begin();
+                             auto end = M[i].end();
+                             for(auto&& [M_ij, j] : Dune::sparseRange(M[i]))
+                             {
+                               suite.check(it!=end)
+                                 << "sparseRange() contains more entries than the original range";
+                               suite.check(&M_ij == &M[i][j])
+                                 << "Entry obtained by sparseRange() does not point to actual range entry";
+                               suite.check(&M_ij == &(*it))
+                                 << "Entry obtained by sparseRange() does not point to actual range entry";
+                               ++it;
+                             }
+                             suite.check(it==end)
+                               << "sparseRange() contains less entries than the original range";
+                           }
+                         };
 
   auto M1 = Dune::DiagonalMatrix<double,1>({42});
   checkWithMatrix(M1);
@@ -297,9 +297,9 @@ int main()
 
   // Hybrid::forEach for integer ranges
   Dune::Hybrid::forEach(range(std::integral_constant<int, 1>()), [] (auto &&i) {
-      static_assert(std::is_same<std::decay_t<decltype(i)>, std::integral_constant<int, 0>>::value,
-                    "Hybrid::forEach(range(std::integral_constant<int, 1>()), ...) should only visit std::integral_constant<int, 0>.");
-    });
+    static_assert(std::is_same<std::decay_t<decltype(i)>, std::integral_constant<int, 0>>::value,
+                  "Hybrid::forEach(range(std::integral_constant<int, 1>()), ...) should only visit std::integral_constant<int, 0>.");
+  });
 
 
   {

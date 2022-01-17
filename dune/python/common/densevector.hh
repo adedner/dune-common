@@ -48,26 +48,26 @@ namespace Dune
         using ValueType = typename T::value_type;
 
         cls.def( "__add__", [] ( pybind11::object self, int a ) {
-            if( a != 0 )
-              throw pybind11::value_error( "Cannot add " + std::to_string( a ) + " to multidimensional dense vector." );
-            return self;
-          } );
+          if( a != 0 )
+            throw pybind11::value_error( "Cannot add " + std::to_string( a ) + " to multidimensional dense vector." );
+          return self;
+        } );
         cls.def( "__sub__", [] ( pybind11::object self, int a ) {
-            if( a != 0 )
-              throw pybind11::value_error( "Cannot subtract " + std::to_string( a ) + " from multidimensional dense vector." );
-            return self;
-          } );
+          if( a != 0 )
+            throw pybind11::value_error( "Cannot subtract " + std::to_string( a ) + " from multidimensional dense vector." );
+          return self;
+        } );
 
         cls.def( "__radd__", [] ( pybind11::object self, int a ) {
-            if( a != 0 )
-              throw pybind11::value_error( "Cannot add multidimensional dense vector to " + std::to_string( a ) + "." );
-            return self;
-          } );
+          if( a != 0 )
+            throw pybind11::value_error( "Cannot add multidimensional dense vector to " + std::to_string( a ) + "." );
+          return self;
+        } );
         cls.def( "__rsub__", [] ( const T &self, int a ) {
-            if( a != 0 )
-              throw pybind11::value_error( "Cannot subtract multidimensional dense vector from " + std::to_string( a ) + "." );
-            T *copy = new T( self ); *copy *= ValueType( -1 ); return copy;
-          } );
+          if( a != 0 )
+            throw pybind11::value_error( "Cannot subtract multidimensional dense vector from " + std::to_string( a ) + "." );
+          T *copy = new T( self ); *copy *= ValueType( -1 ); return copy;
+        } );
       }
 
       template< class T, class... options >
@@ -140,18 +140,18 @@ namespace Dune
       cls.def( "assign", [] ( T &self, const T &x ) { self = x; }, "x"_a );
 
       cls.def( "__getitem__", [] ( const T &self, std::size_t i ) -> ValueType {
-          if( i < self.size() )
-            return self[ i ];
-          else
-            throw pybind11::index_error();
-        }, "i"_a );
+        if( i < self.size() )
+          return self[ i ];
+        else
+          throw pybind11::index_error();
+      }, "i"_a );
 
       cls.def( "__setitem__", [] ( T &self, std::size_t i, ValueType x ) {
-          if( i < self.size() )
-            self[ i ] = x;
-          else
-            throw pybind11::index_error();
-        }, "i"_a, "x"_a );
+        if( i < self.size() )
+          self[ i ] = x;
+        else
+          throw pybind11::index_error();
+      }, "i"_a, "x"_a );
 
       cls.def( "__len__", [] ( const T &self ) -> std::size_t { return self.size(); } );
 

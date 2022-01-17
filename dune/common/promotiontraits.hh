@@ -19,7 +19,7 @@ namespace Dune {
    */
 
   /** \brief Compute type of the result of an arithmetic operation involving two different number types.
-  */
+   */
   template <typename T1, typename T2>
   struct PromotionTraits
   {

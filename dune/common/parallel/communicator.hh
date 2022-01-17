@@ -314,7 +314,7 @@ namespace Dune
     const RemoteIndices* remoteIndices_;
 
     typedef std::map<int,std::pair<MPI_Datatype,MPI_Datatype> >
-    MessageTypeMap;
+      MessageTypeMap;
 
     /**
      * @brief The datatypes built according to the communication interface.
@@ -617,7 +617,7 @@ namespace Dune
      * @brief The type of the map that maps interface information to processors.
      */
     typedef std::map<int,std::pair<InterfaceInformation,InterfaceInformation> >
-    InterfaceMap;
+      InterfaceMap;
 
 
     /**
@@ -860,7 +860,7 @@ namespace Dune
      * the pair of information about sending and receiving messages.
      */
     typedef std::map<int,std::pair<MessageInformation,MessageInformation> >
-    InformationMap;
+      InformationMap;
     /**
      * @brief Gathered information about the messages to send.
      */
@@ -1147,7 +1147,7 @@ namespace Dune
     interfaces_=interface.interfaces();
     communicator_=interface.communicator();
     typedef typename std::map<int,std::pair<InterfaceInformation,InterfaceInformation> >
-    ::const_iterator const_iterator;
+      ::const_iterator const_iterator;
     typedef typename CommPolicy<Data>::IndexedTypeFlag Flag;
     const const_iterator end = interfaces_.end();
     int lrank;
@@ -1162,10 +1162,10 @@ namespace Dune
       int noRecv = MessageSizeCalculator<Data,Flag>() (interfacePair->second.second);
       if (noSend + noRecv > 0)
         messageInformation_.insert(std::make_pair(interfacePair->first,
-                                                std::make_pair(MessageInformation(bufferSize_[0],
-                                                                                  noSend*sizeof(typename CommPolicy<Data>::IndexedType)),
-                                                               MessageInformation(bufferSize_[1],
-                                                                                  noRecv*sizeof(typename CommPolicy<Data>::IndexedType)))));
+                                                  std::make_pair(MessageInformation(bufferSize_[0],
+                                                                                    noSend*sizeof(typename CommPolicy<Data>::IndexedType)),
+                                                                 MessageInformation(bufferSize_[1],
+                                                                                    noRecv*sizeof(typename CommPolicy<Data>::IndexedType)))));
       bufferSize_[0] += noSend;
       bufferSize_[1] += noRecv;
     }
@@ -1185,7 +1185,7 @@ namespace Dune
     interfaces_=interface.interfaces();
     communicator_=interface.communicator();
     typedef typename std::map<int,std::pair<InterfaceInformation,InterfaceInformation> >
-    ::const_iterator const_iterator;
+      ::const_iterator const_iterator;
     typedef typename CommPolicy<Data>::IndexedTypeFlag Flag;
     const const_iterator end = interfaces_.end();
 
@@ -1198,10 +1198,10 @@ namespace Dune
       int noRecv = MessageSizeCalculator<Data,Flag>() (dest, interfacePair->second.second);
       if (noSend + noRecv > 0)
         messageInformation_.insert(std::make_pair(interfacePair->first,
-                                                std::make_pair(MessageInformation(bufferSize_[0],
-                                                                                  noSend*sizeof(typename CommPolicy<Data>::IndexedType)),
-                                                               MessageInformation(bufferSize_[1],
-                                                                                  noRecv*sizeof(typename CommPolicy<Data>::IndexedType)))));
+                                                  std::make_pair(MessageInformation(bufferSize_[0],
+                                                                                    noSend*sizeof(typename CommPolicy<Data>::IndexedType)),
+                                                                 MessageInformation(bufferSize_[1],
+                                                                                    noRecv*sizeof(typename CommPolicy<Data>::IndexedType)))));
       bufferSize_[0] += noSend;
       bufferSize_[1] += noRecv;
     }
@@ -1262,7 +1262,7 @@ namespace Dune
   inline void BufferedCommunicator::MessageGatherer<Data,GatherScatter,FORWARD,VariableSize>::operator()(const InterfaceMap& interfaces,const Data& data, Type* buffer, [[maybe_unused]] size_t bufferSize) const
   {
     typedef typename InterfaceMap::const_iterator
-    const_iterator;
+      const_iterator;
 
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -1296,7 +1296,7 @@ namespace Dune
     const InterfaceMap& interfaces, const Data& data, Type* buffer, [[maybe_unused]] size_t bufferSize) const
   {
     typedef typename InterfaceMap::const_iterator
-    const_iterator;
+      const_iterator;
     const const_iterator end = interfaces.end();
     size_t index = 0;
 

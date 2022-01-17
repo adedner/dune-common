@@ -37,12 +37,12 @@ namespace Dune
   template<class K, int N> class FieldVector;
   namespace {
     /**
-      work around a problem of FieldMatrix/FieldVector,
-      there is no unique way to obtain the size of a class
+       work around a problem of FieldMatrix/FieldVector,
+       there is no unique way to obtain the size of a class
 
-      \deprecated VectorSize is deprecated; please call the 'size()' method directly instead.
-      This will be removed after Dune 2.8.
-      */
+       \deprecated VectorSize is deprecated; please call the 'size()' method directly instead.
+       This will be removed after Dune 2.8.
+     */
     template<class V>
     struct [[deprecated("VectorSize is deprecated; please call the 'size()' method directly instead")]] VectorSize
     {
@@ -104,7 +104,7 @@ namespace Dune
 
     template< class DenseMatrix, class RHS >
     class DenseMatrixAssigner< DenseMatrix, RHS, std::enable_if_t< !std::is_same< typename RHS::const_iterator, void >::value
-        && std::is_convertible< typename RHS::const_iterator::value_type, typename DenseMatrix::iterator::value_type >::value > >
+                                                                   && std::is_convertible< typename RHS::const_iterator::value_type, typename DenseMatrix::iterator::value_type >::value > >
     {
     public:
       static void apply ( DenseMatrix &denseMatrix, const RHS &rhs )
@@ -510,7 +510,7 @@ namespace Dune
     //! y += alpha A x
     template<class X, class Y>
     void usmv (const typename FieldTraits<Y>::field_type & alpha,
-      const X& x, Y& y) const
+               const X& x, Y& y) const
     {
       auto&& xx = Impl::asVector(x);
       auto&& yy = Impl::asVector(y);
@@ -524,7 +524,7 @@ namespace Dune
     //! y += alpha A^T x
     template<class X, class Y>
     void usmtv (const typename FieldTraits<Y>::field_type & alpha,
-      const X& x, Y& y) const
+                const X& x, Y& y) const
     {
       auto&& xx = Impl::asVector(x);
       auto&& yy = Impl::asVector(y);
@@ -538,7 +538,7 @@ namespace Dune
     //! y += alpha A^H x
     template<class X, class Y>
     void usmhv (const typename FieldTraits<Y>::field_type & alpha,
-      const X& x, Y& y) const
+                const X& x, Y& y) const
     {
       auto&& xx = Impl::asVector(x);
       auto&& yy = Impl::asVector(y);
@@ -842,7 +842,7 @@ namespace Dune
      */
     template<class Func, class Mask>
     static void luDecomposition(DenseMatrix<MAT>& A, Func func,
-                         Mask &nonsingularLanes, bool throwEarly, bool doPivoting);
+                                Mask &nonsingularLanes, bool throwEarly, bool doPivoting);
   };
 
 #ifndef DOXYGEN
@@ -1019,7 +1019,7 @@ namespace Dune
       Elim<V1> elim(rhs);
       AutonomousValue<MAT> A(asImp());
       Simd::Mask<typename FieldTraits<value_type>::real_type>
-        nonsingularLanes(true);
+      nonsingularLanes(true);
 
       AutonomousValue<MAT>::luDecomposition(A, elim, nonsingularLanes, true, doPivoting);
 
@@ -1105,7 +1105,7 @@ namespace Dune
       AutonomousValue<MAT> A(asImp());
       std::vector<simd_index_type> pivot(rows());
       Simd::Mask<typename FieldTraits<value_type>::real_type>
-        nonsingularLanes(true);
+      nonsingularLanes(true);
       AutonomousValue<MAT>::luDecomposition(A, ElimPivot(pivot), nonsingularLanes, true, doPivoting);
       auto& L=A;
       auto& U=A;
@@ -1178,7 +1178,7 @@ namespace Dune
     AutonomousValue<MAT> A(asImp());
     field_type det;
     Simd::Mask<typename FieldTraits<value_type>::real_type>
-      nonsingularLanes(true);
+    nonsingularLanes(true);
 
     AutonomousValue<MAT>::luDecomposition(A, ElimDet(det), nonsingularLanes, false, doPivoting);
     det = Simd::cond(nonsingularLanes, det, field_type(0));

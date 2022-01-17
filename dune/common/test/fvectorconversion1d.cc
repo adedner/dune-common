@@ -42,12 +42,12 @@ namespace Dune
 template<class Component, std::size_t Dim >
 class MyVector : public Dune::DenseVector< MyVector<Component, Dim> >
 {
- public:
+public:
   static constexpr std::size_t size () { return Dim; }
 
   Component& operator[] ( std::size_t i ) { return data_; }
   const Component& operator[] ( std::size_t i ) const { return data_; }
- protected:
+protected:
   Component data_;
 };
 

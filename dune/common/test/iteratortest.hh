@@ -222,7 +222,7 @@ int testRandomAccessIterator(Iter begin, Iter end, Opt opt){
   for(int i=0; i < no; i++)
   {
     int index = static_cast<int>(size*(rand()/(RAND_MAX+1.0)));
-    Iter rand(begin), test(begin), res{};
+    Iter rand(begin), test(begin), res {};
     rand+=index;
 
     if((res=begin+index) != rand)

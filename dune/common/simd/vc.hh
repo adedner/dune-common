@@ -82,38 +82,38 @@
  *      may want to enable the `orgtbl` minor mode.  We substitute `|` with
  *      `¦` when describing or-operators so as to not confuse orgtbl. -->
  * \code
-   |                         | Vector       | Vector    | SimdArray  | SimdArray | Masks[4]  |
-   |                         | <double> AVX | <int> SSE | <double,4> | <int,4>   |           |
-   |-------------------------+--------------+-----------+------------+-----------+-----------|
-   | V v(s);                 | y            | y         | y          | y         | y         |
-   | V v = s;                | y            | y         | y          | y         | *N*       |
-   | V v{s};                 | *N*          | y         | *N*        | *N*       | y         |
-   | V v = {s};              | *N*          | y         | *N*        | *N*       | *N*       |
-   |-------------------------+--------------+-----------+------------+-----------+-----------|
-   | v = s;                  | y            | y         | y          | y         | *N*       |
-   | v = {s};                | *N*          | *N*       | *N*        | *N*       | *N*       |
-   |-------------------------+--------------+-----------+------------+-----------+-----------|
-   | v++; ++v;               | y            | y         | *N*        | *N*       | y(n/a)[2] |
-   | v--; --v;               | y            | y         | *N*        | *N*       | n/a       |
-   |-------------------------+--------------+-----------+------------+-----------+-----------|
-   | +v; -v;                 | y            | y         | y          | y         | *N*       |
-   | !v;                     | y            | y         | y          | y         | y         |
-   | ~v;                     | n/a          | y         | n/a        | y         | *N*       |
-   |-------------------------+--------------+-----------+------------+-----------+-----------|
-   | sv @ sv; but see below  | y            | y         | y          | y         | *N*       |
-   |-------------------------+--------------+-----------+------------+-----------+-----------|
-   | s << v; s >> v;         | n/a          | *N*       | n/a        | *N*       | *N*       |
-   |-------------------------+--------------+-----------+------------+-----------+-----------|
-   | v == v; v != v;         | y            | y         | y          | y         | *N* [1]   |
-   |-------------------------+--------------+-----------+------------+-----------+-----------|
-   | v & v; v ^ v; v ¦ v;    | n/a          | y         | n/a        | y         | y         |
-   | sv && sv; sv ¦¦ sv;     | y            | y         | *N*        | *N*       | *N*       |
-   | v && v; v ¦¦ v;         | y            | y         | *N*        | *N*       | y         |
-   |-------------------------+--------------+-----------+------------+-----------+-----------|
-   | v @= sv; but see below  | y            | y         | y          | y         | *N*       |
-   | v &= v; v ^= v; v ¦= v; | n/a          | y         | n/a        | y         | y         |
-   |-------------------------+--------------+-----------+------------+-----------+-----------|
-   | v, v;[3]                | *N*          | *N*       | y          | y         | y         |
+ |                         | Vector       | Vector    | SimdArray  | SimdArray | Masks[4]  |
+ |                         | <double> AVX | <int> SSE | <double,4> | <int,4>   |           |
+ |-------------------------+--------------+-----------+------------+-----------+-----------|
+ | V v(s);                 | y            | y         | y          | y         | y         |
+ | V v = s;                | y            | y         | y          | y         | *N*       |
+ | V v{s};                 | *N*          | y         | *N*        | *N*       | y         |
+ | V v = {s};              | *N*          | y         | *N*        | *N*       | *N*       |
+ |-------------------------+--------------+-----------+------------+-----------+-----------|
+ | v = s;                  | y            | y         | y          | y         | *N*       |
+ | v = {s};                | *N*          | *N*       | *N*        | *N*       | *N*       |
+ |-------------------------+--------------+-----------+------------+-----------+-----------|
+ | v++; ++v;               | y            | y         | *N*        | *N*       | y(n/a)[2] |
+ | v--; --v;               | y            | y         | *N*        | *N*       | n/a       |
+ |-------------------------+--------------+-----------+------------+-----------+-----------|
+ | +v; -v;                 | y            | y         | y          | y         | *N*       |
+ | !v;                     | y            | y         | y          | y         | y         |
+ | ~v;                     | n/a          | y         | n/a        | y         | *N*       |
+ |-------------------------+--------------+-----------+------------+-----------+-----------|
+ | sv @ sv; but see below  | y            | y         | y          | y         | *N*       |
+ |-------------------------+--------------+-----------+------------+-----------+-----------|
+ | s << v; s >> v;         | n/a          | *N*       | n/a        | *N*       | *N*       |
+ |-------------------------+--------------+-----------+------------+-----------+-----------|
+ | v == v; v != v;         | y            | y         | y          | y         | *N* [1]   |
+ |-------------------------+--------------+-----------+------------+-----------+-----------|
+ | v & v; v ^ v; v ¦ v;    | n/a          | y         | n/a        | y         | y         |
+ | sv && sv; sv ¦¦ sv;     | y            | y         | *N*        | *N*       | *N*       |
+ | v && v; v ¦¦ v;         | y            | y         | *N*        | *N*       | y         |
+ |-------------------------+--------------+-----------+------------+-----------+-----------|
+ | v @= sv; but see below  | y            | y         | y          | y         | *N*       |
+ | v &= v; v ^= v; v ¦= v; | n/a          | y         | n/a        | y         | y         |
+ |-------------------------+--------------+-----------+------------+-----------+-----------|
+ | v, v;[3]                | *N*          | *N*       | y          | y         | y         |
  * \endcode
  *
  * Notes:
@@ -588,7 +588,7 @@ namespace Dune {
       //! implements Simd::cond()
       template<class V>
       V cond(ADLTag<5, VcImpl::IsVector<V>::value &&
-                       !VcImpl::IsMask<V>::value>,
+                    !VcImpl::IsMask<V>::value>,
              const Mask<V> &mask, const V &ifTrue, const V &ifFalse)
       {
         return Vc::iif(mask, ifTrue, ifFalse);
@@ -608,7 +608,7 @@ namespace Dune {
       //! implements binary Simd::max()
       template<class V>
       auto max(ADLTag<5, VcImpl::IsVector<V>::value &&
-                         !VcImpl::IsMask<V>::value>,
+                      !VcImpl::IsMask<V>::value>,
                const V &v1, const V &v2)
       {
         return Simd::cond(v1 < v2, v2, v1);
@@ -625,7 +625,7 @@ namespace Dune {
       //! implements binary Simd::min()
       template<class V>
       auto min(ADLTag<5, VcImpl::IsVector<V>::value &&
-                         !VcImpl::IsMask<V>::value>,
+                      !VcImpl::IsMask<V>::value>,
                const V &v1, const V &v2)
       {
         return Simd::cond(v1 < v2, v1, v2);
@@ -665,7 +665,7 @@ namespace Dune {
       //! implements Simd::maxValue()
       template<class V>
       auto max(ADLTag<5, VcImpl::IsVector<V>::value &&
-                         !VcImpl::IsMask<V>::value>,
+                      !VcImpl::IsMask<V>::value>,
                const V &v)
       {
         return v.max();
@@ -681,7 +681,7 @@ namespace Dune {
       //! implements Simd::minValue()
       template<class V>
       auto min(ADLTag<5, VcImpl::IsVector<V>::value &&
-                         !VcImpl::IsMask<V>::value>,
+                      !VcImpl::IsMask<V>::value>,
                const V &v)
       {
         return v.min();
@@ -697,7 +697,7 @@ namespace Dune {
       //! implements Simd::maskAnd()
       template<class S1, class V2>
       auto maskAnd(ADLTag<5, std::is_same<Mask<S1>, bool>::value &&
-                             VcImpl::IsVector<V2>::value>,
+                          VcImpl::IsVector<V2>::value>,
                    const S1 &s1, const V2 &v2)
       {
         return Simd::Mask<V2>(Simd::mask(s1)) && Simd::mask(v2);
@@ -706,7 +706,7 @@ namespace Dune {
       //! implements Simd::maskAnd()
       template<class V1, class S2>
       auto maskAnd(ADLTag<5, VcImpl::IsVector<V1>::value &&
-                             std::is_same<Mask<S2>, bool>::value>,
+                          std::is_same<Mask<S2>, bool>::value>,
                    const V1 &v1, const S2 &s2)
       {
         return Simd::mask(v1) && Simd::Mask<V1>(Simd::mask(s2));
@@ -715,8 +715,8 @@ namespace Dune {
       //! implements Simd::maskOr()
       template<class S1, class V2>
       auto maskOr(ADLTag<5, std::is_same<Mask<S1>, bool>::value &&
-                            VcImpl::IsVector<V2>::value>,
-                   const S1 &s1, const V2 &v2)
+                         VcImpl::IsVector<V2>::value>,
+                  const S1 &s1, const V2 &v2)
       {
         return Simd::Mask<V2>(Simd::mask(s1)) || Simd::mask(v2);
       }
@@ -724,8 +724,8 @@ namespace Dune {
       //! implements Simd::maskOr()
       template<class V1, class S2>
       auto maskOr(ADLTag<5, VcImpl::IsVector<V1>::value &&
-                            std::is_same<Mask<S2>, bool>::value>,
-                   const V1 &v1, const S2 &s2)
+                         std::is_same<Mask<S2>, bool>::value>,
+                  const V1 &v1, const S2 &s2)
       {
         return Simd::mask(v1) || Simd::Mask<V1>(Simd::mask(s2));
       }
@@ -742,13 +742,11 @@ namespace Dune {
    */
   template <typename T, std::size_t N>
   struct IsNumber<Vc::SimdArray<T, N>>
-    : public std::integral_constant<bool, IsNumber<T>::value> {
-  };
+    : public std::integral_constant<bool, IsNumber<T>::value> {};
 
   template <typename T, typename Abi>
   struct IsNumber<Vc::Vector<T, Abi>>
-    : public std::integral_constant<bool, IsNumber<T>::value> {
-  };
+    : public std::integral_constant<bool, IsNumber<T>::value> {};
 
   //! Specialization of AutonomousValue for Vc proxies
   template<class V>

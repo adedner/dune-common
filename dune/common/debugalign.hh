@@ -240,7 +240,7 @@ namespace Dune {
       operator OP(const AlignedNumber<T, tAlign> &t,                    \
                   const AlignedNumber<U, uAlign> &u)                    \
     {                                                                   \
-      /* can't use std::max(); not constexpr */                         \
+  /* can't use std::max(); not constexpr */                         \
       return aligned<(tAlign > uAlign ? tAlign : uAlign)>(T(t) OP U(u)); \
     }                                                                   \
                                                                         \

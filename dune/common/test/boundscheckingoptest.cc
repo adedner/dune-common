@@ -131,7 +131,8 @@ int main() try {
   }
 
   return passed ? 0 : 1;
-} catch (Dune::Exception &e) {
+}
+catch (Dune::Exception &e) {
   std::cerr << e << std::endl;
   return 1;
 } catch (std::exception &e) {

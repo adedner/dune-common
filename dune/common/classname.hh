@@ -28,8 +28,8 @@ namespace Dune {
 #if HAVE_CXA_DEMANGLE
       int status;
       std::unique_ptr<char, void(*)(void*)>
-        demangled(abi::__cxa_demangle(name.c_str(), nullptr, nullptr, &status),
-                  std::free);
+      demangled(abi::__cxa_demangle(name.c_str(), nullptr, nullptr, &status),
+                std::free);
       if( demangled )
         name = demangled.get();
 #endif // #if HAVE_CXA_DEMANGLE
@@ -47,13 +47,13 @@ namespace Dune {
     typedef typename std::remove_reference<T>::type TR;
     std::string className = Impl::demangle( typeid( TR ).name() );
     if (std::is_const<TR>::value)
-        className += " const";
+      className += " const";
     if (std::is_volatile<TR>::value)
-        className += " volatile";
+      className += " volatile";
     if (std::is_lvalue_reference<T>::value)
-        className += "&";
+      className += "&";
     else if (std::is_rvalue_reference<T>::value)
-        className += "&&";
+      className += "&&";
     return className;
   }
 
@@ -67,9 +67,9 @@ namespace Dune {
     typedef typename std::remove_reference<T>::type TR;
     std::string className = Impl::demangle( typeid(v).name() );
     if (std::is_const<TR>::value)
-        className += " const";
+      className += " const";
     if (std::is_volatile<TR>::value)
-        className += " volatile";
+      className += " volatile";
     return className;
   }
 } // namespace Dune

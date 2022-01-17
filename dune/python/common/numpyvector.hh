@@ -66,16 +66,16 @@ namespace Dune
 
       explicit NumPyVector ( size_type size )
         : array_( pybind11::buffer_info( nullptr, sizeof( T ),
-                  pybind11::format_descriptor< T >::value, 1, { size }, { sizeof( T ) } )
-                ),
-          dataPtr_( static_cast< value_type * >( array_.request(true).ptr ) ),
-          size_(size)
+                                         pybind11::format_descriptor< T >::value, 1, { size }, { sizeof( T ) } )
+                  ),
+        dataPtr_( static_cast< value_type * >( array_.request(true).ptr ) ),
+        size_(size)
       {}
 
       NumPyVector ( pybind11::buffer buf )
         : array_( buf ),
-          dataPtr_( nullptr ),
-          size_( 0 )
+        dataPtr_( nullptr ),
+        size_( 0 )
       {
         pybind11::buffer_info info = buf.request();
         if (info.ndim != 1)

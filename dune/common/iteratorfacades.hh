@@ -23,7 +23,7 @@ namespace Dune
      The following example illustrates how a random access iterator might be written:
 
      \code
-     #include<dune/common/iteratorfacades.hh>
+   #include<dune/common/iteratorfacades.hh>
 
      ...
 
@@ -71,7 +71,7 @@ namespace Dune
 
       void increment()
       {
-     ++position_;
+   ++position_;
       }
 
       // Additional function needed by BidirectionalIterator
@@ -230,7 +230,7 @@ namespace Dune
    *
    */
   template<class T1, class V1, class R1, class D,
-      class T2, class V2, class R2>
+           class T2, class V2, class R2>
   inline typename EnableIfInterOperable<T1,T2,bool>::type
   operator==(const ForwardIteratorFacade<T1,V1,R1,D>& lhs,
              const ForwardIteratorFacade<T2,V2,R2,D>& rhs)
@@ -252,7 +252,7 @@ namespace Dune
    *
    */
   template<class T1, class V1, class R1, class D,
-      class T2, class V2, class R2>
+           class T2, class V2, class R2>
   inline typename EnableIfInterOperable<T1,T2,bool>::type
   operator!=(const ForwardIteratorFacade<T1,V1,R1,D>& lhs,
              const ForwardIteratorFacade<T2,V2,R2,D>& rhs)
@@ -377,7 +377,7 @@ namespace Dune
    * yield an invalid type expression.
    */
   template<class T1, class V1, class R1, class D,
-      class T2, class V2, class R2>
+           class T2, class V2, class R2>
   inline typename std::enable_if<std::is_convertible<T2,T1>::value,bool>::type
   operator==(const BidirectionalIteratorFacade<T1,V1,R1,D>& lhs,
              const BidirectionalIteratorFacade<T2,V2,R2,D>& rhs)
@@ -394,10 +394,10 @@ namespace Dune
    * type expression.
    */
   template<class T1, class V1, class R1, class D,
-      class T2, class V2, class R2>
+           class T2, class V2, class R2>
   inline
   typename std::enable_if<std::is_convertible<T1,T2>::value && !std::is_convertible<T2,T1>::value,
-      bool>::type
+                          bool>::type
   operator==(const BidirectionalIteratorFacade<T1,V1,R1,D>& lhs,
              const BidirectionalIteratorFacade<T2,V2,R2,D>& rhs)
   {
@@ -415,7 +415,7 @@ namespace Dune
    *
    */
   template<class T1, class V1, class R1, class D,
-      class T2, class V2, class R2>
+           class T2, class V2, class R2>
   inline typename EnableIfInterOperable<T1,T2,bool>::type
   operator!=(const BidirectionalIteratorFacade<T1,V1,R1,D>& lhs,
              const BidirectionalIteratorFacade<T2,V2,R2,D>& rhs)
@@ -586,7 +586,7 @@ namespace Dune
    *
    */
   template<class T1, class V1, class R1, class D,
-      class T2, class V2, class R2>
+           class T2, class V2, class R2>
   inline typename EnableIfInterOperable<T1,T2,bool>::type
   operator==(const RandomAccessIteratorFacade<T1,V1,R1,D>& lhs,
              const RandomAccessIteratorFacade<T2,V2,R2,D>& rhs)
@@ -608,7 +608,7 @@ namespace Dune
    *
    */
   template<class T1, class V1, class R1, class D,
-      class T2, class V2, class R2>
+           class T2, class V2, class R2>
   inline typename EnableIfInterOperable<T1,T2,bool>::type
   operator!=(const RandomAccessIteratorFacade<T1,V1,R1,D>& lhs,
              const RandomAccessIteratorFacade<T2,V2,R2,D>& rhs)
@@ -630,7 +630,7 @@ namespace Dune
    *
    */
   template<class T1, class V1, class R1, class D,
-      class T2, class V2, class R2>
+           class T2, class V2, class R2>
   inline typename EnableIfInterOperable<T1,T2,bool>::type
   operator<(const RandomAccessIteratorFacade<T1,V1,R1,D>& lhs,
             const RandomAccessIteratorFacade<T2,V2,R2,D>& rhs)
@@ -653,7 +653,7 @@ namespace Dune
    *
    */
   template<class T1, class V1, class R1, class D,
-      class T2, class V2, class R2>
+           class T2, class V2, class R2>
   inline typename EnableIfInterOperable<T1,T2,bool>::type
   operator<=(const RandomAccessIteratorFacade<T1,V1,R1,D>& lhs,
              const RandomAccessIteratorFacade<T2,V2,R2,D>& rhs)
@@ -676,7 +676,7 @@ namespace Dune
    *
    */
   template<class T1, class V1, class R1, class D,
-      class T2, class V2, class R2>
+           class T2, class V2, class R2>
   inline typename EnableIfInterOperable<T1,T2,bool>::type
   operator>(const RandomAccessIteratorFacade<T1,V1,R1,D>& lhs,
             const RandomAccessIteratorFacade<T2,V2,R2,D>& rhs)
@@ -698,7 +698,7 @@ namespace Dune
    *
    */
   template<class T1, class V1, class R1, class D,
-      class T2, class V2, class R2>
+           class T2, class V2, class R2>
   inline typename EnableIfInterOperable<T1,T2,bool>::type
   operator>=(const RandomAccessIteratorFacade<T1,V1,R1,D>& lhs,
              const RandomAccessIteratorFacade<T2,V2,R2,D>& rhs)
@@ -720,7 +720,7 @@ namespace Dune
    *
    */
   template<class T1, class V1, class R1, class D,
-      class T2, class V2, class R2>
+           class T2, class V2, class R2>
   inline typename EnableIfInterOperable<T1,T2,D>::type
   operator-(const RandomAccessIteratorFacade<T1,V1,R1,D>& lhs,
             const RandomAccessIteratorFacade<T2,V2,R2,D>& rhs)

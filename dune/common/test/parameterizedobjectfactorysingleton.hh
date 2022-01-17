@@ -23,21 +23,21 @@
 
 struct InterfaceA
 {
-    virtual std::string info() = 0;
-    virtual ~InterfaceA() = default;
+  virtual std::string info() = 0;
+  virtual ~InterfaceA() = default;
 };
 
 struct InterfaceB
 {
-    virtual std::string info() = 0;
-    virtual ~InterfaceB() = default;
+  virtual std::string info() = 0;
+  virtual ~InterfaceB() = default;
 };
 
 template<typename Interface>
 Dune::ParameterizedObjectFactory<std::unique_ptr<Interface>(int)> &
 globalPtrFactory()
 {
-    return Dune::Singleton<Dune::ParameterizedObjectFactory<std::unique_ptr<Interface>(int)>>::instance();
+  return Dune::Singleton<Dune::ParameterizedObjectFactory<std::unique_ptr<Interface>(int)>>::instance();
 }
 
 #endif //#ifndef DUNE_COMMON_TEST_PARAMETERIZEDOBJECTFACTORYSINGLETON_HH

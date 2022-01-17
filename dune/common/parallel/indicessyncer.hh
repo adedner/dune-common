@@ -165,7 +165,7 @@ namespace Dune
      * @brief The type of the iterator of GlobalIndexList
      */
     typedef typename SLList<GlobalIndex, typename RemoteIndices::Allocator>::iterator
-    GlobalIndexIterator;
+      GlobalIndexIterator;
 
     /** @brief Type of the map of ranks onto GlobalIndexLists. */
     typedef std::map<int, GlobalIndexList> GlobalIndicesMap;
@@ -222,7 +222,7 @@ namespace Dune
 
     /** @brief Type of the tuple of iterators needed for the adding of indices. */
     typedef std::tuple<RemoteIndexModifier,GlobalIndexModifier,BoolListModifier,
-        const ConstRemoteIndexIterator> IteratorTuple;
+                       const ConstRemoteIndexIterator> IteratorTuple;
 
     /**
      * @brief A tuple of iterators.
@@ -483,8 +483,8 @@ namespace Dune
    */
   template<typename T, typename A, typename A1>
   inline void repairLocalIndexPointers(std::map<int,
-                                           SLList<std::pair<typename T::GlobalIndex,
-                                                   typename T::LocalIndex::Attribute>,A> >& globalMap,
+                                                SLList<std::pair<typename T::GlobalIndex,
+                                                                 typename T::LocalIndex::Attribute>,A> >& globalMap,
                                        RemoteIndices<T,A1>& remoteIndices,
                                        const T& indexSet)
   {
@@ -951,7 +951,7 @@ namespace Dune
                                                           char attribute)
   {
     Dune::dverb<<"Inserting from "<<process<<" "<<globalPair.first<<", "<<
-    globalPair.second<<" "<<attribute<<std::endl;
+      globalPair.second<<" "<<attribute<<std::endl;
 
     resetIteratorsMap();
 

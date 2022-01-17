@@ -25,7 +25,7 @@ void deleteOverlapEntries(T& indices,
   typedef Dune::SLList<std::pair<GlobalIndex,Attribute>, typename RemoteIndices::RemoteIndexList::Allocator> GlobalList;
   typedef typename GlobalList::ModifyIterator GlobalModifier;
   typedef std::tuple<RemoteModifier,GlobalModifier,const RemoteIterator,const typename GlobalList::const_iterator,
-      const GlobalList*, const typename RemoteIndices::RemoteIndexList*> IteratorTuple;
+                     const GlobalList*, const typename RemoteIndices::RemoteIndexList*> IteratorTuple;
   typedef std::map<int,IteratorTuple> IteratorMap;
   typedef typename RemoteIndices::const_iterator RemoteMapIterator;
 
@@ -92,9 +92,9 @@ void deleteOverlapEntries(T& indices,
           if(*(std::get<1>(remote->second)) == *index) {
 
             std::cout<<rank<<": Deleting remote "<<
-            std::get<1>(remote->second)->first<<", "<<
-            std::get<1>(remote->second)->second<<" of process "
-            << remote->first<<std::endl;
+              std::get<1>(remote->second)->first<<", "<<
+              std::get<1>(remote->second)->second<<" of process "
+                     << remote->first<<std::endl;
 
             // Delete entries
             std::get<0>(remote->second).remove();
@@ -142,7 +142,7 @@ bool areEqual(T& indices,
     }
     else if(index->local().attribute() !=oIndex->local().attribute()) {
       std::cerr<<rank<<": Entry for "<<index->global() <<" has wrong attribute: "<<
-      index->local().attribute()<< "!= "<<oIndex->local().attribute()<<std::endl;
+        index->local().attribute()<< "!= "<<oIndex->local().attribute()<<std::endl;
       ret = false;
     }
   }

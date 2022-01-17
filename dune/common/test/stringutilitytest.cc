@@ -7,7 +7,7 @@
 #include <dune/common/stringutility.hh>
 
 namespace {
-const std::string hello_world("hello world");
+  const std::string hello_world("hello world");
 } /* namespace */
 
 bool test_hasPrefix()

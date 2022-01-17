@@ -9,9 +9,9 @@
 namespace Dune{
 
   /*! \brief This exception is thrown when `ready()`, `wait()` or `get()` is
-    called on an invalid future. A future is valid until `get()` is called and
-    if it is not default-constructed and it was not moved from.
-  */
+     called on an invalid future. A future is valid until `get()` is called and
+     if it is not default-constructed and it was not moved from.
+   */
   class InvalidFutureException : public InvalidStateException
   {};
 
@@ -20,8 +20,8 @@ namespace Dune{
   class PseudoFuture;
 
   /*! \brief Type-erasure for future-like objects. A future-like object is a
-    object satisfying the interface of FutureBase.
-  */
+     object satisfying the interface of FutureBase.
+   */
   template<class T>
   class Future{
     // Future interface:
@@ -80,33 +80,33 @@ namespace Dune{
     Future() = default;
 
     /*! \brief wait until the future is ready
-      \throws InvalidFutureException
+       \throws InvalidFutureException
      */
     void wait(){
       _future->wait();
     }
 
     /*! \brief Waits until the future is ready and returns the resulting value
-      \returns The contained value
-      \throws InvalidFutureException
+       \returns The contained value
+       \throws InvalidFutureException
      */
     T get() {
       return _future->get();
     }
 
     /*! \brief
-      \returns true is the future is ready, otherwise false
-      \throws InvalidFutureException
-    */
+       \returns true is the future is ready, otherwise false
+       \throws InvalidFutureException
+     */
     bool ready() const {
       return _future->ready();
     }
 
     /*! \brief Checks whether the future is valid. I.e. `get()' was not called
-      on that future and when it was not default-constructed and not moved
-      from.
-      \returns true is the future is valid, otherwise false
-    */
+       on that future and when it was not default-constructed and not moved
+       from.
+       \returns true is the future is valid, otherwise false
+     */
     bool valid() const {
       if(_future)
         return _future->valid();
@@ -155,7 +155,7 @@ namespace Dune{
   };
 
   template<>
-  class PseudoFuture<void>{
+  class PseudoFuture<void> {
     bool valid_;
   public:
     PseudoFuture(bool valid = false) :

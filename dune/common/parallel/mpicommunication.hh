@@ -150,7 +150,7 @@ namespace Dune
       MPIFuture<const T> future(std::forward<const T>(data));
       auto mpidata = future.get_mpidata();
       MPI_Isend(mpidata.ptr(), mpidata.size(), mpidata.type(),
-                       dest_rank, tag, communicator, &future.req_);
+                dest_rank, tag, communicator, &future.req_);
       return future;
     }
 
@@ -161,7 +161,7 @@ namespace Dune
       T lvalue_data(std::forward<T>(data));
       auto mpi_data = getMPIData(lvalue_data);
       MPI_Recv(mpi_data.ptr(), mpi_data.size(), mpi_data.type(),
-                      source_rank, tag, communicator, status);
+               source_rank, tag, communicator, status);
       return lvalue_data;
     }
 
@@ -172,7 +172,7 @@ namespace Dune
       MPIFuture<T> future(std::forward<T>(data));
       auto mpidata = future.get_mpidata();
       MPI_Irecv(mpidata.ptr(), mpidata.size(), mpidata.type(),
-                             source_rank, tag, communicator, &future.req_);
+                source_rank, tag, communicator, &future.req_);
       return future;
     }
 
@@ -347,8 +347,8 @@ namespace Dune
       auto mpidata_out = future.get_mpidata();
       int inlen = (me==root) * mpidata_in.size()/procs;
       MPI_Iscatter(mpidata_in.ptr(), inlen, mpidata_in.type(),
-                  mpidata_out.ptr(), mpidata_out.size(), mpidata_out.type(),
-                  root, communicator, &future.req_);
+                   mpidata_out.ptr(), mpidata_out.size(), mpidata_out.type(),
+                   root, communicator, &future.req_);
       return future;
     }
 
@@ -386,8 +386,8 @@ namespace Dune
       assert(mpidata_in.size()*procs <= mpidata_out.size());
       int outlen = mpidata_in.size();
       MPI_Iallgather(mpidata_in.ptr(), mpidata_in.size(), mpidata_in.type(),
-                  mpidata_out.ptr(), outlen, mpidata_out.type(),
-                  communicator, &future.req_);
+                     mpidata_out.ptr(), outlen, mpidata_out.type(),
+                     communicator, &future.req_);
       return future;
     }
 

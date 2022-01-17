@@ -33,9 +33,9 @@ namespace Dune {
    */
   template <class Domain, class Range>
   class
-  [[deprecated("Dune::Function is deprecated after Dune 2.7.  Use C++ "
+    [[deprecated("Dune::Function is deprecated after Dune 2.7.  Use C++ "
                "function objects instead!")]]
-  Function
+    Function
   {
     typedef typename std::remove_cv<typename std::remove_reference< Domain >::type >::type RawDomainType;
     typedef typename std::remove_cv<typename std::remove_reference< Range >::type >::type RawRangeType;
@@ -79,9 +79,9 @@ namespace Dune {
    */
   template <class DomainType, class RangeType>
   class
-  [[deprecated("Dune::VirtualFunction is deprecated after Dune 2.7.  Use C++ "
+    [[deprecated("Dune::VirtualFunction is deprecated after Dune 2.7.  Use C++ "
                "function objects and std::function instead!")]]
-  VirtualFunction : public Function<const DomainType&, RangeType&>
+    VirtualFunction : public Function<const DomainType&, RangeType&>
   {
   public:
     typedef typename Function<const DomainType&, RangeType&>::Traits Traits;
@@ -99,29 +99,29 @@ namespace Dune {
 
   namespace Impl {
 
-  DUNE_NO_DEPRECATED_BEGIN
-  template<typename Domain, typename Range, typename F>
-  class LambdaVirtualFunction final
-    : public VirtualFunction<Domain, Range>
-  {
-  public:
-    LambdaVirtualFunction(F&& f)
-      : f_(std::move(f))
+    DUNE_NO_DEPRECATED_BEGIN
+    template<typename Domain, typename Range, typename F>
+    class LambdaVirtualFunction final
+      : public VirtualFunction<Domain, Range>
+    {
+    public:
+      LambdaVirtualFunction(F&& f)
+        : f_(std::move(f))
       {}
 
-    LambdaVirtualFunction(const F& f)
-      : f_(f)
+      LambdaVirtualFunction(const F& f)
+        : f_(f)
       {}
 
-    void evaluate(const Domain& x, Range& y) const override
+      void evaluate(const Domain& x, Range& y) const override
       {
         y = f_(x);
       }
 
-  private:
-    const F f_;
-  };
-  DUNE_NO_DEPRECATED_END
+    private:
+      const F f_;
+    };
+    DUNE_NO_DEPRECATED_END
 
   } /* namespace Impl */
 

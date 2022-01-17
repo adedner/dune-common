@@ -96,7 +96,7 @@ namespace Dune
       assert(l.size() == rows); // Actually, this is not needed any more!
       std::copy_n(l.begin(), std::min(static_cast<std::size_t>(ROWS),
                                       l.size()),
-                 _data.begin());
+                  _data.begin());
     }
 
     template <class T,
@@ -417,7 +417,7 @@ namespace Dune
 
     //===== solve
 
-        /** \brief Matrix-matrix multiplication
+    /** \brief Matrix-matrix multiplication
      */
     template <class OtherScalar, int otherCols>
     friend auto operator* ( const FieldMatrix& matrixA,

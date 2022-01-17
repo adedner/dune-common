@@ -63,12 +63,12 @@ struct FieldVectorMainTestCommons
     static_assert(
       std::is_same<ft,typename FieldVector<ft,d>::value_type>::value,
       "FieldVector::value_type is not the correct type"
-    );
+      );
 
     // test traits
     static_assert(
       ( std::is_same< typename Dune::FieldTraits<
-                FieldVector<ft,d> >::field_type, ft >::value ),
+                        FieldVector<ft,d> >::field_type, ft >::value ),
       "FieldTraits<FieldVector> yields wrong field_type"
       );
     static_assert(
@@ -77,7 +77,7 @@ struct FieldVectorMainTestCommons
       );
     static_assert(
       ( std::is_same< typename Dune::FieldTraits<
-                FieldVector<ft,d> >::real_type, rt >::value ),
+                        FieldVector<ft,d> >::real_type, rt >::value ),
       "FieldTraits<FieldVector> yields wrong real_type"
       );
 
@@ -543,7 +543,7 @@ void fieldvectorMathclassifiersTest() {
     std::abort();
   }
   if(Dune::isInf(fv_normal) == true) {
-     std::abort();
+    std::abort();
   }
   if(Dune::isFinite(fv_normal) == false) {
     std::abort();
@@ -551,10 +551,10 @@ void fieldvectorMathclassifiersTest() {
 
   //test vector containing a NaN-entry
   if(Dune::isNaN(fv_nan) == false) {
-     std::abort();
+    std::abort();
   }
   if(Dune::isInf(fv_nan) == true) {
-     std::abort();
+    std::abort();
   }
   if(Dune::isFinite(fv_nan) == true) {
     std::abort();

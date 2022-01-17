@@ -282,7 +282,7 @@ namespace Dune {
    * @tparam rstyle_ How to round
    */
   template<class T, FloatCmp::CmpStyle cstyle_ = FloatCmp::defaultCmpStyle,
-      FloatCmp::RoundingStyle rstyle_ = FloatCmp::defaultRoundingStyle>
+           FloatCmp::RoundingStyle rstyle_ = FloatCmp::defaultRoundingStyle>
   class FloatCmpOps {
     typedef FloatCmp::CmpStyle CmpStyle;
     typedef FloatCmp::RoundingStyle RoundingStyle;

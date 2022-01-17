@@ -626,7 +626,7 @@ namespace std
       for(std::size_t i=0; i < Dune::bigunsignedint<k>::n; ++i)
         // access internal state via the helper base class
         Dune::Impl::numeric_limits_helper<Dune::bigunsignedint<k> >::
-          digit(max_,i)=std::numeric_limits<std::uint16_t>::max();
+        digit(max_,i)=std::numeric_limits<std::uint16_t>::max();
       return max_;
     }
 
