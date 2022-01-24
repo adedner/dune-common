@@ -17,7 +17,6 @@ set(HAVE_PYTHON3_EMBED ${Python3_Development.Embed_FOUND})
 
 # register the QuadMath imported target
 if(HAVE_PYTHON3_DEV)
-  message(WARNING ${Python3_LIBRARIES})
   dune_register_package_flags(
     LIBRARIES ${Python3_LIBRARIES}
     INCLUDE_DIRS ${Python3_INCLUDE_DIRS}
