@@ -23,45 +23,45 @@ include(DuneUtilities)
 # optional second argument is verbosity
 macro(dune_module_information MODULE_DIR)
   # find version strings
-  dune_extract_line("Version:" MODULE_LINE "${MODULE_DIR}/dune.module")
+  extract_line("Version:" MODULE_LINE "${MODULE_DIR}/dune.module")
   if(NOT MODULE_LINE MATCHES ".+")
     message(FATAL_ERROR "${MODULE_DIR}/dune.module is missing a version.")
   endif()
 
   string(REGEX REPLACE ".*Version:[ ]*([^ \n]+).*" "\\1" DUNE_MOD_VERSION "${MODULE_LINE}")
-  dune_extract_major_minor_version("${DUNE_MOD_VERSION}" DUNE_VERSION)
+  extract_major_minor_version("${DUNE_MOD_VERSION}" DUNE_VERSION)
 
   # find strings for module name, maintainer
   # 1. Check for line starting with Module
-  dune_extract_line("Module:" DUNE_MOD_NAME "${MODULE_DIR}/dune.module")
+  extract_line("Module:" DUNE_MOD_NAME "${MODULE_DIR}/dune.module")
   if(NOT DUNE_MOD_NAME)
     message(FATAL_ERROR "${MODULE_DIR}/dune.module is missing a module name.")
   endif()
 
   # 2. Check for line starting with Maintainer
-  dune_extract_line("Maintainer:" DUNE_MAINTAINER "${MODULE_DIR}/dune.module")
+  extract_line("Maintainer:" DUNE_MAINTAINER "${MODULE_DIR}/dune.module")
   if(NOT DUNE_MAINTAINER)
     message(FATAL_ERROR "${MODULE_DIR}/dune.module is missing a maintainer.")
   endif()
 
   # 3. Check for line starting with Depends
-  dune_extract_line("Depends:" ${DUNE_MOD_NAME}_DEPENDS "${MODULE_DIR}/dune.module")
+  extract_line("Depends:" ${DUNE_MOD_NAME}_DEPENDS "${MODULE_DIR}/dune.module")
   if(${DUNE_MOD_NAME}_DEPENDS)
-    dune_split_module_version(${${DUNE_MOD_NAME}_DEPENDS} ${DUNE_MOD_NAME}_DEPENDS_MODULE ${DUNE_MOD_NAME}_DEPENDS_VERSION)
+    split_module_version(${${DUNE_MOD_NAME}_DEPENDS} ${DUNE_MOD_NAME}_DEPENDS_MODULE ${DUNE_MOD_NAME}_DEPENDS_VERSION)
     foreach(_mod ${${DUNE_MOD_NAME}_DEPENDS})
       set(${_mod}_REQUIRED REQUIRED)
     endforeach()
-    dune_convert_deps_to_list(${DUNE_MOD_NAME}_DEPENDS)
+    convert_deps_to_list(${DUNE_MOD_NAME}_DEPENDS)
     if(NOT ("${ARGV1}" STREQUAL QUIET))
       message(STATUS "Dependencies for ${DUNE_MOD_NAME}: ${${DUNE_MOD_NAME}_DEPENDS}")
     endif()
   endif()
 
   # 4. Check for line starting with Suggests
-  dune_extract_line("Suggests:" ${DUNE_MOD_NAME}_SUGGESTS "${MODULE_DIR}/dune.module")
+  extract_line("Suggests:" ${DUNE_MOD_NAME}_SUGGESTS "${MODULE_DIR}/dune.module")
   if(${DUNE_MOD_NAME}_SUGGESTS)
-    dune_split_module_version(${${DUNE_MOD_NAME}_SUGGESTS} ${DUNE_MOD_NAME}_SUGGESTS_MODULE ${DUNE_MOD_NAME}_SUGGESTS_VERSION)
-    dune_convert_deps_to_list(${DUNE_MOD_NAME}_SUGGESTS)
+    split_module_version(${${DUNE_MOD_NAME}_SUGGESTS} ${DUNE_MOD_NAME}_SUGGESTS_MODULE ${DUNE_MOD_NAME}_SUGGESTS_VERSION)
+    convert_deps_to_list(${DUNE_MOD_NAME}_SUGGESTS)
     if(NOT ("${ARGV1}" STREQUAL QUIET))
       message(STATUS "Suggestions for ${DUNE_MOD_NAME}: ${${DUNE_MOD_NAME}_SUGGESTS}")
     endif()
@@ -70,10 +70,10 @@ macro(dune_module_information MODULE_DIR)
   dune_module_to_uppercase(DUNE_MOD_NAME_UPPERCASE ${DUNE_MOD_NAME})
 
   # 5. Check for optional meta data
-  dune_extract_line("Author:" ${DUNE_MOD_NAME_UPPERCASE}_AUTHOR "${MODULE_DIR}/dune.module")
-  dune_extract_line("Description:" ${DUNE_MOD_NAME_UPPERCASE}_DESCRIPTION "${MODULE_DIR}/dune.module")
-  dune_extract_line("URL:" ${DUNE_MOD_NAME_UPPERCASE}_URL "${MODULE_DIR}/dune.module")
-  dune_extract_line("Python-Requires:" ${DUNE_MOD_NAME_UPPERCASE}_PYTHON_REQUIRES "${MODULE_DIR}/dune.module")
+  extract_line("Author:" ${DUNE_MOD_NAME_UPPERCASE}_AUTHOR "${MODULE_DIR}/dune.module")
+  extract_line("Description:" ${DUNE_MOD_NAME_UPPERCASE}_DESCRIPTION "${MODULE_DIR}/dune.module")
+  extract_line("URL:" ${DUNE_MOD_NAME_UPPERCASE}_URL "${MODULE_DIR}/dune.module")
+  extract_line("Python-Requires:" ${DUNE_MOD_NAME_UPPERCASE}_PYTHON_REQUIRES "${MODULE_DIR}/dune.module")
 
   # set module version
   set(${DUNE_MOD_NAME_UPPERCASE}_VERSION          "${DUNE_MOD_VERSION}")
@@ -98,14 +98,14 @@ macro(extract_line HEADER  OUTPUT FILE_NAME)
   else(OUTPUT1)
     set(OUTPUT OUTPUT-NOTFOUND)
   endif()
-endmacro(dune_extract_line)
+endmacro(extract_line)
 
 
 # Convert a string with spaces in a list which is a string with semicolon
 function(convert_deps_to_list var)
   string(REGEX REPLACE "([a-zA-Z0-9\\)]) ([a-zA-Z0-9])" "\\1;\\2" ${var} ${${var}})
   set(${var} ${${var}} PARENT_SCOPE)
-endfunction(dune_convert_deps_to_list var)
+endfunction(convert_deps_to_list)
 
 
 # split list of modules, potentially with version information
@@ -130,7 +130,7 @@ macro(split_module_version STRING MODULES VERSIONS)
     list(APPEND ${MODULES} ${mod})
     list(APPEND ${VERSIONS} ${version})
   endforeach()
-endmacro(dune_split_module_version)
+endmacro(split_module_version)
 
 
 # extracts major, minor, and revision from version string
@@ -153,4 +153,4 @@ function(extract_major_minor_version version_string varname)
   else()
     set(${varname}_REVISION ${${varname}_REVISION} PARENT_SCOPE)
   endif()
-endfunction(dune_extract_major_minor_version version_string varname)
+endfunction(extract_major_minor_version)

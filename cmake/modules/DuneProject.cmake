@@ -11,7 +11,11 @@ Initialize and finalize a Dune module.
 
   .. code-block:: cmake
 
-    dune_project([<target>])
+    dune_project([<target>
+      [INTERFACE]
+      [EXPORT_NAME <export-name>]
+      [OUTPUT_NAME <output-name>]
+    ])
 
   This function starts a new Dune module by setting several variables and
   optionally creating a library target that is added to the export list.
@@ -21,13 +25,13 @@ Initialize and finalize a Dune module.
   at the end of that ``CMakeLists.txt`` file.
 
 
-.. cmake:command:: dune_finalize_project
+.. cmake:command:: finalize_dune_project
 
   Finalize the creation of the Dune module by creating package config files.
 
   .. code-block:: cmake
 
-    dune_finalize_project([<generate-config-h>])
+    finalize_dune_project([<generate-config-h>])
 
   This function needs to be run at the end of every top-level
   ``CMakeLists.txt`` file. Among other things it creates the cmake package
@@ -202,13 +206,13 @@ endmacro(dune_project)
 # macro that should be called at the end of the top level CMakeLists.txt.
 # Namely it creates config.h and the cmake-config files,
 # some install directives and exports the module.
-macro(dune_finalize_project)
+macro(finalize_dune_project)
   if(DUNE_SYMLINK_TO_SOURCE_TREE)
     dune_symlink_to_source_tree()
   endif()
 
   # configure all headerchecks
-  dune_finalize_headercheck()
+  finalize_headercheck()
 
   # create cmake-config files for installation tree
   set(DOXYSTYLE_DIR ${CMAKE_INSTALL_DATAROOTDIR}/dune-common/doc/doxygen/)
@@ -363,26 +367,18 @@ endif()
     install(FILES config.h.cmake DESTINATION share/${ProjectName})
   endif()
 
-  # install library export set
-  install(EXPORT ${ProjectName}-targets
-    NAMESPACE Dune::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${ProjectName})
-
-  # export libraries for use in build tree
-  export(EXPORT ${ProjectName}-targets
-    NAMESPACE Dune::
-    FILE ${PROJECT_BINARY_DIR}/${ProjectName}-targets.cmake)
-
   # install pkg-config files
   # create_and_install_pkconfig(${DUNE_INSTALL_LIBDIR})
 
   if(${ProjectName}_EXPORT_SET)
     # install library export set
     install(EXPORT ${${ProjectName}_EXPORT_SET}
+      NAMESPACE Dune::
       DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${ProjectName})
 
     # export libraries for use in build tree
     export(EXPORT ${${ProjectName}_EXPORT_SET}
+      NAMESPACE Dune::
       FILE ${PROJECT_BINARY_DIR}/${ProjectName}-targets.cmake)
   endif()
 
@@ -411,12 +407,6 @@ endif()
   # check if CXX flag overloading has been enabled
   # and write compiler script (see OverloadCompilerFlags.cmake)
   dune_finalize_compiler_script()
-endmacro(dune_finalize_project)
-
-
-# For backwards compatibility the old function name still exists
-macro(finalize_dune_project)
-  dune_finalize_project(${ARGN})
 endmacro(finalize_dune_project)
 
 

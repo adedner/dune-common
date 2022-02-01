@@ -3,7 +3,7 @@ if(NOT DUNE_DISABLE_SIMD_TESTS)
 endif()
 
 if(NOT VC_FOUND)
-  dune_exclude_dir_from_headercheck()
+  exclude_dir_from_headercheck()
 endif()
 
 #install headers

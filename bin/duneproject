@@ -426,7 +426,7 @@ add_subdirectory(doc)
 add_subdirectory(cmake/modules)
 
 # finalize the dune project, e.g. generating config.h etc.
-dune_finalize_project(GENERATE_CONFIG_H_CMAKE)
+finalize_dune_project(GENERATE_CONFIG_H_CMAKE)
 M_DELIM
 
 ################## PROJECT.PC.IN ##################

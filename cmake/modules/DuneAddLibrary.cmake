@@ -28,7 +28,7 @@ Add a library to a Dune module.
     A dune library is (by default) exported into the ``<export-set>`` given by the
     global name ``${ProjectName}-targets`` if the parameter ``NO_EXPORT`` is not
     given. This ``<export-set>`` is automatically installed and exported in the
-    ``dune_finalize_project()`` function.
+    ``finalize_dune_project()`` function.
 
   ``SOURCES``
     The source files from which to build the library.
@@ -232,87 +232,6 @@ function(dune_add_library_interface _name)
   elseif(NOT ARG_NO_MODULE_LIBRARY)
     # Register library in global property <module>_LIBRARIES
     set_property(GLOBAL APPEND PROPERTY ${ProjectName}_LIBRARIES ${_name})
-  endif()
-endfunction(dune_add_library_interface)
-
-
-# Create an object library that can be used to transport a set of sources
-# \deprecated
-function(dune_add_library_object _name)
-  message(DEPRECATION "The function dune_add_library(<obj> OBJECT ...) is deprecated. "
-    "Create a regular target in a parent scope, e.g., by dune_add_library(<target>), "
-    "and fill it with sources using target_sources(<target> PRIVATE <sources>...).")
-
-  cmake_parse_arguments(ARG
-    "OBJECT"
-    "COMPILE_FLAGS;COMPILE_OPTIONS"
-    "ADD_LIBS;LINK_LIBRARIES;SOURCES" ${ARGN})
-  list(APPEND ARG_SOURCES ${ARG_UNPARSED_ARGUMENTS})
-  list(TRANSFORM ARG_SOURCES PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
-  list(APPEND ARG_LINK_LIBRARIES ${ARG_ADD_LIBS})
-  list(APPEND ARG_COMPILE_OPTIONS ${ARG_COMPILE_FLAGS})
-
-  # Register sources, libs and flags for building the library later
-  define_property(GLOBAL PROPERTY DUNE_LIB_${_name}_SOURCES
-    BRIEF_DOCS "Convenience property with sources for library ${_name}. DO NOT EDIT!"
-    FULL_DOCS "Convenience property with sources for library ${_name}. DO NOT EDIT!")
-  set_property(GLOBAL PROPERTY DUNE_LIB_${_name}_SOURCES
-    "${ARG_SOURCES}")
-  define_property(GLOBAL PROPERTY DUNE_LIB_${_name}_ADD_LIBS
-    BRIEF_DOCS "Convenience property with libraries for library ${_name}. DO NOT EDIT!"
-    FULL_DOCS "Convenience property with libraries for library ${_name}. DO NOT EDIT!")
-  set_property(GLOBAL PROPERTY DUNE_LIB_${_name}_ADD_LIBS
-    "${ARG_LINK_LIBRARIES}")
-  define_property(GLOBAL PROPERTY DUNE_LIB_${_name}_COMPILE_FLAGS
-    BRIEF_DOCS "Convenience property with compile flags for library ${_name}. DO NOT EDIT!"
-    FULL_DOCS "Convenience property with compile flags for library ${_name}. DO NOT EDIT!")
-  set_property(GLOBAL PROPERTY DUNE_LIB_${_name}_COMPILE_FLAGS
-    "${ARG_COMPILE_OPTIONS}")
-endfunction(dune_add_library_object)
-
-  # link with specified libraries from parameter ADD_LIBS
-  target_link_libraries(${_name} PRIVATE "${DUNE_LIB_LINK_LIBRARIES}")
-
-  # set target options from COMPILE_FLAGS
-  target_compile_options(${_name} PRIVATE "${DUNE_LIB_COMPILE_OPTIONS}")
-endfunction(dune_add_library_object)
-
-
-function(dune_add_library_interface _name)
-  cmake_parse_arguments(DUNE_LIB
-    "NO_EXPORT;INTERFACE"
-    "COMPILE_FLAGS;COMPILE_OPTIONS;EXPORT_NAME"
-    "ADD_LIBS;LINK_LIBRARIES" ${ARGN})
-  list(APPEND DUNE_LIB_LINK_LIBRARIES ${DUNE_LIB_ADD_LIBS})
-  list(APPEND DUNE_LIB_COMPILE_OPTIONS ${DUNE_LIB_COMPILE_FLAGS})
-
-  # create lib
-  add_library(${_name} INTERFACE)
-
-  # link with specified libraries from parameter ADD_LIBS
-  target_link_libraries(${_name} INTERFACE "${DUNE_LIB_LINK_LIBRARIES}")
-
-  # set target options from COMPILE_FLAGS
-  target_compile_options(${_name} INTERFACE "${DUNE_LIB_COMPILE_OPTIONS}")
-
-  # prepare the export of the library
-  if(NOT DUNE_LIB_NO_EXPORT)
-    if(NOT DUNE_LIB_EXPORT_NAME)
-      set(DUNE_LIB_EXPORT_NAME ${_name})
-    endif()
-
-    set_target_properties(${_name} PROPERTIES EXPORT_NAME ${DUNE_LIB_EXPORT_NAME})
-    add_library(Dune::${DUNE_LIB_EXPORT_NAME} ALIAS ${_name})
-
-    # register create library in global property DUNE_MODULE_LIBRARIES
-    set_property(GLOBAL APPEND PROPERTY DUNE_MODULE_LIBRARIES Dune::${DUNE_LIB_EXPORT_NAME})
-
-    # install targets to use the libraries in other modules.
-    install(TARGETS ${_name}
-      EXPORT ${ProjectName}-targets DESTINATION ${CMAKE_INSTALL_LIBDIR})
-  else()
-    # register create library in global property DUNE_MODULE_LIBRARIES
-    set_property(GLOBAL APPEND PROPERTY DUNE_MODULE_LIBRARIES ${_name})
   endif()
 endfunction(dune_add_library_interface)
 

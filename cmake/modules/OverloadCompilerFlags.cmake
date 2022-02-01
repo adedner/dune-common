@@ -5,9 +5,9 @@
 #   dune_initialize_compiler_script() : needs to be called before further flags are added to
 #   CMAKE_CXX_FLAGS
 #   dune_finalize_compiler_script()   : needs to be called at the end of the cmake
-#   macros, e.g. in dune_finalize_project
+#   macros, e.g. in finalize_dune_project
 #
-# Those two macro calls are hooked into dune_project/dune_finalize_project.
+# Those two macro calls are hooked into dune_project/finalize_dune_project.
 #
 # .. cmake_variable:: ALLOW_CXXFLAGS_OVERWRITE
 #
