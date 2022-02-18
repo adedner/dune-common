@@ -7,11 +7,6 @@
 #include <type_traits>
 #include <utility>
 
-#if HAVE_DUNE_TYPETREE
-#include <dune/typetree/compositenode.hh>
-#include <dune/typetree/powernode.hh>
-#endif // #if HAVE_DUNE_TYPETREE
-
 #include <dune/python/common/fmatrix.hh>
 #include <dune/python/common/fvector.hh>
 
@@ -65,18 +60,6 @@ namespace Dune
       struct DimRange< FieldMatrix< K, m, n >, void >
         : public std::integral_constant< std::size_t, m*n >
       {};
-
-#if HAVE_DUNE_TYPETREE
-      template< class T >
-      struct DimRange< T, std::enable_if_t< std::is_same< typename T::NodeTag, Dune::TypeTree::CompositeNodeTag >::value > >
-        : public DimRange< typename T::ChildTypes >
-      {};
-
-      template< class T >
-      struct DimRange< T, std::enable_if_t< std::is_same< typename T::NodeTag, Dune::TypeTree::PowerNodeTag >::value > >
-        : public std::integral_constant< std::size_t, sum< int >( T::CHILDREN * DimRange< typename T::ChildType >::value ) >
-      {};
-#endif // #if HAVE_DUNE_TYPETREE
 
       template< class T >
       struct DimRange< T, std::enable_if_t< std::is_class< typename T::FiniteElement >::value > >
