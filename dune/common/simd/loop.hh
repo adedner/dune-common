@@ -151,6 +151,7 @@ namespace Dune {
     }                                                     \
     static_assert(true, "expecting ;")
 
+    DUNE_SIMD_LOOP_ASSIGNMENT_OP(=);
     DUNE_SIMD_LOOP_ASSIGNMENT_OP(+=);
     DUNE_SIMD_LOOP_ASSIGNMENT_OP(-=);
     DUNE_SIMD_LOOP_ASSIGNMENT_OP(*=);
