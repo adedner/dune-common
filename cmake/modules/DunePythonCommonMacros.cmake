@@ -69,8 +69,15 @@ include(DunePythonFindPackage)
 include(DunePythonInstallPackage)
 include(DunePythonTestCommand)
 
-# Find the Python Interpreter and libraries
-find_package(Python3 COMPONENTS Interpreter Development)
+# Add python related meta targets
+# always add these targets (might do nothing if Python is not enabled/found)
+add_custom_target(test_python)
+add_custom_target(install_python)
+
+if(DUNE_ENABLE_PYTHON)
+  # Find the Python Interpreter and libraries
+  find_package(Python3 COMPONENTS Interpreter Development)
+endif()
 
 if(Python3_Interpreter_FOUND)
   include(DuneExecuteProcess)
@@ -81,10 +88,6 @@ if(Python3_Interpreter_FOUND)
 
   # Check presence of python packages required by the buildsystem
   dune_python_find_package(PACKAGE pip)
-
-  # Add python related meta targets
-  add_custom_target(test_python)
-  add_custom_target(install_python)
 
   # this option enables the build of Python bindings for DUNE modules
   option(DUNE_ENABLE_PYTHONBINDINGS "Enable Python bindings for DUNE" ON)

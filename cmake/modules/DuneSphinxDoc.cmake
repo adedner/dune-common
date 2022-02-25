@@ -1,6 +1,9 @@
 include_guard(GLOBAL)
 find_package(Sphinx)
-find_package(Python3 COMPONENTS Interpreter Development)
+
+if(DUNE_ENABLE_PYTHON)
+  find_package(Python3 COMPONENTS Interpreter Development)
+endif()
 
 function(dune_sphinx_doc)
   # Only proceed if Sphinx was found on the system

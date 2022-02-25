@@ -4,6 +4,12 @@ dune_require_cxx_standard(MODULE "dune-common" VERSION 14)
 include(DuneStreams)
 dune_set_minimal_debug_level()
 
+# an option to turn off Python support completely
+option(DUNE_ENABLE_PYTHON "Enable finding Python for Dune" ON)
+if(NOT DUNE_ENABLE_PYTHON)
+  message(STATUS "Python is ignored for this build (DUNE_ENABLE_PYTHON=OFF)")
+endif()
+
 # search for lapack
 find_package(LAPACK)
 include(AddBLASLapackFlags)
