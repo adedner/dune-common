@@ -15,13 +15,13 @@
 
 
 // check A*transpose(B)
-template<class A, class B>
-auto checkAxBT(const A& a, const B&b)
+template<class A, class B, class BT>
+auto checkAxBT(const A& a, const B&b, const BT&bt)
 {
-  Dune::TestSuite suite(std::string{"Check transpose with A="} + Dune::className<A>() + " and B=" + Dune::className<B>());
+  Dune::TestSuite suite(std::string{"Check transpose with A="} + Dune::className<A>() + " and B=" + Dune::className<B>() + " and BT=" + Dune::className<BT>());
 
   // compute abt
-  auto abt = a * transpose(b);
+  auto abt = a * bt;
 
   // check result type
   using FieldA = typename Dune::FieldTraits<A>::field_type;
@@ -49,14 +49,39 @@ auto checkAxBT(const A& a, const B&b)
   return suite;
 }
 
+template<class A, class B>
+void checkTranspose(Dune::TestSuite& suite, A a, B b_original)
+{
+  // Check with reference capture
+  {
+    auto b = b_original;
+    auto bt = transpose(b);
+    suite.subTest(checkAxBT(a,b,bt));
+    // Check if bt was captured by reference
+    b *= 2;
+    suite.subTest(checkAxBT(a,b,bt));
+  }
+
+  // Check with value capture
+  {
+    auto b = b_original;
+    auto bt = transpose(std::move(b));
+    suite.subTest(checkAxBT(a,b_original,bt));
+    // Check if bt was captured by value
+    b = b_original;
+    b *= 2;
+    suite.subTest(checkAxBT(a,b_original,bt));
+  }
+}
+
 
 int main()
 {
   Dune::TestSuite suite;
+  std::size_t seed=0;
 
   // fill dense matrix with test data
-  auto testFillDense = [](auto& matrix) {
-    std::size_t k=0;
+  auto testFillDense = [k=seed](auto& matrix) mutable {
     for(std::size_t i=0; i<matrix.N(); ++i)
       for(std::size_t j=0; j<matrix.M(); ++j)
         matrix[i][j] = k++;
@@ -67,7 +92,7 @@ int main()
     auto b = Dune::FieldMatrix<double,7,4>{};
     testFillDense(a);
     testFillDense(b);
-    suite.subTest(checkAxBT(a,b));
+    checkTranspose(suite,a,b);
   }
 
   {
@@ -75,7 +100,7 @@ int main()
     auto b = Dune::FieldMatrix<double,3,2>{};
     testFillDense(a);
     testFillDense(b);
-    suite.subTest(checkAxBT(a,b));
+    checkTranspose(suite,a,b);
   }
 
   {
@@ -83,7 +108,7 @@ int main()
     auto b = Dune::FieldMatrix<double,1,2>{};
     testFillDense(a);
     testFillDense(b);
-    suite.subTest(checkAxBT(a,b));
+    checkTranspose(suite,a,b);
   }
 
   {
@@ -91,7 +116,7 @@ int main()
     auto b = Dune::DiagonalMatrix<double,4>{};
     testFillDense(a);
     b = {0, 1, 2, 3};
-    suite.subTest(checkAxBT(a,b));
+    checkTranspose(suite,a,b);
   }
 
   return suite.exit();

@@ -1,5 +1,7 @@
 # Master (will become release 2.9)
 
+- The ustility `transpose(m)` now supports passing r-values. In this case a copy of `m` is stored in the returned wrapper.
+
 - Add helper function `resolveRef()` to transparently use `std::reference_wrapper`.
 
 - Add `pragma omp simd` annotations in the LoopSIMD class to improve compiler optimizations
