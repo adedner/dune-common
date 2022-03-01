@@ -121,4 +121,7 @@ if(Python3_Interpreter_FOUND)
 
   # Set up the Dune-internal virtualenv
   include(DunePythonVirtualenv)
+else()
+  message(STATUS "Python bindings disabled as there is no Python3 interpreter")
+  set(DUNE_ENABLE_PYTHONBINDINGS OFF)
 endif()
