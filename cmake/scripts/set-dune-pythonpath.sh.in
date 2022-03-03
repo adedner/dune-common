@@ -1,5 +1,9 @@
 #!@BASH@
 
+if [ "$DUNE_PY_DIR" == "" ]; then
+  export DUNE_PY_DIR=@dune-common_DIR@/.cache
+fi
+
 MODULE_PATHS="@CMAKE_BINARY_DIR@/python@MODULE_DEP_PYTHON_PATH@"
 
 # for all module paths: check if path is contain in PYTHONPATH otherwise add

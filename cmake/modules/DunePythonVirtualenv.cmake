@@ -276,14 +276,18 @@ else()
                      SCRIPT_DIR)
 
     # create list with python module paths
+    set(BUILDDIR_PYTHON "$ENV{BUILDDIR}/python")
     foreach( mod ${ALL_DEPENDENCIES} )
       if( NOT ${${mod}_INCLUDE_DIRS} STREQUAL "")
-        set(MODULE_DEP_PYTHON_PATH "${MODULE_DEP_PYTHON_PATH} ${${mod}_INCLUDE_DIRS}/build-cmake/python" )
+        set(MODULE_DEP_PYTHON_PATH "${MODULE_DEP_PYTHON_PATH}\n ${${mod}_INCLUDE_DIRS}/${BUILDDIR_PYTHON}")
       endif()
     endforeach()
     # configure script
     configure_file(${scriptdir}/set-dune-pythonpath.sh.in
                    ${CMAKE_BINARY_DIR}/set-dune-pythonpath
+                   @ONLY)
+    configure_file(${scriptdir}/run-env-replacement.sh.in
+                   ${CMAKE_BINARY_DIR}/run-in-dune-env
                    @ONLY)
   else()
     message(WARNING "Writing script 'set-dune-pythonpath' not implemented on your platform!")
