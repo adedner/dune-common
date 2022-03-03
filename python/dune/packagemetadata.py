@@ -573,13 +573,15 @@ def _extractCMakeFlags():
     duneOptsFile = None
     cmakeFlags = {}
     for x in _buildMetaData.combine_across_modules("CMAKE_FLAGS"):
-        for y in x.split(";"):
+        x = x.strip(' "')
+        for y in x.split(","):
             try:
                 k, v = y.split(":=", 1)
+                v = v.strip(' "')
                 if k == "DUNE_OPTS_FILE":
                     duneOptsFile = v
                 else:
-                    cmakeFlags[k] = v.strip()
+                    cmakeFlags[k] = v
             except ValueError:  # no '=' in line
                 pass
 
