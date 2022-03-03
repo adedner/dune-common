@@ -1,0 +1,11 @@
+#!@BASH@
+
+MODULE_PATHS="@CMAKE_BINARY_DIR@/python@MODULE_DEP_PYTHON_PATH@"
+
+# for all module paths: check if path is contain in PYTHONPATH otherwise add
+for MODPATH in $MODULE_PATHS; do 
+  MODULEFOUND=`echo $PYTHONPATH | grep $MODPATH` 
+  if [ "$MODULEFOUND" == "" ]; then 
+    export PYTHONPATH=$PYTHONPATH:$MODPATH
+  fi  
+done
