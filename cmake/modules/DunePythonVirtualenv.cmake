@@ -265,6 +265,8 @@ if(DUNE_PYTHON_USE_VENV)
     endif()
   endif()
 
+  # if pip was not found before then we can set it here since it was now found
+  set(DUNE_PYTHON_pip_FOUND ON)
 else()
   # Also write a small script 'dune-set-pythonpath' into the build directory
   # for letting the user correctly setting the needed python path
@@ -294,6 +296,3 @@ else()
   endif()
 
 endif()
-
-# if pip was not found before then we can set it here since it was now found
-set(DUNE_PYTHON_pip_FOUND ON)

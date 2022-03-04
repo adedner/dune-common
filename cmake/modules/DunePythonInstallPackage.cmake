@@ -130,9 +130,10 @@ function(dune_python_install_package)
   endif()
 
   # Check for the presence of the pip package
-  if(NOT DUNE_PYTHON_pip_FOUND)
+  if(NOT DUNE_PYTHON_pip_FOUND AND DUNE_PYTHON_USE_VENV)
     message(WARNING "dune_python_install_package: Requested installations, but pip was not found!")
     set(DUNE_PYTHON_VENVSETUP FALSE CACHE BOOL "The internal venv setup failed due to missing pip")
+    # for VENV use pip is essential
     return()
   endif()
 
@@ -296,47 +297,52 @@ function(dune_python_install_package)
   # Installing python modules here can lead to issues with versions of module source packages and pypi packages
   # and possible unexpected version downgrades
   string(REPLACE " " ";" RequiredPypiModules "${ProjectPythonRequires}")
-  dune_execute_process(COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m pip install
-                                "${WHEEL_OPTION}"
-                                # we can't use the same additional parameters for both internal
-                                # install and normal install so not including these flags at the moment
-                                "${PACKAGE_INDEX}"          # stopgap solution until ci repo fixed
-                                "${RequiredPypiModules}"
-                       RESULT_VARIABLE DUNE_PYTHON_DEPENDENCIES_FAILED
-                       WARNING_MESSAGE "python package requirements could not be installed - possibly connection to the python package index failed"
-                      )
+  if(DUNE_PYTHON_USE_VENV)
+    dune_execute_process(COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m pip install
+                                  "${WHEEL_OPTION}"
+                                  # we can't use the same additional parameters for both internal
+                                  # install and normal install so not including these flags at the moment
+                                  "${PACKAGE_INDEX}"          # stopgap solution until ci repo fixed
+                                  "${RequiredPypiModules}"
+                         RESULT_VARIABLE DUNE_PYTHON_DEPENDENCIES_FAILED
+                         WARNING_MESSAGE "python package requirements could not be installed - possibly connection to the python package index failed"
+                        )
+  endif()
   if(DUNE_PYTHON_DEPENDENCIES_FAILED)
     set(DUNE_PYTHON_VENVSETUP FALSE CACHE BOOL "The internal venv setup failed: some required packages could not be installed")
     return()
   endif()
 
-  set(DUNE_PYTHON_VENVSETUP TRUE CACHE BOOL "The internal venv setup successfull")
+  if(DUNE_PYTHON_USE_VENV)
+    set(DUNE_PYTHON_VENVSETUP TRUE CACHE BOOL "The internal venv setup successfull")
 
-  #
-  # Define build rules that install the Python package into the Dune virtualenv at the build stage
-  #
+    #
+    # Define build rules that install the Python package into the Dune virtualenv at the build stage
+    #
 
-  # installation target for dune package into local env - external requirements are already sorted and we want this step to not require
-  # internet access. Dune packages need to be installed at this stage and should not be optained from pypi (those packages include the C++ part
-  # of the module which we don't want to install. So only use available wheels.
-  add_custom_target(
-    pip_${envtargetname}
-    ALL
-    COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m pip install
-      --no-build-isolation      # avoid looking for packages during 'make' if they in the internal venv from previous 'make'
-      --no-warn-script-location # supress warnings that dune-env/bin not in path
-      --no-index
-      "${WHEEL_OPTION}"
-      # we can't use the same additional parameters for both internal
-      # install and normal install so not including these flags at the moment
-      # ${PYINST_ADDITIONAL_PIP_PARAMS} ${DUNE_PYTHON_ADDITIONAL_PIP_PARAMS}
-      --editable                  # Installations into the internal env are always editable
-      "${PYINST_FULLPATH}"
-    COMMENT "Installing Python package at ${PYINST_FULLPATH} into Dune virtual environment (${PACKAGE_INDEX})."
-    DEPENDS ${PYINST_DEPENDS}
-  )
-  add_dependencies(${envtargetname} pip_${envtargetname})
+    # installation target for dune package into local env - external requirements are already sorted and we want this step to not require
+    # internet access. Dune packages need to be installed at this stage and should not be optained from pypi (those packages include the C++ part
+    # of the module which we don't want to install. So only use available wheels.
 
+    add_custom_target(
+      pip_${envtargetname}
+      ALL
+      COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m pip install
+        --no-build-isolation      # avoid looking for packages during 'make' if they in the internal venv from previous 'make'
+        --no-warn-script-location # supress warnings that dune-env/bin not in path
+        --no-index
+        "${WHEEL_OPTION}"
+        # we can't use the same additional parameters for both internal
+        # install and normal install so not including these flags at the moment
+        # ${PYINST_ADDITIONAL_PIP_PARAMS} ${DUNE_PYTHON_ADDITIONAL_PIP_PARAMS}
+        --editable                  # Installations into the internal env are always editable
+        "${PYINST_FULLPATH}"
+      COMMENT "Installing Python package at ${PYINST_FULLPATH} into Dune virtual environment (${PACKAGE_INDEX})."
+      DEPENDS ${PYINST_DEPENDS}
+    )
+    add_dependencies(${envtargetname} pip_${envtargetname})
+
+  endif()
   #
   # Now define rules for `make install_python`.
   #
@@ -409,6 +415,7 @@ function(dune_python_install_package)
   #     python packages into a virtual environment.
   #
 
+  if(DUNE_PYTHON_USE_VENV)
   install(CODE "set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
                 set(DUNE_PYTHON_WHEELHOUSE ${DUNE_PYTHON_WHEELHOUSE})
                 include(DuneExecuteProcess)
@@ -419,5 +426,6 @@ function(dune_python_install_package)
                 dune_execute_process(COMMAND ${WHEEL_COMMAND}
                                      WARNING_MESSAGE \"wheel installation failed - ignored\")"
           )
+  endif()
 
 endfunction()
