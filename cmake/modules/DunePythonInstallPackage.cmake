@@ -91,6 +91,14 @@ function(dune_python_install_package)
     endif()
   endforeach()
 
+  # find the python package for dune-common to set the PYTHONPATH later
+  if(EXISTS "${dune-common_BINARY_DIR}")
+      set(DuneCommonPython "${dune-common_BINARY_DIR}/python")
+  else()
+      set(DuneCommonPython "${dune-common_DIR}/python")
+  endif()
+  message(STATUS "dune-common python path: ${DuneCommonPython}")
+
   # if MPI is found dune-common will be linked to MPI
   # in that case we require mpi4py for MPI support from the Python side
   # This will not install mpi4py when installing in build-isolation but
@@ -275,15 +283,16 @@ function(dune_python_install_package)
                         )
     endif()
 
+    message(status "~~~~~~ PYTHONPATH=${DuneCommonPython} ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m dune configure")
     # Add a custom command that triggers the configuration of dune-py
     add_custom_command(TARGET ${envtargetname} POST_BUILD
-                       COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m dune configure
+                       COMMAND PYTHONPATH=${DuneCommonPython} ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m dune configure
                       )
 
     # Add a custom command that triggers the configuration of dune-py when installing package
     if(NOT "${DUNE_PYTHON_INSTALL_LOCATION}" STREQUAL "none")
       add_custom_command(TARGET ${targetname} POST_BUILD
-                         COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m dune configure
+                         COMMAND PYTHONPATH=${DuneCommonPython} ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m dune configure
                         )
     endif()
   endif() # PYINST_CMAKE_METADATA_FILE

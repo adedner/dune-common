@@ -198,6 +198,10 @@ else()
   message(STATUS "Using existing virtualenv in ${DUNE_PYTHON_VIRTUALENV_PATH}")
 endif()
 
+# in case no internal venv is used we use the external python executable -
+# don't know if the underscore version of the variable is the best choice
+set(DUNE_PYTHON_VIRTUALENV_EXECUTABLE ${_Python3_EXECUTABLE})
+
 if(DUNE_PYTHON_USE_VENV)
 
   # Also store the virtual env interpreter directly
