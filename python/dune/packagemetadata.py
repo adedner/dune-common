@@ -10,7 +10,6 @@ This module implements helpers for two classes of meta data
 
 """
 
-from setuptools import find_namespace_packages
 import sys
 import os
 import io
@@ -351,6 +350,8 @@ def forceConfigure():
 
 
 def metaData(version=None, dependencyCheck=True):
+    from setuptools import find_namespace_packages
+
     data = Data(version)
 
     # check if all dependencies are listed in pyproject.toml
