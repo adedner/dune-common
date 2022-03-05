@@ -149,7 +149,7 @@ function(dune_python_install_package)
   # Add a custom target that globally installs this package if requested
   string(REPLACE "/" "_" targetname "install_python_${CMAKE_CURRENT_SOURCE_DIR}_${PYINST_PATH}")
 
-  add_custom_target(${envtargetname})
+  add_custom_target(${envtargetname} ALL)
   add_custom_target(${targetname})
 
   #
@@ -218,7 +218,6 @@ function(dune_python_install_package)
       # this is the only version of the metadata we need for the package insallation
       add_custom_target(
         metadata_${envtargetname}
-        ALL
         COMMAND ${CMAKE_COMMAND}
           -Dmetadatafile=${metadatafile}
           -DDEPS="${PROJECT_NAME};${ALL_DEPENDENCIES}"
@@ -238,7 +237,6 @@ function(dune_python_install_package)
       # this is the build version - keep in mind there is an install version further down
       add_custom_target(
         metadata_${envtargetname}
-        ALL
         COMMAND ${CMAKE_COMMAND}
           -Dmetadatafile=${metadatafile}
           -DDEPBUILDDIRS="${_export_builddirs}"
@@ -326,7 +324,6 @@ function(dune_python_install_package)
 
     add_custom_target(
       pip_${envtargetname}
-      ALL
       COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m pip install
         --no-build-isolation      # avoid looking for packages during 'make' if they in the internal venv from previous 'make'
         --no-warn-script-location # supress warnings that dune-env/bin not in path
