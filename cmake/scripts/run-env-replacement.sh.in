@@ -1,3 +1,5 @@
 #!@BASH@
 
 source @CMAKE_BINARY_DIR@/set-dune-pythonpath
+
+"$@"
