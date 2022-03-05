@@ -97,7 +97,6 @@ function(dune_python_install_package)
   else()
       set(DuneCommonPython "${dune-common_DIR}/python")
   endif()
-  message(STATUS "dune-common python path: ${DuneCommonPython}")
 
   # if MPI is found dune-common will be linked to MPI
   # in that case we require mpi4py for MPI support from the Python side
@@ -283,7 +282,6 @@ function(dune_python_install_package)
                         )
     endif()
 
-    message(status "~~~~~~ PYTHONPATH=${DuneCommonPython} ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m dune configure")
     # Add a custom command that triggers the configuration of dune-py
     add_custom_command(TARGET ${envtargetname} POST_BUILD
                        COMMAND PYTHONPATH=${DuneCommonPython} ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m dune configure
