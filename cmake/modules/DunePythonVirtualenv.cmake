@@ -288,11 +288,17 @@ else()
         set(MODULE_DEP_PYTHON_PATH "${MODULE_DEP_PYTHON_PATH}\n ${${mod}_INCLUDE_DIRS}/${BUILDDIR_PYTHON}")
       endif()
     endforeach()
+
+    # for dune-common this variable is not set but needed by the script
+    if( NOT dune-common_DIR )
+      set( dune-common_DIR ${CMAKE_BINARY_DIR} )
+    endif()
+
     # configure script
     configure_file(${scriptdir}/set-dune-pythonpath.sh.in
                    ${CMAKE_BINARY_DIR}/set-dune-pythonpath
                    @ONLY)
-    configure_file(${scriptdir}/run-env-replacement.sh.in
+    configure_file(${scriptdir}/run-in-dune-env.sh.in
                    ${CMAKE_BINARY_DIR}/run-in-dune-env
                    @ONLY)
   else()

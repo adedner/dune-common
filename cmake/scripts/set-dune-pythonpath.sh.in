@@ -6,6 +6,9 @@ fi
 
 MODULE_PATHS="@CMAKE_BINARY_DIR@/python@MODULE_DEP_PYTHON_PATH@"
 
+source @DUNE_OPTS_FILE@
+export DUNE_CMAKE_FLAGS="$CMAKE_FLAGS"
+
 # for all module paths: check if path is contained in PYTHONPATH otherwise add
 for MODPATH in $MODULE_PATHS; do 
   MODULEFOUND=`echo $PYTHONPATH | grep $MODPATH` 
