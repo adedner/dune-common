@@ -38,6 +38,8 @@ namespace Impl {
       cols = WrappedMatrix::rows
     };
 
+    using value_type = typename WrappedMatrix::value_type;
+
     TransposedMatrixWrapper(M&& matrix) : matrix_(std::move(matrix)) {}
     TransposedMatrixWrapper(const M& matrix) : matrix_(matrix) {}
 
@@ -58,6 +60,20 @@ namespace Impl {
       return result;
     }
 
+    Dune::FieldMatrix<value_type, rows, cols> asDense() const
+    {
+      Dune::FieldMatrix<value_type, rows, cols> MT;
+      for(auto&& [M_i, i] : Dune::sparseRange(wrappedMatrix()))
+        for(auto&& [M_ij, j] : Dune::sparseRange(M_i))
+          MT[j][i] = M_ij;
+      return MT;
+    }
+
+    operator Dune::FieldMatrix<value_type, cols, rows> () const
+    {
+      return asDense();
+    }
+
   private:
 
     M matrix_;
@@ -75,6 +91,8 @@ namespace Impl {
  * if a is a FieldMatrix of appropriate size. This is
  * optimal even for sparse b because it only relies on
  * calling b.mv(a[i], c[i]) for the rows of a.
+ * Furthermore the wrapper can be converted to a suitable
+ * dense FieldMatrix using the \code adDense() \endcode method.
  *
  * The created object stores the passed reference to the wrapped matrix
  * but does not copy the latted.
@@ -95,6 +113,8 @@ auto transpose(const Matrix& matrix) {
  * if a is a FieldMatrix of appropriate size. This is
  * optimal even for sparse b because it only relies on
  * calling b.mv(a[i], c[i]) for the rows of a.
+ * Furthermore the wrapper can be converted to a suitable
+ * dense FieldMatrix using the \code adDense() \endcode method.
  *
  * The created object stores a copy of the wrapped matrix
  * and leaves the passed r-value refenrence in moved-from state.

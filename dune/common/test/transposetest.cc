@@ -72,6 +72,14 @@ void checkTranspose(Dune::TestSuite& suite, A a, B b_original)
     b *= 2;
     suite.subTest(checkAxBT(a,b_original,bt));
   }
+
+  // Check conversion to dense matrix
+  {
+    auto b = b_original;
+    auto bt = transpose(b_original).asDense();
+    suite.subTest(checkAxBT(a,b,bt));
+  }
+
 }
 
 
