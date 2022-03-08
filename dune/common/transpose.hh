@@ -60,6 +60,12 @@ namespace Impl {
       return result;
     }
 
+    template<class X, class Y>
+    void mv (const X& x, Y& y) const
+    {
+      wrappedMatrix().mtv(x,y);
+    }
+
     Dune::FieldMatrix<value_type, rows, cols> asDense() const
     {
       Dune::FieldMatrix<value_type, rows, cols> MT;
@@ -92,7 +98,10 @@ namespace Impl {
  * optimal even for sparse b because it only relies on
  * calling b.mv(a[i], c[i]) for the rows of a.
  * Furthermore the wrapper can be converted to a suitable
- * dense FieldMatrix using the \code adDense() \endcode method.
+ * dense FieldMatrix using the \code adDense() \endcode method
+ * if the wrapped matrix allows to iterate over its entries
+ * and matrix-vector multiplication using \code transpose(b).mv(x,y) \endcode
+ * if the wrapped matrix provides the \code b.mtv(x,y) \endcode.
  *
  * The created object stores the passed reference to the wrapped matrix
  * but does not copy the latted.
@@ -114,7 +123,10 @@ auto transpose(const Matrix& matrix) {
  * optimal even for sparse b because it only relies on
  * calling b.mv(a[i], c[i]) for the rows of a.
  * Furthermore the wrapper can be converted to a suitable
- * dense FieldMatrix using the \code adDense() \endcode method.
+ * dense FieldMatrix using the \code adDense() \endcode metho
+ * if the wrapped matrix allows to iterate over its entries
+ * and matrix-vector multiplication using \code transpose(b).mv(x,y) \endcode
+ * if the wrapped matrix provides the \code b.mtv(x,y) \endcode.
  *
  * The created object stores a copy of the wrapped matrix
  * and leaves the passed r-value refenrence in moved-from state.
