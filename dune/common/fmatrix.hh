@@ -20,6 +20,53 @@
 namespace Dune
 {
 
+  namespace Impl
+  {
+
+    template<class M>
+    class ColumnVectorView
+    {
+    public:
+
+      using value_type = typename M::value_type;
+      using size_type = typename M::size_type;
+
+      ColumnVectorView(M& matrix, size_type col) :
+        matrix_(matrix),
+        col_(col)
+      {}
+
+      constexpr size_type N () const {
+        return matrix_.N();
+      }
+
+      value_type& operator[] (size_type row) {
+        return matrix_[row][col_];
+      }
+
+      const value_type& operator[] (size_type row) const {
+        return matrix_[row][col_];
+      }
+
+    protected:
+      M& matrix_;
+      size_type col_;
+    };
+
+    template<class M>
+    ColumnVectorView(M&, std::size_t) -> ColumnVectorView<M>;
+
+    template<class M>
+    ColumnVectorView(const M&, std::size_t) -> ColumnVectorView<const M>;
+  }
+
+  template<typename M>
+  struct FieldTraits< Impl::ColumnVectorView<M> >
+  {
+    using field_type = typename FieldTraits<M>::field_type;
+    using real_type = typename FieldTraits<M>::real_type;
+  };
+
   /**
       @addtogroup DenseMatVec
       @{
@@ -32,6 +79,14 @@ namespace Dune
    */
 
   template< class K, int ROWS, int COLS = ROWS > class FieldMatrix;
+
+  namespace Impl {
+    template<class M>
+    class IsFieldMatrix : public std::false_type {};
+
+    template< class K, int ROWS, int COLS>
+    class IsFieldMatrix<FieldMatrix<K, ROWS, COLS>> : public std::true_type {};
+  }
 
   template< class K, int ROWS, int COLS >
   struct DenseMatVecTraits< FieldMatrix<K,ROWS,COLS> >
@@ -209,6 +264,49 @@ namespace Dune
             result[i][j] += matrixA[i][k] * matrixB[k][j];
         }
 
+      return result;
+    }
+
+    /** \brief Matrix-matrix multiplication
+     *
+     * This implements multiplication of a FieldMatrix with another matrix
+     * of type OtherMatrix. The latter has to provide
+     * OtherMatrix::field_type, OtherMatrix::cols, and OtherMatrix::mtv(x,y).
+     */
+    template <class OtherMatrix,
+             typename = std::void_t<typename OtherMatrix::field_type>,
+             int = (OtherMatrix::cols, 0)>
+    friend auto operator* ( const FieldMatrix& matrixA,
+                            const OtherMatrix& matrixB)
+    {
+      using Field = typename PromotionTraits<K, typename OtherMatrix::field_type>::PromotedType;
+      Dune::FieldMatrix<Field, rows ,OtherMatrix::cols> result;
+      for (std::size_t j=0; j<rows; ++j)
+        matrixB.mtv(matrixA[j], result[j]);
+      return result;
+    }
+
+    /** \brief Matrix-matrix multiplication
+     *
+     * This implements multiplication of another matrix
+     * of type OtherMatrix with a FieldMatrix. The former has to provide
+     * OtherMatrix::field_type, OtherMatrix::rows, and OtherMatrix::mv(x,y).
+     */
+    template <class OtherMatrix,
+             typename = std::void_t<typename OtherMatrix::field_type>,
+             int = (OtherMatrix::rows, 0),
+             std::enable_if_t<not Impl::IsFieldMatrix<OtherMatrix>::value, int> = 0>
+    friend auto operator* ( const OtherMatrix& matrixA,
+                            const FieldMatrix& matrixB)
+    {
+      using Field = typename PromotionTraits<K, typename OtherMatrix::field_type>::PromotedType;
+      Dune::FieldMatrix<Field, OtherMatrix::rows, cols> result;
+      for (std::size_t j=0; j<cols; ++j)
+      {
+        auto B_j = Impl::ColumnVectorView(matrixB, j);
+        auto result_j = Impl::ColumnVectorView(result, j);
+        matrixA.mv(B_j, result_j);
+      }
       return result;
     }
 
