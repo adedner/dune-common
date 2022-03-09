@@ -12,13 +12,29 @@
 #include <dune/common/classname.hh>
 #include <dune/common/test/testsuite.hh>
 
+// Helper function to convert a matrix to a FieldMatrix
+// using only the mv method.
+template<class M>
+auto toDenseMatrix(const M& m){
+  using K = typename M::field_type;
+  Dune::FieldMatrix<K, M::rows, M::cols> result;
+  for (int j=0; j<M::cols; j++) {
+    Dune::FieldVector<K,M::cols> idColumn(0);
+    idColumn[j] = 1;
+    Dune::FieldVector<K,M::rows> column;
+    m.mv(idColumn,column);
+    for (int k=0; k<M::rows; k++)
+      result[k][j] = column[k];
+  }
+  return result;
+}
 
 
 // check A*transpose(B)
 template<class A, class B, class BT>
 auto checkAxBT(const A& a, const B&b, const BT&bt)
 {
-  Dune::TestSuite suite(std::string{"Check transpose with A="} + Dune::className<A>() + " and B=" + Dune::className<B>() + " and BT=" + Dune::className<BT>());
+  Dune::TestSuite suite(std::string{"Check A*transpose(B) with A="} + Dune::className<A>() + " and B=" + Dune::className<B>() + " and BT=" + Dune::className<BT>());
 
   // compute abt
   auto abt = a * bt;
@@ -31,12 +47,15 @@ auto checkAxBT(const A& a, const B&b, const BT&bt)
   suite.check(std::is_same<decltype(abt), ABT>())
     << "Result type of A*transpose(B) should be " << Dune::className<ABT>() << " but is " << Dune::className<decltype(abt)>();
 
+  auto a_dense = toDenseMatrix(a);
+  auto b_dense = toDenseMatrix(b);
+
   // manually compute result value
   auto abt_check = ABT{};
   for(std::size_t i=0; i<A::rows; ++i)
     for(std::size_t j=0; j<B::rows; ++j)
-      for(auto&& [b_jk, k] : Dune::sparseRange(b[j]))
-        abt_check[i][j] += a[i][k]*b_jk;
+      for(std::size_t k=0; k<B::cols; ++k)
+        abt_check[i][j] += a_dense[i][k]*b_dense[j][k];
 
   // check result value
   bool equal = true;
@@ -49,10 +68,47 @@ auto checkAxBT(const A& a, const B&b, const BT&bt)
   return suite;
 }
 
-template<class A, class B>
-void checkTranspose(Dune::TestSuite& suite, A a, B b_original)
+template<class A, class AT, class B>
+auto checkATxB(const A& a, const AT& at, const B& b)
 {
-  // Check with reference capture
+  Dune::TestSuite suite(std::string{"Check transpose(A)*B with AT="} + Dune::className<AT>() + " and B=" + Dune::className<B>() + " and B=" + Dune::className<B>());
+
+  // compute atb
+  auto atb = at * b;
+
+  // check result type
+  using FieldA = typename Dune::FieldTraits<A>::field_type;
+  using FieldB = typename Dune::FieldTraits<B>::field_type;
+  using Field = typename Dune::PromotionTraits<FieldA, FieldB>::PromotedType;
+  using ATB = Dune::FieldMatrix<Field,A::cols, B::cols>;
+  suite.check(std::is_same<decltype(atb), ATB>())
+    << "Result type of transpose(A)*B should be " << Dune::className<ATB>() << " but is " << Dune::className<decltype(atb)>();
+
+  auto a_dense = toDenseMatrix(a);
+  auto b_dense = toDenseMatrix(b);
+
+  // manually compute result value
+  auto atb_check = ATB{};
+  for(std::size_t i=0; i<A::cols; ++i)
+    for(std::size_t j=0; j<B::cols; ++j)
+      for(std::size_t k=0; k<B::rows; ++k)
+        atb_check[i][j] += a_dense[k][i]*b_dense[k][j];
+
+  // check result value
+  bool equal = true;
+  for(std::size_t i=0; i<A::cols; ++i)
+    for(std::size_t j=0; j<B::cols; ++j)
+      equal = equal and (atb_check[i][j] == atb[i][j]);
+  suite.check(equal)
+    << "Result of transpose(A)*B should be \n" << atb_check << " but is \n" << atb;
+
+  return suite;
+}
+
+template<class A, class B, class C>
+void checkTranspose(Dune::TestSuite& suite, A a, B b_original, C c)
+{
+  // Check A*BT with reference capture
   {
     auto b = b_original;
     auto bt = transpose(b);
@@ -62,7 +118,7 @@ void checkTranspose(Dune::TestSuite& suite, A a, B b_original)
     suite.subTest(checkAxBT(a,b,bt));
   }
 
-  // Check with reference capture by std::ref
+  // Check A*BT with reference capture by std::ref
   {
     auto b = b_original;
     auto bt = transpose(std::ref(b));
@@ -72,7 +128,7 @@ void checkTranspose(Dune::TestSuite& suite, A a, B b_original)
     suite.subTest(checkAxBT(a,b,bt));
   }
 
-  // Check with value capture
+  // Check A*BT with value capture
   {
     auto b = b_original;
     auto bt = transpose(std::move(b));
@@ -81,6 +137,16 @@ void checkTranspose(Dune::TestSuite& suite, A a, B b_original)
     b = b_original;
     b *= 2;
     suite.subTest(checkAxBT(a,b_original,bt));
+  }
+
+  // Check BT*C with reference capture
+  {
+    auto b = b_original;
+    auto bt = transpose(b);
+    suite.subTest(checkATxB(b,bt,c));
+    // Check if bt was captured by reference
+    b *= 2;
+    suite.subTest(checkATxB(b,bt,c));
   }
 
   // Check conversion to dense matrix
@@ -108,33 +174,41 @@ int main()
   {
     auto a = Dune::FieldMatrix<double,3,4>{};
     auto b = Dune::FieldMatrix<double,7,4>{};
+    auto c = Dune::FieldMatrix<double,7,2>{};
     testFillDense(a);
     testFillDense(b);
-    checkTranspose(suite,a,b);
+    testFillDense(c);
+    checkTranspose(suite,a,b,c);
   }
 
   {
     auto a = Dune::FieldMatrix<double,1,2>{};
     auto b = Dune::FieldMatrix<double,3,2>{};
+    auto c = Dune::FieldMatrix<double,3,4>{};
     testFillDense(a);
     testFillDense(b);
-    checkTranspose(suite,a,b);
+    testFillDense(c);
+    checkTranspose(suite,a,b,c);
   }
 
   {
     auto a = Dune::FieldMatrix<double,1,2>{};
     auto b = Dune::FieldMatrix<double,1,2>{};
+    auto c = Dune::FieldMatrix<double,1,5>{};
     testFillDense(a);
     testFillDense(b);
-    checkTranspose(suite,a,b);
+    testFillDense(c);
+    checkTranspose(suite,a,b,c);
   }
 
   {
     auto a = Dune::FieldMatrix<double,3,4>{};
     auto b = Dune::DiagonalMatrix<double,4>{};
+    auto c = Dune::FieldMatrix<double,4,7>{};
     testFillDense(a);
     b = {0, 1, 2, 3};
-    checkTranspose(suite,a,b);
+    testFillDense(c);
+    checkTranspose(suite,a,b,c);
   }
 
   return suite.exit();
