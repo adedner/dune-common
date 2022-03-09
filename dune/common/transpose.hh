@@ -39,6 +39,7 @@ namespace Impl {
     };
 
     using value_type = typename WrappedMatrix::value_type;
+    using field_type = typename WrappedMatrix::field_type;
 
     TransposedMatrixWrapper(M&& matrix) : matrix_(std::move(matrix)) {}
     TransposedMatrixWrapper(const M& matrix) : matrix_(matrix) {}
@@ -48,22 +49,16 @@ namespace Impl {
     TransposedMatrixWrapper& operator=(const TransposedMatrixWrapper&) = default;
     TransposedMatrixWrapper& operator=(TransposedMatrixWrapper&&) = default;
 
-    template<class OtherField, int otherRows>
-    friend auto operator* (const FieldMatrix<OtherField, otherRows, rows>& matrixA,
-                            const TransposedMatrixWrapper& matrixB)
-    {
-      using ThisField = typename FieldTraits<WrappedMatrix>::field_type;
-      using Field = typename PromotionTraits<ThisField, OtherField>::PromotedType;
-      FieldMatrix<Field, otherRows, cols> result;
-      for (std::size_t j=0; j<otherRows; ++j)
-        matrixB.wrappedMatrix().mv(matrixA[j], result[j]);
-      return result;
-    }
-
     template<class X, class Y>
     void mv (const X& x, Y& y) const
     {
       wrappedMatrix().mtv(x,y);
+    }
+
+    template<class X, class Y>
+    void mtv (const X& x, Y& y) const
+    {
+      wrappedMatrix().mv(x,y);
     }
 
     Dune::FieldMatrix<value_type, rows, cols> asDense() const
