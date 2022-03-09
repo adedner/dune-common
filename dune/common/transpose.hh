@@ -123,6 +123,31 @@ auto transpose(const Matrix& matrix) {
  * optimal even for sparse b because it only relies on
  * calling b.mv(a[i], c[i]) for the rows of a.
  * Furthermore the wrapper can be converted to a suitable
+ * dense FieldMatrix using the \code adDense() \endcode method
+ * if the wrapped matrix allows to iterate over its entries
+ * and matrix-vector multiplication using \code transpose(b).mv(x,y) \endcode
+ * if the wrapped matrix provides the \code b.mtv(x,y) \endcode.
+ *
+ * This specialization allows to pass a \code std::reference_wrapper \endcode
+ * of a matrix to explicitly request, that the latter is stored by
+ * reference in the wrapper.
+ */
+template<class Matrix>
+auto transpose(const std::reference_wrapper<Matrix>& matrix) {
+  return Impl::TransposedMatrixWrapper(matrix);
+}
+
+/**
+ * \brief Create a wrapper modelling the transposed matrix
+ *
+ * Currently the wrapper only implements
+ * \code
+ * auto c = a*transpose(b);
+ * \endcode
+ * if a is a FieldMatrix of appropriate size. This is
+ * optimal even for sparse b because it only relies on
+ * calling b.mv(a[i], c[i]) for the rows of a.
+ * Furthermore the wrapper can be converted to a suitable
  * dense FieldMatrix using the \code adDense() \endcode metho
  * if the wrapped matrix allows to iterate over its entries
  * and matrix-vector multiplication using \code transpose(b).mv(x,y) \endcode

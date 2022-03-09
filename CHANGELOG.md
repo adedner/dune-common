@@ -1,6 +1,8 @@
 # Master (will become release 2.9)
 
-- The ustility `transpose(m)` now supports passing r-values. In this case a copy of `m` is stored in the returned wrapper.
+- The utility `transpose(m)` now supports passing an r-value or a `std::reference_wrapper` of a matrix.
+  In the former case a copy of `m` is stored in the returned wrapper, while the latter explicitly requests
+  to store the matrix by value.
 
 - Add helper function `resolveRef()` to transparently use `std::reference_wrapper`.
 

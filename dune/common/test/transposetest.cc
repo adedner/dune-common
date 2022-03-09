@@ -62,6 +62,16 @@ void checkTranspose(Dune::TestSuite& suite, A a, B b_original)
     suite.subTest(checkAxBT(a,b,bt));
   }
 
+  // Check with reference capture by std::ref
+  {
+    auto b = b_original;
+    auto bt = transpose(std::ref(b));
+    suite.subTest(checkAxBT(a,b,bt));
+    // Check if bt was captured by reference
+    b *= 2;
+    suite.subTest(checkAxBT(a,b,bt));
+  }
+
   // Check with value capture
   {
     auto b = b_original;
