@@ -11,8 +11,7 @@ export DUNE_CMAKE_FLAGS="$CMAKE_FLAGS"
 
 # for all module paths: check if path is contained in PYTHONPATH otherwise add
 for MODPATH in $MODULE_PATHS; do 
-  MODULEFOUND=`echo $PYTHONPATH | grep $MODPATH` 
-  if [ "$MODULEFOUND" == "" ]; then 
+  if [[ ${PYTHONPATH} != *${MODPATH}* ]]; then
     export PYTHONPATH=$PYTHONPATH:$MODPATH
   fi  
 done
