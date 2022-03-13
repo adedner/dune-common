@@ -442,7 +442,11 @@ class BuildMetaData(dict):
             for k, v in zip(moddata[key].split(" "), moddata[value].split(";")):
                 # we don't store paths for module that have not been found (suggested)
                 # and we also skip the path if it is empty (packaged module)
-                if v.endswith("NOTFOUND") or v == "":
+                # A path in an env might also already be removed if a
+                # source package was installed over a externally installed
+                # package. In this case some metadata might still point to
+                # the dune-env path but we want to prioritize the build version
+                if v.endswith("NOTFOUND") or v == "" or not os.path.exists(v):
                     continue
                 # make sure build directory (if found) is unique across modules
                 if k in result and not result[k] == v:
