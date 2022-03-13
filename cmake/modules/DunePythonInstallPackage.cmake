@@ -269,6 +269,11 @@ function(dune_python_install_package)
         )
         add_dependencies(${targetname} metadata_${targetname})
       endif()
+
+      # Add a custom command that triggers the configuration of dune-py
+      add_custom_command(TARGET ${envtargetname} POST_BUILD
+                         COMMAND PYTHONPATH=${DuneCommonPython} ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m dune configure
+                        )
     endif()
     add_dependencies(${envtargetname} metadata_${envtargetname})
 
@@ -281,11 +286,6 @@ function(dune_python_install_package)
                         COMMENT checking if the modules used to confiugre this module match those from any installed dune packages
                         )
     endif()
-
-    # Add a custom command that triggers the configuration of dune-py
-    add_custom_command(TARGET ${envtargetname} POST_BUILD
-                       COMMAND PYTHONPATH=${DuneCommonPython} ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m dune configure
-                      )
 
     # Add a custom command that triggers the configuration of dune-py when installing package
     if(NOT "${DUNE_PYTHON_INSTALL_LOCATION}" STREQUAL "none")
