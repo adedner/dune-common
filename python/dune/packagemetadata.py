@@ -562,7 +562,6 @@ def _extractCMakeFlags():
         stdout, _ = proc.communicate()
         cmakeArgs = shlex.split(stdout.decode('utf-8'))
 
-    """
     # check environment variable
     cmakeArgs += shlex.split(os.environ.get('CMAKE_FLAGS', ''))
 
@@ -574,7 +573,6 @@ def _extractCMakeFlags():
             cmakeFlags[k] = v.strip()
         except ValueError:  # no '=' in line
             pass
-    """
 
     # try to unify 'ON' and 'OFF' values
     for k, v in cmakeFlags.items():
