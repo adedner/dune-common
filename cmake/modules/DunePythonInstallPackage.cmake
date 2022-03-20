@@ -143,110 +143,13 @@ function(dune_python_install_package)
       set(PACKAGE_INDEX "")
   endif()
 
-  # Install external requirements (i.e. not dune packages) once at configure stage - install of package is
-  # only carried out if this succeeded and with --no-index, i.e., without using any package indices but only local wheels
-  # Installing python modules here can lead to issues with versions of module source packages and pypi packages
-  # and possible unexpected version downgrades
-  string(REPLACE " " ";" RequiredPypiModules "${ProjectPythonRequires}")
-  dune_execute_process(COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m pip install
-                                "${WHEEL_OPTION}"
-                                # we can't use the same additional parameters for both internal
-                                # install and normal install so not including these flags at the moment
-                                "${PACKAGE_INDEX}"          # stopgap solution until ci repo fixed
-                                "${RequiredPypiModules}"
-                       RESULT_VARIABLE DUNE_PYTHON_DEPENDENCIES_FAILED
-                       WARNING_MESSAGE "python package requirements could not be installed - possibly connection to the python package index failed"
-                      )
-  if(DUNE_PYTHON_DEPENDENCIES_FAILED)
-    set(DUNE_PYTHON_VENVSETUP FALSE CACHE BOOL "The internal venv setup failed: some required packages could not be installed")
-    return()
-  endif()
-
-  set(DUNE_PYTHON_VENVSETUP TRUE CACHE BOOL "The internal venv setup successfull")
-
-  #
-  # Define build rules that install the Python package into the Dune virtualenv at the build stage
-  #
-
   # Install the Python Package into the Dune virtual environment in the build stage
   string(REPLACE "/" "_" envtargetname "env_install_python_${CMAKE_CURRENT_SOURCE_DIR}_${PYINST_PATH}")
+  # Add a custom target that globally installs this package if requested
+  string(REPLACE "/" "_" targetname "install_python_${CMAKE_CURRENT_SOURCE_DIR}_${PYINST_PATH}")
 
-  # installation target for dune package into local env - external requirements are already sorted and we want this step to not require
-  # internet access. Dune packages need to be installed at this stage and should not be optained from pypi (those packages include the C++ part
-  # of the module which we don't want to install. So only use available wheels.
-  add_custom_target(
-    ${envtargetname}
-    ALL
-    COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m pip install
-      --no-build-isolation      # avoid looking for packages during 'make' if they in the internal venv from previous 'make'
-      --no-warn-script-location # supress warnings that dune-env/bin not in path
-      --no-index
-      "${WHEEL_OPTION}"
-      # we can't use the same additional parameters for both internal
-      # install and normal install so not including these flags at the moment
-      # ${PYINST_ADDITIONAL_PIP_PARAMS} ${DUNE_PYTHON_ADDITIONAL_PIP_PARAMS}
-      --editable                  # Installations into the internal env are always editable
-      "${PYINST_FULLPATH}"
-    COMMENT "Installing Python package at ${PYINST_FULLPATH} into Dune virtual environment (${PACKAGE_INDEX})."
-    DEPENDS ${PYINST_DEPENDS}
-  )
-
-  #
-  # Now define rules for `make install_python`.
-  #
-
-  # Determine where to install python packages
-  if(NOT DUNE_PYTHON_INSTALL_LOCATION)
-    if(DUNE_PYTHON_SYSTEM_IS_VIRTUALENV)
-      set(DUNE_PYTHON_INSTALL_LOCATION "system")
-    else()
-      set(DUNE_PYTHON_INSTALL_LOCATION "user")
-    endif()
-  endif()
-
-  if(NOT(("${DUNE_PYTHON_INSTALL_LOCATION}" STREQUAL "user") OR
-         ("${DUNE_PYTHON_INSTALL_LOCATION}" STREQUAL "system") OR
-         ("${DUNE_PYTHON_INSTALL_LOCATION}" STREQUAL "none") OR
-         ("${DUNE_PYTHON_INSTALL_LOCATION}" MATCHES "--target")   # this allow to provide a folder, i.e., --target /home/foo/site-packages
-    ))
-    message(FATAL_ERROR "DUNE_PYTHON_INSTALL_LOCATION must be user|system|none.")
-  endif()
-  if(("${DUNE_PYTHON_INSTALL_LOCATION}" STREQUAL "user") AND
-     DUNE_PYTHON_SYSTEM_IS_VIRTUALENV)
-    message(FATAL_ERROR "Specifying 'user' as install location is incomaptible with using virtual environments (as per pip docs)")
-  endif()
-
-  # Only add installation rules if it was requested
-  if(NOT "${DUNE_PYTHON_INSTALL_LOCATION}" STREQUAL "none")
-    # Construct the installation location option string
-    set(USER_INSTALL_OPTION "")
-    if("${DUNE_PYTHON_INSTALL_LOCATION}" STREQUAL "user")
-      set(USER_INSTALL_OPTION "--user")
-    endif()
-    if("${DUNE_PYTHON_INSTALL_LOCATION}" MATCHES "--target")
-      set(USER_INSTALL_OPTION "${DUNE_PYTHON_INSTALL_LOCATION}")
-    endif()
-
-    # Add a custom target that globally installs this package if requested
-    string(REPLACE "/" "_" targetname "install_python_${CMAKE_CURRENT_SOURCE_DIR}_${PYINST_PATH}")
-    add_custom_target(${targetname}
-                      COMMAND ${Python3_EXECUTABLE} -m pip install
-                        "${USER_INSTALL_OPTION}"
-                       "${PACKAGE_INDEX}"
-                        # --use-feature=in-tree-build
-                        --upgrade
-                        "${WHEEL_OPTION}"
-                        ${PYINST_ADDITIONAL_PIP_PARAMS} ${DUNE_PYTHON_ADDITIONAL_PIP_PARAMS}
-                        "${PYINST_FULLPATH}"
-                      COMMENT "Installing the python package at ${PYINST_FULLPATH} (location ${USER_INSTALL_OPTION})"
-                      )
-
-    # during package installation we don't want the package to be installed
-    # since skbuild takes care of that.
-    if(NOT SKBUILD)
-      add_dependencies(install_python ${targetname})
-    endif()
-  endif()
+  add_custom_target(${envtargetname})
+  add_custom_target(${targetname})
 
   #
   # Add some CMake-exported metadata to the package
@@ -310,80 +213,183 @@ function(dune_python_install_package)
     #
 
     # Make sure to generate the metadata for the build stage
-    if(NOT DUNE_PYTHON_DEPENDENCIES_FAILED)
-      if(SKBUILD)
-        # this is the only version of the metadata we need for the package insallation
+    if(SKBUILD)
+      # this is the only version of the metadata we need for the package insallation
+      add_custom_target(
+        metadata_${envtargetname}
+        ALL
+        COMMAND ${CMAKE_COMMAND}
+          -Dmetadatafile=${metadatafile}
+          -DDEPS="${PROJECT_NAME};${ALL_DEPENDENCIES}"
+          -DMODULENAME=${PROJECT_NAME}
+          -DCMAKE_FLAGS="${_cmake_flags}"
+          -P ${scriptdir}/WritePythonCMakeMetadata.cmake
+        COMMENT "Generating the CMake metadata file at ${PYINST_CMAKE_METADATA_FILE}"
+        DEPENDS ${PYINST_DEPENDS}
+      )
+      # don't need an 'install' target for the metadata since we can use the build version
+      # but we need to make sure that skbuild correctly installs the
+      # existing metadata file into the site-package
+      get_filename_component(PYINST_CMAKE_METADATA_PATH ${PYINST_CMAKE_METADATA_FILE} DIRECTORY)
+      # todo: not use 'python' here but somehow use PATH parameter?
+      install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PYINST_CMAKE_METADATA_FILE} DESTINATION python/${PYINST_CMAKE_METADATA_PATH})
+    else()
+      # this is the build version - keep in mind there is an install version further down
+      add_custom_target(
+        metadata_${envtargetname}
+        ALL
+        COMMAND ${CMAKE_COMMAND}
+          -Dmetadatafile=${metadatafile}
+          -DDEPBUILDDIRS="${_export_builddirs}"
+          -DDEPS="${PROJECT_NAME};${ALL_DEPENDENCIES}"
+          -DMODULENAME=${PROJECT_NAME}
+          -DCMAKE_FLAGS="${_cmake_flags}"
+          -DINSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+          -P ${scriptdir}/WritePythonCMakeMetadata.cmake
+        COMMENT "Generating the CMake metadata file at ${PYINST_CMAKE_METADATA_FILE}"
+        DEPENDS ${PYINST_DEPENDS}
+      )
+      if(NOT "${DUNE_PYTHON_INSTALL_LOCATION}" STREQUAL "none")
         add_custom_target(
-          metadata_${envtargetname}
+          metadata_${targetname}
           COMMAND ${CMAKE_COMMAND}
             -Dmetadatafile=${metadatafile}
-            -DDEPS="${PROJECT_NAME};${ALL_DEPENDENCIES}"
-            -DMODULENAME=${PROJECT_NAME}
-            -DCMAKE_FLAGS="${_cmake_flags}"
-            -P ${scriptdir}/WritePythonCMakeMetadata.cmake
-          COMMENT "Generating the CMake metadata file at ${PYINST_CMAKE_METADATA_FILE}"
-          DEPENDS ${PYINST_DEPENDS}
-        )
-        # don't need an 'install' target for the metadata since we can use the build version
-        # but we need to make sure that skbuild correctly installs the
-        # existing metadata file into the site-package
-        get_filename_component(PYINST_CMAKE_METADATA_PATH ${PYINST_CMAKE_METADATA_FILE} DIRECTORY)
-        # todo: not use 'python' here but somehow use PATH parameter?
-        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PYINST_CMAKE_METADATA_FILE} DESTINATION python/${PYINST_CMAKE_METADATA_PATH})
-      else()
-        # this is the build version - keep in mind there is an install version further down
-        add_custom_target(
-          metadata_${envtargetname}
-          COMMAND ${CMAKE_COMMAND}
-            -Dmetadatafile=${metadatafile}
-            -DDEPBUILDDIRS="${_export_builddirs}"
             -DDEPS="${PROJECT_NAME};${ALL_DEPENDENCIES}"
             -DMODULENAME=${PROJECT_NAME}
             -DCMAKE_FLAGS="${_cmake_flags}"
             -DINSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
             -P ${scriptdir}/WritePythonCMakeMetadata.cmake
           COMMENT "Generating the CMake metadata file at ${PYINST_CMAKE_METADATA_FILE}"
-          DEPENDS ${PYINST_DEPENDS}
         )
-        if(NOT "${DUNE_PYTHON_INSTALL_LOCATION}" STREQUAL "none")
-          add_custom_target(
-            metadata_${targetname}
-            COMMAND ${CMAKE_COMMAND}
-              -Dmetadatafile=${metadatafile}
-              -DDEPS="${PROJECT_NAME};${ALL_DEPENDENCIES}"
-              -DMODULENAME=${PROJECT_NAME}
-              -DCMAKE_FLAGS="${_cmake_flags}"
-              -DINSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-              -P ${scriptdir}/WritePythonCMakeMetadata.cmake
-            COMMENT "Generating the CMake metadata file at ${PYINST_CMAKE_METADATA_FILE}"
-          )
-          add_dependencies(${targetname} metadata_${targetname})
-        endif()
+        add_dependencies(${targetname} metadata_${targetname})
       endif()
-      add_dependencies(${envtargetname} metadata_${envtargetname})
+    endif()
+    add_dependencies(${envtargetname} metadata_${envtargetname})
 
-      # check consistency of the builddir when using an external venv
-      if(DUNE_PYTHON_SYSTEM_IS_VIRTUALENV)
-        add_custom_command(TARGET metadata_${envtargetname} PRE_BUILD
-                          COMMAND "${CMAKE_COMMAND}" -E echo "configured for interpreter ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE}"
-                          COMMAND "${DUNE_PYTHON_VIRTUALENV_EXECUTABLE}" "${scriptdir}/checkvenvconf.py"
-                                   checkbuilddirs \"${PROJECT_NAME};${ALL_DEPENDENCIES}\" "${_export_builddirs}"
-                          COMMENT checking if the modules used to confiugre this module match those from any installed dune packages
-                          )
-      endif()
-
-      # Add a custom command that triggers the configuration of dune-py
-      add_custom_command(TARGET ${envtargetname} POST_BUILD
-                         COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m dune configure
+    # check consistency of the builddir when using an external venv
+    if(DUNE_PYTHON_SYSTEM_IS_VIRTUALENV)
+      add_custom_command(TARGET metadata_${envtargetname} PRE_BUILD
+                        COMMAND "${CMAKE_COMMAND}" -E echo "configured for interpreter ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE}"
+                        COMMAND "${DUNE_PYTHON_VIRTUALENV_EXECUTABLE}" "${scriptdir}/checkvenvconf.py"
+                                 checkbuilddirs \"${PROJECT_NAME};${ALL_DEPENDENCIES}\" "${_export_builddirs}"
+                        COMMENT checking if the modules used to confiugre this module match those from any installed dune packages
                         )
-    endif() # NOT DUNE_PYTHON_DEPENDENCIES_FAILED)
+    endif()
 
+    # Add a custom command that triggers the configuration of dune-py
+    add_custom_command(TARGET ${envtargetname} POST_BUILD
+                       COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m dune configure
+                      )
 
     # Add a custom command that triggers the configuration of dune-py when installing package
     if(NOT "${DUNE_PYTHON_INSTALL_LOCATION}" STREQUAL "none")
       add_custom_command(TARGET ${targetname} POST_BUILD
                          COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m dune configure
                         )
+    endif()
+  endif() # PYINST_CMAKE_METADATA_FILE
+
+
+
+  # Install external requirements (i.e. not dune packages) once at configure stage - install of package is
+  # only carried out if this succeeded and with --no-index, i.e., without using any package indices but only local wheels
+  # Installing python modules here can lead to issues with versions of module source packages and pypi packages
+  # and possible unexpected version downgrades
+  string(REPLACE " " ";" RequiredPypiModules "${ProjectPythonRequires}")
+  dune_execute_process(COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m pip install
+                                "${WHEEL_OPTION}"
+                                # we can't use the same additional parameters for both internal
+                                # install and normal install so not including these flags at the moment
+                                "${PACKAGE_INDEX}"          # stopgap solution until ci repo fixed
+                                "${RequiredPypiModules}"
+                       RESULT_VARIABLE DUNE_PYTHON_DEPENDENCIES_FAILED
+                       WARNING_MESSAGE "python package requirements could not be installed - possibly connection to the python package index failed"
+                      )
+  if(DUNE_PYTHON_DEPENDENCIES_FAILED)
+    set(DUNE_PYTHON_VENVSETUP FALSE CACHE BOOL "The internal venv setup failed: some required packages could not be installed")
+    return()
+  endif()
+
+  set(DUNE_PYTHON_VENVSETUP TRUE CACHE BOOL "The internal venv setup successfull")
+
+  #
+  # Define build rules that install the Python package into the Dune virtualenv at the build stage
+  #
+
+  # installation target for dune package into local env - external requirements are already sorted and we want this step to not require
+  # internet access. Dune packages need to be installed at this stage and should not be optained from pypi (those packages include the C++ part
+  # of the module which we don't want to install. So only use available wheels.
+  add_custom_target(
+    pip_${envtargetname}
+    ALL
+    COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m pip install
+      --no-build-isolation      # avoid looking for packages during 'make' if they in the internal venv from previous 'make'
+      --no-warn-script-location # supress warnings that dune-env/bin not in path
+      --no-index
+      "${WHEEL_OPTION}"
+      # we can't use the same additional parameters for both internal
+      # install and normal install so not including these flags at the moment
+      # ${PYINST_ADDITIONAL_PIP_PARAMS} ${DUNE_PYTHON_ADDITIONAL_PIP_PARAMS}
+      --editable                  # Installations into the internal env are always editable
+      "${PYINST_FULLPATH}"
+    COMMENT "Installing Python package at ${PYINST_FULLPATH} into Dune virtual environment (${PACKAGE_INDEX})."
+    DEPENDS ${PYINST_DEPENDS}
+  )
+  add_dependencies(${envtargetname} pip_${envtargetname})
+
+  #
+  # Now define rules for `make install_python`.
+  #
+
+  # Determine where to install python packages
+  if(NOT DUNE_PYTHON_INSTALL_LOCATION)
+    if(DUNE_PYTHON_SYSTEM_IS_VIRTUALENV)
+      set(DUNE_PYTHON_INSTALL_LOCATION "system")
+    else()
+      set(DUNE_PYTHON_INSTALL_LOCATION "user")
+    endif()
+  endif()
+
+  if(NOT(("${DUNE_PYTHON_INSTALL_LOCATION}" STREQUAL "user") OR
+         ("${DUNE_PYTHON_INSTALL_LOCATION}" STREQUAL "system") OR
+         ("${DUNE_PYTHON_INSTALL_LOCATION}" STREQUAL "none") OR
+         ("${DUNE_PYTHON_INSTALL_LOCATION}" MATCHES "--target")   # this allow to provide a folder, i.e., --target /home/foo/site-packages
+    ))
+    message(FATAL_ERROR "DUNE_PYTHON_INSTALL_LOCATION must be user|system|none.")
+  endif()
+  if(("${DUNE_PYTHON_INSTALL_LOCATION}" STREQUAL "user") AND
+     DUNE_PYTHON_SYSTEM_IS_VIRTUALENV)
+    message(FATAL_ERROR "Specifying 'user' as install location is incomaptible with using virtual environments (as per pip docs)")
+  endif()
+
+  # Only add installation rules if it was requested
+  if(NOT "${DUNE_PYTHON_INSTALL_LOCATION}" STREQUAL "none")
+    # Construct the installation location option string
+    set(USER_INSTALL_OPTION "")
+    if("${DUNE_PYTHON_INSTALL_LOCATION}" STREQUAL "user")
+      set(USER_INSTALL_OPTION "--user")
+    endif()
+    if("${DUNE_PYTHON_INSTALL_LOCATION}" MATCHES "--target")
+      set(USER_INSTALL_OPTION "${DUNE_PYTHON_INSTALL_LOCATION}")
+    endif()
+
+    add_custom_target(pip_${targetname}
+                      COMMAND ${Python3_EXECUTABLE} -m pip install
+                        "${USER_INSTALL_OPTION}"
+                       "${PACKAGE_INDEX}"
+                        # --use-feature=in-tree-build
+                        --upgrade
+                        "${WHEEL_OPTION}"
+                        ${PYINST_ADDITIONAL_PIP_PARAMS} ${DUNE_PYTHON_ADDITIONAL_PIP_PARAMS}
+                        "${PYINST_FULLPATH}"
+                      COMMENT "Installing the python package at ${PYINST_FULLPATH} (location ${USER_INSTALL_OPTION})"
+                      )
+    add_dependencies(${targetname} pip_${targetname})
+
+    # during package installation we don't want the package to be installed
+    # since skbuild takes care of that.
+    if(NOT SKBUILD)
+      add_dependencies(install_python ${targetname})
     endif()
   endif()
 
