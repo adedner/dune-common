@@ -272,7 +272,7 @@ dune_add_test(SOURCES parametertreetest.cc
               LINK_LIBRARIES dunecommon
               LABELS quick)
 
-dune_add_test(SOURCES readPythonParameterTreeTest.cc
+dune_add_test(SOURCES readpythonparametertreetest.cc
               LINK_LIBRARIES dunecommon
               LABELS quick
               CMAKE_GUARD HAVE_PYTHON3_EMBED)
