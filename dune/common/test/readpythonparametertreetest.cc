@@ -44,11 +44,13 @@ int main(){
   // apparently ParameterTree does not allow to cast a boolean into an int
   // expect(ptree.get<int>("bool") != 0);
 
+  // try to read different vector vector types from string, list, tuple and numpy.array
+  using V = std::vector<double>;
+  using A = std::array<float,3>;
+  using FV = Dune::FieldVector<double,3>;
+
   // 'vectorStr': "1 127 2.5",
   {
-      using V = std::vector<double>;
-      using A = std::array<float,3>;
-      using FV = Dune::FieldVector<double,3>;
       expect(ptree.get<V>("vectorStr")  == V({1., 127., 2.5}));
       expect(ptree.get<A>("vectorStr")  == A({1., 127., 2.5}));
       expect(ptree.get<FV>("vectorStr") == FV({1., 127., 2.5}));
@@ -56,23 +58,30 @@ int main(){
 
   // 'array': [2, 12, 5.2]
   {
-      using V = std::vector<double>;
-      using A = std::array<float,3>;
-      using FV = Dune::FieldVector<double,3>;
       expect(ptree.get<V>("array")  == V({2,12,5.2}));
       expect(ptree.get<A>("array")  == A({2,12,5.2}));
       expect(ptree.get<FV>("array") == FV({2,12,5.2}));
   }
 
+  // 'tuple': (3, 13, 6.2)
+  {
+      expect(ptree.get<V>("tuple")  == V({3, 13, 6.2}));
+      expect(ptree.get<A>("tuple")  == A({3, 13, 6.2}));
+      expect(ptree.get<FV>("tuple") == FV({3, 13, 6.2}));
+  }
+
   // if we have numpy, we can also test reading numpy arrays
   if (ptree.get<bool>("haveNumpy"))
   {
-      using V = std::vector<double>;
-      using A = std::array<float,3>;
-      using FV = Dune::FieldVector<double,3>;
+      // 'numpy': np.array([2,4,6], dtype=np.float64)
       expect(ptree.get<V>("numpy")  == V({2,4,6}));
       expect(ptree.get<A>("numpy")  == A({2,4,6}));
       expect(ptree.get<FV>("numpy") == FV({2,4,6}));
+
+      // 'numpyInt': np.array([3,5,7])
+      expect(ptree.get<V>("numpyInt")  == V({3,5,7}));
+      expect(ptree.get<A>("numpyInt")  == A({3,5,7}));
+      expect(ptree.get<FV>("numpyInt") == FV({3,5,7}));
   }
 
   if (failures > 0)

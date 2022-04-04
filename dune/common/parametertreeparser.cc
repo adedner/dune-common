@@ -21,6 +21,8 @@
 
 #if HAVE_PYTHON3_EMBED
 #include <dune/python/pybind11/embed.h>
+#include <dune/python/pybind11/stl.h>
+#include <dune/python/pybind11/numpy.h>
 #endif
 
 std::string Dune::ParameterTreeParser::ltrim(const std::string& s)
@@ -280,7 +282,16 @@ void Dune::ParameterTreeParser::readPythonDict(const pybind11::dict& scope,
     if(!overwrite and pt.hasKey(key_str))
       continue;
     // otherwise add the python string representation as value
-    std::string val_str = pybind11::str(value);
+    std::string val_str = "";
+    if(pybind11::isinstance<pybind11::list>(value)
+      || pybind11::isinstance<pybind11::array>(value)
+      || pybind11::isinstance<pybind11::tuple>(value))
+    {
+      std::vector<double> vec = value.cast<std::vector<double>>();
+      for (double v : vec) val_str += std::to_string(v) + " ";
+    }
+    else
+      val_str = pybind11::str(value);
     pt[key_str] = val_str;
   }
 }
