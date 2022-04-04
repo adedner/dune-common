@@ -10,18 +10,72 @@
 
 using namespace Dune;
 
+#define expect(A)                                                       \
+    std::cout << "checking " #A << std::endl;                           \
+    tests++;                                                            \
+    try {                                                               \
+        if (!(A)) {                                                     \
+            std::cerr << "ERROR: failed expectation\n\t" #A << std::endl; \
+            failures++;                                                 \
+        }                                                               \
+    }                                                                   \
+    catch (Dune::Exception & e) {                                       \
+        std::cerr << "ERROR: " << e.what() << std::endl;                \
+        failures++;                                                     \
+    }
+
+
 int main(){
 
   std::ofstream pyfile;
-  std::string filename = "parametertree.py";
-  pyfile.open(filename);
-  pyfile << "foo = {'test': 'test', " << std::endl
-         << "  'test_dict': {'a': 1, 'b':2}}" << std::endl;
-  pyfile.close();
+  std::string filename = "readpythonparametertree.py";
   ParameterTree ptree;
   ParameterTreeParser::readPythonFile(filename, ptree,true,"foo");
   ptree.report();
-  assert(ptree.get("test", "foo") == "test");
-  assert(ptree.sub("test_dict").get("b", -1) == 2);
-  return 0;
+  int failures = 0;
+  int tests = 0;
+  expect(ptree.get("str", "foo") == "test");
+  expect(ptree.sub("subTree").get("b", -1) == 2);
+  expect(ptree.get<double>("value") == 11.);
+  expect(ptree.get<int>("value") == 11);
+  expect(ptree.get<bool>("bool") == true);
+  expect(ptree.get<bool>("bool") != false);
+
+  // apparently ParameterTree does not allow to cast a boolean into an int
+  // expect(ptree.get<int>("bool") != 0);
+
+  // 'vectorStr': "1 127 2.5",
+  {
+      using V = std::vector<double>;
+      using A = std::array<float,3>;
+      using FV = Dune::FieldVector<double,3>;
+      expect(ptree.get<V>("vectorStr")  == V({1., 127., 2.5}));
+      expect(ptree.get<A>("vectorStr")  == A({1., 127., 2.5}));
+      expect(ptree.get<FV>("vectorStr") == FV({1., 127., 2.5}));
+  }
+
+  // 'array': [2, 12, 5.2]
+  {
+      using V = std::vector<double>;
+      using A = std::array<float,3>;
+      using FV = Dune::FieldVector<double,3>;
+      expect(ptree.get<V>("array")  == V({2,12,5.2}));
+      expect(ptree.get<A>("array")  == A({2,12,5.2}));
+      expect(ptree.get<FV>("array") == FV({2,12,5.2}));
+  }
+
+  // if we have numpy, we can also test reading numpy arrays
+  if (ptree.get<bool>("haveNumpy"))
+  {
+      using V = std::vector<double>;
+      using A = std::array<float,3>;
+      using FV = Dune::FieldVector<double,3>;
+      expect(ptree.get<V>("numpy")  == V({2,4,6}));
+      expect(ptree.get<A>("numpy")  == A({2,4,6}));
+      expect(ptree.get<FV>("numpy") == FV({2,4,6}));
+  }
+
+  if (failures > 0)
+      std::cerr << "=== ERROR: " << failures << " tests out of " << tests << " failed" << std::endl;
+  return failures;
 }

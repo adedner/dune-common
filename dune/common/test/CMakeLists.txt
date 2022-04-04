@@ -272,6 +272,8 @@ dune_add_test(SOURCES parametertreetest.cc
               LINK_LIBRARIES dunecommon
               LABELS quick)
 
+# add a symlink to the python file, we will read it in the test
+dune_symlink_to_source_files(FILES readpythonparametertree.py)
 dune_add_test(SOURCES readpythonparametertreetest.cc
               LINK_LIBRARIES dunecommon
               LABELS quick
