@@ -70,7 +70,7 @@ include(DunePythonInstallPackage)
 include(DunePythonTestCommand)
 
 # Find the Python Interpreter and libraries
-find_package(Python3 COMPONENTS Interpreter Development)
+find_package(Python3 COMPONENTS Interpreter Development.Module)
 
 if(Python3_Interpreter_FOUND)
   include(DuneExecuteProcess)
