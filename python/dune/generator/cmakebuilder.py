@@ -199,7 +199,7 @@ class Builder:
         active = active or verbose
         if active:
             if infoTxt:
-                logger.log(logLevel,infoTxt) #  + " ...")
+                logger.log(logLevel, f"active: {infoTxt}") #  + " ...")
         # call the cmake process
         with subprocess.Popen(cmake_args,
                               cwd=cwd,
@@ -207,6 +207,7 @@ class Builder:
                               stderr=subprocess.PIPE) as cmake:
             try:
                 stdout, stderr = cmake.communicate(timeout=2) # no message if delay is <2sec
+                logger.debug(f"Less than 2 seconds ({infoTxt})")  # + " ...")
             except subprocess.TimeoutExpired:
                 if infoTxt and not active:
                     logger.log(logLevel, infoTxt) #  + " ...")
@@ -218,6 +219,7 @@ class Builder:
                 # retrieve stderr output
                 stdout, stderr = cmake.communicate()
                 raise CompileError(buffer_to_str(stderr))
+        logger.debug("callCMake I'm here")
         return stdout, stderr
 
     def compile(self, infoTxt, target='all', verbose=False):
@@ -234,6 +236,8 @@ class Builder:
 
         if cmake_args != []:
             cmake_args += ["--"] + make_args
+
+        print(cmake_args)
         stdout, stderr = Builder.callCMake(cmake_args,
                                            cwd=self.generated_dir,
                                            infoTxt=infoTxt,
@@ -263,6 +267,12 @@ class Builder:
                     self.savedOutput[1].write(err)
                 if nlines > 1:
                     self.savedOutput[1].write("\n###############################\n")
+
+        if stdout is not None:
+            print(buffer_to_str(stdout))
+        if stderr is not None:
+            print(buffer_to_str(stderr))
+
 
     def _maybeConfigureWithCMake(self, moduleName, source, pythonName, extraCMake):
         sourceFileName = os.path.join(self.generated_dir, moduleName + ".cc")
