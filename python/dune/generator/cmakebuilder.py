@@ -8,7 +8,6 @@ import jinja2
 import signal
 import json
 import copy
-
 import dune
 
 from dune.packagemetadata import (
@@ -212,6 +211,14 @@ class Builder:
                 if infoTxt and not active:
                     logger.log(logLevel, infoTxt) #  + " ...")
                     active = True # make sure 'done' is printed
+
+            while True:
+                output = cmake.stdout.readline()
+                if cmake.poll() is not None:
+                    break
+                if output:
+                    print(output.strip())
+
             # wait for cmd to finish
             cmake.wait()
             # check return code
@@ -368,7 +375,10 @@ class Builder:
                         self.compile(infoTxt=compilationMessage, target=moduleName)
 
         ## TODO remove barrier here
-        comm.barrier()
+        logger.debug("Wating for barrier... ")
+        returncode = comm.barrier()
+        if returncode != 0:
+            logger.debug("Barrier failed with return code {returncode}")
 
         logger.debug("Loading " + moduleName)
         module = importlib.import_module("dune.generated." + moduleName)
