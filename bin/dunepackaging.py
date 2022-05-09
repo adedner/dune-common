@@ -129,7 +129,7 @@ def main(argv):
 #
 """)
     requires = data.asPythonRequirementString(data.depends + data.python_requires)
-    minimal = ["pip", "setuptools", "wheel", "scikit-build", "cmake>=3.13", "ninja", "requests"]
+    minimal = ["pip>=21", "setuptools", "wheel", "scikit-build", "cmake>=3.13", "ninja", "requests"]
     requires += [r for r in minimal if not any([a.startswith(r) for a in requires])]
     requires.sort()
     f.write("[build-system]\n")
@@ -222,7 +222,7 @@ def main(argv):
             f.write('  script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv "\n\n')
             f.write('requirements:\n')
 
-            requirements = ['pip', 'python', 'mkl', 'tbb', 'intel-openmp',
+            requirements = ['pip>=21', 'python', 'mkl', 'tbb', 'intel-openmp',
                             'libgcc-ng', 'libstdcxx-ng', 'gmp', 'scikit-build',
                             'mpi4py', 'matplotlib', 'numpy', 'scipy', 'ufl']
 
