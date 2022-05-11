@@ -8,7 +8,7 @@ class ThreadedGenerator:
     def clear(self):
         self.builders = []
     def execute(self):
-        with ThreadPoolExecutor(max_workers = 4) as executor:
+        with ThreadPoolExecutor(max_workers = self.maxWorkers) as executor:
             thread = executor.map(ThreadedGenerator._gen, self.builders)
         self.clear()
         return [m for m in thread]
