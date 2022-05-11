@@ -1,5 +1,6 @@
 from io import StringIO
 from numpy import array
+from concurrent.futures import ThreadPoolExecutor
 
 import os
 # enable DUNE_SAVE_BUILD to test various output options
@@ -97,11 +98,19 @@ def test_threaded():
     y = array([-1.]*100)
     z = array([2.]*100)
 
+    """
     # build two algorthms in parallel
     generator = ThreadedGenerator(maxWorkers=2)
     generator.add( load, "add", StringIO(addVec), x,y,z)
     generator.add( load, "dot", StringIO(dotVec), x,y)
     add,dot = generator.execute()
+    """
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        addFuture = executor.submit( load, "add", StringIO(addVec), x,y,z)
+        dotFuture = executor.submit( load, "dot", StringIO(dotVec), x,y)
+    while not all([addFuture.done(), dotFuture.done()]): sleep(2)
+    add,dot = addFuture.result(), dotFuture.result()
 
     add(x,y,z)
     for i in range(len(z)):
