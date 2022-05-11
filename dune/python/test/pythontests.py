@@ -61,6 +61,54 @@ def test_numpyvector():
     for i in range(len(x)):
         assert x[i] == float(i)
 
+addVec="""
+#include <dune/python/common/numpyvector.hh>
+template <class T>
+void add(pybind11::array_t< T >& a, pybind11::array_t< T >& b, pybind11::array_t< T >& c)
+{
+  Dune::Python::NumPyVector< T > x( a );
+  Dune::Python::NumPyVector< T > y( b );
+  Dune::Python::NumPyVector< T > ret( c );
+  for( size_t i=0; i<x.size(); ++i )
+    ret[ i ] = x[i] + y[i];
+}
+"""
+dotVec="""
+#include <dune/python/common/numpyvector.hh>
+template <class T>
+double dot(pybind11::array_t< T >& a, pybind11::array_t< T >& b)
+{
+  double ret = 0;
+  Dune::Python::NumPyVector< T > x( a );
+  Dune::Python::NumPyVector< T > y( b );
+  for( size_t i=0; i<x.size(); ++i )
+    ret += x[i]*y[i];
+  return ret;
+}
+"""
+
+def test_threaded():
+    """
+    Test building multiple modules using threading
+    """
+    from dune.generator.algorithm import load
+    from dune.generator.threadedgenerator import ThreadedGenerator
+    x = array([1.]*100)
+    y = array([-1.]*100)
+    z = array([2.]*100)
+
+    # build two algorthms in parallel
+    generator = ThreadedGenerator(maxWorkers=2)
+    generator.add( load, "add", StringIO(addVec), x,y,z)
+    generator.add( load, "dot", StringIO(dotVec), x,y)
+    add,dot = generator.execute()
+
+    add(x,y,z)
+    for i in range(len(z)):
+        assert z[i] == float(0)
+    a = dot(x,y)
+    assert a == -len(z)
+
 def test_class_export():
     from dune.generator.importclass import load
     from dune.generator.algorithm   import run
@@ -84,3 +132,4 @@ if __name__ == "__main__":
     _ = getDunePyDir()
     test_class_export()
     test_numpyvector()
+    test_threaded()
