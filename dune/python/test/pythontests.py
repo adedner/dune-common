@@ -109,7 +109,6 @@ def test_threaded():
     with ThreadPoolExecutor(max_workers=2) as executor:
         addFuture = executor.submit( load, "add", StringIO(addVec), x,y,z)
         dotFuture = executor.submit( load, "dot", StringIO(dotVec), x,y)
-    while not all([addFuture.done(), dotFuture.done()]): sleep(2)
     add,dot = addFuture.result(), dotFuture.result()
 
     add(x,y,z)
