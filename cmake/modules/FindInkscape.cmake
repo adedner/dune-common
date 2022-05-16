@@ -27,5 +27,4 @@ endif(INKSCAPE)
 # text for feature summary
 set_package_properties("Inkscape" PROPERTIES
   DESCRIPTION "converts SVG images"
-  URL "www.inkscape.org"
-  PURPOSE "To generate the documentation with LaTeX")
+  URL "www.inkscape.org")

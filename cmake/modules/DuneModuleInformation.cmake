@@ -105,7 +105,7 @@ endmacro(extract_line)
 function(convert_deps_to_list var)
   string(REGEX REPLACE "([a-zA-Z0-9\\)]) ([a-zA-Z0-9])" "\\1;\\2" ${var} ${${var}})
   set(${var} ${${var}} PARENT_SCOPE)
-endfunction(convert_deps_to_list var)
+endfunction(convert_deps_to_list)
 
 
 # split list of modules, potentially with version information
@@ -153,4 +153,4 @@ function(extract_major_minor_version version_string varname)
   else()
     set(${varname}_REVISION ${${varname}_REVISION} PARENT_SCOPE)
   endif()
-endfunction(extract_major_minor_version version_string varname)
+endfunction(extract_major_minor_version)

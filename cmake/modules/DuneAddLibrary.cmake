@@ -28,7 +28,7 @@ Add a library to a Dune module.
     A dune library is (by default) exported into the ``<export-set>`` given by the
     global name ``${ProjectName}-targets`` if the parameter ``NO_EXPORT`` is not
     given. This ``<export-set>`` is automatically installed and exported in the
-    ``dune_finalize_project()`` function.
+    ``finalize_dune_project()`` function.
 
   ``SOURCES``
     The source files from which to build the library.
@@ -173,10 +173,11 @@ function(dune_add_library_normal _name)
     endif()
 
     set_target_properties(${_name} PROPERTIES EXPORT_NAME ${ARG_EXPORT_NAME})
+    add_library(Dune::${ARG_EXPORT_NAME} ALIAS ${_name})
 
     # Register library in global property <module>LIBRARIES
     if(NOT ARG_NO_MODULE_LIBRARY)
-      set_property(GLOBAL APPEND PROPERTY ${ProjectName}_LIBRARIES ${ARG_EXPORT_NAME})
+      set_property(GLOBAL APPEND PROPERTY ${ProjectName}_LIBRARIES Dune::${ARG_EXPORT_NAME})
     endif()
 
     # Install targets to use the libraries in other modules.
@@ -216,10 +217,11 @@ function(dune_add_library_interface _name)
     endif()
 
     set_target_properties(${_name} PROPERTIES EXPORT_NAME ${ARG_EXPORT_NAME})
+    add_library(Dune::${ARG_EXPORT_NAME} ALIAS ${_name})
 
     # Register library in global property <module>_LIBRARIES
     if(NOT ARG_NO_MODULE_LIBRARY)
-      set_property(GLOBAL APPEND PROPERTY ${ProjectName}_LIBRARIES ${ARG_EXPORT_NAME})
+      set_property(GLOBAL APPEND PROPERTY ${ProjectName}_LIBRARIES Dune::${ARG_EXPORT_NAME})
     endif()
 
     # Install targets to use the libraries in other modules.
@@ -234,38 +236,41 @@ function(dune_add_library_interface _name)
 endfunction(dune_add_library_interface)
 
 
-# Create an object library that can be used to transport a set of sources
-# \deprecated
+### Create an object library that can be used to transport a set of sources
+### \deprecated
 function(dune_add_library_object _name)
   message(DEPRECATION "The function dune_add_library(<obj> OBJECT ...) is deprecated. "
     "Create a regular target in a parent scope, e.g., by dune_add_library(<target>), "
-    "and fill it with sources using target_sources(<target> PRIVATE <sources>...).")
+    "and fill it with sources using target_source(<target> PRIVATE <sources>...).")
 
-  cmake_parse_arguments(ARG
+  cmake_parse_arguments(DUNE_LIB
     "OBJECT"
     "COMPILE_FLAGS;COMPILE_OPTIONS"
     "ADD_LIBS;LINK_LIBRARIES;SOURCES" ${ARGN})
-  list(APPEND ARG_SOURCES ${ARG_UNPARSED_ARGUMENTS})
-  list(TRANSFORM ARG_SOURCES PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
-  list(APPEND ARG_LINK_LIBRARIES ${ARG_ADD_LIBS})
-  list(APPEND ARG_COMPILE_OPTIONS ${ARG_COMPILE_FLAGS})
+  list(APPEND DUNE_LIB_SOURCES ${DUNE_LIB_UNPARSED_ARGUMENTS})
+  list(APPEND DUNE_LIB_LINK_LIBRARIES ${DUNE_LIB_ADD_LIBS})
+  list(APPEND DUNE_LIB_COMPILE_OPTIONS ${DUNE_LIB_COMPILE_FLAGS})
 
-  # Register sources, libs and flags for building the library later
+  foreach(source ${DUNE_LIB_SOURCES})
+    list(APPEND full_path_sources ${CMAKE_CURRENT_SOURCE_DIR}/${source})
+  endforeach()
+
+  # register sources, libs and flags for building the library later
   define_property(GLOBAL PROPERTY DUNE_LIB_${_name}_SOURCES
     BRIEF_DOCS "Convenience property with sources for library ${_name}. DO NOT EDIT!"
     FULL_DOCS "Convenience property with sources for library ${_name}. DO NOT EDIT!")
   set_property(GLOBAL PROPERTY DUNE_LIB_${_name}_SOURCES
-    "${ARG_SOURCES}")
+    "${full_path_sources}")
   define_property(GLOBAL PROPERTY DUNE_LIB_${_name}_ADD_LIBS
     BRIEF_DOCS "Convenience property with libraries for library ${_name}. DO NOT EDIT!"
     FULL_DOCS "Convenience property with libraries for library ${_name}. DO NOT EDIT!")
   set_property(GLOBAL PROPERTY DUNE_LIB_${_name}_ADD_LIBS
-    "${ARG_LINK_LIBRARIES}")
+    "${DUNE_LIB_LINK_LIBRARIES}")
   define_property(GLOBAL PROPERTY DUNE_LIB_${_name}_COMPILE_FLAGS
     BRIEF_DOCS "Convenience property with compile flags for library ${_name}. DO NOT EDIT!"
     FULL_DOCS "Convenience property with compile flags for library ${_name}. DO NOT EDIT!")
   set_property(GLOBAL PROPERTY DUNE_LIB_${_name}_COMPILE_FLAGS
-    "${ARG_COMPILE_OPTIONS}")
+    "${DUNE_LIB_COMPILE_OPTIONS}")
 endfunction(dune_add_library_object)
 
 

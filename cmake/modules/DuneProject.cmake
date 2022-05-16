@@ -11,11 +11,17 @@ Initialize and finalize a Dune module.
 
   .. code-block:: cmake
 
-    dune_project()
+    dune_project([<target>
+      [INTERFACE]
+      [EXPORT_NAME <export-name>]
+      [OUTPUT_NAME <output-name>]
+    ])
 
-  This function needs to be called from every module top-level
-  ``CMakeLists.txt`` file. It sets up the module, defines basic variables and
-  manages dependencies. Don't forget to call :command:`finalize_dune_project`
+  This function starts a new Dune module by setting several variables and
+  optionally creating a library target that is added to the export list.
+  It needs to be called from every module top-level ``CMakeLists.txt`` file.
+  It sets up the module, defines basic variables and manages dependencies.
+  Don't forget to call :command:`finalize_dune_project`
   at the end of that ``CMakeLists.txt`` file.
 
 
@@ -55,9 +61,8 @@ include(OverloadCompilerFlags)
 # depedencies.
 # Don't forget to call finalize_dune_project afterwards.
 macro(dune_project)
-
   # check if CXX flag overloading has been enabled (see OverloadCompilerFlags.cmake)
-  initialize_compiler_script()
+  dune_initialize_compiler_script()
 
   # extract information from dune.module
   dune_module_information(${PROJECT_SOURCE_DIR})
@@ -84,6 +89,11 @@ macro(dune_project)
   define_property(GLOBAL PROPERTY ${ProjectName}_LIBRARIES
         BRIEF_DOCS "List of libraries of the module. DO NOT EDIT!"
         FULL_DOCS "List of libraries of the module. Used to generate CMake's package configuration files. DO NOT EDIT!")
+
+  define_property(GLOBAL PROPERTY DUNE_MODULE_LIBRARY_EXPORTS
+    BRIEF_DOCS "List of library exports of the module. DO NOT EDIT!"
+    FULL_DOCS "List of library export of the module. Used to generate CMake's package configuration files. DO NOT EDIT!")
+
   dune_create_dependency_tree()
 
   # assert the project names matches
@@ -91,22 +101,71 @@ macro(dune_project)
     message(FATAL_ERROR "Module name from dune.module does not match the name given in CMakeLists.txt.")
   endif()
 
+  if(EXISTS ${PROJECT_SOURCE_DIR}/cmake/modules)
+    list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
+  endif()
+
+  # Process the macros provided by the dependencies and ourself
+  dune_process_dependency_macros()
+
   # As default request position independent code if shared libraries are built
   # This should allow DUNE modules to use CMake's object libraries.
   # This can be overwritten for targets by setting the target property
   # POSITION_INDEPENDENT_CODE to false/OFF
-  include(CMakeDependentOption)
   cmake_dependent_option(CMAKE_POSITION_INDEPENDENT_CODE "Build position independent code" ON "NOT BUILD_SHARED_LIBS" ON)
 
   # check for C++ features, set compiler flags for C++14 or C++11 mode
   include(CheckCXXFeatures)
 
   # set include path and link path for the current project.
-  include_directories("${PROJECT_BINARY_DIR}")
-  include_directories("${PROJECT_SOURCE_DIR}")
-  include_directories("${CMAKE_CURRENT_BINARY_DIR}")
-  include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
-  add_definitions(-DHAVE_CONFIG_H)
+  if(${ARGC} GREATER 0)
+    cmake_parse_arguments(DUNE_MODULE "INTERFACE" "TARGET;OUTPUT_NAME;EXPORT_NAME" "" ${ARGN})
+
+    # if first argument is given, create module library
+    if(NOT DUNE_MODULE_TARGET)
+      set(DUNE_MODULE_TARGET ${DUNE_MODULE_UNPARSED_ARGUMENTS})
+    endif()
+
+    if(NOT DUNE_MODULE_OUTPUT_NAME)
+      dune_module_to_output_name(DUNE_MODULE_OUTPUT_NAME ${DUNE_MODULE_TARGET})
+    endif()
+
+    if(NOT DUNE_MODULE_EXPORT_NAME)
+      dune_module_to_export_name(DUNE_MODULE_EXPORT_NAME ${DUNE_MODULE_TARGET})
+    endif()
+
+    set(_interface "")
+    set(_scope "PUBLIC")
+    if(DUNE_MODULE_INTERFACE)
+      set(_interface "INTERFACE")
+      set(_scope "INTERFACE")
+    endif()
+
+    dune_add_library(${DUNE_MODULE_TARGET} ${_interface}
+      OUTPUT_NAME ${DUNE_MODULE_OUTPUT_NAME}
+      EXPORT_NAME ${DUNE_MODULE_EXPORT_NAME}
+      LINK_LIBRARIES ${DUNE_LIBS})
+
+    # set include directories for module library target
+    target_include_directories(${DUNE_MODULE_TARGET} ${_scope}
+      $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+
+    target_compile_definitions(${DUNE_MODULE_TARGET} ${_scope} HAVE_CONFIG_H)
+
+    unset(_interface)
+    unset(_scope)
+  else()
+    # fallback for legacy cmake build system
+    include_directories(${PROJECT_BINARY_DIR})
+    include_directories(${PROJECT_SOURCE_DIR})
+    add_definitions(-DHAVE_CONFIG_H)
+
+    add_library(${ProjectName}_dummy INTERFACE)
+    install(TARGETS ${ProjectName}_dummy EXPORT ${ProjectName}-targets DESTINATION ${CMAKE_INSTALL_LIBDIR})
+  endif()
+
 
   # Create custom target for building the documentation
   # and provide macros for installing the docs and force
@@ -114,12 +173,8 @@ macro(dune_project)
   include(DuneDoc)
 
   # activate pkg-config
-  include(DunePkgConfig)
+  # include(DunePkgConfig)
 
-  # Process the macros provided by the dependencies and ourself
-  dune_process_dependency_macros()
-
-  include(GNUInstallDirs)
   # Set variable where the cmake modules will be installed.
   # Thus the user can override it and for example install
   # directly into the CMake installation. We use a cache variable
@@ -139,13 +194,12 @@ macro(dune_project)
       "Installation directory for libraries that are not architecture dependent. Default is lib when not set explicitely")
     set(DUNE_INSTALL_NONOBJECTLIBDIR lib)
   endif()
+
   # set up make headercheck
-  include(Headercheck)
   setup_headercheck()
 
   # define that we found this module
   set(${ProjectName}_FOUND 1)
-
 endmacro(dune_project)
 
 
@@ -157,18 +211,21 @@ macro(finalize_dune_project)
     dune_symlink_to_source_tree()
   endif()
 
-  #configure all headerchecks
+  # configure all headerchecks
   finalize_headercheck()
 
-  #create cmake-config files for installation tree
-  include(CMakePackageConfigHelpers)
-  include(GNUInstallDirs)
+  # create cmake-config files for installation tree
   set(DOXYSTYLE_DIR ${CMAKE_INSTALL_DATAROOTDIR}/dune-common/doc/doxygen/)
   set(SCRIPT_DIR ${CMAKE_INSTALL_DATAROOTDIR}/dune/cmake/scripts)
   # Set the location where the doc sources are installed.
   # Needed by custom package configuration
   # file section of dune-grid.
   set(DUNE_MODULE_SRC_DOCDIR "\${${ProjectName}_PREFIX}/${CMAKE_INSTALL_DOCDIR}")
+
+  set(FALLBACK_INCLUDE_DIRECTORIES)
+  if(NOT DUNE_MODULE_TARGET)
+    set(FALLBACK_INCLUDE_DIRECTORIES "include_directories(\${${ProjectName}_INCLUDE_DIRS})")
+  endif()
 
   if(NOT EXISTS ${PROJECT_SOURCE_DIR}/cmake/pkg/${ProjectName}-config.cmake.in)
     # Generate a standard cmake package configuration file
@@ -197,21 +254,24 @@ set(${ProjectName}_LIBRARIES \"@${ProjectName}_LIBRARIES@\")
 set(${ProjectName}_HASPYTHON @DUNE_MODULE_HASPYTHON@)
 set(${ProjectName}_PYTHONREQUIRES \"@DUNE_MODULE_PYTHONREQUIRES@\")
 
+list(APPEND CMAKE_MODULE_PATH \${${ProjectName}_MODULE_PATH})
+${FALLBACK_INCLUDE_DIRECTORIES}
+
 # Lines that are set by the CMake build system via the variable DUNE_CUSTOM_PKG_CONFIG_SECTION
 ${DUNE_CUSTOM_PKG_CONFIG_SECTION}
 
 #import the target
 if(${ProjectName}_LIBRARIES)
   get_filename_component(_dir \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)
-  include(\"\${_dir}/${ProjectName}-targets.cmake\")
+  if(NOT TARGET \"Dune::${DUNE_MODULE_EXPORT_NAME}\")
+    include(\"\${_dir}/${ProjectName}-targets.cmake\")
+  endif()
 endif()
-
 endif()")
       set(CONFIG_SOURCE_FILE ${PROJECT_BINARY_DIR}/CMakeFiles/${ProjectName}-config.cmake.in)
   else()
     set(CONFIG_SOURCE_FILE ${PROJECT_SOURCE_DIR}/cmake/pkg/${ProjectName}-config.cmake.in)
   endif()
-  get_property(${ProjectName}_LIBRARIES GLOBAL PROPERTY ${ProjectName}_LIBRARIES)
 
   # compute under which libdir the package configuration files are to be installed.
   # If the module installs an object library we use CMAKE_INSTALL_LIBDIR
@@ -223,6 +283,16 @@ endif()")
     set(DUNE_INSTALL_LIBDIR ${CMAKE_INSTALL_LIBDIR})
   else()
     set(DUNE_INSTALL_LIBDIR ${DUNE_INSTALL_NONOBJECTLIBDIR})
+  endif()
+
+  # A fallback target source if non is given before
+  if(${ProjectName}_LIBRARY)
+    get_target_property(${ProjectName}_LIBRARY_SOURCES ${${ProjectName}_LIBRARY} SOURCES)
+    if(NOT ${ProjectName}_LIBRARY_SOURCES)
+      file(TOUCH ${PROJECT_BINARY_DIR}/lib${${ProjectName}_LIBRARY}.cc)
+      target_sources(${${ProjectName}_LIBRARY} PRIVATE
+        ${PROJECT_BINARY_DIR}/lib${${ProjectName}_LIBRARY}.cc)
+    endif()
   endif()
 
   # Set the location of the doc file source. Needed by custom package configuration
@@ -244,7 +314,7 @@ endif()")
     DOXYSTYLE_DIR SCRIPT_DIR)
 
 
-  #create cmake-config files for build tree
+  # create cmake-config files for build tree
   set(PACKAGE_CMAKE_INSTALL_INCLUDEDIR ${PROJECT_SOURCE_DIR})
   set(PACKAGE_CMAKE_INSTALL_DATAROOTDIR ${PROJECT_BINARY_DIR})
   set(PACKAGE_DOXYSTYLE_DIR ${PROJECT_SOURCE_DIR}/doc/doxygen)
@@ -260,7 +330,6 @@ macro(set_and_check _var _file)
   endif()
 endmacro()")
   set(MODULE_INSTALLED OFF)
-
   configure_file(
     ${CONFIG_SOURCE_FILE}
     ${PROJECT_BINARY_DIR}/${ProjectName}-config.cmake @ONLY)
@@ -299,15 +368,17 @@ endif()
   endif()
 
   # install pkg-config files
-  create_and_install_pkconfig(${DUNE_INSTALL_LIBDIR})
+  # create_and_install_pkconfig(${DUNE_INSTALL_LIBDIR})
 
   if(${ProjectName}_EXPORT_SET)
     # install library export set
     install(EXPORT ${${ProjectName}_EXPORT_SET}
+      NAMESPACE Dune::
       DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${ProjectName})
 
     # export libraries for use in build tree
     export(EXPORT ${${ProjectName}_EXPORT_SET}
+      NAMESPACE Dune::
       FILE ${PROJECT_BINARY_DIR}/${ProjectName}-targets.cmake)
   endif()
 
@@ -335,7 +406,7 @@ endif()
 
   # check if CXX flag overloading has been enabled
   # and write compiler script (see OverloadCompilerFlags.cmake)
-  finalize_compiler_script()
+  dune_finalize_compiler_script()
 endmacro(finalize_dune_project)
 
 

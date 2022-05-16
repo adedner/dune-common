@@ -26,6 +26,7 @@ macro(setup_headercheck)
   endif()
 endmacro(setup_headercheck)
 
+
 # these macros are used to exclude headers from make headercheck
 # call this from a CMakeLists.txt file with a list of headers in that directory
 macro(exclude_from_headercheck)
@@ -39,10 +40,12 @@ macro(exclude_from_headercheck)
   set_property(GLOBAL PROPERTY headercheck_list ${headerlist})
 endmacro(exclude_from_headercheck)
 
+
 macro(exclude_dir_from_headercheck)
   file(GLOB list RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.hh")
   exclude_from_headercheck(${list})
 endmacro(exclude_dir_from_headercheck)
+
 
 macro(exclude_subdir_from_headercheck DIRNAME)
   file(GLOB_RECURSE exlist "${CMAKE_CURRENT_SOURCE_DIR}/${DIRNAME}/*.hh")
@@ -52,6 +55,7 @@ macro(exclude_subdir_from_headercheck DIRNAME)
   endforeach()
   set_property(GLOBAL PROPERTY headercheck_list ${headerlist})
 endmacro(exclude_subdir_from_headercheck)
+
 
 macro(exclude_all_but_from_headercheck)
   file(GLOB excllist RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.hh")
@@ -63,6 +67,7 @@ macro(exclude_all_but_from_headercheck)
   endforeach()
   exclude_from_headercheck(${excllist})
 endmacro(exclude_all_but_from_headercheck)
+
 
 # configure all headerchecks
 macro(finalize_headercheck)

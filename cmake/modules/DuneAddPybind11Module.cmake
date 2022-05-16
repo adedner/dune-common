@@ -25,7 +25,7 @@
 #       :argname: def
 #
 #       A set of compile definitions to add to the target.
-#       Only definitions beyond the application of :ref:`add_dune_all_flags`
+#       Only definitions beyond the application of :ref:`dune_add_all_flags`
 #       have to be stated.
 #
 #    .. cmake_param:: CMAKE_GUARD
@@ -83,6 +83,13 @@ function(dune_add_pybind11_module)
   endif()
 
   target_compile_definitions(${PYBIND11_MODULE_NAME} PRIVATE ${PYBIND11_MODULE_COMPILE_DEFINITIONS})
+
+  if(DUNE_MODULE_TARGET)
+    target_link_libraries(${PYBIND11_MODULE_NAME} PUBLIC ${DUNE_MODULE_TARGET})
+  else()
+    target_link_libraries(${PYBIND11_MODULE_NAME} PUBLIC Dune::common)
+  endif()
+
   dune_target_enable_all_packages(${PYBIND11_MODULE_NAME})
 
   if(PYBIND11_MODULE_EXCLUDE_FROM_ALL)

@@ -77,7 +77,7 @@ def make_project(dir, description, subdirs=None, enable_all_packages=True, is_du
         cmake_content += ['list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules" "${dune-common_MODULE_PATH}")']
     else:
         cmake_content += ['list(APPEND CMAKE_MODULE_PATH ${dune-common_MODULE_PATH})']
-    cmake_content += ['', 'include(DuneMacros)', 'dune_project()']
+    cmake_content += ['', 'include(DuneMacros)', 'dune_project(' + description.name + ')']
     if enable_all_packages:
         cmake_content += ['dune_enable_all_packages()']
     if subdirs is not None:
