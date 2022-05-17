@@ -10,6 +10,11 @@ dune_python_add_test(NAME pythontests_parallel
                      CMAKE_GUARD HAVE_MPI
                      LABELS quick)
 
+dune_python_add_test(NAME compileparallel
+                     SCRIPT compileparallel.py
+                     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                     LABELS quick)
+
 dune_add_test(SOURCES test_embed1.cc
               LINK_LIBRARIES ${DUNE_LIBS} ${Python3_LIBRARIES}
               LABELS quick

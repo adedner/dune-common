@@ -405,11 +405,11 @@ class Builder:
 
           def __call__(self, *args):
             # Unwrap if constructor argument is another wrapper object
-            unwrap = lambda x: x.module if hasattr(x, "module") else x
+            unwrap = lambda x: x._instance if hasattr(x, "_instance") else x
             unwrapped_args = tuple(unwrap(x) for x in args)
 
             if self._class is None:
-              self._constructorArgs = args
+              self._constructorArgs = unwrapped_args
               # Return self that will act as instance
               return self
             else:

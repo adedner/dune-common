@@ -135,4 +135,6 @@ def run(functionName, includes, *args):
     Returns:
         return value of `functionName(*args)`
     '''
-    return load(functionName, includes, *args)(*args)
+    cls = load(functionName, includes, *args)(*args)
+    cls.init()
+    return cls._instance
