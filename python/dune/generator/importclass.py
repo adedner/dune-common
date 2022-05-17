@@ -95,4 +95,4 @@ def load(className, includeFiles, *args,
 
     # make sure to reload the builder here in case it got updated
     from . import builder
-    return builder.load(moduleName, source, signature).cls(*args)
+    return builder.load(moduleName, source, "cls").cls(*args)

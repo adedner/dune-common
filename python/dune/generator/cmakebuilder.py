@@ -8,6 +8,7 @@ import jinja2
 import signal
 import json
 import copy
+from threading import Thread
 
 import dune
 
@@ -323,54 +324,145 @@ class Builder:
         if not self.initialized or not self.externalPythonModules == getExternalPythonModules():
             self.initialize()
 
-        # check whether modul is already compiled and build it if necessary
-        # (only try to build module on rank 0!)
-        # TODO replace if rank with something better and remove barrier further down
-        if comm.rank == 0:
-            module = sys.modules.get("dune.generated." + moduleName)
-            if module is None:
-                logger.debug("Module {} not loaded".format(moduleName))
-                # make sure nothing (compilation, generating and building) is taking place
-                with Lock(os.path.join(self.dune_py_dir, '..', 'lock-module.lock'), flags=LOCK_EX):
-                    # module must be generated so lock the source file
-                    with Lock(os.path.join(self.dune_py_dir, 'lock-'+moduleName+'.lock'), flags=LOCK_EX):
-                        # the module might now be present, so check again
-                        # (see #295)
-                        module = sys.modules.get("dune.generated." + moduleName)
-                        if module is None:
-                            compilationMessage = self._maybeConfigureWithCMake(
-                                moduleName, source, pythonName, extraCMake
-                            )
-                        else:
-                            compilationMessage = f"Compiling {pythonName} (rebuilding after concurrent build)"
-                # end of exclusive dune-py lock
+        def compileCommand(moduleName, source, pythonName, extraCMake):
+          # check whether modul is already compiled and build it if necessary
+          # (only try to build module on rank 0!)
+          # TODO replace if rank with something better and remove barrier further down
+          if comm.rank == 0:
+              module = sys.modules.get("dune.generated." + moduleName)
+              if module is None:
+                  logger.debug("Module {} not loaded".format(moduleName))
+                  # make sure nothing (compilation, generating and building) is taking place
+                  with Lock(os.path.join(self.dune_py_dir, '..', 'lock-module.lock'), flags=LOCK_EX):
+                      # module must be generated so lock the source file
+                      with Lock(os.path.join(self.dune_py_dir, 'lock-'+moduleName+'.lock'), flags=LOCK_EX):
+                          # the module might now be present, so check again
+                          # (see #295)
+                          module = sys.modules.get("dune.generated." + moduleName)
+                          if module is None:
+                              compilationMessage = self._maybeConfigureWithCMake(
+                                  moduleName, source, pythonName, extraCMake
+                              )
+                          else:
+                              compilationMessage = f"Compiling {pythonName} (rebuilding after concurrent build)"
+                  # end of exclusive dune-py lock
 
-                # we always compile even if the module is always compiled since it can happen
-                # that dune-py was updated in the mean time.
-                # This step is quite fast but there is room for optimization.
+                  # we always compile even if the module is always compiled since it can happen
+                  # that dune-py was updated in the mean time.
+                  # This step is quite fast but there is room for optimization.
 
-                # for compilation a shared lock is enough
-                #
-                # A side effect is that during the parallel make calls
-                # for whatever reason cmake might be invoked due to
-                # changes to the module (i.e. a new target
-                # added). Parallel cmake calls are not allowed and as
-                # a consequence the complete build may fail. We take
-                # care of such parallel cmake calls by additional
-                # locking in the dune-py CMakeLists.txt
-                with Lock(os.path.join(self.dune_py_dir, '..', 'lock-module.lock'), flags=LOCK_SH):
-                    # lock generated module
-                    with Lock(os.path.join(self.dune_py_dir, 'lock-'+moduleName+'.lock'), flags=LOCK_EX):
-                        self.compile(infoTxt=compilationMessage, target=moduleName)
+                  # for compilation a shared lock is enough
+                  #
+                  # A side effect is that during the parallel make calls
+                  # for whatever reason cmake might be invoked due to
+                  # changes to the module (i.e. a new target
+                  # added). Parallel cmake calls are not allowed and as
+                  # a consequence the complete build may fail. We take
+                  # care of such parallel cmake calls by additional
+                  # locking in the dune-py CMakeLists.txt
+                  with Lock(os.path.join(self.dune_py_dir, '..', 'lock-module.lock'), flags=LOCK_SH):
+                      # lock generated module
+                      with Lock(os.path.join(self.dune_py_dir, 'lock-'+moduleName+'.lock'), flags=LOCK_EX):
+                          self.compile(infoTxt=compilationMessage, target=moduleName)
 
-        ## TODO remove barrier here
-        comm.barrier()
+          ## TODO remove barrier here
+          comm.barrier()
 
-        logger.debug("Loading " + moduleName)
-        module = importlib.import_module("dune.generated." + moduleName)
 
-        if self.force:
-            logger.info("Reloading " + pythonName)
-            module = reload_module(module)
+        def loadCommand(moduleName, source, pythonName, extraCMake):
+          logger.debug("Loading " + moduleName)
+          module = importlib.import_module("dune.generated." + moduleName)
 
-        return module
+          if self.force:
+              logger.info("Reloading " + pythonName)
+              module = reload_module(module)
+
+          return module
+
+
+        class WrappedClass(object):
+          def __init__(self, wrappedModule, className, *args):
+            self._class = None
+            self._constructorArgs = None
+            self._instance = None
+
+            self._wrappedModule = wrappedModule
+            self._className = className
+
+
+          # Make sure module is compiled
+          def init(self):
+            if self._class is None:
+              self._wrappedModule.wait()
+
+
+          def call(self):
+            self._class = getattr(self._wrappedModule.module, self._className)
+
+            if self._constructorArgs is not None:
+              self._instance = self._class(*self._constructorArgs)
+
+
+          def __call__(self, *args):
+            # Unwrap if constructor argument is another wrapper object
+            unwrap = lambda x: x.module if hasattr(x, "module") else x
+            unwrapped_args = tuple(unwrap(x) for x in args)
+
+            if self._class is None:
+              self._constructorArgs = args
+              # Return self that will act as instance
+              return self
+            else:
+              self._instance = self._class(*unwrapped_args)
+              return self._instance
+
+
+          def __getattr__(self, attr):
+            self.init()
+            if self._instance is not None:
+              return getattr(self._instance, attr)
+            else:
+              return getattr(self._class, attr)
+
+
+          def __setattr__(self, attr, value):
+            if attr.startswith("_"):
+              super().__setattr__(attr, value)
+            else:
+              self.init()
+              if self._instance is not None:
+                setattr(self._instance, attr, value)
+              else:
+                setattr(self._class, attr, value)
+
+
+        # Wrapper class to compile independent modules in parallel
+        class WrappedModule():
+          def __init__(self, moduleName, source, pythonName, extraCMake):
+            self.module = None
+            self.classes = {}
+            self.args = (moduleName, source, pythonName, extraCMake)
+            self.thread = Thread(target=compileCommand, args=self.args)
+            self.thread.start()
+
+
+          def __getattr__(self, attr):
+            if attr in self.classes:
+              return self.classes[attr]
+            else:
+              self.classes[attr] = WrappedClass(self, attr)
+              if self.module:
+                self.classes[attr].call()
+              return self.classes[attr]
+
+
+          def wait(self):
+            if self.module is None:
+              self.thread.join()
+              self.module = loadCommand(*self.args)
+              for c in self.classes:
+                self.classes[c].call()
+
+
+        # Return the wrapped module
+        return WrappedModule(moduleName, source, pythonName, extraCMake)
