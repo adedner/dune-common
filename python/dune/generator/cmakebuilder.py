@@ -322,6 +322,7 @@ class Builder:
         # this is the first call to load or because an external module with metadata has been registered
         if not self.initialized or not self.externalPythonModules == getExternalPythonModules():
             self.initialize()
+            self.compile("Initial build of dune-py module")
 
         # check whether modul is already compiled and build it if necessary
         # (only try to build module on rank 0!)
