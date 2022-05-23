@@ -1,3 +1,8 @@
+dune_add_test(SOURCES ../test.cc
+              NAME test_simd
+              LINK_LIBRARIES dunecommon
+              LABELS quick)
+
 # We need to explicitly instantiate the tests for small groups of types --
 # else the compiler will eat excessive amounts of memory.  This way it seems
 # to stay below 1GByte (with g++ 4.9.2 -O0 -g on x86_64 GNU/Linux, looking at

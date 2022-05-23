@@ -13,7 +13,6 @@ target_sources(dunecommon PRIVATE
   parametertree.cc
   parametertreeparser.cc
   path.cc
-  simd/test.cc
   stdstreams.cc
   stdthread.cc)
 
