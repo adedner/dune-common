@@ -137,6 +137,7 @@ class Builder:
                                )
             generatedDir = os.path.join(dunepy_dir,'python','dune','generated')
 
+            """
             # use CMakeFiles/extractCompiler.dir/linker.txt to get the linker command
             linkerScriptName = os.path.join(generatedDir,'linker.sh')
             linkerSourceName = os.path.join(generatedDir,'CMakeFiles','extractCompiler.dir','link.txt')
@@ -155,15 +156,11 @@ class Builder:
                         s = l.split("=",1)
                         if len(s) == 2:
                             flagScript.write(s[0].strip()+'="'+s[1].strip()+'"\n')
+            """
 
             """ Alternative approach:
                 this requires compiler overload in dune-py to get command output
-            buildScriptName = os.path.join(generatedDir,'buildScript.sh')
-            with open(buildScriptName, "w") as buildScript:
-                buildScript.write('echo Building\n')
-                buildScript.write(compilerCmd)
-                buildScript.write('\n')
-                buildScript.write(linkerCmd)
+            """
             print("###############")
             print( buffer_to_str(stdout) )
             print("###############")
@@ -192,7 +189,6 @@ class Builder:
                 buildScript.write(compilerCmd)
                 buildScript.write('\n')
                 buildScript.write(linkerCmd)
-            """
 
     def __init__(self, force=False, saveOutput=False):
         self.force = force
@@ -339,9 +335,14 @@ class Builder:
             code = str(source)
             with open(os.path.join(sourceFileName), 'w') as out:
                 out.write(code)
-            os.makedirs(os.path.join(self.generated_dir,moduleName+".dir"), exist_ok=True)
+        elif isString(source) and not source == open(os.path.join(sourceFileName), 'r').read():
+            compilationInfoMessage = f"Compiling {pythonName} (updated)"
+            code = str(source)
+            with open(os.path.join(sourceFileName), 'w') as out:
+                out.write(code)
         else:
             compilationInfoMessage = f"file exists..."
+        os.makedirs(os.path.join(self.generated_dir,moduleName+".dir"), exist_ok=True)
         return compilationInfoMessage
 
     def _maybeConfigureWithCMake(self, moduleName, source, pythonName, extraCMake):
@@ -428,7 +429,16 @@ class Builder:
                         # This step is quite fast but there is room for optimization.
                         makeFileName = os.path.join(self.generated_dir,moduleName+'.dir',moduleName+'.make')
                         print(compilationMessage)
-                        if not os.path.exists(makeFileName):
+                        with subprocess.Popen(["make", "-f",makeFileName, moduleName+'.so'],
+                                              cwd=self.generated_dir,
+                                              stdout=subprocess.PIPE,
+                                              stderr=subprocess.PIPE) as cmake:
+                            stdout, stderr = cmake.communicate()
+                            exit_code = cmake.returncode
+                        print('make return:', exit_code)
+                        print('make:',stdout)
+                        print('make:',stderr)
+                        if exit_code:
                             with subprocess.Popen(["bash","buildScript.sh",moduleName],
                                                   cwd=self.generated_dir,
                                                   stdout=subprocess.PIPE,
@@ -436,14 +446,6 @@ class Builder:
                                 stdout, stderr = cmake.communicate()
                             print('build:',stdout)
                             print('build:',stderr)
-                        else:
-                            with subprocess.Popen(["make", "-f",makeFileName, moduleName+'.so'],
-                                                  cwd=self.generated_dir,
-                                                  stdout=subprocess.PIPE,
-                                                  stderr=subprocess.PIPE) as cmake:
-                                stdout, stderr = cmake.communicate()
-                            print('make:',stdout)
-                            print('make:',stderr)
                         depFileName  = os.path.join(self.generated_dir,moduleName+'.dir',moduleName+'.cc.o.d')
                         with open(makeFileName, "w") as makeFile:
                             makeFile.write('.SUFFIXES:\n')
