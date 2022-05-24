@@ -134,6 +134,11 @@ class Builder:
                                  infoTxt="extract compiler command",
                                  active=True, # print details anyway
                                )
+            print("###############")
+            print( buffer_to_str(stdout) )
+            print("###############")
+            print( buffer_to_str(stderr) )
+            print("###############")
             out = buffer_to_str(stdout).strip().split("\n")
             nlines = len(out)
             for i,l in enumerate(out):
