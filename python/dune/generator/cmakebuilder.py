@@ -93,6 +93,7 @@ class Builder:
             context["builddirs"]      = builddirs
             context["install_prefix"] = metaData.unique_value_across_modules("INSTALL_PREFIX")
             context["cmake_flags"]    = getCMakeFlags()
+            context["cxx_compiler"]   = context["cmake_flags"]["CMAKE_CXX_COMPILER"]
             print(context["cmake_flags"])
 
             # Find the correct template path
@@ -401,7 +402,7 @@ class Builder:
         # this is the first call to load or because an external module with metadata has been registered
         if not self.initialized or not self.externalPythonModules == getExternalPythonModules():
             self.initialize()
-            self.compile("Initial build of dune-py module")
+            # self.compile("Initial build of dune-py module")
 
         # check whether modul is already compiled and build it if necessary
         # (only try to build module on rank 0!)
