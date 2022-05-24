@@ -132,6 +132,7 @@ class Builder:
               Builder.callCMake(["cmake"]+
                                  ['--build','.','--target',"extractCompiler"],
                                  cwd=dunepy_dir,
+                                 env={**os.environ,"CMAKE_NO_VERBOSE":"0"},
                                  infoTxt="extract compiler command",
                                  active=True, # print details anyway
                                )
@@ -161,27 +162,18 @@ class Builder:
             """ Alternative approach:
                 this requires compiler overload in dune-py to get command output
             """
-            print("###############")
-            print( buffer_to_str(stdout) )
-            print("###############")
-            print( buffer_to_str(stderr) )
-            print("###############")
             out = buffer_to_str(stdout).strip().split("\n")
             nlines = len(out)
             for i,l in enumerate(out):
                 print(i,'\n',l)
-            # 0: [ 50%] Building CXX object python/dune/generated/CMakeFiles/extractCompiler.dir/extractCompiler.cc.o
-            # 1: compiler command
-            # 2: [100%] Linking CXX shared library extractCompiler.so
-            # 3: linker command
-            # 4: [100%] Built target extractCompiler
-            assert nlines == 5
-            compilerCmd = out[1].\
-                          replace('extractCompiler', '$1').replace('CMakeFiles','.').\
-                          replace('python/dune/generated/./','') # this is for the target name in the dependency file
-                                        # which is for a relative path starting at cmake base dir
-            linkerCmd   = out[3].replace('extractCompiler', '$1').replace('CMakeFiles','.')
-            # alternative: parse flags.make and link.txt in dune-py/python/dune/generated/CMakeFiles/extractCompiler.dir
+                if '.cc.o' in l:
+                    if '.so' in l:
+                        linkerCmd = l.replace('extractCompiler', '$1').replace('CMakeFiles','.')
+                    else:
+                        compilerCmd = l.\
+                                      replace('extractCompiler', '$1').replace('CMakeFiles','.').\
+                                      replace('python/dune/generated/./','') # this is for the target name in the dependency file
+                                            # which is for a relative path starting at cmake base dir
 
             buildScriptName = os.path.join(dunepy_dir,'python','dune','generated','buildScript.sh')
             with open(buildScriptName, "w") as buildScript:
@@ -254,7 +246,7 @@ class Builder:
 
 
     @staticmethod
-    def callCMake(cmake_args, cwd, infoTxt, verbose=False, active=False, logLevel=logging.DEBUG):
+    def callCMake(cmake_args, cwd, infoTxt, verbose=False, active=False, logLevel=logging.DEBUG, env=None):
         # print initial info, if we are verbose
         # or we know that we have to build something
         stdout, stderr = None, None
@@ -266,6 +258,7 @@ class Builder:
         print(cmake_args)
         with subprocess.Popen(cmake_args,
                               cwd=cwd,
+                              env=env,
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE) as cmake:
             try:
