@@ -134,6 +134,35 @@ class Builder:
                                  infoTxt="extract compiler command",
                                  active=True, # print details anyway
                                )
+            generatedDir = os.path.join(dunepy_dir,'python','dune','generated')
+
+            # use CMakeFiles/extractCompiler.dir/linker.txt to get the linker command
+            linkerScriptName = os.path.join(generatedDir,'linker.sh')
+            linkerSourceName = os.path.join(generatedDir,'CMakeFiles','extractCompiler.dir','link.txt')
+            with open(linkerScriptName, "w") as linkerScript:
+                with open(linkerSourceName, "r") as linkerSource:
+                    linker = linkerSource.read()
+                linker = linker.replace("CMakeFiles/","").replace("extractCompiler","$1")
+                linkerScript.write(linker)
+            # use CMakeFiles/extractCompiler.dir/flags.make to get the flags
+            # Issue: how to find the c++ command
+            flagScriptName = os.path.join(generatedDir,'flags.make')
+            flagSourceName = os.path.join(generatedDir,'CMakeFiles','extractCompiler.dir','flags.make')
+            with open(flagScriptName, "w") as flagScript:
+                with open(flagSourceName, "r") as flagSource:
+                    for l in flagSource.readlines():
+                        s = l.split("=",1)
+                        if len(s) == 2:
+                            flagScript.write(s[0].strip()+'="'+s[1].strip()+'"\n')
+
+            """ Alternative approach:
+                this requires compiler overload in dune-py to get command output
+            buildScriptName = os.path.join(generatedDir,'buildScript.sh')
+            with open(buildScriptName, "w") as buildScript:
+                buildScript.write('echo Building\n')
+                buildScript.write(compilerCmd)
+                buildScript.write('\n')
+                buildScript.write(linkerCmd)
             print("###############")
             print( buffer_to_str(stdout) )
             print("###############")
@@ -162,6 +191,7 @@ class Builder:
                 buildScript.write(compilerCmd)
                 buildScript.write('\n')
                 buildScript.write(linkerCmd)
+            """
 
     def __init__(self, force=False, saveOutput=False):
         self.force = force
@@ -213,7 +243,7 @@ class Builder:
                     open(tagfile, 'a').close()
                 else:
                     logger.debug('Using existing dune-py module in ' + self.dune_py_dir)
-                    self.compile("Rebuilding dune-py module")
+                    # self.compile("Rebuilding dune-py module")
 
                 # Auto-clean up dune-py: Remove all modules that have not been used in the last 30 days.
                 removeGenerated(['30'], date=True)
@@ -430,9 +460,11 @@ class Builder:
                 depFileName  = os.path.join(self.generated_dir,moduleName+'.dir',moduleName+'.cc.o.d')
                 with open(makeFileName, "w") as makeFile:
                     makeFile.write('.SUFFIXES:\n')
+                    makeFile.write('include flags.make\n')
                     with open(depFileName, "r") as depFile:
                         makeFile.write(depFile.read())
-                    makeFile.write('\tbash buildScript.sh '+moduleName+'\n')
+                    makeFile.write('\tbash buildScript.sh '+moduleName+
+                            "$(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS)\n")
                     makeFile.write(moduleName+'.so: '+moduleName+'.dir/'+moduleName+'.cc.o\n')
                 """
                 with Lock(os.path.join(self.dune_py_dir, '..', 'lock-module.lock'), flags=LOCK_SH):
