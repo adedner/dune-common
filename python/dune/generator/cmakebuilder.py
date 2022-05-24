@@ -174,6 +174,10 @@ class Builder:
                                       replace('extractCompiler', '$1').replace('CMakeFiles','.').\
                                       replace('python/dune/generated/./','') # this is for the target name in the dependency file
                                             # which is for a relative path starting at cmake base dir
+                        if not 'cc.o.d' in compilerCmd:
+                            compilerCmd = compilerCmd +\
+                                 " -MD -MT $1.dir/$1.cc.o -MF $1.dir/$1.cc.o.d"
+                        # generate the dependency file - this is apparently not done in all cmake versions
 
             buildScriptName = os.path.join(dunepy_dir,'python','dune','generated','buildScript.sh')
             with open(buildScriptName, "w") as buildScript:
