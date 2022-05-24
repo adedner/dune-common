@@ -166,12 +166,14 @@ class Builder:
                 this requires compiler overload in dune-py to get command output
             """
             out = buffer_to_str(stdout).strip().split("\n")
-            nlines = len(out)
+            # the following is quite a hack and needs to be improved
             for i,l in enumerate(out):
                 print(i,'\n',l)
                 if '.cc.o' in l:
                     if '.so' in l:
                         linkerCmd = l.replace('extractCompiler', '$1').replace('CMakeFiles','.')
+                        linkerCmd = linkerCmd.split(' ',1)
+                        linkerCmd = linkerCmd[0] + " $CXXFLAGS " + linkerCmd[1]
                     else:
                         compilerCmd = l.\
                                       replace('extractCompiler', '$1').replace('CMakeFiles','.').\
@@ -180,6 +182,8 @@ class Builder:
                         if not 'cc.o.d' in compilerCmd:
                             compilerCmd = compilerCmd +\
                                  " -MD -MT $1.dir/$1.cc.o -MF $1.dir/$1.cc.o.d"
+                        compilerCmd = compilerCmd.split(' ',1)
+                        compilerCmd = compilerCmd[0] + " $CXXFLAGS " + compilerCmd[1]
                         # generate the dependency file - this is apparently not done in all cmake versions
 
             buildScriptName = os.path.join(dunepy_dir,'python','dune','generated','buildScript.sh')
