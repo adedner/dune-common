@@ -136,8 +136,8 @@ class Builder:
                                )
             out = buffer_to_str(stdout).strip().split("\n")
             nlines = len(out)
-            # for i,l in enumerate(out):
-            #     print(i,'\n',l)
+            for i,l in enumerate(out):
+                print(i,'\n',l)
             # 0: [ 50%] Building CXX object python/dune/generated/CMakeFiles/extractCompiler.dir/extractCompiler.cc.o
             # 1: compiler command
             # 2: [100%] Linking CXX shared library extractCompiler.so
