@@ -412,67 +412,45 @@ class Builder:
             if module is None:
                 logger.debug("Module {} not loaded".format(moduleName))
                 # make sure nothing (compilation, generating and building) is taking place
-                with Lock(os.path.join(self.dune_py_dir, '..', 'lock-module.lock'), flags=LOCK_EX):
-                    # module must be generated so lock the source file
+                # module must be generated so lock the source file
+                with Lock(os.path.join(self.dune_py_dir, '..', 'lock-module.lock'), flags=LOCK_SH):
                     with Lock(os.path.join(self.dune_py_dir, 'lock-'+moduleName+'.lock'), flags=LOCK_EX):
                         # the module might now be present, so check again
                         # (see #295)
                         module = sys.modules.get("dune.generated." + moduleName)
                         if module is None:
                             compilationMessage = self.buildWithMake( moduleName, source, pythonName )
-                            # compilationMessage = self._maybeConfigureWithCMake(
-                            #     moduleName, source, pythonName, extraCMake
-                            # )
                         else:
                             compilationMessage = f"Compiling {pythonName} (rebuilding after concurrent build)"
-                # end of exclusive dune-py lock
 
-                # we always compile even if the module is always compiled since it can happen
-                # that dune-py was updated in the mean time.
-                # This step is quite fast but there is room for optimization.
-
-                # for compilation a shared lock is enough
-                #
-                # A side effect is that during the parallel make calls
-                # for whatever reason cmake might be invoked due to
-                # changes to the module (i.e. a new target
-                # added). Parallel cmake calls are not allowed and as
-                # a consequence the complete build may fail. We take
-                # care of such parallel cmake calls by additional
-                # locking in the dune-py CMakeLists.txt
-                makeFileName = os.path.join(self.generated_dir,moduleName+'.dir',moduleName+'.make')
-                print(compilationMessage)
-                if not os.path.exists(makeFileName):
-                    with subprocess.Popen(["bash","buildScript.sh",moduleName],
-                                          cwd=self.generated_dir,
-                                          stdout=subprocess.PIPE,
-                                          stderr=subprocess.PIPE) as cmake:
-                        stdout, stderr = cmake.communicate()
-                    print('build:',stdout)
-                    print('build:',stderr)
-                else:
-                    with subprocess.Popen(["make", "-f",makeFileName, moduleName+'.so'],
-                                          cwd=self.generated_dir,
-                                          stdout=subprocess.PIPE,
-                                          stderr=subprocess.PIPE) as cmake:
-                        stdout, stderr = cmake.communicate()
-                    print('make:',stdout)
-                    print('make:',stderr)
-                depFileName  = os.path.join(self.generated_dir,moduleName+'.dir',moduleName+'.cc.o.d')
-                with open(makeFileName, "w") as makeFile:
-                    makeFile.write('.SUFFIXES:\n')
-                    makeFile.write('include flags.make\n')
-                    with open(depFileName, "r") as depFile:
-                        makeFile.write(depFile.read())
-                    makeFile.write('\tbash buildScript.sh '+moduleName+
-                            "$(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS)\n")
-                    makeFile.write(moduleName+'.so: '+moduleName+'.dir/'+moduleName+'.cc.o\n')
-                """
-                with Lock(os.path.join(self.dune_py_dir, '..', 'lock-module.lock'), flags=LOCK_SH):
-                    # lock generated module
-                    with Lock(os.path.join(self.dune_py_dir, 'lock-'+moduleName+'.lock'), flags=LOCK_EX):
-                        self.compile(infoTxt=compilationMessage, target=moduleName)
-                """
+                        # we always compile even if the module is already compiled since it can happen
+                        # that dune-py was updated in the mean time ?????
+                        # This step is quite fast but there is room for optimization.
+                        makeFileName = os.path.join(self.generated_dir,moduleName+'.dir',moduleName+'.make')
+                        print(compilationMessage)
+                        if not os.path.exists(makeFileName):
+                            with subprocess.Popen(["bash","buildScript.sh",moduleName],
+                                                  cwd=self.generated_dir,
+                                                  stdout=subprocess.PIPE,
+                                                  stderr=subprocess.PIPE) as cmake:
+                                stdout, stderr = cmake.communicate()
+                            print('build:',stdout)
+                            print('build:',stderr)
+                        else:
+                            with subprocess.Popen(["make", "-f",makeFileName, moduleName+'.so'],
+                                                  cwd=self.generated_dir,
+                                                  stdout=subprocess.PIPE,
+                                                  stderr=subprocess.PIPE) as cmake:
+                                stdout, stderr = cmake.communicate()
+                            print('make:',stdout)
+                            print('make:',stderr)
+                        depFileName  = os.path.join(self.generated_dir,moduleName+'.dir',moduleName+'.cc.o.d')
+                        with open(makeFileName, "w") as makeFile:
+                            makeFile.write('.SUFFIXES:\n')
+                            with open(depFileName, "r") as depFile:
+                                makeFile.write(depFile.read())
+                            makeFile.write('\tbash buildScript.sh '+moduleName+"\n")
+                            makeFile.write(moduleName+'.so: '+moduleName+'.dir/'+moduleName+'.cc.o\n')
 
         ## TODO remove barrier here
         comm.barrier()
