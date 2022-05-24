@@ -131,7 +131,7 @@ class Builder:
                               )
             stdout, stderr = \
               Builder.callCMake(["cmake"]+
-                                 ['--build','.','--target',"extractCompiler"],
+                                 ['--build','.','--target',"extractCompiler","--","-B"],
                                  cwd=dunepy_dir,
                                  env={**os.environ,
                                       "CXXFLAGS":" ",
