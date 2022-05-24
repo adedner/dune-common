@@ -15,6 +15,7 @@ message("---- LOCK")
 file(LOCK ${lock})
 message("---- AQUIRED")
 
+set(ALLOW_CXXFLAGS_OVERWRITE ON) 
 set(DUNE_ENABLE_PYTHONBINDINGS ON)
 set(CMAKE_PREFIX_PATH {{ install_prefix }})
 
