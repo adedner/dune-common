@@ -94,6 +94,7 @@ class Builder:
             context["install_prefix"] = metaData.unique_value_across_modules("INSTALL_PREFIX")
             context["cmake_flags"]    = getCMakeFlags()
             context["cxx_compiler"]   = context["cmake_flags"]["CMAKE_CXX_COMPILER"]
+            context["cxx_flags"]      = context["cmake_flags"]["CMAKE_CXX_FLAGS"]
             print(context["cmake_flags"])
 
             # Find the correct template path
@@ -132,7 +133,9 @@ class Builder:
               Builder.callCMake(["cmake"]+
                                  ['--build','.','--target',"extractCompiler"],
                                  cwd=dunepy_dir,
-                                 env={**os.environ,"CMAKE_NO_VERBOSE":"0"},
+                                 env={**os.environ,
+                                      "CXXFLAGS":" ",
+                                      },
                                  infoTxt="extract compiler command",
                                  active=True, # print details anyway
                                )
@@ -180,7 +183,7 @@ class Builder:
                         # generate the dependency file - this is apparently not done in all cmake versions
 
             buildScriptName = os.path.join(dunepy_dir,'python','dune','generated','buildScript.sh')
-            with open(buildScriptName, "w") as buildScript:
+            with open(buildScriptName, "a") as buildScript:
                 buildScript.write('echo Building\n')
                 buildScript.write(compilerCmd)
                 buildScript.write('\n')
