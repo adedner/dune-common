@@ -129,6 +129,8 @@ class Builder:
                               infoTxt="Configuring dune-py with CMake",
                               active=True, # print details anyway
                               )
+            generatedDir = os.path.join(dunepy_dir,'python','dune','generated')
+
             stdout, stderr = \
               Builder.callCMake(["cmake"]+
                                  ['--build','.','--target',"extractCompiler","--","-B"],
@@ -139,10 +141,10 @@ class Builder:
                                  infoTxt="extract compiler command",
                                  active=True, # print details anyway
                                )
-            generatedDir = os.path.join(dunepy_dir,'python','dune','generated')
-
             """
+            #########################################################################
             # use CMakeFiles/extractCompiler.dir/linker.txt to get the linker command
+            #########################################################################
             linkerScriptName = os.path.join(generatedDir,'linker.sh')
             linkerSourceName = os.path.join(generatedDir,'CMakeFiles','extractCompiler.dir','link.txt')
             with open(linkerScriptName, "w") as linkerScript:
@@ -162,9 +164,10 @@ class Builder:
                             flagScript.write(s[0].strip()+'="'+s[1].strip()+'"\n')
             """
 
-            """ Alternative approach:
-                this requires compiler overload in dune-py to get command output
             """
+            #########################################################################
+            this requires compiler overload in dune-py to get command output
+            #########################################################################
             out = buffer_to_str(stdout).strip().split("\n")
             # the following is quite a hack and needs to be improved
             for i,l in enumerate(out):
@@ -187,11 +190,49 @@ class Builder:
                         # generate the dependency file - this is apparently not done in all cmake versions
 
             buildScriptName = os.path.join(dunepy_dir,'python','dune','generated','buildScript.sh')
+            # we append in this case since the 'magic' of CXXFLAGS replacement is not available anymore
             with open(buildScriptName, "a") as buildScript:
                 buildScript.write('echo Building\n')
                 buildScript.write(compilerCmd)
                 buildScript.write('\n')
                 buildScript.write(linkerCmd)
+            """
+            """
+            #########################################################################
+            Use link.txt and -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .
+            #########################################################################
+            """
+            # we already have link.txt from the previous cmake run
+            linkerSourceName = os.path.join(generatedDir,'CMakeFiles','extractCompiler.dir','link.txt')
+            # now also generate compiler command
+            stdout, stderr = \
+              Builder.callCMake(["cmake","-DCMAKE_EXPORT_COMPILE_COMMANDS=ON","."],
+                                 cwd=dunepy_dir,
+                                 env={**os.environ,
+                                      "CXXFLAGS":" ",
+                                      },
+                                 infoTxt="extract compiler command",
+                                 active=True, # print details anyway
+                               )
+            commandSourceName = os.path.join(dunepy_dir,'compile_commands.json')
+            buildScriptName = os.path.join(dunepy_dir,'python','dune','generated','buildScript.sh')
+            # we do not need the buildScript template since the compiler command generated uses CXX_compiler.sh
+            with open(buildScriptName, "w") as buildScript:
+                buildScript.write('echo Building\n')
+                with open(commandSourceName) as commandFile:
+                    compilerCmd = json.load(commandFile)[0]["command"]
+                compilerCmd = compilerCmd.replace('extractCompiler', '$1').replace('CMakeFiles/','')
+                compilerCmd = compilerCmd + " -MD -MT $1.dir/$1.cc.o -MF $1.dir/$1.cc.o.d"
+                buildScript.write(compilerCmd)
+                buildScript.write('\n')
+                with open(linkerSourceName, "r") as linkerSource:
+                    linkerCmd = linkerSource.read()
+                linkerCmd = linkerCmd.replace('extractCompiler','$1').replace('CMakeFiles/','')
+                buildScript.write(linkerCmd)
+            """
+            #########################################################################
+            #########################################################################
+            """
 
     def __init__(self, force=False, saveOutput=False):
         self.force = force
