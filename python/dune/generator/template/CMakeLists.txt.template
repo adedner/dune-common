@@ -16,6 +16,7 @@ file(LOCK ${lock})
 message("---- AQUIRED")
 
 set(ALLOW_CXXFLAGS_OVERWRITE ON) 
+set(CMAKE_CXX_FLAGS " ") # we don't want NDEBUG set by default
 set(DUNE_ENABLE_PYTHONBINDINGS ON)
 set(CMAKE_PREFIX_PATH {{ install_prefix }})
 
@@ -25,7 +26,7 @@ set({{ mod }}_DIR {{ dir }})
 {% endif %}
 {%- endfor %}
 
-{% for flag, value in cmake_flags.items() -%}
+{% for flag, value in cmake_flags.items() if not flag=="CMAKE_CXX_FLAGS" -%}
 {% if flag != "" %}
 set({{ flag }} "{{ value }}")
 {% endif %}
