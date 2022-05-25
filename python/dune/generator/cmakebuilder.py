@@ -124,16 +124,26 @@ class Builder:
                         outfile.write(env.get_template(relative_template_file).render(**context))
 
             # configure dune-py
+            generatedDir = os.path.join(dunepy_dir,'python','dune','generated')
+            #########################################################################
+            # Remark about ninja:
+            # - the -B used below for the extractCompiler build needed for
+            #   the second approach does not work with ninja
+            # - the link.txt used in approach 1/3 is not available with ninja
+            # - the CXXFLAGS overwrite seems not to work with ninja -
+            #   the script is not generated so approach 2 will not work due to missing echo
+            # We don't have to use ninja explicitely for dune-py but have
+            # to make sure the user can't set up ninja for dune-py by # mistake
+            #########################################################################
             Builder.callCMake(["cmake"]+defaultCMakeFlags()+["."],
                               cwd=dunepy_dir,
                               infoTxt="Configuring dune-py with CMake",
                               active=True, # print details anyway
                               )
-            generatedDir = os.path.join(dunepy_dir,'python','dune','generated')
-
             stdout, stderr = \
               Builder.callCMake(["cmake"]+
-                                 ['--build','.','--target',"extractCompiler","--","-B"],
+                                 ['--build','.','--target',"extractCompiler"]+
+                                 ['--','-B'],
                                  cwd=dunepy_dir,
                                  env={**os.environ,
                                       "CXXFLAGS":" ",
@@ -141,8 +151,10 @@ class Builder:
                                  infoTxt="extract compiler command",
                                  active=True, # print details anyway
                                )
+
             """
             #########################################################################
+            # Approach 1:
             # use CMakeFiles/extractCompiler.dir/linker.txt to get the linker command
             #########################################################################
             linkerScriptName = os.path.join(generatedDir,'linker.sh')
@@ -166,6 +178,7 @@ class Builder:
 
             """
             #########################################################################
+            # Approach 2:
             this requires compiler overload in dune-py to get command output
             #########################################################################
             out = buffer_to_str(stdout).strip().split("\n")
@@ -199,6 +212,7 @@ class Builder:
             """
             """
             #########################################################################
+            # Approach 3:
             Use link.txt and -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .
             #########################################################################
             """
