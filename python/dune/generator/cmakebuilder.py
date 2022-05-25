@@ -271,14 +271,17 @@ class Builder:
                                          replace(' python/dune/generated/',' ') # better to move the script to the root of dune-py then this can be kept
                     compilerCmd = compilerCmd.split(' ',1)
                     compilerCmd = compilerCmd[0] + " $CXXFLAGS " + compilerCmd[1]
-                    buildScript.write(compilerCmd)
-                    buildScript.write('\n')
+                    buildScript.write("echo "+compilerCmd+"\n")
+                    buildScript.write(compilerCmd+"\n")
                     linkerCmd = out[1].replace('extractCompiler','$1').\
                                        replace('CMakeFiles/','').\
                                        replace(' python/dune/generated/',' ') # better to move the script to the root of dune-py then this can be kept
                     linkerCmd = linkerCmd.split(' ',1)
-                    linkerCmd = linkerCmd[0] + " $CXXFLAGS " + linkerCmd[1]
-                    buildScript.write(linkerCmd)
+                    # this needs fixing. Issue is that at the linker line beginns
+                    # with ': && '
+                    # linkerCmd = linkerCmd[0] + " $CXXFLAGS " + linkerCmd[1]
+                    buildScript.write("echo "+linkerCmd+"\n")
+                    buildScript.write(linkerCmd+"\n")
 
     def __init__(self, force=False, saveOutput=False):
         self.force = force
