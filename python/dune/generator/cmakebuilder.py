@@ -412,7 +412,7 @@ class MakefileBuilder(Builder):
     bash = 'bash'
 
     @staticmethod
-    def dunepy_from_template(dunepy_dir,force=False,useNinja=False):
+    def dunepy_from_template(dunepy_dir,force=False,useNinja=True):
 
         # call base class dunepy_from_template
         force = Builder._dunepy_from_template(dunepy_dir, force=force)
@@ -508,15 +508,14 @@ class MakefileBuilder(Builder):
                                          replace(' python/dune/generated/',' ') # better to move the script to the root of dune-py then this can be kept
                     compilerCmd = compilerCmd.split(' ',1)
                     compilerCmd = compilerCmd[0] + " $CXXFLAGS " + compilerCmd[1]
-                    #buildScript.write("echo "+compilerCmd+"\n")
                     buildScript.write(compilerCmd+"\n")
+                    # this needs fixing: Issue is that at the linker line beginns with ': && '
                     linkerCmd = out[1].replace('extractCompiler','$1').\
                                        replace('CMakeFiles/','').\
                                        replace(' python/dune/generated/',' ') # better to move the script to the root of dune-py then this can be kept
-                    linkerCmd = linkerCmd.split(' ',1)
-                    # this needs fixing: Issue is that at the linker line beginns with ': && '
-                    linkerCmd = linkerCmd[0] + " $CXXFLAGS " + linkerCmd[1]
-                    #buildScript.write("echo "+linkerCmd+"\n")
+                    linkerCmd = linkerCmd.split(' ',3)
+                    linkerCmd = linkerCmd[2] + " $CXXFLAGS " + linkerCmd[3]
+                    compilerCmd = compilerCmd.replace('DUMMYCXXFLAGS','$CXXFLAGS')
                     buildScript.write(linkerCmd+"\n")
 
 
