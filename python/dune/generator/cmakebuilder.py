@@ -48,7 +48,7 @@ def getDefaultBuildArgs():
 class Builder:
 
     @staticmethod
-    def dunepy_from_template(dunepy_dir,force=False):
+    def _dunepy_from_template(dunepy_dir,force=False):
         # Extract the raw data dictionary
 
         metaData = getBuildMetaData()
@@ -95,7 +95,6 @@ class Builder:
             context["cmake_flags"]    = getCMakeFlags()
             context["cxx_compiler"]   = context["cmake_flags"]["CMAKE_CXX_COMPILER"]
             context["cxx_flags"]      = context["cmake_flags"]["CMAKE_CXX_FLAGS"]
-            print(context["cmake_flags"])
 
             # Find the correct template path
             path, _ = os.path.split(__file__)
@@ -123,14 +122,19 @@ class Builder:
                     with open(gen_file, "w") as outfile:
                         outfile.write(env.get_template(relative_template_file).render(**context))
 
+        # return force variable because this might be needed in the overloaded versions
+        return force
+
+    @staticmethod
+    def dunepy_from_template(dunepy_dir,force=False):
+        force = _dunepy_from_template(dunpe_dir,force)
+        if force:
             # configure dune-py
             Builder.callCMake(["cmake"]+defaultCMakeFlags()+["."],
                               cwd=dunepy_dir,
                               infoTxt="Configuring dune-py with CMake",
                               active=True, # print details anyway
                               )
-
-        # return force variable because this might be needed in the overloaded versions
         return force
 
     def __init__(self, force=False, saveOutput=False):
@@ -408,83 +412,113 @@ class MakefileBuilder(Builder):
     bash = 'bash'
 
     @staticmethod
-    def dunepy_from_template(dunepy_dir,force=False):
+    def dunepy_from_template(dunepy_dir,force=False,useNinja=False):
 
         # call base class dunepy_from_template
-        force = Builder.dunepy_from_template(dunepy_dir, force=force)
+        force = Builder._dunepy_from_template(dunepy_dir, force=force)
 
         if force:
             # generate path for the buildScript and other filed to be created
             generatedDir = os.path.join(dunepy_dir,'python','dune','generated')
-
-            #########################################################################
-            # Remark about ninja:
-            # - the -B used below for the extractCompiler build needed for
-            #   the second approach does not work with ninja
-            # - the link.txt used in approach 1/3 is not available with ninja
-            # - the CXXFLAGS overwrite seems not to work with ninja -
-            #   the script is not generated so approach 2 will not work due to missing echo
-            # We don't have to use ninja explicitly for dune-py but have
-            # to make sure the user can't set up ninja for dune-py by # mistake
-            #########################################################################
-            stdout, stderr = \
-              Builder.callCMake(["cmake"]+
-                                 ['--build','.','--target',"extractCompiler"]+
-                                 ['--','-B'],
-                                 cwd=dunepy_dir,
-                                 env={**os.environ,
-                                      "CXXFLAGS":" ",
-                                      },
-                                 infoTxt="extract compiler command",
-                                 active=True, # print details anyway
-                               )
-
-            """
-            #########################################################################
-            # Approach 3:
-            Use link.txt and -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .
-            #########################################################################
-            """
-            # we already have link.txt from the previous cmake run (extractCompiler)
-            linkerSourceName = os.path.join(generatedDir,'CMakeFiles','extractCompiler.dir','link.txt')
-            # now also generate compiler command
-            stdout, stderr = \
-              Builder.callCMake(["cmake","-DCMAKE_EXPORT_COMPILE_COMMANDS=ON","."],
-                                 cwd=dunepy_dir,
-                                 env={**os.environ,
-                                      "CXXFLAGS":" ",
-                                      },
-                                 infoTxt="extract compiler command",
-                                 active=True, # print details anyway
-                               )
-            commandSourceName = os.path.join(dunepy_dir,'compile_commands.json')
-
-            bashline = ''
-            with open(dunepy_dir + "/CXX_compiler.sh") as compiler:
-                bashline = compiler.readline()
-                bash = bashline.replace("#!", "")
-                bash = bash.replace("\n", "")
-                MakefileBuilder.bash = bash
-
             buildScriptName = os.path.join(dunepy_dir,'python','dune','generated','buildScript.sh')
-            # we do not need the buildScript template since the compiler command generated uses CXX_compiler.sh
-            with open(buildScriptName, "w") as buildScript:
-                buildScript.write(bashline)
-                #buildScript.write('echo Building\n')
-                with open(commandSourceName) as commandFile:
-                    compilerCmd = json.load(commandFile)[0]["command"]
-                compilerCmd = compilerCmd.replace('extractCompiler', '$1').replace('CMakeFiles/','')
-                compilerCmd = compilerCmd + " -MD -MT $1.dir/$1.cc.o -MF $1.dir/$1.cc.o.d"
-                buildScript.write(compilerCmd)
-                buildScript.write('\n')
-                with open(linkerSourceName, "r") as linkerSource:
-                    linkerCmd = linkerSource.read()
-                linkerCmd = linkerCmd.replace('extractCompiler','$1').replace('CMakeFiles/','')
-                buildScript.write(linkerCmd)
-            """
-            #########################################################################
-            #########################################################################
-            """
+
+            if not useNinja:
+                Builder.callCMake(["cmake"]+defaultCMakeFlags()+["."],
+                                  cwd=dunepy_dir,
+                                  infoTxt="Configuring dune-py with CMake",
+                                  active=True, # print details anyway
+                                  )
+                #########################################################################
+                # Remark about ninja:
+                # - the -B used below for the extractCompiler build needed for
+                #   the second approach does not work with ninja
+                # - the link.txt used in approach 1/3 is not available with ninja
+                # - the CXXFLAGS overwrite seems not to work with ninja -
+                #   the script is not generated so approach 2 will not work due to missing echo
+                # We don't have to use ninja explicitly for dune-py but have
+                # to make sure the user can't set up ninja for dune-py by # mistake
+                #########################################################################
+                stdout, stderr = \
+                  Builder.callCMake(["cmake"]+
+                                     ['--build','.','--target',"extractCompiler"]+
+                                     ['--','-B'],
+                                     cwd=dunepy_dir,
+                                     env={**os.environ,
+                                          "CXXFLAGS":" ",
+                                          },
+                                     infoTxt="extract compiler command",
+                                     active=True, # print details anyway
+                                   )
+
+                # we already have link.txt from the previous cmake run (extractCompiler)
+                linkerSourceName = os.path.join(generatedDir,'CMakeFiles','extractCompiler.dir','link.txt')
+                # now also generate compiler command
+                stdout, stderr = \
+                  Builder.callCMake(["cmake","-DCMAKE_EXPORT_COMPILE_COMMANDS=ON","."],
+                                     cwd=dunepy_dir,
+                                     env={**os.environ,
+                                          "CXXFLAGS":" ",
+                                          },
+                                     infoTxt="extract compiler command",
+                                     active=True, # print details anyway
+                                   )
+                commandSourceName = os.path.join(dunepy_dir,'compile_commands.json')
+
+                bashline = ''
+                with open(dunepy_dir + "/CXX_compiler.sh") as compiler:
+                    bashline = compiler.readline()
+                    bash = bashline.replace("#!", "")
+                    bash = bash.replace("\n", "")
+                    MakefileBuilder.bash = bash
+
+                # we do not need the buildScript template since the compiler command generated uses CXX_compiler.sh
+                with open(buildScriptName, "w") as buildScript:
+                    buildScript.write(bashline)
+                    #buildScript.write('echo Building\n')
+                    with open(commandSourceName) as commandFile:
+                        compilerCmd = json.load(commandFile)[0]["command"]
+                    compilerCmd = compilerCmd.replace('extractCompiler', '$1').replace('CMakeFiles/','')
+                    compilerCmd = compilerCmd + " -MD -MT $1.dir/$1.cc.o -MF $1.dir/$1.cc.o.d"
+                    buildScript.write(compilerCmd)
+                    buildScript.write('\n')
+                    with open(linkerSourceName, "r") as linkerSource:
+                        linkerCmd = linkerSource.read()
+                    linkerCmd = linkerCmd.replace('extractCompiler','$1').replace('CMakeFiles/','')
+                    buildScript.write(linkerCmd)
+            else: # useNinja
+                Builder.callCMake(["cmake","-G","Ninja","."],
+                                  cwd=dunepy_dir,
+                                  infoTxt="Configuring dune-py with CMake",
+                                  active=True, # print details anyway
+                                 )
+                with subprocess.Popen(["ninja", "-t","commands","extractCompiler"],
+                                      cwd=dunepy_dir,
+                                      stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE) as ninja:
+                    stdout, stderr = ninja.communicate()
+                    exit_code = ninja.returncode
+
+                assert exit_code == 0
+                out = buffer_to_str(stdout).strip().split("\n")
+                assert len(out) == 2
+                with open(buildScriptName, "a") as buildScript:
+                    #buildScript.write('echo Building $CXXFLAGS\n')
+                    compilerCmd = out[0].replace('extractCompiler', '$1').\
+                                         replace('CMakeFiles/','').\
+                                         replace(' python/dune/generated/',' ') # better to move the script to the root of dune-py then this can be kept
+                    compilerCmd = compilerCmd.split(' ',1)
+                    compilerCmd = compilerCmd[0] + " $CXXFLAGS " + compilerCmd[1]
+                    #buildScript.write("echo "+compilerCmd+"\n")
+                    buildScript.write(compilerCmd+"\n")
+                    linkerCmd = out[1].replace('extractCompiler','$1').\
+                                       replace('CMakeFiles/','').\
+                                       replace(' python/dune/generated/',' ') # better to move the script to the root of dune-py then this can be kept
+                    linkerCmd = linkerCmd.split(' ',1)
+                    # this needs fixing: Issue is that at the linker line beginns with ': && '
+                    linkerCmd = linkerCmd[0] + " $CXXFLAGS " + linkerCmd[1]
+                    #buildScript.write("echo "+linkerCmd+"\n")
+                    buildScript.write(linkerCmd+"\n")
+
 
     def __init__(self, force=False, saveOutput=False):
         # call __init__ of base class
