@@ -412,7 +412,7 @@ class MakefileBuilder(Builder):
     bash = 'bash'
 
     @staticmethod
-    def dunepy_from_template(dunepy_dir,force=False,useNinja=True):
+    def dunepy_from_template(dunepy_dir,force=False,useNinja=False):
 
         # call base class dunepy_from_template
         force = Builder._dunepy_from_template(dunepy_dir, force=force)
@@ -566,7 +566,7 @@ class MakefileBuilder(Builder):
                 # This step is quite fast but there is room for optimization.
                 makeFileName = os.path.join(self.generated_dir,moduleName+'.dir',moduleName+'.make')
                 if self.savedOutput is not None:
-                    print(compilationMessage)
+                    self.savedOutput[0].write(compilationMessage)
                 with subprocess.Popen(["make", "-f",makeFileName, moduleName+'.so'],
                                       cwd=self.generated_dir,
                                       stdout=subprocess.PIPE,
@@ -575,9 +575,9 @@ class MakefileBuilder(Builder):
                     exit_code = cmake.returncode
 
                 if self.savedOutput is not None:
-                    print('make return:', exit_code)
-                    print('make:',stdout)
-                    print('make:',stderr)
+                    self.savedOutput[0].write('make return:' + str(exit_code) + "\n")
+                    self.savedOutput[0].write('make:' + str(stdout) + "\n")
+                    self.savedOutput[1].write('make:' + str(stderr) + "\n")
 
                 bash = MakefileBuilder.bash
                 if exit_code:
@@ -587,8 +587,8 @@ class MakefileBuilder(Builder):
                                           stderr=subprocess.PIPE) as process:
                         stdout, stderr = process.communicate()
                     if self.savedOutput is not None:
-                        print('build:',stdout)
-                        print('build:',stderr)
+                        self.savedOutput[0].write('build:' + str(stdout) + "\n")
+                        self.savedOutput[1].write('build:' + str(stderr) + "\n")
                 depFileName  = os.path.join(self.generated_dir,moduleName+'.dir',moduleName+'.cc.o.d')
                 with open(makeFileName, "w") as makeFile:
                     makeFile.write('.SUFFIXES:\n')
