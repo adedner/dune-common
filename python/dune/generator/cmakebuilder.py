@@ -542,7 +542,7 @@ class MakefileBuilder(Builder):
             with open(os.path.join(sourceFileName), 'w') as out:
                 out.write(code)
         else:
-            compilationInfoMessage = f"file exists..."
+            compilationInfoMessage = f"{pythonName} exists..."
         os.makedirs(os.path.join(self.generated_dir,moduleName+".dir"), exist_ok=True)
         return compilationInfoMessage
 
@@ -560,6 +560,8 @@ class MakefileBuilder(Builder):
                     compilationMessage = self._buildWithMake( moduleName, source, pythonName )
                 else:
                     compilationMessage = f"Compiling {pythonName} (rebuilding after concurrent build)"
+
+                logger.log(logging.INFO,compilationMessage)
 
                 # we always compile even if the module is already compiled since it can happen
                 # that dune-py was updated in the mean time ?????
