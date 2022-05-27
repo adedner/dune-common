@@ -124,23 +124,13 @@ class Builder:
                         outfile.write(env.get_template(relative_template_file).render(**context))
 
             # configure dune-py
-            generatedDir = os.path.join(dunepy_dir,'python','dune','generated')
             Builder.callCMake(["cmake"]+defaultCMakeFlags()+["."],
                               cwd=dunepy_dir,
                               infoTxt="Configuring dune-py with CMake",
                               active=True, # print details anyway
                               )
 
-            #########################################################################
-            # Remark about ninja:
-            # - the -B used below for the extractCompiler build needed for
-            #   the second approach does not work with ninja
-            # - the link.txt used in approach 1/3 is not available with ninja
-            # - the CXXFLAGS overwrite seems not to work with ninja -
-            #   the script is not generated so approach 2 will not work due to missing echo
-            # We don't have to use ninja explicitely for dune-py but have
-            # to make sure the user can't set up ninja for dune-py by # mistake
-            #########################################################################
+        # return force variable because this might be needed in the overloaded versions
         return force
 
     def __init__(self, force=False, saveOutput=False):
@@ -410,6 +400,8 @@ class Builder:
 
 class MakefileBuilder(Builder):
 
+    bash = 'bash'
+
     @staticmethod
     def dunepy_from_template(dunepy_dir,force=False):
 
@@ -417,7 +409,7 @@ class MakefileBuilder(Builder):
         force = Builder.dunepy_from_template(dunepy_dir, force=force)
 
         if force:
-            # configure dune-py
+            # generate path for the buildScript and other filed to be created
             generatedDir = os.path.join(dunepy_dir,'python','dune','generated')
 
             #########################################################################
@@ -461,10 +453,19 @@ class MakefileBuilder(Builder):
                                  active=True, # print details anyway
                                )
             commandSourceName = os.path.join(dunepy_dir,'compile_commands.json')
+
+            bashline = ''
+            with open(dunepy_dir + "/CXX_compiler.sh") as compiler:
+                bashline = compiler.readline()
+                bash = bashline.replace("#!", "")
+                bash = bash.replace("\n", "")
+                MakefileBuilder.bash = bash
+
             buildScriptName = os.path.join(dunepy_dir,'python','dune','generated','buildScript.sh')
             # we do not need the buildScript template since the compiler command generated uses CXX_compiler.sh
             with open(buildScriptName, "w") as buildScript:
-                buildScript.write('echo Building\n')
+                buildScript.write(bashline)
+                #buildScript.write('echo Building\n')
                 with open(commandSourceName) as commandFile:
                     compilerCmd = json.load(commandFile)[0]["command"]
                 compilerCmd = compilerCmd.replace('extractCompiler', '$1').replace('CMakeFiles/','')
@@ -479,7 +480,6 @@ class MakefileBuilder(Builder):
             #########################################################################
             #########################################################################
             """
-
     def __init__(self, force=False, saveOutput=False):
         # call __init__ of base class
         super().__init__(force=force, saveOutput=saveOutput)
@@ -546,12 +546,14 @@ class MakefileBuilder(Builder):
                         print('make return:', exit_code)
                         print('make:',stdout)
                         print('make:',stderr)
+
+                        bash = MakefileBuilder.bash
                         if exit_code:
-                            with subprocess.Popen(["bash","buildScript.sh",moduleName],
+                            with subprocess.Popen([bash,"buildScript.sh",moduleName],
                                                   cwd=self.generated_dir,
                                                   stdout=subprocess.PIPE,
-                                                  stderr=subprocess.PIPE) as cmake:
-                                stdout, stderr = cmake.communicate()
+                                                  stderr=subprocess.PIPE) as process:
+                                stdout, stderr = process.communicate()
                             print('build:',stdout)
                             print('build:',stderr)
                         depFileName  = os.path.join(self.generated_dir,moduleName+'.dir',moduleName+'.cc.o.d')
@@ -559,7 +561,7 @@ class MakefileBuilder(Builder):
                             makeFile.write('.SUFFIXES:\n')
                             with open(depFileName, "r") as depFile:
                                 makeFile.write(depFile.read())
-                            makeFile.write('\tbash buildScript.sh '+moduleName+"\n")
+                            makeFile.write('\t'+bash+ ' buildScript.sh '+moduleName+"\n")
                             makeFile.write(moduleName+'.so: '+moduleName+'.dir/'+moduleName+'.cc.o\n')
 
         ## TODO remove barrier here
