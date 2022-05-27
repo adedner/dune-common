@@ -50,6 +50,14 @@ add_subdirectory(python/dune/generated)
 # dune_add_pybind11_module(NAME ${DUNEPY_FILE})
 # dune_target_enable_all_packages(${DUNEPY_FILE})
 
+include(FindUnixCommands)
+set( UNIXCMD_SCRIPT_FILE "bashCmd  = \"${BASH}\"
+makeCmd  = \"${CMAKE_MAKE_PROGRAM}\"
+ninjaCmd = \"${CMAKE_NINJA_PROGRAM}\"")
+# ninja does not work yet
+
+file(WRITE "${CMAKE_BINARY_DIR}/unixcommands.py" ${UNIXCMD_SCRIPT_FILE})
+
 finalize_dune_project(GENERATE_CONFIG_H_CMAKE)
 
 # we are done, so release lock
