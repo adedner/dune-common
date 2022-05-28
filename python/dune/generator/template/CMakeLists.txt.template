@@ -50,13 +50,20 @@ add_subdirectory(python/dune/generated)
 # dune_add_pybind11_module(NAME ${DUNEPY_FILE})
 # dune_target_enable_all_packages(${DUNEPY_FILE})
 
+# find bash
 include(FindUnixCommands)
-set( UNIXCMD_SCRIPT_FILE "bashCmd  = \"${BASH}\"
-makeCmd  = \"${CMAKE_MAKE_PROGRAM}\"
-ninjaCmd = \"${CMAKE_NINJA_PROGRAM}\"")
-# ninja does not work yet
+# find make program (might differ from CMAKE_MAKE_PROGRAM when ninja is used
+find_program(MAKE make)  
+# CMAKE_MAKE_PROGRAM points to either make or ninja
+set( UNIXCMD_SCRIPT_FILE "[
+{ 
+ \"bash\" : \"${BASH}\", 
+ \"make\" : \"${MAKE}\",
+ \"generator\" : \"${CMAKE_MAKE_PROGRAM}\"
+}
+]")
 
-file(WRITE "${CMAKE_BINARY_DIR}/unixcommands.py" ${UNIXCMD_SCRIPT_FILE})
+file(WRITE "${CMAKE_BINARY_DIR}/unix_commands.json" ${UNIXCMD_SCRIPT_FILE})
 
 finalize_dune_project(GENERATE_CONFIG_H_CMAKE)
 
