@@ -50,6 +50,8 @@ In order to build the DUNE core modules you need at least the following software
 - Add the utility `IsCompileTimeConstant` to check for integral constants and anything with
   the same interface.
 
+- Fixed MPI implementation of `Communication::isend`.
+
 ## Build System
 
 - Remove deprecated `add_directory_test_target` function.
