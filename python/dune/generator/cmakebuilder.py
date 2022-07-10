@@ -185,6 +185,7 @@ class Builder:
         self.generated_dir = os.path.join(self.dune_py_dir, 'python', 'dune', 'generated')
         self.initialized = False
         self.externalPythonModules = copy.deepcopy(getExternalPythonModules())
+        self.checkedDunePyDir = False
 
     def cacheExternalModules(self):
         """Store external modules in dune-py"""
@@ -200,6 +201,29 @@ class Builder:
             return False
 
         self.externalPythonModules = copy.deepcopy(getExternalPythonModules())
+
+        # one time check that self.dune_py_dir is the same on all cores
+        if not self.checkedDunePyDir:
+            lSize = len(self.dune_py_dir)
+            gSize = comm.max( lSize )
+
+            errMsg = """DUNE_PY_DIR appears to be different on
+            different cores indicating different locations! This is not yet
+            implemented! DUNE_PY_DIR needs to point to the same location of all
+            cores!"""
+
+            # first check sizes of string
+            assert lSize == gSize, errMsg
+
+            # then check string itself
+            dunepydir = self.dune_py_dir
+            # broadcast dune_py_dir to compare on all cores
+            dunepydir = comm.broadcast( dunepydir, 0 )
+
+            check = int(dunepydir == self.dune_py_dir)
+            check = comm.min( check )
+            assert check, errMsg
+            self.checkedDunePyDir = True
 
         if comm.rank == 0:
             logger.debug("(Re-)Initializing JIT compilation module")
