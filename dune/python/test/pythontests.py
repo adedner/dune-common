@@ -83,7 +83,21 @@ def test_class_export():
     assert run("run",StringIO(runCode),cls) == 10**2*10*3
 
 if __name__ == "__main__":
+    from mpi4py import MPI
     from dune.packagemetadata import getDunePyDir
+    # standard test
+    _ = getDunePyDir()
+    test_class_export()
+    test_numpyvector()
+
+    # now test with different dunepy dirs
+    comm = MPI.COMM_WORLD
+    dunePyDir = getDunePyDir()
+    newDunePyDir = "_".join([dunePyDir, str(comm.rank)])
+    # set rank dependent dune-py directory
+    # test that different DUNE_PY_DIR work
+    os.environ['DUNE_PY_DIR'] = newDunePyDir
+
     _ = getDunePyDir()
     test_class_export()
     test_numpyvector()
