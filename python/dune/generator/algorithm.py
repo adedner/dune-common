@@ -37,6 +37,7 @@ def cppType(arg):
         elif isinstance(arg, str):
             t, i = "std::string", ["string"]
         elif callable(arg):
+            # see issue: #317 in dune-common
             t, i = "pybind11::function", ["dune/python/pybind11/pybind11.h"]
         elif isinstance(arg,tuple) or isinstance(arg,list):
             t, i = cppType(arg[0])
