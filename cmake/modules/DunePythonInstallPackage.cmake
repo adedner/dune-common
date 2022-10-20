@@ -257,6 +257,7 @@ function(dune_python_configure_dependencies)
                                     # install and normal install so not including these flags at the moment
                                     "${DUNE_PIP_INDEX}"          # stopgap solution until ci repo fixed
                                     "${requirement}"
+                                    --upgrade --upgrade-strategy=only-if-needed
                           RESULT_VARIABLE INSTALL_FAILED
                           ERROR_VARIABLE DEPENDENCIES_ERROR
                           WARNING_MESSAGE "Python ${PYCONFDEPS_OPT}package requirement '${requirement}' could not be installed - possibly connection to the python package index failed\n${DEPENDENCIES_ERROR}"
