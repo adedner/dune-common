@@ -271,7 +271,7 @@ class Data:
         if self.version.find('git') or version is not None:
             if version is None:
                 major = self.version.split('-')[0]
-                self.version = Version(major).__str__() + '.dev' + date.today().strftime('%Y%m%d')
+                self.version = Version(major).__str__() # + '.dev' + date.today().strftime('%Y%m%d')
 
 
             # append self.version to any dune python requirement that has no specified version number
