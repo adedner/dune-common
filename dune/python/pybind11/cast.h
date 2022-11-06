@@ -462,8 +462,6 @@ PYBIND11_NOINLINE inline std::string error_string() {
 #    endif
             Py_DECREF(frame);
             frame = b_frame;
-
-            frame = frame->f_back;
         }
     }
 #endif
