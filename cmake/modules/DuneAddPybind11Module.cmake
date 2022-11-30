@@ -92,7 +92,7 @@ function(dune_add_pybind11_module)
   if(DUNE_PROJECT_TARGET)
     target_link_libraries(${PYBIND11_MODULE_NAME} PUBLIC ${DUNE_PROJECT_TARGET})
   else()
-    target_link_libraries(${PYBIND11_MODULE_NAME} PUBLIC ${DUNE_LIBS})
+    target_link_libraries(${PYBIND11_MODULE_NAME} PUBLIC dunecommon)
   endif()
 
   if(PYBIND11_MODULE_EXCLUDE_FROM_ALL)
