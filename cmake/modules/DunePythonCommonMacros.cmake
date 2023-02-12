@@ -65,12 +65,10 @@ if(${CMAKE_VERSION} VERSION_LESS "3.20")
   list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_LIST_DIR}/FindPython3")
 endif()
 
-# Include all the other parts of the python extension to avoid that users need
+# Include some other parts of the python extension to avoid that users need
 # to explicitly include parts of our build system.
 include(DunePythonDeprecations)
 include(DunePythonFindPackage)
-include(DunePythonInstallPackage)
-include(DunePythonTestCommand)
 
 # Find the Python Interpreter and libraries
 find_package(Python3 COMPONENTS Interpreter Development)
@@ -143,5 +141,10 @@ if(Python3_Interpreter_FOUND)
   if(("${DUNE_PYTHON_INSTALL_LOCATION}" STREQUAL "user") AND DUNE_PYTHON_SYSTEM_IS_VIRTUALENV)
     message(FATAL_ERROR "Specifying 'user' as install location is incompatible with using virtual environments (as per pip docs)")
   endif()
+
+  # Include some other parts of the python extension to avoid that users need
+  # to explicitly include parts of our build system.
+  include(DunePythonInstallPackage)
+  include(DunePythonTestCommand)
 
 endif()
