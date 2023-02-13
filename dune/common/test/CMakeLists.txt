@@ -100,23 +100,25 @@ dune_add_test(SOURCES debugaligntest.cc
               LINK_LIBRARIES dunecommon
               LABELS quick)
 
-# Generate files with instantiations, external declarations, and also the
-# invocations in the test for each instance.
-dune_instance_begin(FILES debugalignsimdtest.hh debugalignsimdtest.cc)
-foreach(SCALAR IN ITEMS double bool)
-  dune_instance_add(ID "${SCALAR}")
-  foreach(POINT IN ITEMS Type BinaryOpsScalarVector BinaryOpsVectorScalar)
-    dune_instance_add(TEMPLATE POINT
-                      ID "${POINT}_${SCALAR}"
-                      FILES debugalignsimd.cc)
+if(NOT DUNE_DISABLE_SIMD_TESTS)
+  # Generate files with instantiations, external declarations, and also the
+  # invocations in the test for each instance.
+  dune_instance_begin(FILES debugalignsimdtest.hh debugalignsimdtest.cc)
+  foreach(SCALAR IN ITEMS double bool)
+    dune_instance_add(ID "${SCALAR}")
+    foreach(POINT IN ITEMS Type BinaryOpsScalarVector BinaryOpsVectorScalar)
+      dune_instance_add(TEMPLATE POINT
+                        ID "${POINT}_${SCALAR}"
+                        FILES debugalignsimd.cc)
+    endforeach()
   endforeach()
-endforeach()
-dune_instance_end()
-list(FILTER DUNE_INSTANCE_GENERATED INCLUDE REGEX [[\.cc$]])
-dune_add_test(NAME debugalignsimdtest
-              SOURCES ${DUNE_INSTANCE_GENERATED}
-              LINK_LIBRARIES dunecommon
-              LABELS quick)
+  dune_instance_end()
+  list(FILTER DUNE_INSTANCE_GENERATED INCLUDE REGEX [[\.cc$]])
+  dune_add_test(NAME debugalignsimdtest
+                SOURCES ${DUNE_INSTANCE_GENERATED}
+                LINK_LIBRARIES dunecommon
+                LABELS quick)
+endif()
 
 dune_add_test(SOURCES densematrixassignmenttest.cc
               LINK_LIBRARIES dunecommon

@@ -1,7 +1,12 @@
 # SPDX-FileCopyrightInfo: Copyright © DUNE Project contributors, see file LICENSE.md in module root
 # SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
 
-add_subdirectory(test)
+option(DUNE_DISABLE_SIMD_TESTS "Disable all simd tests." OFF)
+if(NOT DUNE_DISABLE_SIMD_TESTS)
+  add_subdirectory(test)
+else()
+  message(STATUS "simd tests are discabled. Reactivate by DUNE_DISABLE_SIMD_TESTS:BOOL=0")
+endif()
 
 if(NOT VC_FOUND)
   exclude_dir_from_headercheck()
