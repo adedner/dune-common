@@ -704,7 +704,7 @@ namespace Impl
   constexpr decltype(auto) withIndex (std::integer_sequence<T,ii...>, std::integral_constant<U,index>, Call&& call)
   {
     static_assert((...|| (ii == index)), "Index out of sequence");
-    return call(std::integral_constant<T>(index));
+    return call(std::integral_constant<T,index>());
   }
 
   // [[expects: index is in the sequence ii...]]
