@@ -681,6 +681,77 @@ constexpr void switchCases(const Cases& cases, const Value& value, Branches&& br
 }
 
 
+
+namespace Impl
+{
+  template <class T, T value, class F>
+  constexpr auto callWithIndex (F& f)
+    -> decltype(f(std::integral_constant<T,value>{}))
+  {
+    return f(std::integral_constant<T,value>{});
+  }
+
+  // [[expects: index is in the range indices]]
+  template <class T, class Index, class Call>
+  constexpr decltype(auto) withIndex (IntegralRange<T> indices, Index index, Call&& call)
+  {
+    assert(indices.contains(index) && "Index out of Range");
+    return call(T(index));
+  }
+
+  // [[expects: index is in the sequence ii...]]
+  template <class T, T... ii, class U, U index, class Call>
+  constexpr decltype(auto) withIndex (std::integer_sequence<T,ii...>, std::integral_constant<U,index>, Call&& call)
+  {
+    static_assert((...|| (ii == index)), "Index out of sequence");
+    return call(std::integral_constant<T>(index));
+  }
+
+  // [[expects: index is in the sequence ii...]]
+  template <class T, T... ii, class Index, class Call,
+    std::enable_if_t<std::is_integral_v<Index>, int> = 0>
+  constexpr decltype(auto) withIndex (std::integer_sequence<T,ii...>, Index index, Call&& call)
+  {
+    using S0 = std::integer_sequence<T,(ii-std::min({ii...}))...>;
+    using S1 = std::make_integer_sequence<T,sizeof...(ii)>;
+    static_assert(std::is_same_v<S0,S1>, "Sequence must be consecutive");
+    assert((...|| (ii == index)) && "Index out of sequence");
+    return std::array{callWithIndex<T,ii,Call>...}[index](call);
+  }
+
+  // redirect to the integer_sequence implementation
+  template <class T, T to, T from, class Index, class Call>
+  constexpr decltype(auto) withIndex (StaticIntegralRange<T,to,from> range, Index index, Call&& call)
+  {
+    using S = typename decltype(range)::integer_sequence;
+    return Impl::withIndex(S{}, index, std::forward<Call>(call));
+  }
+
+} // namespace Impl
+
+/**
+ * \brief Call a function with an argument from an index-range that is equal to a given index.
+ *
+ * \ingroup HybridUtilities
+ *
+ * \param indices Range of indices to choose the argument from
+ * \param index   Value the argument from indices should be equal to
+ * \param call    Function to call with an index from the `indices` range.
+ *
+ * Index is checked against all entries of the given `indices` range.
+ * If one matches, then `call` is executed with the matching
+ * value as single argument. If the indices range is an std::integer_sequence or
+ * a StaticIntegralRange, the value is passed as std::integral_constant.
+ * Otherwise, the value is passed directly.
+ *
+ * Passing an index that is not contained in the `indices` range is undefined behavior.
+ */
+template <class Indices, class Index, class Call>
+constexpr decltype(auto) withIndex (const Indices& indices, const Index& index, Call&& call)
+{
+  return Impl::withIndex(indices, index, std::forward<Call>(call));
+}
+
 } // namespace Hybrid
 } // namespace Dune
 
