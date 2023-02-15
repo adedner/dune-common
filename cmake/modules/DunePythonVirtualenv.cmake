@@ -119,6 +119,14 @@ dune_execute_process(COMMAND "${Python3_EXECUTABLE}" "${scriptdir}/venvpath.py"
                      OUTPUT_STRIP_TRAILING_WHITESPACE
                      )
 
+# Check if determined virtual env folder is actually writeable
+execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${DUNE_PYTHON_VIRTUALENV_PATH} RESULT_VARIABLE ret)
+
+if(NOT ret EQUAL "0")
+  message(STATUS "Found python virtual env path ${DUNE_PYTHON_VIRTUALENV_PATH} is not writeable.")
+  unset(DUNE_PYTHON_VIRTUALENV_PATH )
+endif()
+
 # If the user has not specified an absolute, we look through the dependency tree of this module
 # for a build directory that already contains a virtual environment.
 # if we haven't found it yet, check in the current build directory - this might be a reconfigure
