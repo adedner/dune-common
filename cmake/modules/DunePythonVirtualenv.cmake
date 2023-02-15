@@ -129,6 +129,12 @@ if(DUNE_PYTHON_WHEELHOUSE STREQUAL "unset")
   set(DUNE_PYTHON_WHEELHOUSE "${CMAKE_INSTALL_PREFIX}/share/dune/wheelhouse")
 endif()
 
+# Check if determined virtual env folder is actually writeable
+execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${DUNE_PYTHON_VIRTUALENV_PATH} RESULT_VARIABLE env_writable)
+if(NOT env_writable EQUAL "0")
+  message(FATAL_ERROR "Found python virtual env path ${DUNE_PYTHON_VIRTUALENV_PATH} is not writeable.")
+endif()
+
 # if use of venv is enabled
 if(DUNE_PYTHON_USE_VENV)
 
