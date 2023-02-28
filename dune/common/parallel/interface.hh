@@ -133,6 +133,8 @@ namespace Dune
      */
     void reserve(size_t size)
     {
+      if(indices_)
+        delete[] indices_;
       indices_ = new std::size_t[size];
       maxSize_ = size;
 
