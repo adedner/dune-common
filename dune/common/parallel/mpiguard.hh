@@ -58,7 +58,10 @@ namespace Dune
       : public GuardCommunicator
     {
       const Communication<T> comm;
-      GenericGuardCommunicator(const Communication<T> & c) :
+      explicit GenericGuardCommunicator(const Communication<T> & c) :
+        comm(c) {}
+      template <class U, std::enable_if_t<std::is_convertible_v<U,T>, int> = 0>
+      explicit GenericGuardCommunicator(const U& c) :
         comm(c) {}
       int rank() override { return comm.rank(); };
       int size() override { return comm.size(); };
@@ -71,7 +74,7 @@ namespace Dune
     struct GenericGuardCommunicator<MPI_Comm>
       : public GenericGuardCommunicator< Communication<MPI_Comm> >
     {
-      GenericGuardCommunicator(const MPI_Comm & c) :
+      explicit GenericGuardCommunicator(const MPI_Comm & c) :
         GenericGuardCommunicator< Communication<MPI_Comm> >(
           Communication<MPI_Comm>(c)) {}
     };
@@ -143,7 +146,7 @@ namespace Dune
 
        @param active should the MPIGuard be active upon creation?
      */
-    MPIGuard (bool active=true) :
+    explicit MPIGuard (bool active=true) :
       comm_(GuardCommunicator::create(
               MPIHelper::getCommunication())),
       active_(active)
@@ -154,7 +157,7 @@ namespace Dune
        @param m a reference to an MPIHelper
        @param active should the MPIGuard be active upon creation?
      */
-    MPIGuard (MPIHelper & m, bool active=true) :
+    explicit MPIGuard (MPIHelper & m, bool active=true) :
       comm_(GuardCommunicator::create(
               m.getCommunication())),
       active_(active)
@@ -171,13 +174,13 @@ namespace Dune
        @param active should the MPIGuard be active upon creation?
      */
     template <class C>
-    MPIGuard (const C & comm, bool active=true) :
+    explicit MPIGuard (const C & comm, bool active=true) :
       comm_(GuardCommunicator::create(comm)),
       active_(active)
     {}
 
 #if HAVE_MPI
-     MPIGuard (const MPI_Comm & comm, bool active=true) :
+    explicit MPIGuard (const MPI_Comm & comm, bool active=true) :
       comm_(GuardCommunicator::create(comm)),
       active_(active)
     {}

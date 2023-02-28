@@ -52,7 +52,7 @@ namespace Dune{
   protected:
     T& data_;
 
-    MPIData(T& t)
+    explicit MPIData(T& t)
       : data_(t)
     {}
 
@@ -77,7 +77,7 @@ namespace Dune{
   template<>
   struct MPIData<void>{
   protected:
-    MPIData() {}
+    explicit MPIData() {}
 
   public:
     void* ptr(){
@@ -104,7 +104,7 @@ namespace Dune{
 
   protected:
     friend auto getMPIData<T>(T&);
-    MPIData(T& t)
+    explicit MPIData(T& t)
       : data_(t)
     {}
   public:
