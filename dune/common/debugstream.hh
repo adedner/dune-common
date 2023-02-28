@@ -151,7 +151,7 @@ namespace Dune {
   public:
     StreamWrap(std::ostream& _out) : out(_out) { }
     std::ostream& out;
-    StreamWrap *next;
+    StreamWrap *next = nullptr;
   };
 
   //! \brief Intermediate class to implement tie-operation of DebugStream
@@ -421,7 +421,7 @@ namespace Dune {
 
   private:
     //! \brief pointer to data of stream we're tied to
-    DebugStreamState* tiedstate;
+    DebugStreamState* tiedstate = nullptr;
 
     /*! \brief Activation state history.
 

@@ -311,7 +311,7 @@ namespace Dune
     /**
      * @brief The indices also known at other processes.
      */
-    const RemoteIndices* remoteIndices_;
+    const RemoteIndices* remoteIndices_ = nullptr;
 
     typedef std::map<int,std::pair<MPI_Datatype,MPI_Datatype> >
     MessageTypeMap;
@@ -324,14 +324,14 @@ namespace Dune
     /**
      * @brief The pointer to the data whose entries we communicate.
      */
-    void* data_;
+    void* data_ = nullptr;
 
     MPI_Request* requests_[2];
 
     /**
      * @brief True if the request and data types were created.
      */
-    bool created_;
+    bool created_ = false;
 
     /**
      * @brief Creates the MPI_Requests for the forward communication.
