@@ -42,8 +42,8 @@ namespace Dune {
      * \param name A name to identify this TestSuite. Defaults to "".
      * \param policy If AlwaysThrow any failing check will throw, otherwise only required checks will do.
      */
-    TestSuite(ThrowPolicy policy, std::string name="") :
-      name_(name),
+    explicit TestSuite(ThrowPolicy policy, std::string name="") :
+      name_(std::move(name)),
       checks_(0),
       failedChecks_(0),
       throwPolicy_(policy==AlwaysThrow)
@@ -55,8 +55,8 @@ namespace Dune {
      * \param name A name to identify this TestSuite. Defaults to "".
      * \param policy If AlwaysThrow any failing check will throw, otherwise only required checks will do. Defaults to ThrowOnRequired
      */
-    TestSuite(std::string name="", ThrowPolicy policy=ThrowOnRequired) :
-      name_(name),
+    explicit TestSuite(std::string name="", ThrowPolicy policy=ThrowOnRequired) :
+      name_(std::move(name)),
       checks_(0),
       failedChecks_(0),
       throwPolicy_(policy==AlwaysThrow)
@@ -71,13 +71,13 @@ namespace Dune {
      * \param name A name to identify this check. Defaults to ""
      * \returns A CollectorStream that can be used to create a diagnostic message to be printed on failure.
      */
-    CollectorStream check(bool condition, std::string name="")
+    CollectorStream check(bool condition, const std::string& name="")
     {
       ++checks_;
       if (not condition)
         ++failedChecks_;
 
-      return CollectorStream([condition, name, this](std::string reason) {
+      return CollectorStream([condition, name, this](const std::string& reason) {
           if (not condition)
             this->announceCheckResult(throwPolicy_, "CHECK  ", name, reason);
         });
@@ -92,13 +92,13 @@ namespace Dune {
      * \param name A name to identify this check. Defaults to ""
      * \returns A CollectorStream that can be used to create a diagnostic message to be printed on failure.
      */
-    CollectorStream require(bool condition, std::string name="")
+    CollectorStream require(bool condition, const std::string& name="")
     {
       ++checks_;
       if (not condition)
         ++failedChecks_;
 
-      return CollectorStream([condition, name, this](std::string reason) {
+      return CollectorStream([condition, name, this](const std::string& reason) {
           if (not condition)
             this->announceCheckResult(true, "REQUIRED CHECK", name, reason);
         });
@@ -141,7 +141,7 @@ namespace Dune {
      * \endcode
      */
     template <class Exception= AnyException,class Expression>
-    CollectorStream checkThrow(Expression&& expr, std::string name = "")
+    CollectorStream checkThrow(Expression&& expr, const std::string& name = "")
     {
       return check(evaluateThrowCondition<Exception>(expr),name);
     }
@@ -160,7 +160,7 @@ namespace Dune {
      * \endcode
      */
     template <class Expression>
-    CollectorStream checkNoThrow(Expression&& expr, std::string name = "")
+    CollectorStream checkNoThrow(Expression&& expr, const std::string& name = "")
     {
       return check(evaluateThrowCondition<NoException>(expr),name);
     }
@@ -180,7 +180,7 @@ namespace Dune {
      * \endcode
      */
     template <class Exception= AnyException,class Expression>
-    CollectorStream requireThrow(Expression&& expr, std::string name = "")
+    CollectorStream requireThrow(Expression&& expr, const std::string& name = "")
     {
       return require(evaluateThrowCondition<Exception>(expr),name);
     }
@@ -199,7 +199,7 @@ namespace Dune {
      * \endcode
      */
     template <class Expression>
-    CollectorStream requireNoThrow(Expression&& expr, std::string name = "")
+    CollectorStream requireNoThrow(Expression&& expr, const std::string& name = "")
     {
       return require(evaluateThrowCondition<NoException>(expr),name);
     }
@@ -268,7 +268,7 @@ namespace Dune {
   protected:
 
     // Compose a diagnostic message
-    static std::string composeMessage(std::string type, std::string name, std::string reason)
+    static std::string composeMessage(const std::string& type, const std::string& name, const std::string& reason)
     {
       std::ostringstream s;
       s << type << " FAILED";
@@ -281,7 +281,7 @@ namespace Dune {
     }
 
     // Announce check results. To be called on failed checks
-    static void announceCheckResult(bool throwException, std::string type, std::string name, std::string reason)
+    static void announceCheckResult(bool throwException, const std::string& type, const std::string& name, const std::string& reason)
     {
       std::string message = composeMessage(type, name, reason);
       std::cout << message << std::endl;
