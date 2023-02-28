@@ -337,7 +337,7 @@ namespace Dune
     inline difference_type distanceTo(const ArrayListIterator<T,N,A>& other) const;
 
     //! Standard constructor
-    inline ArrayListIterator() : position_(0), list_(nullptr)
+    ArrayListIterator() : position_(0), list_(nullptr)
     {}
 
   private:
@@ -346,7 +346,7 @@ namespace Dune
      * @param list The list we are an iterator for.
      * @param position The initial position of the iterator.
      */
-    inline ArrayListIterator(ArrayList<T,N,A>& arrayList, size_type position);
+    ArrayListIterator(ArrayList<T,N,A>& arrayList, size_type position);
 
     /**
      * @brief The current position.
@@ -428,10 +428,11 @@ namespace Dune
      */
     inline const_reference dereference() const;
 
-    inline ConstArrayListIterator() : position_(0), list_(nullptr)
+    ConstArrayListIterator() : position_(0), list_(nullptr)
     {}
 
-    inline ConstArrayListIterator(const ArrayListIterator<T,N,A>& other);
+    // NOTE: implicit conversion intended
+    ConstArrayListIterator(const ArrayListIterator<T,N,A>& other);
 
   private:
 
@@ -440,7 +441,7 @@ namespace Dune
      * @param list The list we are an iterator for.
      * @param position The initial position of the iterator.
      */
-    inline ConstArrayListIterator(const ArrayList<T,N,A>& arrayList, size_type position);
+    ConstArrayListIterator(const ArrayList<T,N,A>& arrayList, size_type position);
 
     /**
      * @brief The current position.

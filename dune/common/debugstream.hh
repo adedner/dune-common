@@ -149,7 +149,7 @@ namespace Dune {
 
   class StreamWrap {
   public:
-    StreamWrap(std::ostream& _out) : out(_out) { }
+    explicit StreamWrap(std::ostream& _out) : out(_out) { }
     std::ostream& out;
     StreamWrap *next = nullptr;
   };
@@ -196,7 +196,7 @@ namespace Dune {
        during runtime another stream can be attach()ed, however the
        initial stream may not be detach()ed.
      */
-    DebugStream(std::ostream& out = std::cerr) {
+    explicit DebugStream(std::ostream& out = std::cerr) {
       // start a new list of streams
       current = new StreamWrap(out);
       current->next = 0;
@@ -216,7 +216,7 @@ namespace Dune {
        The fallback is used if a DebugStream constructed via this method
        is untie()ed later. Otherwise the stream would be broken afterwards.
      */
-    DebugStream (DebugStreamState& master,
+    explicit DebugStream (DebugStreamState& master,
                  std::ostream& fallback = std::cerr)
     {
       // start a new list of streams

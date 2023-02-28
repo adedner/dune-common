@@ -274,7 +274,7 @@ namespace Dune
      */
     PseudoFuture<void> ibarrier () const
     {
-      return {true}; // return a valid future
+      return PseudoFuture<void>{true}; // return a valid future
     }
 
     /** @brief Distribute an array from the process with rank root to all other processes
