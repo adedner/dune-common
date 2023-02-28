@@ -383,7 +383,7 @@ namespace Dune
      * @brief Check whether the iterator tuples of all neighbouring processes
      * are reset.
      */
-    bool checkReset();
+    bool checkReset() const;
 
     /**
      * @brief Check whether the iterator tuple is reset.
@@ -393,8 +393,8 @@ namespace Dune
      * @param gList The SLList of the global indices.
      * @param bList The SLList of the bool values.
      */
-    bool checkReset(const Iterators& iterators, RemoteIndexList& rlist, GlobalIndexList& gList,
-                    BoolList& bList);
+    bool checkReset(const Iterators& iterators, const RemoteIndexList& rlist, const GlobalIndexList& gList,
+                    const BoolList& bList) const;
   };
 
   template<typename TG, typename TA>
@@ -770,7 +770,7 @@ namespace Dune
 
       Iterators iterators(rList, global, added);
       iteratorsMap_.insert(std::make_pair(remote->first, iterators));
-      assert(checkReset(iteratorsMap_[remote->first], rList,global,added));
+      assert(checkReset(iteratorsMap_.at(remote->first), rList,global,added));
     }
 
     // Exchange indices with each neighbour
@@ -1140,8 +1140,8 @@ namespace Dune
   }
 
   template<typename T>
-  bool IndicesSyncer<T>::checkReset(const Iterators& iterators, RemoteIndexList& rList, GlobalIndexList& gList,
-                                    BoolList& bList){
+  bool IndicesSyncer<T>::checkReset(const Iterators& iterators, const RemoteIndexList& rList, const GlobalIndexList& gList,
+                                    const BoolList& bList) const {
 
     if(std::get<0>(iterators.iterators_) != rList.begin())
       return false;
@@ -1154,7 +1154,7 @@ namespace Dune
 
 
   template<typename T>
-  bool IndicesSyncer<T>::checkReset(){
+  bool IndicesSyncer<T>::checkReset() const {
 
     // Reset iterators in all tuples.
     const auto remoteEnd = remoteIndices_.remoteIndices_.end();
