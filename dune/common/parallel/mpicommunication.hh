@@ -179,12 +179,13 @@ namespace Dune
       MPIFuture<T> future(std::forward<T>(data));
       auto mpidata = future.get_mpidata();
       if (mpidata.size() == 0)
-        DUNE_THROW(ParallelError, "Size if irecv data object is zero. Reserve sufficient size for the whole message");
+        DUNE_THROW(ParallelError, "Size of irecv data object is zero. Reserve sufficient size for the whole message");
       MPI_Irecv(mpidata.ptr(), mpidata.size(), mpidata.type(),
                              source_rank, tag, communicator, &future.req_);
       return future;
     }
 
+    //! @copydoc Communication::rrecv
     template<class T>
     T rrecv(T&& data, int source_rank, int tag, MPI_Status* status = MPI_STATUS_IGNORE) const
     {

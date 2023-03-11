@@ -151,7 +151,7 @@ namespace Dune
     }
 
     /** @brief Receives the data from the source_rank
-        @returns MPI_SUCCESS (==0) if successful, an MPI error code otherwise
+        @returns vector T containing the received data
      */
     template<class T>
     T recv([[maybe_unused]] T&& data,
@@ -173,6 +173,10 @@ namespace Dune
       DUNE_THROW(ParallelError, "This method is not supported in sequential programs");
     }
 
+    /** @brief Receives the data from the source_rank (blocking) and ajusts data size
+        @returns vector T containing the received data
+        @note only works if T has dynamic size
+     */
     template<class T>
     T rrecv([[maybe_unused]] T&& data,
             [[maybe_unused]] int source_rank,
@@ -181,6 +185,7 @@ namespace Dune
     {
       DUNE_THROW(ParallelError, "This method is not supported in sequential programs");
     }
+
     /** @brief  Compute the sum of the argument over all processes and
             return the result in every process. Assumes that T has an operator+
      */
