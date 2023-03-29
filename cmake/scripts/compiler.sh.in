@@ -1,4 +1,7 @@
 #!/usr/bin/bash
+# SPDX-FileCopyrightInfo: Copyright © DUNE Project contributors, see file LICENSE.md in module root
+# SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
+
 SED=@SED_PROGRAM@
 GREP=@GREP_PROGRAM@
 CUT=@CUT_PROGRAM@
