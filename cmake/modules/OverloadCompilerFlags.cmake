@@ -92,7 +92,7 @@ macro(finalize_compiler_script)
 
     # for the found compilers for flag overloading generate compiler script
     foreach(COMP ${COMPILERS})
-      configure_file(${SCRIPT_DIR}/compiler.sh.in
+      configure_file(${scriptdir}/compiler.sh.in
       ${${COMP}_COMPILER_SCRIPT} @ONLY)
       set(CMAKE_${COMP}_COMPILER_LAUNCHER ${${COMP}_COMPILER_SCRIPT} CACHE STRING "")
       message("-- Generating ${COMP} compiler script for ${COMP}FLAGS overloading on command line")
