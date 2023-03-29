@@ -1,0 +1,51 @@
+#!/usr/bin/bash
+SED=@SED_PROGRAM@
+GREP=@GREP_PROGRAM@
+CUT=@CUT_PROGRAM@
+ENV=@ENV_PROGRAM@
+ECHO=@ECHO_PROGRAM@
+CHMOD=@CHMOD_PROGRAM@
+
+# store flags
+FLAGS="$@"
+MAKE_EXECUTABLE_NEW=0
+
+if [ "$@COMP@FLAGS" == "" ]; then
+  # default @COMP@ flags
+  @COMP@FLAGS="@DEFAULT_CXXFLAGS@"
+fi
+
+if [ "$EXTRA_@COMP@FLAGS" != "" ]; then
+  # extra @COMP@ flags
+  @COMP@FLAGS="$@COMP@FLAGS $EXTRA_@COMP@FLAGS"
+fi
+
+GRIDS=
+CONFIG_H=@CMAKE_BINARY_DIR@/config.h
+if [ "$GRIDTYPE" != "" ]; then
+  GRIDS=`$GREP "defined USED_[A-Z_]*_GRIDTYPE" $CONFIG_H | $SED 's/\(.*defined USED\_\)\(.*\)\(\_GRIDTYPE*\)/\2/g'`
+fi
+
+OLDFLAGS=$FLAGS
+FLAGS=
+for FLAG in $OLDFLAGS; do
+  NEWFLAG=$FLAG
+  VARNAME=`$ECHO $FLAG | $GREP "\-D" | $SED 's/-D//g'`
+  for GRID in $GRIDS; do
+    if [ "$VARNAME" == "$GRID" ]; then
+      NEWFLAG="-D$GRIDTYPE"
+      break
+    fi
+  done
+  VARNAME=`$ECHO $VARNAME | $GREP "=" | $CUT -d "=" -f 1`
+  if [ "$VARNAME" != "" ]; then
+    VAR=`$ENV | $GREP $VARNAME`
+    if [ "$VAR" != "" ]; then
+      # add variable from environment to flags list
+      NEWFLAG="-D$VARNAME=${!VARNAME}"
+    fi
+  fi
+  FLAGS="$FLAGS $NEWFLAG"
+done
+$ECHO "@COMPILER@ $CXXFLAGS $FLAGS"
+exec @COMPILER@ $CXXFLAGS $FLAGS

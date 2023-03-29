@@ -3,6 +3,7 @@
 
 # Install non-executable scripts
 install(FILES
+  compiler.sh.in
   conf.py.in
   CreateDoxyFile.cmake
   venvpath.py
