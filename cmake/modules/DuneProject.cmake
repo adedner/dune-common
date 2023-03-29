@@ -59,9 +59,6 @@ include(OverloadCompilerFlags)
 # Don't forget to call finalize_dune_project afterwards.
 macro(dune_project)
 
-  # check if CXX flag overloading has been enabled (see OverloadCompilerFlags.cmake)
-  initialize_compiler_script()
-
   # extract information from dune.module
   dune_module_information(${PROJECT_SOURCE_DIR})
   set(ProjectName            "${DUNE_MOD_NAME}")

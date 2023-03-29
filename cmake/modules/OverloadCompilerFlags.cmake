@@ -5,7 +5,6 @@
 #
 # Provides the following macros:
 #
-#   initialize_compiler_script() : needs to be called before further flags are added to CMAKE_CXX_FLAGS
 #   finalize_compiler_script()   : needs to be called at the end of the cmake macros, e.g. in finalize_dune_project
 #
 # Those two macro calls are hooked into dune_project/finalize_dune_project.
@@ -75,52 +74,25 @@ macro(find_extended_unix_commands)
   mark_as_advanced(CHMOD_PROGRAM)
 endmacro(find_extended_unix_commands)
 
-# init compiler script and store CXX flags
-macro(initialize_compiler_script)
-  if(ALLOW_CXXFLAGS_OVERWRITE AND WRITE_CXXFLAGS_COMPILER_SCRIPT)
-    # check for unix commands necessary
-    find_extended_unix_commands()
-    # set CXXFLAGS as environment variable
-    set( DEFAULT_CXXFLAGS ${CMAKE_CXX_FLAGS} CACHE STRING "default CXX flags")
-    set( CMAKE_CXX_FLAGS "" )
-    set( DEFAULT_CXX_COMPILER ${CMAKE_CXX_COMPILER} )
-    set( CXX_COMPILER_SCRIPT_FILE "#!${BASH}\nexec ${CMAKE_CXX_COMPILER} \"\$@\"")
-    file(WRITE ${CXX_COMPILER_SCRIPT} "${CXX_COMPILER_SCRIPT_FILE}")
-    execute_process(COMMAND ${CHMOD_PROGRAM} 755 ${CXX_COMPILER_SCRIPT})
-    set(CMAKE_CXX_COMPILER ${CXX_COMPILER_SCRIPT})
-  endif()
-  if(ALLOW_CFLAGS_OVERWRITE AND WRITE_CXXFLAGS_COMPILER_SCRIPT)
-    # check for unix commands necessary
-    find_extended_unix_commands()
-    # set CFLAGS as environment variable
-    set( DEFAULT_CFLAGS ${CMAKE_C_FLAGS} CACHE STRING "default C flags")
-    set( CMAKE_C_FLAGS "" )
-    set( DEFAULT_C_COMPILER ${CMAKE_C_COMPILER} )
-    set( C_COMPILER_SCRIPT_FILE "#!${BASH}\nexec ${CMAKE_C_COMPILER} \"\$@\"")
-    file(WRITE ${C_COMPILER_SCRIPT} "${C_COMPILER_SCRIPT_FILE}")
-    execute_process(COMMAND ${CHMOD_PROGRAM} 755 ${C_COMPILER_SCRIPT})
-    set(CMAKE_C_COMPILER ${C_COMPILER_SCRIPT})
-  endif()
-endmacro()
-
-# finalize compiler script and write it
+# generate a compiler script used as launcher
 macro(finalize_compiler_script)
-  if( WRITE_CXXFLAGS_COMPILER_SCRIPT )
+  if(WRITE_CXXFLAGS_COMPILER_SCRIPT)
+    find_extended_unix_commands()
     # check CXX compiler
-    if((ALLOW_CXXFLAGS_OVERWRITE))
-      set(COMPILERS "CXX")
+    set(COMPILERS)
+    if(ALLOW_CXXFLAGS_OVERWRITE)
+      list(APPEND COMPILERS "CXX")
     endif()
     # check C compiler
-    if((ALLOW_CFLAGS_OVERWRITE))
-      set(COMPILERS ${COMPILERS} "C")
+    if(ALLOW_CFLAGS_OVERWRITE)
+      list(APPEND COMPILERS "C")
     endif()
 
     # for the found compilers for flag overloading generate compiler script
     foreach(COMP ${COMPILERS})
-      set(COMPILER ${DEFAULT_${COMP}_COMPILER})
-      set(COMPILER_SCRIPT ${${COMP}_COMPILER_SCRIPT})
       configure_file(${PROJECT_SOURCE_DIR}/cmake/scripts/compiler.sh.in
-        ${COMPILER_SCRIPT} @ONLY)
+      ${${COMP}_COMPILER_SCRIPT} @ONLY)
+      set(CMAKE_${COMP}_COMPILER_LAUNCHER ${${COMP}_COMPILER_SCRIPT} CACHE STRING "")
       message("-- Generating ${COMP} compiler script for ${COMP}FLAGS overloading on command line")
     endforeach()
     unset(COMPILER)

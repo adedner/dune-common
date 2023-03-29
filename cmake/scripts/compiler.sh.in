@@ -9,13 +9,20 @@ ENV=@ENV_PROGRAM@
 ECHO=@ECHO_PROGRAM@
 CHMOD=@CHMOD_PROGRAM@
 
+# store the compiler
+COMPILER=$1
+shift
+
 # store flags
 FLAGS="$@"
 MAKE_EXECUTABLE_NEW=0
 
+CMAKE_C_FLAGS="@CMAKE_C_FLAGS@"
+CMAKE_CXX_FLAGS="@CMAKE_CXX_FLAGS@"
+
 if [ "$@COMP@FLAGS" == "" ]; then
   # default @COMP@ flags
-  @COMP@FLAGS="@DEFAULT_CXXFLAGS@"
+  @COMP@FLAGS="$CMAKE_@COMP@_FLAGS"
 fi
 
 if [ "$EXTRA_@COMP@FLAGS" != "" ]; then
@@ -50,5 +57,4 @@ for FLAG in $OLDFLAGS; do
   fi
   FLAGS="$FLAGS $NEWFLAG"
 done
-$ECHO "@COMPILER@ $CXXFLAGS $FLAGS"
-exec @COMPILER@ $CXXFLAGS $FLAGS
+exec $COMPILER $CXXFLAGS $FLAGS
