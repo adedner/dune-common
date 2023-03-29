@@ -88,9 +88,11 @@ macro(finalize_compiler_script)
       list(APPEND COMPILERS "C")
     endif()
 
+    dune_module_path(MODULE dune-common RESULT scriptdir SCRIPT_DIR)
+
     # for the found compilers for flag overloading generate compiler script
     foreach(COMP ${COMPILERS})
-      configure_file(${PROJECT_SOURCE_DIR}/cmake/scripts/compiler.sh.in
+      configure_file(${SCRIPT_DIR}/compiler.sh.in
       ${${COMP}_COMPILER_SCRIPT} @ONLY)
       set(CMAKE_${COMP}_COMPILER_LAUNCHER ${${COMP}_COMPILER_SCRIPT} CACHE STRING "")
       message("-- Generating ${COMP} compiler script for ${COMP}FLAGS overloading on command line")
