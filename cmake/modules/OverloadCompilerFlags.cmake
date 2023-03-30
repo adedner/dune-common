@@ -5,6 +5,7 @@
 #
 # Provides the following macros:
 #
+#   initialize_compiler_script() : needs to be called before further flags are added to CMAKE_CXX_FLAGS
 #   finalize_compiler_script()   : needs to be called at the end of the cmake macros, e.g. in finalize_dune_project
 #
 # Those two macro calls are hooked into dune_project/finalize_dune_project.
@@ -73,6 +74,16 @@ macro(find_extended_unix_commands)
   mark_as_advanced(ECHO_PROGRAM)
   mark_as_advanced(CHMOD_PROGRAM)
 endmacro(find_extended_unix_commands)
+
+# init compiler script and store CXX flags
+macro(initialize_compiler_script)
+  if(ALLOW_CXXFLAGS_OVERWRITE AND WRITE_CXXFLAGS_COMPILER_SCRIPT)
+    set(DEFAULT_CXXFLAGS ${CMAKE_CXX_FLAGS} CACHE STRING "default CXX flags")
+  endif()
+  if(ALLOW_CFLAGS_OVERWRITE AND WRITE_CXXFLAGS_COMPILER_SCRIPT)
+    set(DEFAULT_CFLAGS ${CMAKE_C_FLAGS} CACHE STRING "default C flags")
+  endif()
+endmacro()
 
 # generate a compiler script used as launcher
 macro(finalize_compiler_script)

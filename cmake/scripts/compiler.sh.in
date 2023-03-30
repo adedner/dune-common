@@ -15,14 +15,13 @@ shift
 
 # store flags
 FLAGS="$@"
-MAKE_EXECUTABLE_NEW=0
 
-CMAKE_C_FLAGS="@CMAKE_C_FLAGS@"
-CMAKE_CXX_FLAGS="@CMAKE_CXX_FLAGS@"
+DEFAULT_CFLAGS="@DEFAULT_CFLAGS@"
+DEFAULT_CXXFLAGS="@DEFAULT_CXXFLAGS@"
 
 if [ "$@COMP@FLAGS" == "" ]; then
   # default @COMP@ flags
-  @COMP@FLAGS="$CMAKE_@COMP@_FLAGS"
+  @COMP@FLAGS="$DEFAULT_@COMP@FLAGS"
 fi
 
 if [ "$EXTRA_@COMP@FLAGS" != "" ]; then
@@ -39,6 +38,10 @@ fi
 OLDFLAGS=$FLAGS
 FLAGS=
 for FLAG in $OLDFLAGS; do
+  # filter flags that are in the INITIAL_FLAGS list
+  if [ " $DEFAULT_@COMP@FLAGS " == *" $FLAG "* ]; then
+    FLAG=""
+  fi
   NEWFLAG=$FLAG
   VARNAME=`$ECHO $FLAG | $GREP "\-D" | $SED 's/-D//g'`
   for GRID in $GRIDS; do
@@ -57,4 +60,7 @@ for FLAG in $OLDFLAGS; do
   fi
   FLAGS="$FLAGS $NEWFLAG"
 done
+if [ ! -z ${VERBOSE+x} ]; then
+  $ECHO "$COMPILER $CXXFLAGS $FLAGS"
+fi
 exec $COMPILER $CXXFLAGS $FLAGS
