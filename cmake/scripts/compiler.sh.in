@@ -39,7 +39,7 @@ OLDFLAGS=$FLAGS
 FLAGS=
 for FLAG in $OLDFLAGS; do
   # filter flags that are in the INITIAL_FLAGS list
-  if [ " $DEFAULT_@COMP@FLAGS " == *" $FLAG "* ]; then
+  if [[ " $DEFAULT_@COMP@FLAGS " == *" $FLAG "* ]]; then
     FLAG=""
   fi
   NEWFLAG=$FLAG
