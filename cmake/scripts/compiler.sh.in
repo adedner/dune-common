@@ -16,6 +16,7 @@ shift
 # store flags
 FLAGS="$@"
 
+DEFAULT_VERBOSE="@CMAKE_VERBOSE_MAKEFILE@"
 DEFAULT_CFLAGS="@DEFAULT_CFLAGS@"
 DEFAULT_CXXFLAGS="@DEFAULT_CXXFLAGS@"
 
@@ -60,7 +61,10 @@ for FLAG in $OLDFLAGS; do
   fi
   FLAGS="$FLAGS $NEWFLAG"
 done
-if [ ! -z ${VERBOSE+x} ]; then
+shopt -s extglob
+if [[ (! -z ${VERBOSE}) ||
+      (! -z ${DEFAULT_VERBOSE} && ! "${DEFAULT_VERBOSE}" == @("0"|"OFF"|"FALSE")) ]];
+then
   $ECHO "$COMPILER $CXXFLAGS $FLAGS"
 fi
 exec $COMPILER $CXXFLAGS $FLAGS
