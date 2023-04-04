@@ -63,16 +63,11 @@ macro(find_extended_unix_commands)
   if(NOT ECHO_PROGRAM)
     message( SEND_ERROR "echo not found, please disable ${FLAGSNAMES}")
   endif()
-  find_program (CHMOD_PROGRAM chmod)
-  if(NOT CHMOD_PROGRAM)
-    message( SEND_ERROR "chmod not found, please disable ${FLAGSNAMES}")
-  endif()
   mark_as_advanced(GREP_PROGRAM)
   mark_as_advanced(SED_PROGRAM)
   mark_as_advanced(CUT_PROGRAM)
   mark_as_advanced(ENV_PROGRAM)
   mark_as_advanced(ECHO_PROGRAM)
-  mark_as_advanced(CHMOD_PROGRAM)
 endmacro(find_extended_unix_commands)
 
 # init compiler script and store CXX flags
@@ -99,6 +94,7 @@ macro(finalize_compiler_script)
       list(APPEND COMPILERS "C")
     endif()
 
+    # extract the script dir from the dune-common module
     dune_module_path(MODULE dune-common RESULT scriptdir SCRIPT_DIR)
 
     # for the found compilers for flag overloading generate compiler script
@@ -108,7 +104,5 @@ macro(finalize_compiler_script)
       set(CMAKE_${COMP}_COMPILER_LAUNCHER ${${COMP}_COMPILER_SCRIPT} CACHE STRING "")
       message("-- Generating ${COMP} compiler script for ${COMP}FLAGS overloading on command line")
     endforeach()
-    unset(COMPILER)
-    unset(COMPILER_SCRIPT)
   endif()
 endmacro()
