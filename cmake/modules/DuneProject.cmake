@@ -133,8 +133,8 @@ macro(dune_project)
   if(NOT DUNE_INSTALL_MODULEDIR)
     set(DUNE_INSTALL_MODULEDIR ""
       CACHE PATH
-      "Installation directory for CMake modules. Default is \${CMAKE_INSTALL_DATAROOTDIR}/dune/cmake/modules when not set explicitly")
-    set(DUNE_INSTALL_MODULEDIR ${CMAKE_INSTALL_DATAROOTDIR}/dune/cmake/modules)
+      "Installation directory for CMake modules. Default is \${CMAKE_INSTALL_DATAROOTDIR}/${ProjectName}/cmake/modules when not set explicitly")
+    set(DUNE_INSTALL_MODULEDIR ${CMAKE_INSTALL_DATAROOTDIR}/${ProjectName}/cmake/modules)
   endif()
   if(NOT DUNE_INSTALL_NONOBJECTLIBDIR)
     set(DUNE_INSTALL_NONOBJECTLIBDIR ""
