@@ -14,10 +14,15 @@
 #
 include_guard(GLOBAL)
 
+find_package(QuadMath)
+set_property(GLOBAL APPEND PROPERTY DUNE_DEPENDENCY_REGISRTY "QUADMATH")
+set_property(GLOBAL PROPERTY        DUNE_DEPENDENCY_REGISRTY_QUADMATH "include(AddQuadMathFlags)")
+
 # set HAVE_QUADMATH for config.h
 set(HAVE_QUADMATH ${QuadMath_FOUND})
 
 # register the QuadMath imported target
+include(DuneEnableAllPackages)
 if(QuadMath_FOUND)
   dune_register_package_flags(
     LIBRARIES QuadMath::QuadMath

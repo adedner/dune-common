@@ -5,12 +5,9 @@ include(DuneStreams)
 dune_set_minimal_debug_level()
 
 # search for lapack
-find_package(LAPACK)
 include(AddBLASLapackFlags)
 
-find_package(GMP)
 include(AddGMPFlags)
-find_package(QuadMath)
 include(AddQuadMathFlags)
 
 # find program for image manipulation
@@ -18,23 +15,17 @@ find_package(Inkscape)
 include(UseInkscape)
 
 # find the threading library
-find_package(Threads)
 include(AddThreadsFlags)
 
 # find the MPI library
-find_package(MPI 3.0 COMPONENTS C)
 include(AddMPIFlags)
 
 # find library for Threading Building Blocks
-find_package(TBB)
 include(AddTBBFlags)
 
 # find libraries for graph partitioning
-find_package(PTScotch)
 include(AddPTScotchFlags)
-find_package(METIS)
 include(AddMETISFlags)
-find_package(ParMETIS 4.0)
 include(AddParMETISFlags)
 
 # try to find the Vc library

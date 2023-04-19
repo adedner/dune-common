@@ -174,6 +174,44 @@ macro(finalize_dune_project)
   set(DUNE_MODULE_SRC_DOCDIR "\${${ProjectName}_PREFIX}/${CMAKE_INSTALL_DOCDIR}")
 
   if(NOT EXISTS ${PROJECT_SOURCE_DIR}/cmake/pkg/${ProjectName}-config.cmake.in)
+
+
+    if(${ProjectName} STREQUAL "dune-common")
+      set(DUNE_DEPENDENCY_HEADER
+"set_and_check(@DUNE_MOD_NAME@_SCRIPT_DIR \"@PACKAGE_SCRIPT_DIR@\")
+set_and_check(DOXYSTYLE_FILE \"@PACKAGE_DOXYSTYLE_DIR@/Doxystyle\")
+set_and_check(DOXYGENMACROS_FILE \"@PACKAGE_DOXYSTYLE_DIR@/doxygen-macros\")")
+    endif()
+
+    # collect dependencies out of target files
+    set(DUNE_LIBRARY_DEPENDECY_CALLS
+"file(READ \"\${_dir}/${ProjectName}-targets.cmake\" _dune_targets_file)")
+
+    get_property(DUNE_DEPENDENCY_REGISRTY GLOBAL PROPERTY DUNE_DEPENDENCY_REGISRTY)
+    foreach(_dep ${DUNE_DEPENDENCY_REGISRTY})
+      list(APPEND _deps_regex "HAVE_${_dep}")
+      list(APPEND _deps_regex "ENABLE_${_dep}=1")
+    endforeach()
+    list(JOIN _deps_regex "|" _deps_regex)
+
+    set(DUNE_LIBRARY_DEPENDECY_CALLS
+  "${DUNE_LIBRARY_DEPENDECY_CALLS}
+  string(REGEX MATCH \"${_deps_regex}\" _found_dependencies \"\${_dune_targets_file}\")")
+
+    foreach(_dep ${DUNE_DEPENDENCY_REGISRTY})
+      get_property(_dep_call GLOBAL PROPERTY DUNE_DEPENDENCY_REGISRTY_${_dep})
+      if (_dep_call)
+        set(DUNE_LIBRARY_DEPENDECY_CALLS
+  "${DUNE_LIBRARY_DEPENDECY_CALLS}
+  string(FIND \"\${_found_dependencies}\" \"${_dep}\" _found_dependency)
+  if(_found_dependency GREATER -1)
+    ${_dep_call}
+  endif()")
+      endif()
+
+    endforeach()
+
+
     # Generate a standard cmake package configuration file
     file(WRITE ${PROJECT_BINARY_DIR}/CMakeFiles/${ProjectName}-config.cmake.in
 "if(NOT ${ProjectName}_FOUND)
@@ -200,12 +238,22 @@ set(${ProjectName}_LIBRARIES \"@${ProjectName}_LIBRARIES@\")
 set(${ProjectName}_HASPYTHON @DUNE_MODULE_HASPYTHON@)
 set(${ProjectName}_PYTHONREQUIRES \"@DUNE_MODULE_PYTHONREQUIRES@\")
 
+list(APPEND CMAKE_MODULE_PATH \"\${${ProjectName}_MODULE_PATH}\")
+
+# Resolve dune dependencies
+${DUNE_DEPENDENCY_HEADER}
+
+
 # Lines that are set by the CMake build system via the variable DUNE_CUSTOM_PKG_CONFIG_SECTION
 ${DUNE_CUSTOM_PKG_CONFIG_SECTION}
 
 #import the target
 if(${ProjectName}_LIBRARIES)
   get_filename_component(_dir \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)
+
+  # Resolve upstream library dependencies
+  ${DUNE_LIBRARY_DEPENDECY_CALLS}
+
   include(\"\${_dir}/${ProjectName}-targets.cmake\")
 endif()
 

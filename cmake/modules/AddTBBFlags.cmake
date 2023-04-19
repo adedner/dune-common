@@ -14,10 +14,16 @@
 #
 include_guard(GLOBAL)
 
+find_package(TBB)
+
+set_property(GLOBAL APPEND PROPERTY DUNE_DEPENDENCY_REGISRTY "TBB")
+set_property(GLOBAL PROPERTY DUNE_DEPENDENCY_REGISRTY_TBB "include(AddTBBFlags)")
+
 # set variable for config.h
 set(HAVE_TBB ${TBB_FOUND})
 
 # perform DUNE-specific setup tasks
+include(DuneEnableAllPackages)
 if (TBB_FOUND)
   dune_register_package_flags(
     LIBRARIES TBB::tbb

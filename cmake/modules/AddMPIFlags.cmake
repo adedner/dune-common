@@ -21,6 +21,11 @@ set_package_properties("MPI" PROPERTIES
   DESCRIPTION "Message Passing Interface library"
   PURPOSE "Parallel programming on multiple processors")
 
+find_package(MPI 3.0 COMPONENTS C)
+set_property(GLOBAL APPEND PROPERTY DUNE_DEPENDENCY_REGISRTY "MPI")
+set_property(GLOBAL PROPERTY DUNE_DEPENDENCY_REGISRTY_MPI "include(AddMPIFlags)")
+
+include(DuneEnableAllPackages)
 if(MPI_C_FOUND)
   set(HAVE_MPI ${MPI_C_FOUND})
 

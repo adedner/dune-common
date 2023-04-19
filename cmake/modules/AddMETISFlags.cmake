@@ -14,6 +14,10 @@
 #
 include_guard(GLOBAL)
 
+find_package(METIS)
+set_property(GLOBAL APPEND PROPERTY DUNE_DEPENDENCY_REGISRTY "METIS")
+set_property(GLOBAL PROPERTY DUNE_DEPENDENCY_REGISRTY_METIS "include(AddMETISFlags)")
+
 # register HAVE_METIS for config.h
 set(HAVE_METIS ${METIS_FOUND})
 

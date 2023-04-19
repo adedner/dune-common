@@ -14,10 +14,15 @@
 #
 include_guard(GLOBAL)
 
+find_package(ParMETIS 4.0)
+set_property(GLOBAL APPEND PROPERTY DUNE_DEPENDENCY_REGISRTY "PARMETIS")
+set_property(GLOBAL PROPERTY        DUNE_DEPENDENCY_REGISRTY_PARMETIS "include(AddParMETISLapackFlags)")
+
 # set HAVE_PARMETIS for config.h
 set(HAVE_PARMETIS ${ParMETIS_FOUND})
 
 # register all ParMETIS related flags
+include(DuneEnableAllPackages)
 if(ParMETIS_FOUND)
   dune_register_package_flags(LIBRARIES ParMETIS::ParMETIS
     COMPILE_DEFINITIONS "ENABLE_PARMETIS=1")

@@ -14,6 +14,10 @@
 #
 include_guard(GLOBAL)
 
+find_package(GMP)
+set_property(GLOBAL APPEND PROPERTY DUNE_DEPENDENCY_REGISRTY "GMP")
+set_property(GLOBAL PROPERTY        DUNE_DEPENDENCY_REGISRTY_GMP "include(AddGMPLapackFlags)")
+
 # set HAVE_GMP for the config.h file
 set(HAVE_GMP ${GMP_FOUND})
 

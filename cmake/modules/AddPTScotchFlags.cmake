@@ -14,10 +14,17 @@
 #
 include_guard(GLOBAL)
 
+find_package(PTScotch)
+set_property(GLOBAL APPEND PROPERTY DUNE_DEPENDENCY_REGISRTY "PTSCOTCH")
+set_property(GLOBAL PROPERTY        DUNE_DEPENDENCY_REGISRTY_PTSCOTCH "include(AddPTScotchFlags)")
+set_property(GLOBAL APPEND PROPERTY DUNE_DEPENDENCY_REGISRTY "SCOTCH")
+set_property(GLOBAL PROPERTY        DUNE_DEPENDENCY_REGISRTY_SCOTCH   "include(AddPTScotchFlags)")
+
 # set HAVE_PTSCOTCH for config.h
 set(HAVE_PTSCOTCH ${PTScotch_FOUND})
 
 # register all PTScotch related flags
+include(DuneEnableAllPackages)
 if(PTScotch_SCOTCH_FOUND)
   dune_register_package_flags(LIBRARIES PTScotch::Scotch
     COMPILE_DEFINITIONS "ENABLE_SCOTCH=1")
