@@ -210,7 +210,7 @@ function(dune_add_library_normal _name)
     endif()
   endif()
 
-  # Register library in global property <module>LIBRARIES
+  # Register library in global property <module>_LIBRARIES
   if(NOT ARG_NO_MODULE_LIBRARY)
     set_property(GLOBAL APPEND PROPERTY ${ProjectName}_LIBRARIES ${name})
   endif()
