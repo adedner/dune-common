@@ -47,10 +47,8 @@ Add a library to a Dune module.
 
   ``EXPORT_NAME``
     Name of the exported target to be used when linking against the library.
-    This target will always be under the `Dune::` namespace.
-    We recommend to choose an export name with a camel title case matching your
-    library name (e.g., Common, ISTL, and MultiDomainGrid will be exported as
-    Dune::Common, Dune::ISTL, and Dune::MultiDomainGrid)
+    We recommend to choose a scoped export name with a camel title case matching your
+    library name (e.g., Dune::Common, Dune::ISTL, Dune::MultiDomainGrid, ...)
 
   ``NO_EXPORT``
     If omitted the library is exported for usage in other modules.
@@ -83,10 +81,8 @@ Add a library to a Dune module.
 
   ``EXPORT_NAME``
     Name of the exported target to be used when linking against the library.
-    This target will always be under the `Dune::` namespace.
-    We recommend to choose an export name with a camel title case matching your
-    library name (e.g., Common, ISTL, and MultiDomainGrid will be exported as
-    Dune::Common, Dune::ISTL, and Dune::MultiDomainGrid)
+    We recommend to choose a scoped export name with a camel title case matching your
+    library name (e.g., Dune::Common, Dune::ISTL, Dune::MultiDomainGrid, ...)
 
   ``NO_EXPORT``
     If omitted the library is exported for usage in other modules.
@@ -181,13 +177,12 @@ function(dune_add_library_normal _name)
     set_target_properties(${_name} PROPERTIES OUTPUT_NAME ${ARG_OUTPUT_NAME})
   endif()
 
-  # Prepare the export of the library
   if(NOT ARG_NO_EXPORT)
     if(NOT ARG_EXPORT_NAME)
       message(DEPRECATION
         "The function dune_add_library(<lib> ...) now requires to provide NO_EXPORT or EXPORT_NAME. "
-        "We recommend to choose an export name with a camel title case matching your library name "
-        "(e.g., Common, ISTL, and MultiDomainGrid will be exported as Dune::Common, Dune::ISTL, and Dune::MultiDomainGrid)\n"
+        "We recommend to choose a scoped export name with a camel title case matching your library name "
+        "(e.g., Dune::Common, Dune::ISTL, OPM::Grid, ...)\n"
         " * Calls to `dune_add_library(<lib> ...)` without export specification will be supported until Dune 2.11\n"
         " * Consumption of unscoped targets `<lib>` will be supported until Dune 2.12")
       set(ARG_EXPORT_NAME __dune_impl_${_name})
@@ -196,7 +191,7 @@ function(dune_add_library_normal _name)
     set(${ProjectName}_EXPORT_SET ${ProjectName}-targets CACHE INTERNAL "")
 
     # Install targets to use the libraries in other modules.
-    add_library(Dune::${ARG_EXPORT_NAME} ALIAS ${_name})
+    add_library(${ARG_EXPORT_NAME} ALIAS ${_name})
     set_target_properties(${_name} PROPERTIES EXPORT_NAME ${ARG_EXPORT_NAME})
     install(TARGETS ${_name}
       EXPORT ${${ProjectName}_EXPORT_SET} DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -204,14 +199,14 @@ function(dune_add_library_normal _name)
     # Install (unaliased) targets to use the libraries in other modules.
     # NOTE: Remove when compatibility with 2.9 is not needed anymore (e.g., 2.13)
     add_library(_dune_unaliased_${_name} INTERFACE)
-    target_link_libraries(_dune_unaliased_${_name} INTERFACE Dune::${ARG_EXPORT_NAME})
+    target_link_libraries(_dune_unaliased_${_name} INTERFACE ${ARG_EXPORT_NAME})
     set_target_properties(_dune_unaliased_${_name} PROPERTIES EXPORT_NAME ${_name})
     install(TARGETS _dune_unaliased_${_name}
       EXPORT ${${ProjectName}_EXPORT_SET} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
     # Register target as an exported library
     if(NOT ARG_NO_MODULE_LIBRARY)
-      set_property(GLOBAL APPEND PROPERTY ${ProjectName}_INTERFACE_LIBRARIES Dune::${ARG_EXPORT_NAME})
+      set_property(GLOBAL APPEND PROPERTY ${ProjectName}_INTERFACE_LIBRARIES ${ARG_EXPORT_NAME})
     endif()
   endif()
 
@@ -240,15 +235,13 @@ function(dune_add_library_interface _name)
   # Set target options from COMPILE_FLAGS
   target_compile_options(${_name} INTERFACE "${ARG_COMPILE_OPTIONS}")
 
-  # Prepare the export of the library
   if(NOT ARG_NO_EXPORT)
     if(NOT ARG_EXPORT_NAME)
       message(DEPRECATION
         "The function dune_add_library(<lib> ...) now requires to provide NO_EXPORT or EXPORT_NAME. "
-        "We recommend to choose an export name with a camel title case matching your library name "
-        "(e.g., Common, ISTL, and MultiDomainGrid will be exported as Dune::Common, Dune::ISTL, and Dune::MultiDomainGrid)\n"
+        "We recommend to choose a scoped export name with a camel title case matching your library name "
+        "(e.g., Dune::Common, Dune::ISTL, OPM::Grid, ...)\n"
         " * Calls to `dune_add_library(<lib> ...)` without export specification will be supported until Dune 2.11\n"
-
         " * Consumption of unscoped targets `<lib>` will be supported until Dune 2.12")
       set(ARG_EXPORT_NAME __dune_impl_${_name})
     endif()
@@ -256,7 +249,7 @@ function(dune_add_library_interface _name)
     set(${ProjectName}_EXPORT_SET ${ProjectName}-targets CACHE INTERNAL "")
 
     # Install targets to use the libraries in other modules.
-    add_library(Dune::${ARG_EXPORT_NAME} ALIAS ${_name})
+    add_library(${ARG_EXPORT_NAME} ALIAS ${_name})
     set_target_properties(${_name} PROPERTIES EXPORT_NAME ${ARG_EXPORT_NAME})
     install(TARGETS ${_name}
       EXPORT ${${ProjectName}_EXPORT_SET} DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -264,14 +257,14 @@ function(dune_add_library_interface _name)
     # Install (unaliased) targets to use the libraries in other modules.
     # NOTE: Remove when compatibility with 2.9 is not needed anymore (e.g., 2.13)
     add_library(_dune_unaliased_${_name} INTERFACE)
-    target_link_libraries(_dune_unaliased_${_name} INTERFACE Dune::${ARG_EXPORT_NAME})
+    target_link_libraries(_dune_unaliased_${_name} INTERFACE ${ARG_EXPORT_NAME})
     set_target_properties(_dune_unaliased_${_name} PROPERTIES EXPORT_NAME ${_name})
     install(TARGETS _dune_unaliased_${_name}
       EXPORT ${${ProjectName}_EXPORT_SET} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
     # Register target as an exported library
     if(NOT ARG_NO_MODULE_LIBRARY)
-      set_property(GLOBAL APPEND PROPERTY ${ProjectName}_INTERFACE_LIBRARIES Dune::${ARG_EXPORT_NAME})
+      set_property(GLOBAL APPEND PROPERTY ${ProjectName}_INTERFACE_LIBRARIES ${ARG_EXPORT_NAME})
     endif()
   endif()
 

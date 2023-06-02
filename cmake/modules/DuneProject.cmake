@@ -211,8 +211,7 @@ ${DUNE_CUSTOM_PKG_CONFIG_SECTION}
 #import the target
 if(${ProjectName}_LIBRARIES)
   get_filename_component(_dir \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)
-  include(\"\${_dir}/${ProjectName}-targets-scoped.cmake\")
-  include(\"\${_dir}/${ProjectName}-targets-unscoped.cmake\")
+  include(\"\${_dir}/${ProjectName}-targets.cmake\")
   # Deprecation warning for unscoped targets
   if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.19)
     @DUNE_DEPRECATED_LIBRARY_ALIASES@
@@ -331,23 +330,11 @@ endif()
     # install library export set
     install(EXPORT ${${ProjectName}_EXPORT_SET}
       DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${ProjectName}
-      NAMESPACE Dune::
-      FILE ${ProjectName}-targets-scoped.cmake)
+      FILE ${ProjectName}-targets.cmake)
 
     # export libraries for use in build tree
     export(EXPORT ${${ProjectName}_EXPORT_SET}
-      FILE ${PROJECT_BINARY_DIR}/${ProjectName}-targets-scoped.cmake
-      NAMESPACE Dune::)
-
-    # NOTE: Remove when compatibility with 2.10 is not needed anymore (e.g., 2.13)
-    # install (unscoped) library export set
-    install(EXPORT ${${ProjectName}_EXPORT_SET}
-      DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${ProjectName}
-      FILE ${ProjectName}-targets-unscoped.cmake)
-
-    # export (unscoped) libraries for use in build tree
-    export(EXPORT ${${ProjectName}_EXPORT_SET}
-      FILE ${PROJECT_BINARY_DIR}/${ProjectName}-targets-unscoped.cmake)
+      FILE ${PROJECT_BINARY_DIR}/${ProjectName}-targets.cmake)
   endif()
 
   if("${ARGC}" EQUAL "1")

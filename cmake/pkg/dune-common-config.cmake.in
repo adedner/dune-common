@@ -6,8 +6,7 @@ if(NOT @DUNE_MOD_NAME@_FOUND)
 
 #import the target
 get_filename_component(_dir "${CMAKE_CURRENT_LIST_FILE}" PATH)
-include("${_dir}/@DUNE_MOD_NAME@-targets-scoped.cmake")
-include("${_dir}/@DUNE_MOD_NAME@-targets-unscoped.cmake")
+include("${_dir}/@DUNE_MOD_NAME@-targets.cmake")
 
 #report other information
 set_and_check(@DUNE_MOD_NAME@_PREFIX "${PACKAGE_PREFIX_DIR}")
