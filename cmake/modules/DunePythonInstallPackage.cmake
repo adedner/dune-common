@@ -187,8 +187,8 @@ function(dune_python_configure_dependencies)
     message(FATAL_ERROR "Directory '${PYCONFDEPS_PATH}' does not contain a configuration file 'setup.py'")
   endif()
 
-  if(IS_DIRECTORY ${DUNE_PYTHON_WHEELHOUSE})
-    set(WHEEL_OPTION "--find-links=file://${DUNE_PYTHON_WHEELHOUSE}")
+  if(IS_DIRECTORY ${DUNE_PYTHON_WHEELHOUSE_DIR})
+    set(WHEEL_OPTION "--find-links=file://${DUNE_PYTHON_WHEELHOUSE_DIR}")
   endif()
 
   if(PYCONFDEPS_INSTALL_CONCRETE_DEPENDENCIES)
@@ -465,8 +465,8 @@ function(dune_python_configure_package)
     endif()
   endif()
 
-  if(IS_DIRECTORY ${DUNE_PYTHON_WHEELHOUSE})
-    set(WHEEL_OPTION "--find-links=file://${DUNE_PYTHON_WHEELHOUSE}")
+  if(IS_DIRECTORY ${DUNE_PYTHON_WHEELHOUSE_DIR})
+    set(WHEEL_OPTION "--find-links=file://${DUNE_PYTHON_WHEELHOUSE_DIR}")
   endif()
 
   # installation command for dune package into local env - external requirements are already sorted and we want this step to not require
@@ -546,7 +546,7 @@ function(dune_python_configure_package)
 
   # Construct the wheel installation commandline
   # TODO should the wheel be build for the internal env setup or for the external one?
-  set(WHEEL_COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m pip wheel -w ${DUNE_PYTHON_WHEELHOUSE} --no-deps
+  set(WHEEL_COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m pip wheel -w ${DUNE_PYTHON_WHEELHOUSE_DIR} --no-deps
                         "${DUNE_PIP_INDEX}"
                         # --use-feature=in-tree-build
                         "${WHEEL_OPTION}"
@@ -567,7 +567,7 @@ function(dune_python_configure_package)
                   message(\"Installing python package\")
                   dune_execute_process(COMMAND \"${CMAKE_COMMAND}\" --build .  --target install_python --config $<CONFIG>
                                        WARNING_MESSAGE \"python package installation failed - ignored\")
-                  message(\"Installing wheel for python package at ${PYPKGCONF_PATH} into ${DUNE_PYTHON_WHEELHOUSE}...\")
+                  message(\"Installing wheel for python package at ${PYPKGCONF_PATH} into ${DUNE_PYTHON_WHEELHOUSE_DIR}...\")
                   dune_execute_process(COMMAND ${WHEEL_COMMAND}
                                        WARNING_MESSAGE \"wheel installation failed - ignored\")"
             )

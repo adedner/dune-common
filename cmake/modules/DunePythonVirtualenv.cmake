@@ -124,7 +124,12 @@ endif()
 #     when *using* installed modules, you used when *installing* them.
 #     TODO: Replace this with a better mechanism (like writing the location into
 #           dune-commons package config file)
-set(DUNE_PYTHON_WHEELHOUSE "${CMAKE_INSTALL_PREFIX}/share/dune/wheelhouse" CACHE PATH "The place where the wheels will be stored")
+set(DUNE_PYTHON_WHEELHOUSE "default" CACHE PATH "The place where the wheels will be stored")
+if("${DUNE_PYTHON_WHEELHOUSE}" STREQUAL "default")
+  set(DUNE_PYTHON_WHEELHOUSE_DIR "${CMAKE_INSTALL_PREFIX}/share/dune/wheelhouse")
+else()
+  set(DUNE_PYTHON_WHEELHOUSE_DIR "${DUNE_PYTHON_WHEELHOUSE}")
+endif()
 
 # if use of venv is enabled
 if(DUNE_PYTHON_USE_VENV)
