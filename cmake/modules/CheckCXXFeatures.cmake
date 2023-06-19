@@ -71,22 +71,3 @@ elseif(CMAKE_CXX_STANDARD AND CXX_MAX_STANDARD)
   message(DEPRECATION "The cmake variable CXX_MAX_STANDARD is deprecated. The variable CMAKE_CXX_STANDARD "
     "takes precedence over CXX_MAX_STANDARD.")
 endif()
-
-
-# perform tests
-
-# Check for `std::is_detected<...>`
-dune_check_cxx_source_compiles("
-  #include <experimental/type_traits>
-  int main() { std::experimental::detected_t<std::decay_t,int>{}; }
-" DUNE_HAVE_CXX_EXPERIMENTAL_IS_DETECTED)
-
-# Check whether compiler supports lambdas in unevaluated contexts
-string(REPLACE ";" "\;" cxx_lambda_test "using F = decltype([](){}); int main() {return 0;}")
-dune_check_cxx_source_compiles(${cxx_lambda_test} DUNE_HAVE_CXX_UNEVALUATED_CONTEXT_LAMBDA)
-
-# Check for `std::identity<...>`
-dune_check_cxx_source_compiles("
-  #include <functional>
-  int main() { std::identity{}; }
-" DUNE_HAVE_CXX_STD_IDENTITY)

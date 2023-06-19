@@ -9,10 +9,6 @@
 #include <dune/common/typetraits.hh>
 #include <dune/common/typeutilities.hh>
 
-#if DUNE_HAVE_CXX_EXPERIMENTAL_IS_DETECTED
-#include <experimental/type_traits>
-#endif
-
 namespace Dune
 {
 
@@ -32,21 +28,6 @@ namespace Std
   /// A helper alias template std::bool_constant imported into the namespace Dune::Std
   /// \deprecated Use the `std::bool_constant` directly.
   using std::bool_constant;
-
-#if DUNE_HAVE_CXX_EXPERIMENTAL_IS_DETECTED
-
-  using std::experimental::nonesuch;
-  using std::experimental::detected_or;
-  using std::experimental::is_detected;
-  using std::experimental::detected_t;
-  using std::experimental::is_detected_v;
-  using std::experimental::detected_or_t;
-  using std::experimental::is_detected_exact;
-  using std::experimental::is_detected_exact_v;
-  using std::experimental::is_detected_convertible;
-  using std::experimental::is_detected_convertible_v;
-
-#else // DUNE_HAVE_CXX_EXPERIMENTAL_IS_DETECTED
 
   // fallback version of std::experimental::is_detected et al., heavily scribbled
   // from cppreference.com (but there is actually not much implementation to the thing)
@@ -230,8 +211,6 @@ namespace Std
   template<typename Target, template<typename...> class Op, typename... Args>
   constexpr bool is_detected_convertible_v = is_detected_convertible<Target,Op,Args...>::value;
 #endif // __cpp_variable_templates
-
-#endif // DUNE_HAVE_CXX_EXPERIMENTAL_IS_DETECTED
 
 } // namespace Std
 
