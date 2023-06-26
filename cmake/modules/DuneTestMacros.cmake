@@ -344,7 +344,8 @@ function(dune_add_test)
   endif()
 
   # add some default libraries to link against
-  list(APPEND ADDTEST_LINK_LIBRARIES Dune::Common ${${ProjectName}_LIBRARIES})
+  get_property(PROJECT_INTERFACE_LIBRARIES GLOBAL PROPERTY ${ProjectName}_INTERFACE_LIBRARIES)
+  list(APPEND ADDTEST_LINK_LIBRARIES Dune::Common ${PROJECT_INTERFACE_LIBRARIES})
   list(REMOVE_DUPLICATES ADDTEST_LINK_LIBRARIES)
 
   # Add the executable if it is not already present
