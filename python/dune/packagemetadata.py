@@ -598,6 +598,7 @@ def _extractCMakeFlags():
         proc = subprocess.Popen(command, stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
         cmakeArgs = shlex.split(stdout.decode('utf-8'))
+        print("cmakeArgs(in opts file) = ",cmakeArgs)
 
     # check environment variable
     cmakeArgs += shlex.split(os.environ.get('DUNE_CMAKE_FLAGS', ''))
