@@ -618,6 +618,7 @@ def _extractCMakeFlags():
         elif v.upper() in ['OFF', 'FALSE', 'F', '0', 'NO', 'N']:
             cmakeFlags[k] = False
 
+    print("cmakeFlags = ",cmakeFlags)
     return cmakeFlags
 
 

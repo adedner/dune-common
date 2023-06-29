@@ -168,6 +168,7 @@ class Builder:
                         else:
                             return os.open(path, flags, 0o664)
                     with open(gen_file, "w", opener=opener) as outfile:
+                        print("gen_file = ",gen_file)
                         outfile.write(env.get_template(relative_template_file).render(**context))
                         os.fsync(outfile) # make sure files are correctly synced before calling make or cmake
 
