@@ -18,6 +18,7 @@ Export the current toolchain configuration into a file.
     dune_export_toolchain(<filename>
       [LANGUAGES {C,CXX,FORTRAN,ASM...}]
       [CONFIGS {DEBUG,RELEASE,RELWITHDEBINFO,MINSIZEREL}]
+      [IGNORE_TOOLCHAIN_FILE]
     )
 
     Export a set of toolchain variables into the file ``<filename>``. This file
@@ -31,13 +32,28 @@ Export the current toolchain configuration into a file.
     (optional) A list of build configurations which to extract the flags from.
     Default is ``DEBUG RELEASE``.
 
+  ``IGNORE_TOOLCHAIN_FILE``
+    (optional) If this option is set, an existing toolchain file will be
+    ignored and simply a new one generated.
+    Default is ``not set``, i.e. simply copy an existing toolchain file to
+    the target location.
+
 #]=======================================================================]
 include_guard(GLOBAL)
 
 
 # Public interface for exporting a ŧoolchain file
 function(dune_export_toolchain _filename)
-  cmake_parse_arguments(ARG "" "" "LANGUAGES;CONFIGS" ${ARGN})
+  cmake_parse_arguments(ARG "IGNORE_TOOLCHAIN_FILE" "" "LANGUAGES;CONFIGS" ${ARGN})
+
+  # if there is already a toolchain and it should not be ignored,
+  # copy its content to the output location
+  if(NOT IGNORE_TOOLCHAIN_FILE AND CMAKE_TOOLCHAIN_FILE)
+    file(READ ${CMAKE_TOOLCHAIN_FILE} _output)
+    file(WRITE ${_filename} ${_output})
+    message(STATUS "Toolchain file has been copied to: ${_filename}")
+    return()
+  endif()
 
   if(NOT ARG_LANGUAGES)
     set(ARG_LANGUAGES "C" "CXX")
