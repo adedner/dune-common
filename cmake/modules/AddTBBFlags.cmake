@@ -18,17 +18,15 @@ include_guard(GLOBAL)
 set(HAVE_TBB ${TBB_FOUND})
 
 # perform DUNE-specific setup tasks
-if (TBB_FOUND)
-  dune_register_package_flags(
-    LIBRARIES TBB::tbb
-    )
-endif()
+dune_register_package_flags(
+  LIBRARIES           $<TARGET_NAME_IF_EXISTS:TBB::tbb>
+  COMPILE_DEFINITIONS $<$<TARGET_EXISTS:TBB::tbb>:HAVE_TBB=1>
+  )
 
 # function for adding TBB flags to a list of targets
 function(add_dune_tbb_flags _targets)
-  if(TBB_FOUND)
-    foreach(_target ${_targets})
-      target_link_libraries(${_target} PUBLIC TBB::tbb)
-    endforeach(_target)
-  endif()
+  foreach(_target ${_targets})
+    target_link_libraries(${_target} PUBLIC $<TARGET_NAME_IF_EXISTS:TBB::tbb>)
+    target_compile_definitions(${_target} PUBLIC $<$<TARGET_EXISTS:TBB::tbb>:HAVE_TBB=1>)
+  endforeach()
 endfunction(add_dune_tbb_flags)

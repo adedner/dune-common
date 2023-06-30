@@ -10,7 +10,7 @@ set_package_properties("Threads" PROPERTIES
 # set HAVE_THREADS for config.h
 set(HAVE_THREADS ${Threads_FOUND})
 
-# register the Threads imported target globally
-if(Threads_FOUND)
-  link_libraries(Threads::Threads)
-endif()
+# register the Threads imported target
+dune_register_package_flags(
+  LIBRARIES $<TARGET_NAME_IF_EXISTS:Threads::Threads>
+)

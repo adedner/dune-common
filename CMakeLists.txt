@@ -22,6 +22,7 @@ target_compile_features(dunecommon PUBLIC cxx_std_17)
 # Set properties to the dunecommon target
 add_dune_blas_lapack_flags(dunecommon)
 add_dune_tbb_flags(dunecommon)
+target_link_libraries(dunecommon PUBLIC $<TARGET_NAME_IF_EXISTS:Threads::Threads>)
 
 # add subdirectories to execute CMakeLists.txt there
 add_subdirectory(bin)

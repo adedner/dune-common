@@ -21,22 +21,19 @@ set_package_properties("MPI" PROPERTIES
   DESCRIPTION "Message Passing Interface library"
   PURPOSE "Parallel programming on multiple processors")
 
-if(MPI_C_FOUND)
-  set(HAVE_MPI ${MPI_C_FOUND})
+set(HAVE_MPI ${MPI_C_FOUND})
 
-  dune_register_package_flags(COMPILE_DEFINITIONS "ENABLE_MPI=1"
-                              LIBRARIES MPI::MPI_C)
-endif()
+dune_register_package_flags(
+  COMPILE_DEFINITIONS $<$<TARGET_EXISTS:MPI::MPI_C>:HAVE_MPI=1>
+  LIBRARIES           $<TARGET_NAME_IF_EXISTS:MPI::MPI_C>)
 
 # adds MPI flags to the targets
 function(add_dune_mpi_flags)
   cmake_parse_arguments(ADD_MPI "SOURCE_ONLY;OBJECT" "" "" ${ARGN}) # ignored
   set(targets ${ADD_MPI_UNPARSED_ARGUMENTS})
 
-  if(MPI_C_FOUND)
-    foreach(target ${targets})
-      target_link_libraries(${target} PUBLIC MPI::MPI_C)
-      target_compile_definitions(${target} PUBLIC "ENABLE_MPI=1")
-    endforeach(target)
-  endif()
+  foreach(target ${targets})
+    target_link_libraries(${target}       PUBLIC $<TARGET_NAME_IF_EXISTS:MPI::MPI_C>)
+    target_compile_definitions(${target}  PUBLIC $<$<TARGET_EXISTS:MPI::MPI_C>:HAVE_MPI=1>)
+  endforeach(target)
 endfunction(add_dune_mpi_flags)

@@ -18,19 +18,15 @@ include_guard(GLOBAL)
 set(HAVE_QUADMATH ${QuadMath_FOUND})
 
 # register the QuadMath imported target
-if(QuadMath_FOUND)
-  dune_register_package_flags(
-    LIBRARIES QuadMath::QuadMath
-    COMPILE_DEFINITIONS "ENABLE_QUADMATH=1"
-  )
-endif()
+dune_register_package_flags(
+  LIBRARIES $<TARGET_NAME_IF_EXISTS:QuadMath::QuadMath>
+  COMPILE_DEFINITIONS $<$<TARGET_EXISTS:QuadMath::QuadMath>:HAVE_QUADMATH=1>
+)
 
 # add function to link against QuadMath::QuadMath
 function(add_dune_quadmath_flags _targets)
-  if(QuadMath_FOUND)
-    foreach(_target ${_targets})
-      target_link_libraries(${_target} PUBLIC QuadMath::QuadMath)
-      target_compile_definitions(${_target} PUBLIC ENABLE_QUADMATH=1)
-    endforeach(_target ${_targets})
-  endif()
+  foreach(_target ${_targets})
+    target_link_libraries(${_target}      PUBLIC $<TARGET_NAME_IF_EXISTS:QuadMath::QuadMath>)
+    target_compile_definitions(${_target} PUBLIC $<$<TARGET_EXISTS:QuadMath::QuadMath>:HAVE_QUADMATH=1>)
+  endforeach()
 endfunction(add_dune_quadmath_flags)

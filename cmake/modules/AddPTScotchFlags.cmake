@@ -18,26 +18,20 @@ include_guard(GLOBAL)
 set(HAVE_PTSCOTCH ${PTScotch_FOUND})
 
 # register all PTScotch related flags
-if(PTScotch_SCOTCH_FOUND)
-  dune_register_package_flags(LIBRARIES PTScotch::Scotch
-    COMPILE_DEFINITIONS "ENABLE_SCOTCH=1")
-endif()
-if(PTScotch_PTSCOTCH_FOUND)
-  dune_register_package_flags(LIBRARIES PTScotch::PTScotch
-    COMPILE_DEFINITIONS "ENABLE_PTSCOTCH=1")
-endif()
+dune_register_package_flags(LIBRARIES $<TARGET_NAME_IF_EXISTS:PTScotch::Scotch>
+  COMPILE_DEFINITIONS $<$<TARGET_EXISTS:PTScotch::Scotch>:HAVE_SCOTCH=1>)
+
+  dune_register_package_flags(LIBRARIES $<TARGET_NAME_IF_EXISTS:PTScotch::PTScotch>
+  COMPILE_DEFINITIONS $<$<TARGET_EXISTS:PTScotch::PTScotch>:HAVE_PTSCOTCH=1>)
+
 
 function(add_dune_ptscotch_flags _targets)
-  if(PTScotch_SCOTCH_FOUND)
-    foreach(_target ${_targets})
-      target_link_libraries(${_target} PUBLIC PTScotch::Scotch)
-      target_compile_definitions(${_target} PUBLIC ENABLE_SCOTCH=1)
-    endforeach(_target ${_targets})
-  endif()
-  if(PTScotch_PTSCOTCH_FOUND)
-    foreach(_target ${_targets})
-      target_link_libraries(${_target} PUBLIC PTScotch::PTScotch)
-      target_compile_definitions(${_target} PUBLIC ENABLE_PTSCOTCH=1)
-    endforeach(_target ${_targets})
-  endif()
+  foreach(_target ${_targets})
+    target_link_libraries(${_target}      PUBLIC $<TARGET_NAME_IF_EXISTS:PTScotch::Scotch>)
+    target_compile_definitions(${_target} PUBLIC $<$<TARGET_EXISTS:PTScotch::Scotch>:HAVE_SCOTCH=1>)
+  endforeach()
+  foreach(_target ${_targets})
+    target_link_libraries(${_target}      PUBLIC $<TARGET_NAME_IF_EXISTS:PTScotch::PTScotch>)
+    target_compile_definitions(${_target} PUBLIC $<$<TARGET_EXISTS:PTScotch::PTScotch>:HAVE_PTSCOTCH=1>)
+  endforeach()
 endfunction(add_dune_ptscotch_flags)

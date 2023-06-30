@@ -31,15 +31,6 @@
 /* does the standard library provide identity ? */
 #cmakedefine DUNE_HAVE_CXX_STD_IDENTITY 1
 
-/* Define if you have a BLAS library. */
-#cmakedefine HAVE_BLAS 1
-
-/* Define if you have LAPACK library. */
-#cmakedefine HAVE_LAPACK 1
-
-/* Define if you have the MPI library.  */
-#cmakedefine HAVE_MPI ENABLE_MPI
-
 /* Deactivate cxx bindings for MPI */
 #if defined(HAVE_MPI) && HAVE_MPI
 #define MPICH_SKIP_MPICXX 1
@@ -48,21 +39,6 @@
 #define MPIPP_H
 #define _MPICC_H
 #endif
-
-/* Define if you have the GNU GMP library. The value should be ENABLE_GMP
-   to facilitate activating and deactivating GMP using compile flags. */
-#cmakedefine HAVE_GMP ENABLE_GMP
-
-/* Define if you have the GCC Quad-Precision library. The value should be ENABLE_QUADMATH
-   to facilitate activating and deactivating QuadMath using compile flags. */
-#cmakedefine HAVE_QUADMATH ENABLE_QUADMATH
-
-/* Define if you have the Vc library. The value should be ENABLE_VC
-   to facilitate activating and deactivating Vc using compile flags. */
-#cmakedefine HAVE_VC ENABLE_VC
-
-/* Define to 1 if you have the Threading Building Blocks (TBB) library */
-#cmakedefine HAVE_TBB 1
 
 /* begin private */
 
@@ -97,65 +73,39 @@
 #define DUNE_HAVE_CXX_EXPERIMENTAL_MAKE_ARRAY 0
 
 /* Define to ENABLE_UMFPACK if the UMFPack library is available */
-#cmakedefine HAVE_UMFPACK ENABLE_SUITESPARSE
+#define HAVE_UMFPACK HAVE_SUITESPARSE
 
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse library is available */
-#cmakedefine HAVE_SUITESPARSE ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's AMD library is available */
-#cmakedefine HAVE_SUITESPARSE_AMD ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's BTF library is available */
-#cmakedefine HAVE_SUITESPARSE_BTF ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's CAMD library is available */
-#cmakedefine HAVE_SUITESPARSE_CAMD ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's CCOLAMD library is available */
-#cmakedefine HAVE_SUITESPARSE_CCOLAMD ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's CHOLMOD library is available */
-#cmakedefine HAVE_SUITESPARSE_CHOLMOD ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's COLAMD library is available */
-#cmakedefine HAVE_SUITESPARSE_COLAMD ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's CXSPARSE library is available */
-#cmakedefine HAVE_SUITESPARSE_CXSPARSE ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's KLU library is available */
-#cmakedefine HAVE_SUITESPARSE_KLU ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's LDL library is available */
-#cmakedefine HAVE_SUITESPARSE_LDL ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's RBIO library is available */
-#cmakedefine HAVE_SUITESPARSE_RBIO ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's SPQR library is available
+/* Define to HAVE_SUITESPARSE if the SuiteSparse's AMD library is available */
+#define HAVE_SUITESPARSE_AMD HAVE_SUITESPARSE
+/* Define to HAVE_SUITESPARSE if the SuiteSparse's BTF library is available */
+#define HAVE_SUITESPARSE_BTF HAVE_SUITESPARSE
+/* Define to HAVE_SUITESPARSE if the SuiteSparse's CAMD library is available */
+#define HAVE_SUITESPARSE_CAMD HAVE_SUITESPARSE
+/* Define to HAVE_SUITESPARSE if the SuiteSparse's CCOLAMD library is available */
+#define HAVE_SUITESPARSE_CCOLAMD HAVE_SUITESPARSE
+/* Define to HAVE_SUITESPARSE if the SuiteSparse's CHOLMOD library is available */
+#define HAVE_SUITESPARSE_CHOLMOD HAVE_SUITESPARSE
+/* Define to HAVE_SUITESPARSE if the SuiteSparse's COLAMD library is available */
+#define HAVE_SUITESPARSE_COLAMD HAVE_SUITESPARSE
+/* Define to HAVE_SUITESPARSE if the SuiteSparse's CXSPARSE library is available */
+#define HAVE_SUITESPARSE_CXSPARSE HAVE_SUITESPARSE
+/* Define to HAVE_SUITESPARSE if the SuiteSparse's KLU library is available */
+#define HAVE_SUITESPARSE_KLU HAVE_SUITESPARSE
+/* Define to HAVE_SUITESPARSE if the SuiteSparse's LDL library is available */
+#define HAVE_SUITESPARSE_LDL HAVE_SUITESPARSE
+/* Define to HAVE_SUITESPARSE if the SuiteSparse's RBIO library is available */
+#define HAVE_SUITESPARSE_RBIO HAVE_SUITESPARSE
+/* Define to HAVE_SUITESPARSE if the SuiteSparse's SPQR library is available
    and if it's version is at least 4.3 */
-#cmakedefine HAVE_SUITESPARSE_SPQR ENABLE_SUITESPARSE
-
-/* Define to ENABLE_SUITESPARSE if the SuiteSparse's UMFPACK library is available */
-#cmakedefine HAVE_SUITESPARSE_UMFPACK ENABLE_SUITESPARSE
-
-/* Define to 1 if METIS is available */
-#cmakedefine HAVE_METIS ENABLE_METIS
+#define HAVE_SUITESPARSE_SPQR HAVE_SUITESPARSE
+/* Define to HAVE_SUITESPARSE if the SuiteSparse's UMFPACK library is available */
+#define HAVE_SUITESPARSE_UMFPACK HAVE_SUITESPARSE
 
 /* Define to 1 if the Scotch replacement for METIS is used. */
 #cmakedefine HAVE_SCOTCH_METIS 1
 
-/* Define to 1 if you have the ParMETIS library. */
-#cmakedefine HAVE_PARMETIS ENABLE_PARMETIS
-
 /* Define to 1 if the PTScotch replacement for ParMETIS is used. */
 #cmakedefine HAVE_PTSCOTCH_PARMETIS 1
-
-/* Define to 1 if PT-Scotch is available */
-#cmakedefine HAVE_PTSCOTCH ENABLE_PTSCOTCH
-
-/* Used to call lapack functions */
-#cmakedefine LAPACK_NEEDS_UNDERLINE
 
 /* end dune-common
    Everything below here will be overwritten

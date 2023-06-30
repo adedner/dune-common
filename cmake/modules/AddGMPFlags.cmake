@@ -18,19 +18,15 @@ include_guard(GLOBAL)
 set(HAVE_GMP ${GMP_FOUND})
 
 # register all GMP related flags
-if(GMP_FOUND)
-  dune_register_package_flags(
-    LIBRARIES GMP::gmpxx
-    COMPILE_DEFINITIONS "ENABLE_GMP=1"
-  )
-endif()
+dune_register_package_flags(
+  LIBRARIES           $<TARGET_NAME_IF_EXISTS:GMP::gmpxx>
+  COMPILE_DEFINITIONS $<$<TARGET_EXISTS:GMP::gmpxx>:HAVE_GMP=1>
+)
 
 # add function to link against the GMP library
 function(add_dune_gmp_flags _targets)
-  if(GMP_FOUND)
-    foreach(_target ${_targets})
-      target_link_libraries(${_target} PUBLIC GMP::gmpxx)
-      target_compile_definitions(${_target} PUBLIC ENABLE_GMP=1)
-    endforeach(_target ${_targets})
-  endif(GMP_FOUND)
+  foreach(_target ${_targets})
+    target_link_libraries(${_target}      PUBLIC $<TARGET_NAME_IF_EXISTS:GMP::gmpxx>)
+    target_compile_definitions(${_target} PUBLIC $<$<TARGET_EXISTS:GMP::gmpxx>:HAVE_GMP=1>)
+  endforeach()
 endfunction(add_dune_gmp_flags)

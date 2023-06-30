@@ -18,17 +18,14 @@ include_guard(GLOBAL)
 set(HAVE_METIS ${METIS_FOUND})
 
 # register METIS library as dune package
-if(METIS_FOUND)
-  dune_register_package_flags(LIBRARIES METIS::METIS
-    COMPILE_DEFINITIONS "ENABLE_METIS=1")
-endif()
+dune_register_package_flags(
+  LIBRARIES           $<TARGET_NAME_IF_EXISTS:METIS::METIS>
+  COMPILE_DEFINITIONS $<$<TARGET_EXISTS:METIS::METIS>:HAVE_METIS=1>)
 
 # Add function to link targets against METIS library
 function(add_dune_metis_flags _targets)
-  if(METIS_FOUND)
-    foreach(_target ${_targets})
-      target_link_libraries(${_target} PUBLIC METIS::METIS)
-      target_compile_definitions(${_target} PUBLIC ENABLE_METIS=1)
-    endforeach(_target)
-  endif()
+  foreach(_target ${_targets})
+    target_link_libraries(${_target}      PUBLIC $<TARGET_NAME_IF_EXISTS:METIS::METIS>)
+    target_compile_definitions(${_target} PUBLIC $<$<TARGET_EXISTS:METIS::METIS>:HAVE_METIS=1>)
+  endforeach()
 endfunction(add_dune_metis_flags _targets)
