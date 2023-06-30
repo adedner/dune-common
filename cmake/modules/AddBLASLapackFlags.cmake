@@ -24,20 +24,20 @@ set_package_properties("LAPACK" PROPERTIES
 set(HAVE_BLAS ${BLAS_FOUND})
 set(HAVE_LAPACK ${LAPACK_FOUND})
 
-unset(LAPACK_COMPILE_FLAGS)
+unset(LAPACK_COMPILE_OPTIONS_FLAGS)
 if(HAVE_LAPACK)
   include(CMakePushCheckState)
   cmake_push_check_state()
   set(CMAKE_REQUIRED_LIBRARIES ${LAPACK_LIBRARIES})
   check_function_exists("dsyev_" LAPACK_NEEDS_UNDERLINE)
   cmake_pop_check_state()
-  set(LAPACK_COMPILE_FLAGS "-DLAPACK_COMPILE_FLAGS;-DHAVE_LAPACK=1")
+  set(LAPACK_COMPILE_OPTIONS_FLAGS "-DLAPACK_NEEDS_UNDERLINE;-DHAVE_LAPACK=1")
 endif()
 
 # register Lapack library as dune package
 dune_register_package_flags(
   LIBRARIES           $<$<BOOL:${LAPACK_FOUND}>:${LAPACK_LIBRARIES}>
-  COMPILE_DEFINITIONS $<$<BOOL:${LAPACK_FOUND}>:${LAPACK_COMPILE_FLAGS}>)
+  COMPILE_OPTIONS     $<$<BOOL:${LAPACK_FOUND}>:${LAPACK_COMPILE_OPTIONS_FLAGS}>)
 
 dune_register_package_flags(
   LIBRARIES           $<$<BOOL:${BLAS_FOUND}>:${BLAS_LIBRARIES}>
@@ -47,7 +47,7 @@ dune_register_package_flags(
 function(add_dune_blas_lapack_flags _targets)
   foreach(_target ${_targets})
     target_link_libraries(${_target}      PUBLIC $<$<BOOL:${LAPACK_FOUND}>:${LAPACK_LIBRARIES}>)
-    target_compile_definitions(${_target} PUBLIC $<$<BOOL:${LAPACK_FOUND}>:${LAPACK_COMPILE_FLAGS}>)
+    target_compile_options(${_target} PUBLIC $<$<BOOL:${LAPACK_FOUND}>:${LAPACK_COMPILE_OPTIONS_FLAGS}>)
 
     target_link_libraries(${_target}      PUBLIC $<$<BOOL:${BLAS_FOUND}>:${BLAS_LIBRARIES}>)
     target_compile_definitions(${_target} PUBLIC $<$<BOOL:${BLAS_FOUND}>:HAVE_BLAS=1>)
