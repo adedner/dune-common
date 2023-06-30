@@ -25,15 +25,17 @@ set_package_properties("Vc" PROPERTIES
 
 set(HAVE_VC ${Vc_FOUND})
 
-dune_register_package_flags(COMPILE_OPTIONS $<$<BOOL:${Vc_FOUND}>:${Vc_COMPILE_FLAGS};-DHAVE_VC=1>
-                            LIBRARIES       $<$<BOOL:${Vc_FOUND}>:${Vc_LIBRARIES}>
-                            INCLUDE_DIRS    $<$<BOOL:${Vc_FOUND}>:${Vc_INCLUDE_DIR}>)
+dune_register_package_flags(COMPILE_DEFINITIONS   $<$<BOOL:${Vc_FOUND}>:HAVE_VC=1>
+                            COMPILE_OPTIONS       "$<$<BOOL:${Vc_FOUND}>:${Vc_COMPILE_FLAGS}>"
+                            LIBRARIES             "$<$<BOOL:${Vc_FOUND}>:${Vc_LIBRARIES}>"
+                            INCLUDE_DIRS          "$<$<BOOL:${Vc_FOUND}>:${Vc_INCLUDE_DIR}>")
+
 
 function(add_dune_vc_flags _targets)
   foreach(_target ${_targets})
-    target_link_libraries(${_target}      PUBLIC $<$<BOOL:${Vc_FOUND}>:${Vc_LIBRARIES}>)
-    target_compile_options(${_target}     PUBLIC $<$<BOOL:${Vc_FOUND}>:${Vc_COMPILE_FLAGS}>)
-    target_compile_definitions(${_target} PUBLIC $<$<BOOL:${Vc_FOUND}>:HAVE_VC=1>)
-    target_include_directories(${_target} SYSTEM PUBLIC $<$<BOOL:${Vc_FOUND}>:${Vc_INCLUDE_DIR}>)
+    target_compile_definitions(${_target}        PUBLIC $<$<BOOL:${Vc_FOUND}>:HAVE_VC=1>)
+    target_link_libraries(${_target}             PUBLIC "$<$<BOOL:${Vc_FOUND}>:${Vc_LIBRARIES}>")
+    target_compile_options(${_target}            PUBLIC "$<$<BOOL:${Vc_FOUND}>:${Vc_COMPILE_FLAGS}>")
+    target_include_directories(${_target} SYSTEM PUBLIC "$<$<BOOL:${Vc_FOUND}>:${Vc_INCLUDE_DIR}>")
   endforeach(_target ${_targets})
 endfunction(add_dune_vc_flags)

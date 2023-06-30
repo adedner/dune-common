@@ -19,7 +19,7 @@ set(HAVE_QUADMATH ${QuadMath_FOUND})
 
 # register the QuadMath imported target
 dune_register_package_flags(
-  LIBRARIES $<TARGET_NAME_IF_EXISTS:QuadMath::QuadMath>
+  LIBRARIES           $<TARGET_NAME_IF_EXISTS:QuadMath::QuadMath>
   COMPILE_DEFINITIONS $<$<TARGET_EXISTS:QuadMath::QuadMath>:HAVE_QUADMATH=1>
 )
 

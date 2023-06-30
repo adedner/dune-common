@@ -26,7 +26,7 @@ dune_register_package_flags(
 # function for adding TBB flags to a list of targets
 function(add_dune_tbb_flags _targets)
   foreach(_target ${_targets})
-    target_link_libraries(${_target} PUBLIC $<TARGET_NAME_IF_EXISTS:TBB::tbb>)
+    target_link_libraries(${_target}      PUBLIC $<TARGET_NAME_IF_EXISTS:TBB::tbb>)
     target_compile_definitions(${_target} PUBLIC $<$<TARGET_EXISTS:TBB::tbb>:HAVE_TBB=1>)
   endforeach()
 endfunction(add_dune_tbb_flags)

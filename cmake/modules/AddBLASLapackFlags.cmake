@@ -25,31 +25,34 @@ set(HAVE_BLAS ${BLAS_FOUND})
 set(HAVE_LAPACK ${LAPACK_FOUND})
 
 unset(LAPACK_COMPILE_OPTIONS_FLAGS)
-if(HAVE_LAPACK)
+  if(HAVE_LAPACK)
+    set(LAPACK_COMPILE_OPTIONS_FLAGS "-DHAVE_LAPACK=1")
+  endif()
   include(CMakePushCheckState)
   cmake_push_check_state()
   set(CMAKE_REQUIRED_LIBRARIES ${LAPACK_LIBRARIES})
   check_function_exists("dsyev_" LAPACK_NEEDS_UNDERLINE)
   cmake_pop_check_state()
-  set(LAPACK_COMPILE_OPTIONS_FLAGS "-DLAPACK_NEEDS_UNDERLINE;-DHAVE_LAPACK=1")
+  if(LAPACK_NEEDS_UNDERLINE)
+  list(APPEND LAPACK_COMPILE_OPTIONS_FLAGS "-DLAPACK_NEEDS_UNDERLINE")
 endif()
 
 # register Lapack library as dune package
 dune_register_package_flags(
-  LIBRARIES           $<$<BOOL:${LAPACK_FOUND}>:${LAPACK_LIBRARIES}>
-  COMPILE_OPTIONS     $<$<BOOL:${LAPACK_FOUND}>:${LAPACK_COMPILE_OPTIONS_FLAGS}>)
+  LIBRARIES           "$<$<BOOL:${LAPACK_FOUND}>:${LAPACK_LIBRARIES}>"
+  COMPILE_OPTIONS     "$<$<BOOL:${LAPACK_FOUND}>:${LAPACK_COMPILE_OPTIONS_FLAGS}>")
 
 dune_register_package_flags(
-  LIBRARIES           $<$<BOOL:${BLAS_FOUND}>:${BLAS_LIBRARIES}>
+  LIBRARIES           "$<$<BOOL:${BLAS_FOUND}>:${BLAS_LIBRARIES}>"
   COMPILE_DEFINITIONS $<$<BOOL:${BLAS_FOUND}>:HAVE_BLAS=1>)
 
 # add function to link against the BLAS/Lapack library
 function(add_dune_blas_lapack_flags _targets)
   foreach(_target ${_targets})
-    target_link_libraries(${_target}      PUBLIC $<$<BOOL:${LAPACK_FOUND}>:${LAPACK_LIBRARIES}>)
-    target_compile_options(${_target} PUBLIC $<$<BOOL:${LAPACK_FOUND}>:${LAPACK_COMPILE_OPTIONS_FLAGS}>)
+    target_link_libraries(${_target}      PUBLIC "$<$<BOOL:${LAPACK_FOUND}>:${LAPACK_LIBRARIES}>")
+    target_compile_options(${_target}     PUBLIC "$<$<BOOL:${LAPACK_FOUND}>:${LAPACK_COMPILE_OPTIONS_FLAGS}>")
 
-    target_link_libraries(${_target}      PUBLIC $<$<BOOL:${BLAS_FOUND}>:${BLAS_LIBRARIES}>)
+    target_link_libraries(${_target}      PUBLIC "$<$<BOOL:${BLAS_FOUND}>:${BLAS_LIBRARIES}>")
     target_compile_definitions(${_target} PUBLIC $<$<BOOL:${BLAS_FOUND}>:HAVE_BLAS=1>)
   endforeach()
 endfunction(add_dune_blas_lapack_flags)
