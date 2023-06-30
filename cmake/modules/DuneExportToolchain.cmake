@@ -42,7 +42,7 @@ Export the current toolchain configuration into a file.
 include_guard(GLOBAL)
 
 
-# Public interface for exporting a ŧoolchain file
+# Public interface for exporting a toolchain file
 function(dune_export_toolchain _filename)
   cmake_parse_arguments(ARG "IGNORE_TOOLCHAIN_FILE" "" "LANGUAGES;CONFIGS" ${ARGN})
 
