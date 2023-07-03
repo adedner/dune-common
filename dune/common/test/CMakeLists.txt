@@ -9,10 +9,6 @@ dune_add_test(SOURCES arithmetictestsuitetest.cc
 dune_add_test(SOURCES arraylisttest.cc
               LABELS quick)
 
-dune_add_test(SOURCES arraytest.cc
-              LINK_LIBRARIES dunecommon
-              LABELS quick)
-
 dune_add_test(SOURCES assertandreturntest.cc
               LABELS quick)
 dune_add_test(NAME assertandreturntest_compiletime_fail
@@ -32,7 +28,6 @@ dune_add_test(SOURCES bigunsignedinttest.cc
               LABELS quick)
 
 dune_add_test(SOURCES bitsetvectortest.cc
-              LINK_LIBRARIES dunecommon
               LABELS quick)
 
 dune_add_test(SOURCES boundscheckingtest.cc
@@ -303,7 +298,6 @@ dune_add_test(NAME testdebugallocator_fail5
               LABELS quick)
 
 dune_add_test(SOURCES testfloatcmp.cc
-              LINK_LIBRARIES dunecommon
               LABELS quick)
 
 dune_add_test(SOURCES transposetest.cc
