@@ -111,7 +111,6 @@ add_dune_gmp_flags(densematrixassignmenttest)
 foreach(FAIL RANGE 0 6)
   dune_add_test(NAME densematrixassignmenttest_fail${FAIL}
                 SOURCES densematrixassignmenttest.cc
-                LINK_LIBRARIES dunecommon
                 COMPILE_DEFINITIONS "FAILURE${FAIL}"
                 EXPECT_COMPILE_FAIL
                 LABELS quick)
