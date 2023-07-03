@@ -14,7 +14,7 @@ add_python_targets(common
   utility
 )
 dune_add_pybind11_module(NAME _common)
-set_property(TARGET _common PROPERTY LINK_LIBRARIES dunecommon APPEND)
+target_link_libraries(_common PUBLIC Dune::Common)
 if(SKBUILD)
   install(TARGETS _common LIBRARY DESTINATION python/dune/common)
 endif()
