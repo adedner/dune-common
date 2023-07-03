@@ -298,16 +298,16 @@ function(dune_target_enable_all_packages)
   foreach(_target ${ARGN})
 
     get_property(all_incs GLOBAL PROPERTY ALL_PKG_INCS)
-    target_include_directories(${_target} PUBLIC ${all_incs})
+    target_include_directories(${_target} PUBLIC "${all_incs}")
 
     get_property(all_defs GLOBAL PROPERTY ALL_PKG_DEFS)
-    target_compile_definitions(${_target} PUBLIC ${all_defs})
+    target_compile_definitions(${_target} PUBLIC "${all_defs}")
 
     get_property(all_opts GLOBAL PROPERTY ALL_PKG_OPTS)
-    target_compile_options(${_target} PUBLIC ${all_opts})
+    target_compile_options(${_target} PUBLIC "${all_opts}")
 
     get_property(all_libs GLOBAL PROPERTY ALL_PKG_LIBS)
-    target_link_libraries(${_target} PUBLIC ${DUNE_LIBS} ${all_libs})
+    target_link_libraries(${_target} PUBLIC ${DUNE_LIBS} "${all_libs}")
 
   endforeach()
 endfunction(dune_target_enable_all_packages)
