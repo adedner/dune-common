@@ -153,25 +153,32 @@ function(dune_register_package_flags)
     message(WARNING "Unrecognized arguments for dune_register_package_flags!")
   endif()
 
-  if(REGISTRY_APPEND)
-    set_property(GLOBAL APPEND PROPERTY ALL_PKG_INCS "${REGISTRY_INCLUDE_DIRS}")
-    set_property(GLOBAL APPEND PROPERTY ALL_PKG_LIBS "${REGISTRY_LIBRARIES}")
-    set_property(GLOBAL APPEND PROPERTY ALL_PKG_DEFS "${REGISTRY_COMPILE_DEFINITIONS}")
-    set_property(GLOBAL APPEND PROPERTY ALL_PKG_OPTS "${REGISTRY_COMPILE_OPTIONS}")
-  else(REGISTRY_APPEND)
-    get_property(all_incs GLOBAL PROPERTY ALL_PKG_INCS)
-    get_property(all_libs GLOBAL PROPERTY ALL_PKG_LIBS)
-    get_property(all_defs GLOBAL PROPERTY ALL_PKG_DEFS)
-    get_property(all_opts GLOBAL PROPERTY ALL_PKG_OPTS)
-    set_property(GLOBAL PROPERTY ALL_PKG_INCS "${REGISTRY_INCLUDE_DIRS}" "${all_incs}")
-    set_property(GLOBAL PROPERTY ALL_PKG_LIBS "${REGISTRY_LIBRARIES}" "${all_libs}")
-    set_property(GLOBAL PROPERTY ALL_PKG_DEFS "${REGISTRY_COMPILE_DEFINITIONS}" "${all_defs}")
-    set_property(GLOBAL PROPERTY ALL_PKG_OPTS "${REGISTRY_COMPILE_OPTIONS}" "${all_opts}")
-  endif(REGISTRY_APPEND)
+  set(target ${ProjectName}-all-packages)
+  if(REGISTRY_COMPILE_DEFINITIONS)
+    target_compile_definitions(${target} INTERFACE "${REGISTRY_COMPILE_DEFINITIONS}")
+  endif()
+  if(REGISTRY_COMPILE_OPTIONS)
+    target_compile_options(${target} INTERFACE "${REGISTRY_COMPILE_OPTIONS}")
+  endif()
+  if(REGISTRY_INCLUDE_DIRS)
+    if(REGISTRY_APPEND)
+      target_include_directories(${target} AFTER INTERFACE "${REGISTRY_INCLUDE_DIRS}")
+    else()
+      target_include_directories(${target} BEFORE INTERFACE "${REGISTRY_INCLUDE_DIRS}")
+    endif()
+  endif()
+  if(REGISTRY_LIBRARIES)
+    target_link_libraries(${target} INTERFACE "${REGISTRY_LIBRARIES}")
+  endif()
 endfunction(dune_register_package_flags)
 
 
 function(dune_enable_all_packages)
+  dune_global_properties_from_target(${ProjectName}-all-packages ${ARGN})
+endfunction(dune_enable_all_packages)
+
+
+function(dune_enable_all_packages_old)
   set(MULTIARGS COMPILE_DEFINITIONS COMPILE_OPTIONS INCLUDE_DIRS MODULE_LIBRARIES)
   cmake_parse_arguments(DUNE_ENABLE_ALL_PACKAGES "APPEND;VERBOSE" "" "${MULTIARGS}" ${ARGN})
 
@@ -291,25 +298,11 @@ function(dune_enable_all_packages)
     message("Libraries for this project: ${all_libs}")
   endif(DUNE_ENABLE_ALL_PACKAGES_VERBOSE)
 
-endfunction(dune_enable_all_packages)
+endfunction(dune_enable_all_packages_old)
 
 
 function(dune_target_enable_all_packages)
-  foreach(_target ${ARGN})
-
-    get_property(all_incs GLOBAL PROPERTY ALL_PKG_INCS)
-    target_include_directories(${_target} PUBLIC ${all_incs})
-
-    get_property(all_defs GLOBAL PROPERTY ALL_PKG_DEFS)
-    target_compile_definitions(${_target} PUBLIC ${all_defs})
-
-    get_property(all_opts GLOBAL PROPERTY ALL_PKG_OPTS)
-    target_compile_options(${_target} PUBLIC ${all_opts})
-
-    get_property(all_libs GLOBAL PROPERTY ALL_PKG_LIBS)
-    target_link_libraries(${_target} PUBLIC ${DUNE_LIBS} ${all_libs})
-
-  endforeach()
+  add_dune_all_flags(${ARGN})
 endfunction(dune_target_enable_all_packages)
 
 

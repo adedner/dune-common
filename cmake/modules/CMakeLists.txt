@@ -30,6 +30,7 @@ install(FILES
   DuneMacros.cmake
   DuneModuleDependencies.cmake
   DuneModuleInformation.cmake
+  DuneParseArguments.cmake
   DunePathHelper.cmake
   DunePkgConfig.cmake
   DuneProject.cmake
@@ -44,6 +45,7 @@ install(FILES
   DuneSphinxCMakeDoc.cmake
   DuneStreams.cmake
   DuneSymlinkOrCopy.cmake
+  DuneTargetForwardProperties.cmake
   DuneTestMacros.cmake
   DuneUtilities.cmake
   FindGMP.cmake

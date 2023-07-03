@@ -37,22 +37,20 @@ unset(LAPACK_COMPILE_OPTIONS_FLAGS)
   list(APPEND LAPACK_COMPILE_OPTIONS_FLAGS "-DLAPACK_NEEDS_UNDERLINE")
 endif()
 
-# register Lapack library as dune package
-dune_register_package_flags(
-  LIBRARIES           "$<$<BOOL:${LAPACK_FOUND}>:${LAPACK_LIBRARIES}>"
-  COMPILE_OPTIONS     "$<$<BOOL:${LAPACK_FOUND}>:${LAPACK_COMPILE_OPTIONS_FLAGS}>")
+function(add_dune_blas_lapack_flags)
+  dune_parse_arguments(ARG "" "" "" "SCOPE:PUBLIC:INTERFACE,PRIVATE,PUBLIC" ${ARGN})
 
-dune_register_package_flags(
-  LIBRARIES           "$<$<BOOL:${BLAS_FOUND}>:${BLAS_LIBRARIES}>"
-  COMPILE_DEFINITIONS $<$<BOOL:${BLAS_FOUND}>:HAVE_BLAS=1>)
-
-# add function to link against the BLAS/Lapack library
-function(add_dune_blas_lapack_flags _targets)
-  foreach(_target ${_targets})
-    target_link_libraries(${_target}      PUBLIC "$<$<BOOL:${LAPACK_FOUND}>:${LAPACK_LIBRARIES}>")
-    target_compile_options(${_target}     PUBLIC "$<$<BOOL:${LAPACK_FOUND}>:${LAPACK_COMPILE_OPTIONS_FLAGS}>")
-
-    target_link_libraries(${_target}      PUBLIC "$<$<BOOL:${BLAS_FOUND}>:${BLAS_LIBRARIES}>")
-    target_compile_definitions(${_target} PUBLIC $<$<BOOL:${BLAS_FOUND}>:HAVE_BLAS=1>)
-  endforeach()
+  foreach(_target ${ARG_UNPARSED_ARGUMENTS})
+    target_link_libraries(${_target} ${ARG_SCOPE}
+      "$<$<BOOL:${LAPACK_FOUND}>:${LAPACK_LIBRARIES}>")
+    target_compile_options(${_target} ${ARG_SCOPE}
+      "$<$<BOOL:${LAPACK_FOUND}>:${LAPACK_COMPILE_OPTIONS_FLAGS}>")
+    target_link_libraries(${_target} ${ARG_SCOPE}
+      "$<$<BOOL:${BLAS_FOUND}>:${BLAS_LIBRARIES}>")
+    target_compile_definitions(${_target} ${ARG_SCOPE}
+      "$<$<BOOL:${BLAS_FOUND}>:HAVE_BLAS=1>")
+  endforeach(_target)
 endfunction(add_dune_blas_lapack_flags)
+
+# register Lapack library as dune package
+add_dune_blas_lapack_flags(${ProjectName}-all-packages INTERFACE)

@@ -92,6 +92,8 @@ macro(dune_project)
         BRIEF_DOCS "List of interface libraries of the module. DO NOT EDIT!"
         FULL_DOCS "List of interface libraries of the module. Used to set up external module configuration. DO NOT EDIT!")
 
+  add_library(${ProjectName}-all-packages INTERFACE)
+
   dune_create_dependency_tree()
 
   # assert the project names matches
