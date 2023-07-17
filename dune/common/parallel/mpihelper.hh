@@ -246,20 +246,17 @@ namespace Dune
     DUNE_EXPORT static MPIHelper& instance(int& argc, char**& argv)
     {
       // create singleton instance
-      if (!instance_){
-        static std::mutex mutex;
-        std::lock_guard<std::mutex> guard(mutex);
-        if(!instance_)
-          instance_.reset(new MPIHelper(argc,argv));
-      }
-      return *instance_;
+      static MPIHelper instance(argc, argv);
+      static std::once_flag instance_flag;
+      std::call_once(instance_flag, [&]() { instance_ptr_ = &instance; });
+      return instance;
     }
 
     DUNE_EXPORT static MPIHelper& instance()
     {
-      if(!instance_)
+      if (!instance_ptr_)
         DUNE_THROW(InvalidStateException, "MPIHelper not initialized! Call MPIHelper::instance(argc, argv) with arguments first.");
-      return *instance_;
+      return *instance_ptr_;
     }
 
     /**
@@ -289,7 +286,7 @@ namespace Dune
     int size_;
     bool initializedHere_;
     void prevent_warning(int){}
-    static inline std::unique_ptr<MPIHelper> instance_ = {};
+    static inline MPIHelper* instance_ptr_ = nullptr;
 
     //! \brief calls MPI_Init with argc and argv as parameters
     MPIHelper(int& argc, char**& argv)
