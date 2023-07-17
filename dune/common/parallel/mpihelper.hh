@@ -10,6 +10,7 @@
 #include <mpi.h>
 #endif
 
+#include <atomic>
 #include <mutex>
 
 #include <dune/common/parallel/communication.hh>
@@ -248,15 +249,17 @@ namespace Dune
       // create singleton instance
       static MPIHelper instance(argc, argv);
       static std::once_flag instance_flag;
-      std::call_once(instance_flag, [&]() { instance_ptr_ = &instance; });
+      std::call_once(instance_flag, [&]() { instance_ptr_.store(&instance); });
       return instance;
     }
 
     DUNE_EXPORT static MPIHelper& instance()
     {
-      if (!instance_ptr_)
-        DUNE_THROW(InvalidStateException, "MPIHelper not initialized! Call MPIHelper::instance(argc, argv) with arguments first.");
-      return *instance_ptr_;
+      if (auto ptr = instance_ptr_.load())
+        return *ptr;
+      DUNE_THROW(InvalidStateException,
+                 "MPIHelper not initialized! Call MPIHelper::instance(argc, "
+                 "argv) with arguments first.");
     }
 
     /**
@@ -286,7 +289,7 @@ namespace Dune
     int size_;
     bool initializedHere_;
     void prevent_warning(int){}
-    static inline MPIHelper* instance_ptr_ = nullptr;
+    static inline std::atomic<MPIHelper*> instance_ptr_ = nullptr;
 
     //! \brief calls MPI_Init with argc and argv as parameters
     MPIHelper(int& argc, char**& argv)
