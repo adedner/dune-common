@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <functional>
 #include <memory>
+#include <cassert>
 
 #include <mpi.h>
 
