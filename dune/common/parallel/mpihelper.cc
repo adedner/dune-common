@@ -7,6 +7,24 @@
 
 #include "mpihelper.hh"
 
+#if HAVE_MPI
+#include <cassert>
+#include <dune/common/stdstreams.hh>
+#include <mpi.h>
+#endif
+
+#if HAVE_MPI
+#include <mutex>
+#include <atomic>
+#include <cassert>
+#include <mpi.h>
+#endif
+
+#if HAVE_MPI
+#include <dune/common/parallel/mpicommunication.hh>
+#include <dune/common/stdstreams.hh>
+#endif
+
 namespace Dune {
 
 auto
@@ -22,7 +40,8 @@ FakeMPIHelper::getLocalCommunicator() -> MPICommunicator
   return getCommunicator();
 }
 
-[[deprecated("getCollectionCommunication is deprecated. Use getCommunication instead.")]] auto
+[[deprecated("getCollectionCommunication is deprecated. Use getCommunication "
+             "instead.")]] auto
 FakeMPIHelper::getCollectiveCommunication() -> Communication<MPICommunicator>
 {
   return Communication<MPICommunicator>(getCommunicator());

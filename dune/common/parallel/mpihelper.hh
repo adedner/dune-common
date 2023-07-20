@@ -5,18 +5,9 @@
 #ifndef DUNE_MPIHELPER
 #define DUNE_MPIHELPER
 
-#if HAVE_MPI
-#include <cassert>
-#include <mpi.h>
-#endif
-
-#include <atomic>
-#include <mutex>
-
 #include <dune/common/parallel/communication.hh>
 #if HAVE_MPI
 #include <dune/common/parallel/mpicommunication.hh>
-#include <dune/common/stdstreams.hh>
 #endif
 #include <dune/common/visibility.hh>
 
