@@ -3,6 +3,8 @@
 // SPDX-FileCopyrightInfo: Copyright © DUNE Project contributors, see file LICENSE.md in module root
 // SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
 
+#include <config.h>
+
 #include "mpihelper.hh"
 
 namespace Dune {
@@ -61,14 +63,14 @@ FakeMPIHelper::size() const
 
 static inline std::atomic<MPIHelper*> mpi_helper_instance_ptr_ = nullptr;
 
-MPICommunicator
-MPIHelper::getCommunicator()
+auto
+MPIHelper::getCommunicator() -> MPICommunicator
 {
   return MPI_COMM_WORLD;
 }
 
-MPICommunicator
-MPIHelper::getLocalCommunicator()
+auto
+MPIHelper::getLocalCommunicator() -> MPICommunicator
 {
   return MPI_COMM_SELF;
 }

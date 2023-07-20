@@ -23,6 +23,9 @@ target_compile_features(dunecommon PUBLIC cxx_std_17)
 add_dune_blas_lapack_flags(dunecommon)
 add_dune_tbb_flags(dunecommon)
 
+target_link_libraries(dunecommon PRIVATE $<TARGET_NAME_IF_EXISTS:MPI::MPI_C>)
+target_compile_definitions(dunecommon PRIVATE $<$<TARGET_EXISTS:MPI::MPI_C>:ENABLE_MPI=1>)
+
 # add subdirectories to execute CMakeLists.txt there
 add_subdirectory(bin)
 add_subdirectory(cmake)
