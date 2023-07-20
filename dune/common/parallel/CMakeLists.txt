@@ -27,3 +27,6 @@ install(FILES
         selection.hh
         variablesizecommunicator.hh
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/common/parallel)
+
+target_sources(dunecommon PRIVATE
+  mpihelper.cc)

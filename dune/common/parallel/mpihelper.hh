@@ -91,11 +91,7 @@ namespace Dune
      *
      *  \returns a fake communicator
      */
-    DUNE_EXPORT static MPICommunicator getCommunicator ()
-    {
-      static MPICommunicator comm;
-      return comm;
-    }
+    DUNE_EXPORT static MPICommunicator getCommunicator ();
 
     /** \brief get a local communicator
      *
@@ -103,12 +99,7 @@ namespace Dune
      *
      *  \returns a fake communicator
      */
-    static MPICommunicator getLocalCommunicator ()
-    {
-      return getCommunicator();
-    }
-
-
+    static MPICommunicator getLocalCommunicator ();
 
     /**
      * \deprecated getCollectionCommunication is deprecated and will be removed after Dune 2.9.
@@ -116,16 +107,10 @@ namespace Dune
      * Use getCommunication instead.
      */
     [[deprecated("getCollectionCommunication is deprecated. Use getCommunication instead.")]]
-    static Communication<MPICommunicator> getCollectiveCommunication()
-    {
-      return Communication<MPICommunicator>(getCommunicator());
-    }
+    static Communication<MPICommunicator> getCollectiveCommunication();
 
     static Communication<MPICommunicator>
-    getCommunication()
-    {
-      return Communication<MPICommunicator>(getCommunicator());
-    }
+    getCommunication();
 
     /**
      * @brief Get the singleton instance of the helper.
@@ -143,28 +128,21 @@ namespace Dune
      * @param argv The arguments provided to main.
      */
     DUNE_EXPORT static FakeMPIHelper& instance([[maybe_unused]] int argc,
-                                               [[maybe_unused]] char** argv)
-    {
-      return instance();
-    }
+                                               [[maybe_unused]] char** argv);
 
-    DUNE_EXPORT static FakeMPIHelper& instance()
-    {
-      static FakeMPIHelper singleton;
-      return singleton;
-    }
+    DUNE_EXPORT static FakeMPIHelper& instance();
 
     /**
      * @brief return rank of process, i.e. zero
      */
-    int rank () const { return 0; }
+    int rank () const;
     /**
      * @brief return rank of process, i.e. one
      */
-    int size () const { return 1; }
+    int size () const;
 
   private:
-    FakeMPIHelper() {}
+    FakeMPIHelper() = default;
     FakeMPIHelper(const FakeMPIHelper&);
     FakeMPIHelper& operator=(const FakeMPIHelper);
   };
@@ -196,10 +174,7 @@ namespace Dune
      *
      *  \returns MPI_COMM_WORLD
      */
-    static MPICommunicator getCommunicator ()
-    {
-      return MPI_COMM_WORLD;
-    }
+    static MPICommunicator getCommunicator ();
 
     /** \brief get a local communicator
      *
@@ -207,10 +182,7 @@ namespace Dune
      *
      *  \returns MPI_COMM_SELF
      */
-    static MPICommunicator getLocalCommunicator ()
-    {
-      return MPI_COMM_SELF;
-    }
+    static MPICommunicator getLocalCommunicator ();
 
     /**
      * \deprecated getCollectionCommunication is deprecated and will be removed after Dune 2.9.
@@ -219,16 +191,11 @@ namespace Dune
      */
     [[deprecated("getCollectionCommunication is deprecated. Use getCommunication instead.")]]
     static Communication<MPICommunicator>
-    getCollectiveCommunication()
-    {
-      return Communication<MPICommunicator>(getCommunicator());
-    }
+    getCollectiveCommunication();
 
     static Communication<MPICommunicator>
-    getCommunication()
-    {
-      return Communication<MPICommunicator>(getCommunicator());
-    }
+    getCommunication();
+
     /**
      * @brief Get the singleton instance of the helper.
      *
@@ -244,76 +211,29 @@ namespace Dune
      * @param argc The number of arguments provided to main.
      * @param argv The arguments provided to main.
      */
-    DUNE_EXPORT static MPIHelper& instance(int& argc, char**& argv)
-    {
-      // create singleton instance
-      static MPIHelper instance(argc, argv);
-      static std::once_flag instance_flag;
-      std::call_once(instance_flag, [&]() { instance_ptr_.store(&instance); });
-      return instance;
-    }
+    DUNE_EXPORT static MPIHelper& instance(int& argc, char**& argv);
 
-    DUNE_EXPORT static MPIHelper& instance()
-    {
-      if (auto ptr = instance_ptr_.load())
-        return *ptr;
-      DUNE_THROW(InvalidStateException,
-                 "MPIHelper not initialized! Call MPIHelper::instance(argc, "
-                 "argv) with arguments first.");
-    }
-
+    DUNE_EXPORT static MPIHelper& instance();
     /**
      * @brief return rank of process
      */
-    int rank () const { return rank_; }
+    int rank () const;
     /**
      * @brief return number of processes
      */
-    int size () const { return size_; }
+    int size () const;
 
     //! \brief calls MPI_Finalize
-    ~MPIHelper()
-    {
-      int wasFinalized = -1;
-      MPI_Finalized( &wasFinalized );
-      if(!wasFinalized && initializedHere_)
-      {
-        MPI_Finalize();
-        dverb << "Called MPI_Finalize on p=" << rank_ << "!" <<std::endl;
-      }
-
-    }
+    ~MPIHelper();
 
   private:
     int rank_;
     int size_;
     bool initializedHere_;
     void prevent_warning(int){}
-    static inline std::atomic<MPIHelper*> instance_ptr_ = nullptr;
 
     //! \brief calls MPI_Init with argc and argv as parameters
-    MPIHelper(int& argc, char**& argv)
-    : initializedHere_(false)
-    {
-      int wasInitialized = -1;
-      MPI_Initialized( &wasInitialized );
-      if(!wasInitialized)
-      {
-        rank_ = -1;
-        size_ = -1;
-        static int is_initialized = MPI_Init(&argc, &argv);
-        prevent_warning(is_initialized);
-        initializedHere_ = true;
-      }
-
-      MPI_Comm_rank(MPI_COMM_WORLD,&rank_);
-      MPI_Comm_size(MPI_COMM_WORLD,&size_);
-
-      assert( rank_ >= 0 );
-      assert( size_ >= 1 );
-
-      dverb << "Called  MPI_Init on p=" << rank_ << "!" << std::endl;
-    }
+    MPIHelper(int& argc, char**& argv);
 
     MPIHelper(const MPIHelper&);
     MPIHelper& operator=(const MPIHelper);
