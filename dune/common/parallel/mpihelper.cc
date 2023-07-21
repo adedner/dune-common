@@ -110,7 +110,7 @@ MPIHelper::getCommunication() -> Communication<MPICommunicator>
 MPIHelper&
 MPIHelper::instance(int& argc, char**& argv)
 {
-  // create singleton instance
+  // create singleton instance & record its address for later use
   static MPIHelper instance(argc, argv);
   static std::once_flag instance_flag;
   std::call_once(instance_flag,
@@ -121,11 +121,22 @@ MPIHelper::instance(int& argc, char**& argv)
 MPIHelper&
 MPIHelper::instance()
 {
-  if (auto ptr = mpi_helper_instance_ptr_.load())
+  // if pointer is written in another thread we may need to wait until this threads sees the value
+  MPIHelper* ptr = nullptr;
+  if (ptr = mpi_helper_instance_ptr_.load())
     return *ptr;
-  DUNE_THROW(InvalidStateException,
-             "MPIHelper not initialized! Call MPIHelper::instance(argc, "
-             "argv) with arguments first.");
+  unsigned int count = 0;
+  do {
+#if defined(__x86_64__) || defined(__i386__)
+    __asm__ __volatile__("pause");
+#endif
+    ptr = mpi_helper_instance_ptr_.load(std::memory_order_relaxed);
+    if (++count == ~(unsigned int){0})
+      std::cerr << "MPIHelper seems to be not initialized! Ensure to call "
+                   "MPIHelper::instance(argc, argv) with arguments first."
+                << std::endl;
+  } while (!ptr);
+  return *mpi_helper_instance_ptr_.load();
 }
 
 int
