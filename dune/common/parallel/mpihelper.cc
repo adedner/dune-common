@@ -113,17 +113,19 @@ MPIHelper::instance(int& argc, char**& argv)
   // create singleton instance & record its address for later use
   static MPIHelper instance(argc, argv);
   static std::once_flag instance_flag;
-  std::call_once(instance_flag,
-                 [&]() { mpi_helper_instance_ptr_.store(&instance); });
+  std::call_once(instance_flag, [&]() {
+    mpi_helper_instance_ptr_.store(&instance, std::memory_order_release);
+  });
   return instance;
 }
 
 MPIHelper&
 MPIHelper::instance()
 {
-  // if pointer is written in another thread we may need to wait until this threads sees the value
+  // if pointer is written in another thread we may need to wait until this
+  // threads sees the value
   MPIHelper* ptr = nullptr;
-  if (ptr = mpi_helper_instance_ptr_.load())
+  if (ptr = mpi_helper_instance_ptr_.load(std::memory_order_acquire))
     return *ptr;
   unsigned int count = 0;
   do {
@@ -131,12 +133,12 @@ MPIHelper::instance()
     __asm__ __volatile__("pause");
 #endif
     ptr = mpi_helper_instance_ptr_.load(std::memory_order_relaxed);
-    if (++count == ~(unsigned int){0})
+    if (++count == ~(unsigned int){ 0 })
       std::cerr << "MPIHelper seems to be not initialized! Ensure to call "
                    "MPIHelper::instance(argc, argv) with arguments first."
                 << std::endl;
   } while (!ptr);
-  return *mpi_helper_instance_ptr_.load();
+  return *mpi_helper_instance_ptr_.load(std::memory_order_acquire);
 }
 
 int
