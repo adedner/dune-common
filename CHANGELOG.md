@@ -106,6 +106,7 @@ In order to build the DUNE core modules you need at least the following software
 - Remove deprecated `dune/common/std/apply.hh`, use `std::apply` instead.
 - Deprecated the file `dune/common/assertandreturn.hh` and the contained utility
   `DUNE_ASSERT_AND_RETURN`. Use `assert()` macro directly in `constexpr` functions.
+- Deprecated the file `dune/common/vc.hh`, directly include `<Vc/Vc>` instead.
 
 # Release 2.9
 
