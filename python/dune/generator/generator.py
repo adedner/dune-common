@@ -33,7 +33,7 @@ class SimpleGenerator(object):
           self.pythonName = pythonname
         self.fileName = filename
 
-    def pre(self, includes, duneType, moduleName, defines=None, preamble=None):
+    def pre(self, includes, extraIncludes, duneType, moduleName, defines=None, preamble=None):
         if defines is None: defines = []
         source  = '#ifndef Guard_' + moduleName + '\n'
         source += '#define Guard_' + moduleName + '\n\n'
@@ -41,6 +41,7 @@ class SimpleGenerator(object):
         source += '#define USING_DUNE_PYTHON 1\n\n'
         source += ''.join(["#define " + d + "\n" for d in defines])
         source += ''.join(["#include <" + i + ">\n" for i in includes])
+        source += ''.join(["#include <" + i + ">\n" for i in extraIncludes])
         source += '\n'
         source += '#include <dune/python/common/typeregistry.hh>\n'
         source += '#include <dune/python/pybind11/pybind11.h>\n'
@@ -126,6 +127,7 @@ class SimpleGenerator(object):
         return module
 
     def load(self, includes, typeName, moduleName, *args,
+            extraIncludes=[],
             extraCMake=None,
             defines=None, preamble=None, postscript=None,
             options=None, bufferProtocol=False, dynamicAttr=False,
@@ -164,7 +166,7 @@ class SimpleGenerator(object):
             allIncludes = includes
         allIncludes = sorted(set(allIncludes))
         includes = sorted(set(includes))
-        source  = self.pre(allIncludes, typeName[0], moduleName, defines, preamble)
+        source  = self.pre(allIncludes, extraIncludes, typeName[0], moduleName, defines, preamble)
         for nr, (tn, a, o, b, d, bc, h)  in enumerate( zip(typeName, args, options, bufferProtocol, dynamicAttr, baseClasses, holder) ):
             source += self.main(nr, includes, tn, *a, options=o,
                                 bufferProtocol=b, dynamicAttr=d,
