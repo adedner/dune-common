@@ -315,7 +315,7 @@ if(DUNE_PYTHON_USE_VENV)
   dune_execute_process(COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m pip install
         "${DUNE_PIP_INDEX}"
         setuptools>=41 ninja
-    WARNING_MESSAGE "python 'setuptools' package could not be installed - possibly connection to the python package index failed"
+    # WARNING_MESSAGE "python 'setuptools' package could not be installed - possibly connection to the python package index failed"
     )
 
 else()

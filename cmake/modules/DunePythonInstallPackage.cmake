@@ -156,8 +156,7 @@
 #    be used to point pip to alternative package indices in restricted environments.
 #
 include_guard(GLOBAL)
-
-
+# include(FeatureSummary)
 
 function(dune_python_configure_dependencies)
   if(NOT DUNE_PYTHON_USE_VENV)
@@ -263,7 +262,7 @@ function(dune_python_configure_dependencies)
                                     "${requirement}"
                           RESULT_VARIABLE INSTALL_FAILED
                           ERROR_VARIABLE DEPENDENCIES_ERROR
-                          WARNING_MESSAGE "Python ${PYCONFDEPS_OPT}package requirement '${requirement}' could not be installed - possibly connection to the python package index failed\n${DEPENDENCIES_ERROR}"
+                          # WARNING_MESSAGE "Python ${PYCONFDEPS_OPT}package requirement '${requirement}' could not be installed - possibly connection to the python package index failed\n${DEPENDENCIES_ERROR}"
                           )
       if(NOT OPTIONAL_PACKAGE)
         if(INSTALL_FAILED)
@@ -650,8 +649,13 @@ function(dune_python_configure_bindings)
       INSTALL_TARGET install_python_package_${PYCONFBIND_PACKAGENAME}
       CMAKE_METADATA_FLAGS ${PYCONFBIND_CMAKE_METADATA_FLAGS}
     )
+    add_feature_info("Python bindings" TRUE
+      "configuration successful"
+    )
   else()
-    message(WARNING "python binding configuration failed - no linking done")
+    add_feature_info("Python bindings" FALSE
+      "configuration failed: possibly the download from the Python package index timed out due to missing internet connection"
+    )
   endif()
 
 endfunction()
