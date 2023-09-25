@@ -110,8 +110,9 @@ MPIHelper::getCommunication() -> Communication<MPICommunicator>
 MPIHelper&
 MPIHelper::instance(int& argc, char**& argv)
 {
-  // create singleton instance & record its address for later use
+  // create singleton instance
   static MPIHelper instance(argc, argv);
+  // register address of singleton on the first call of this function
   static std::once_flag instanceFlag;
   std::call_once(instanceFlag, [&]() {
     mpiHelperInstancePtr_.store(&instance, std::memory_order_release);
@@ -123,21 +124,30 @@ MPIHelper&
 MPIHelper::instance()
 {
   // if pointer is written in another thread we may need to wait until this
-  // threads sees the value
+  // threads sees the value, thus, we need to ensure the memory order consistency
   MPIHelper* ptr = mpiHelperInstancePtr_.load(std::memory_order_acquire);
+  // if current value is not null, mpi helper was already created and registered
   if (ptr)
     return *ptr;
   unsigned int count = 0;
+  // otherwise, we make a busy-loop until ptr gets assigned by another thread
   do {
 #if defined(__x86_64__) || defined(__i386__)
+    // recommended pause op on busy loops for x86
     __asm__ __volatile__("pause");
 #endif
+    // load ptr again without any strong memory ordering requirement
     ptr = mpiHelperInstancePtr_.load(std::memory_order_relaxed);
+    // if the loop count is too high (i.e., UINT_MAX), it is almost certain that
+    // the version with arguments was not called at all
     if (++count == ~(unsigned int){ 0 })
       std::cerr << "MPIHelper seems to be not initialized! Ensure to call "
                    "MPIHelper::instance(argc, argv) with arguments first."
                 << std::endl;
   } while (!ptr);
+  // To ensure memory order consistency of subsequent reads/writes, we need to
+  // load the pointer again with relesase-acquire ordering. Note that we do not
+  // check the pointer again because we write the pointer only once.
   return *mpiHelperInstancePtr_.load(std::memory_order_acquire);
 }
 
