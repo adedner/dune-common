@@ -56,6 +56,9 @@ In order to build the DUNE core modules you need at least the following software
 - Add the utility `IsCompileTimeConstant` to check for integral constants and anything with
   the same interface.
 
+- `DynamicMatrix` is now fully compatible to `FieldMatrix`. Two
+  methods (`rightmultiplyany` and `leftmultiplyany`) were added.
+
 ## Build System
 
 - The function `dune_add_library(<lib> ...)` now requires to provide `EXPORT_NAME` or `NO_EXPORT`.
