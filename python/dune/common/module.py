@@ -360,7 +360,6 @@ def make_dune_py_module(dune_py_dir=None, deps=None):
         project.write_cmake_file(generated_dir, cmake_content)
 
         with open(os.path.join(generated_dir, 'generated_test.cc'), 'w') as file:
-            file.write('#include <config.h>\n\n')
             file.write('#define USING_DUNE_PYTHON 1\n\n')
             file.write('\n#include "generated_module.hh"\n')
 
@@ -440,7 +439,7 @@ def getCXXFlags():
        These are extracted from the CMackeCache.txt file.
     '''
     cache = os.path.join(getDunePyDir(), "CMakeCache.txt")
-    matches = [match for match in [re.match(r'DEFAULT_CXXFLAGS:STRING=', line) for line in open(cache)] if match is not None]
+    matches = [match for match in [re.match('DEFAULT_CXXFLAGS:STRING=', line) for line in open(cache)] if match is not None]
     if not matches:
         return ''
     if matches.__len__() > 1:

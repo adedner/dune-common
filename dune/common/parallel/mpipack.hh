@@ -21,6 +21,9 @@
 #define DUNE_COMMON_PARALLEL_MPIPACK_HH
 
 #include <vector>
+
+#include <dune-common-config.hh>
+
 #if HAVE_MPI
 #include <mpi.h>
 #include <dune/common/parallel/mpicommunication.hh>

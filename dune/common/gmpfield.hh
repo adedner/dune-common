@@ -13,6 +13,8 @@
 #include <string>
 #include <type_traits>
 
+#include <dune-common-config.hh>
+
 #if HAVE_GMP || DOXYGEN
 
 #include <gmpxx.h>

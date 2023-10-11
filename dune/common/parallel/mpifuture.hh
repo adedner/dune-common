@@ -7,6 +7,8 @@
 
 #include <optional>
 
+#include <dune-common-config.hh>
+
 #include <dune/common/parallel/communication.hh>
 #include <dune/common/parallel/future.hh>
 #include <dune/common/parallel/mpidata.hh>

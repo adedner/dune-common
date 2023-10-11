@@ -9,6 +9,8 @@
 #include <vector>
 #include <string>
 
+#include <dune-common-config.hh>
+
 #if HAVE_MPI
 
 #include <dune/common/typetraits.hh>

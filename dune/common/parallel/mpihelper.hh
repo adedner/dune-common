@@ -5,6 +5,8 @@
 #ifndef DUNE_MPIHELPER
 #define DUNE_MPIHELPER
 
+#include <dune-common-config.hh>
+
 #if HAVE_MPI
 #include <cassert>
 #include <mpi.h>

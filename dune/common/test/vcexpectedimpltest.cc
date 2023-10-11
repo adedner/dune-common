@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightInfo: Copyright © DUNE Project contributors, see file LICENSE.md in module root
 // SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
-#include "config.h"
+#include <dune-common-config.hh>
 
 #if !HAVE_VC
 #error Inconsistent buildsystem.  This program should not be built in the \

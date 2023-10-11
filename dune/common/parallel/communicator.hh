@@ -5,6 +5,8 @@
 #ifndef DUNE_COMMUNICATOR
 #define DUNE_COMMUNICATOR
 
+#include <dune-common-config.hh>
+
 #if HAVE_MPI
 
 #include <cassert>

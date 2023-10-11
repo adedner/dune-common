@@ -46,7 +46,7 @@ class Version:
             self.revision = s.revision
             self.build = s.build
         else:
-            match = re.match(r'(?P<major>[0-9]+)([.](?P<minor>[0-9*]+))?([.](?P<revision>[0-9*]+))?([.](?P<build>[a-z0-9*]+))?', s)
+            match = re.match('(?P<major>[0-9]+)([.](?P<minor>[0-9*]+))?([.](?P<revision>[0-9*]+))?([.](?P<build>[a-z0-9*]+))?', s)
             if not match:
                 raise ValueError('Invalid version: \'' + s + '\'.')
             self.major = int(match.group('major'))
@@ -531,13 +531,12 @@ def _extractBuildMetaData():
     # add meta data of packages from the dune namespace
     def addPackageMetaData(package, metaDataFile):
         result.setdefault(package, {})
-        with open(metaDataFile, "r") as mdFile:
-            for line in mdFile:
-                try:
-                    key, value = line.split("=", 1)
-                    result[package][key] = value.strip()
-                except ValueError:  # no '=' in line
-                    pass
+        for line in open(metaDataFile, "r"):
+            try:
+                key, value = line.split("=", 1)
+                result[package][key] = value.strip()
+            except ValueError:  # no '=' in line
+                pass
 
     try:
         import dune.data
@@ -602,14 +601,12 @@ def _extractCMakeFlags():
 
     # check environment variable
     cmakeArgs += shlex.split(os.environ.get('DUNE_CMAKE_FLAGS', ''))
-    for y in cmakeArgs:
-        try:
-            k, v = y.split("=", 1)
-            if k.startswith('-D'):
-                k = k[2:]
-            cmakeFlags[k] = v.strip()
-        except ValueError:  # no '=' in line
-            pass
+    cmakeArgPattern = re.compile(r"-D[ ]*(?P<key>[A-Za-z0-9_-]+)(?:\:(?P<type>BOOL|FILESYSTEM|PATH|STRING|INTERNAL))?=(?P<value>\S+)")
+    for match in re.finditer(cmakeArgPattern, ' '.join(cmakeArgs)):
+        k = match.group("key")
+        v = match.group("value")
+        # the type of the variable is ignored
+        cmakeFlags[k] = v.strip()
 
     # try to unify 'ON' and 'OFF' values
     for k, v in cmakeFlags.items():

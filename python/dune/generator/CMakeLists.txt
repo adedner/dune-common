@@ -11,5 +11,4 @@ add_python_targets(generator
   exceptions
   generator
   remove
-  make
   )

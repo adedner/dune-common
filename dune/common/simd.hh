@@ -32,6 +32,7 @@
 #include <type_traits>
 #include <utility>
 
+#include <dune-common-config.hh>
 #include <dune/common/conditional.hh>
 #include <dune/common/debugalign.hh>
 #include <dune/common/rangeutilities.hh>

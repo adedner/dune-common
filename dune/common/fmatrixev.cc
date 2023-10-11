@@ -5,15 +5,14 @@
 #ifndef DUNE_FMATRIXEIGENVALUES_CC
 #define DUNE_FMATRIXEIGENVALUES_CC
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <iostream>
 #include <cmath>
 #include <cassert>
 
+#include <dune-common-config.hh>
+
 #include <dune/common/exceptions.hh>
+#include <dune/common/fmatrixev.hh>
 
 #if HAVE_LAPACK
 

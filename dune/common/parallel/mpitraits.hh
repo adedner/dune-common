@@ -15,6 +15,8 @@
  * @author Markus Blatt
  */
 
+#include <dune-common-config.hh>
+
 #if HAVE_MPI
 
 #include <cstddef>

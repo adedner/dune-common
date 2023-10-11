@@ -5,6 +5,8 @@
 #ifndef DUNE_REMOTEINDICES_HH
 #define DUNE_REMOTEINDICES_HH
 
+#include <dune-common-config.hh>
+
 #if HAVE_MPI
 
 #include <cassert>
