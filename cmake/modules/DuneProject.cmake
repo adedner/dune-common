@@ -110,9 +110,7 @@ macro(dune_project)
   include(CheckCXXFeatures)
 
   # set include path and link path for the current project.
-  include_directories("${PROJECT_BINARY_DIR}")
   include_directories("${PROJECT_SOURCE_DIR}")
-  include_directories("${CMAKE_CURRENT_BINARY_DIR}")
   include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
   include_directories("${CMAKE_CURRENT_BINARY_DIR}/generated")
   add_definitions(-DHAVE_CONFIG_H)
@@ -429,8 +427,8 @@ endif()")
     dune_parse_module_config_file(${ProjectName} FILE ${PROJECT_SOURCE_DIR}/config.h.cmake)
 
     # configure private config file
-    file(WRITE ${PROJECT_BINARY_DIR}/${ProjectName}-config-private.hh.cmake "${${ProjectName}_CONFIG_PRIVATE_HH}")
-    configure_file(${CMAKE_CURRENT_BINARY_DIR}/${ProjectName}-config-private.hh.cmake ${CMAKE_CURRENT_BINARY_DIR}/${ProjectName}-config-private.hh)
+    file(WRITE ${PROJECT_BINARY_DIR}/config-private/${ProjectName}-config-private.hh.cmake "${${ProjectName}_CONFIG_PRIVATE_HH}")
+    configure_file(${CMAKE_CURRENT_BINARY_DIR}/config-private/${ProjectName}-config-private.hh.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-private/${ProjectName}-config-private.hh)
 
     # configure and install public config file
     file(WRITE ${PROJECT_BINARY_DIR}/generated/${ProjectName}-config.hh.cmake "${${ProjectName}_CONFIG_HH}\n${${ProjectName}_CONFIG_BOTTOM_HH}")
@@ -449,8 +447,10 @@ endif()")
   endif()
   # actually write the config.h file to disk
   # using generated file
-  configure_file(${CMAKE_CURRENT_BINARY_DIR}/config_collected.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+  configure_file(${CMAKE_CURRENT_BINARY_DIR}/config_collected.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-private/config.h)
 
+  # create a symlink in the binary dir to the generated config.h file
+  file(CREATE_LINK ${CMAKE_CURRENT_BINARY_DIR}/config-private/config.h ${CMAKE_CURRENT_BINARY_DIR}/config.h SYMBOLIC)
   if(PROJECT_NAME STREQUAL CMAKE_PROJECT_NAME)
     feature_summary(WHAT ALL)
   endif()
