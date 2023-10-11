@@ -5,6 +5,8 @@
 #ifndef DUNE_INTERFACE_HH
 #define DUNE_INTERFACE_HH
 
+#include <dune-common-config.hh>
+
 #if HAVE_MPI
 
 #include "remoteindices.hh"

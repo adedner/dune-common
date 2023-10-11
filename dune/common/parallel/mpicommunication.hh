@@ -13,6 +13,8 @@
    \ingroup ParallelCommunication
  */
 
+#include <dune-common-config.hh>
+
 #if HAVE_MPI
 
 #include <algorithm>

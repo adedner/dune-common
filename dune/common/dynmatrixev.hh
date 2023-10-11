@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <memory>
 
+#include <dune-common-config.hh>
+
 #include "dynmatrix.hh"
 #include "fmatrixev.hh"
 

@@ -5,6 +5,8 @@
 #ifndef DUNE_INDICESSYNCER_HH
 #define DUNE_INDICESSYNCER_HH
 
+#include <dune-common-config.hh>
+
 #include "indexset.hh"
 #include "remoteindices.hh"
 #include <dune/common/stdstreams.hh>

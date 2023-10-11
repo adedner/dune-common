@@ -3,6 +3,8 @@
 #ifndef DUNE_COMMON_VC_HH
 #define DUNE_COMMON_VC_HH
 
+#include <dune-common-config.hh>
+
 /**
    \file
 

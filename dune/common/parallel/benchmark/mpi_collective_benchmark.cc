@@ -65,12 +65,11 @@
  * (https://software.intel.com/en-us/mpi-developer-reference-linux-asynchronous-progress-control)
  */
 
-
-#include <config.h>
-
 #include <iostream>
 #include <iomanip>
 #include <thread>
+
+#include <dune-common-config.hh>
 
 #include <dune/common/parallel/mpihelper.hh>
 #include <dune/common/timer.hh>
