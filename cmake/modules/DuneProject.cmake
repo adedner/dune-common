@@ -167,6 +167,7 @@ macro(dune_project)
   include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
   include_directories("${CMAKE_CURRENT_BINARY_DIR}/include")
   include_directories("${CMAKE_CURRENT_BINARY_DIR}/include_private")
+  include_directories("${CMAKE_CURRENT_BINARY_DIR}/generated")
   add_definitions(-DHAVE_CONFIG_H)
 
   # Create custom target for building the documentation
