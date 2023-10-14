@@ -114,7 +114,7 @@ macro(dune_project)
   include_directories("${PROJECT_SOURCE_DIR}")
   include_directories("${CMAKE_CURRENT_BINARY_DIR}")
   include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
-  include_directories("${CMAKE_CURRENT_BINARY_DIR}/config")
+  include_directories("${CMAKE_CURRENT_BINARY_DIR}/generated")
   add_definitions(-DHAVE_CONFIG_H)
 
   # Create custom target for building the documentation
@@ -264,10 +264,7 @@ endif()")
 
 
   #create cmake-config files for build tree
-  set(PACKAGE_CMAKE_INSTALL_INCLUDEDIR ${PROJECT_SOURCE_DIR})
-  if(EXISTS ${PROJECT_SOURCE_DIR}/config.h.cmake)
-    list(APPEND PACKAGE_CMAKE_INSTALL_INCLUDEDIR ${PROJECT_BINARY_DIR}/config)
-  endif()
+  set(PACKAGE_CMAKE_INSTALL_INCLUDEDIR ${PROJECT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/generated)
   set(PACKAGE_CMAKE_INSTALL_DATAROOTDIR ${PROJECT_BINARY_DIR})
   set(PACKAGE_DOXYSTYLE_DIR ${PROJECT_SOURCE_DIR}/doc/doxygen)
   set(PACKAGE_SCRIPT_DIR ${PROJECT_SOURCE_DIR}/cmake/scripts)
@@ -276,6 +273,10 @@ endif()")
   set(PACKAGE_INIT "# Set prefix to source dir
 set(PACKAGE_PREFIX_DIR ${PROJECT_SOURCE_DIR})
 macro(set_and_check _var _file)
+  set(\${_var} \"\${_file}\")
+  if(\"_\${_file}_\" STREQUAL \"__\")
+    message(FATAL_ERROR \"File or directory referenced by variable \${_var} is unset !\")
+  endif()
   foreach(_f \${_file})
     if(NOT EXISTS \"\${_f}\")
       message(FATAL_ERROR \"File or directory \${_f} referenced by variable \${_var} does not exist !\")
@@ -423,6 +424,7 @@ endif()")
   ###########################
 
   # generate and install headers file: ${ProjectName}-config.hh and ${ProjectName}-config-private.hh
+  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/)
   if(EXISTS ${PROJECT_SOURCE_DIR}/config.h.cmake)
     dune_parse_module_config_file(${ProjectName} FILE ${PROJECT_SOURCE_DIR}/config.h.cmake)
 
@@ -431,11 +433,11 @@ endif()")
     configure_file(${CMAKE_CURRENT_BINARY_DIR}/${ProjectName}-config-private.hh.cmake ${CMAKE_CURRENT_BINARY_DIR}/${ProjectName}-config-private.hh)
 
     # configure and install public config file
-    file(WRITE ${PROJECT_BINARY_DIR}/config/${ProjectName}-config.hh.cmake "${${ProjectName}_CONFIG_HH}\n${${ProjectName}_CONFIG_BOTTOM_HH}")
+    file(WRITE ${PROJECT_BINARY_DIR}/generated/${ProjectName}-config.hh.cmake "${${ProjectName}_CONFIG_HH}\n${${ProjectName}_CONFIG_BOTTOM_HH}")
     # parse again dune.module file of current module to set PACKAGE_* variables
     dune_module_information(${PROJECT_SOURCE_DIR} QUIET)
-    configure_file(${CMAKE_CURRENT_BINARY_DIR}/config/${ProjectName}-config.hh.cmake ${CMAKE_CURRENT_BINARY_DIR}/config/${ProjectName}-config.hh)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/config/${ProjectName}-config.hh DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+    configure_file(${CMAKE_CURRENT_BINARY_DIR}/generated/${ProjectName}-config.hh.cmake ${CMAKE_CURRENT_BINARY_DIR}/generated/${ProjectName}-config.hh)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/generated/${ProjectName}-config.hh DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
   endif()
 
   message(STATUS "Adding custom target for config.h generation")
