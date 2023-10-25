@@ -228,6 +228,7 @@ namespace Dune
     {
       return Communication<MPICommunicator>(getCommunicator());
     }
+
     /**
      * @brief Get the singleton instance of the helper.
      *
@@ -245,21 +246,21 @@ namespace Dune
      */
     DUNE_EXPORT static MPIHelper& instance(int& argc, char**& argv)
     {
-      // create singleton instance
-      if (!instance_){
-        static std::mutex mutex;
-        std::lock_guard<std::mutex> guard(mutex);
-        if(!instance_)
-          instance_.reset(new MPIHelper(argc,argv));
-      }
-      return *instance_;
+      return getSingleton(&argc, &argv);
     }
 
+    /**
+     * @brief Get the singleton instance of the helper.
+     *
+     * This method can only be called after a prior call to
+     * `instance(argc, argv)` that initializes MPI.
+     *
+     * @throws InvalidStateException  Is throws if MPI was not initialized
+     *    before by a call to `instance(argc,argv)`.
+     */
     DUNE_EXPORT static MPIHelper& instance()
     {
-      if(!instance_)
-        DUNE_THROW(InvalidStateException, "MPIHelper not initialized! Call MPIHelper::instance(argc, argv) with arguments first.");
-      return *instance_;
+      return getSingleton(nullptr, nullptr);
     }
 
     /**
@@ -291,17 +292,29 @@ namespace Dune
     void prevent_warning(int){}
     static inline std::unique_ptr<MPIHelper> instance_ = {};
 
+    //! Create a unique singleton for both `instance()` methods
+    DUNE_EXPORT static MPIHelper& getSingleton(int* argc, char*** argv)
+    {
+      static MPIHelper singleton{argc, argv};
+      return singleton;
+    }
+
     //! \brief calls MPI_Init with argc and argv as parameters
-    MPIHelper(int& argc, char**& argv)
+    MPIHelper(int* argc, char*** argv)
     : initializedHere_(false)
     {
+      if(!argc || !argv) {
+        DUNE_THROW(InvalidStateException,
+          "MPIHelper not initialized! Call MPIHelper::instance(argc, argv) with arguments first.");
+      }
+
       int wasInitialized = -1;
       MPI_Initialized( &wasInitialized );
       if(!wasInitialized)
       {
         rank_ = -1;
         size_ = -1;
-        static int is_initialized = MPI_Init(&argc, &argv);
+        static int is_initialized = MPI_Init(argc, argv);
         prevent_warning(is_initialized);
         initializedHere_ = true;
       }
