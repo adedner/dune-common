@@ -91,7 +91,6 @@ install(FILES
         scalarvectorview.hh
         scalarmatrixview.hh
         shared_ptr.hh
-        simd.hh
         singleton.hh
         sllist.hh
         stdstreams.hh
