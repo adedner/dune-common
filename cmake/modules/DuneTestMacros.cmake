@@ -192,6 +192,18 @@
 #       place to make it easy to construct regular expressions from the label
 #       names for :code:`ctest -L ${label_regex}`.
 #
+#    .. cmake_param:: NO_LINK_PROJECT_LIBRARIES
+#       :option:
+#
+#       Disable the automatic linking of all <ProjectName>_INTERFACE_LIBRARIES
+#       and instead just link against `Dune::Common`.
+#
+#    .. cmake_param:: NO_ADD_DUNE_ALL_FLAGS
+#       :option:
+#
+#       Disable the call to :ref:`add_dune_all_flags` for the test target. This
+#       call can be globally enabled by the variable `DUNE_ADD_TEST_ADD_DUNE_ALL_FLAGS`
+#
 #    This function defines the Dune way of adding a test to the testing suite.
 #    You may either add the executable yourself through :ref:`add_executable`
 #    and pass it to the :code:`TARGET` option, or you may rely on :ref:`dune_add_test`
@@ -209,6 +221,11 @@
 #    build all tests during `make all`. Note, that this may take quite some time for some modules.
 #    If not in use, you have to build tests through the target :code:`build_tests`. This option
 #    does not apply on non-mutable targets (i.e., aliased and imported targets).
+#
+# .. cmake_variable:: DUNE_ADD_TEST_ADD_DUNE_ALL_FLAGS
+#
+#    Globally enable the call to :ref:`add_dune_all_flags` for all test targets
+#    except for those that are configured with the option `NO_ADD_DUNE_ALL_FLAGS`.
 #
 # .. cmake_variable:: PYTHON_TEST
 #
@@ -257,7 +274,7 @@ if(NOT DUNE_MAX_TEST_CORES)
 endif()
 
 function(dune_add_test)
-  set(OPTIONS EXPECT_COMPILE_FAIL EXPECT_FAIL SKIP_ON_77 COMPILE_ONLY PYTHON_TEST NO_LINK_PROJECT_LIBRARIES)
+  set(OPTIONS EXPECT_COMPILE_FAIL EXPECT_FAIL SKIP_ON_77 COMPILE_ONLY PYTHON_TEST NO_LINK_PROJECT_LIBRARIES NO_ADD_DUNE_ALL_FLAGS)
   set(SINGLEARGS NAME TARGET TIMEOUT WORKING_DIRECTORY)
   set(MULTIARGS SOURCES COMPILE_DEFINITIONS COMPILE_FLAGS LINK_LIBRARIES CMD_ARGS MPI_RANKS COMMAND CMAKE_GUARD LABELS)
   cmake_parse_arguments(ADDTEST "${OPTIONS}" "${SINGLEARGS}" "${MULTIARGS}" ${ARGN})
@@ -357,7 +374,7 @@ function(dune_add_test)
   # Add the executable if it is not already present
   if(ADDTEST_SOURCES)
     add_executable(${ADDTEST_NAME} ${ADDTEST_SOURCES})
-    if(DUNE_ADD_TEST_ADD_DUNE_ALL_FLAGS)
+    if(DUNE_ADD_TEST_ADD_DUNE_ALL_FLAGS AND NOT NO_ADD_DUNE_ALL_FLAGS)
       # add all flags to the target!
       add_dune_all_flags(${ADDTEST_NAME})
     endif()
