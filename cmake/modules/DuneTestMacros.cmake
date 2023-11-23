@@ -192,6 +192,12 @@
 #       place to make it easy to construct regular expressions from the label
 #       names for :code:`ctest -L ${label_regex}`.
 #
+#    .. cmake_param:: NO_LINK_PROJECT_LIBRARIES
+#       :option:
+#
+#       Disable the automatic linking of all `<ProjectName>_INTERFACE_LIBRARIES`
+#       and instead just link against `Dune::Common`.
+#
 #    This function defines the Dune way of adding a test to the testing suite.
 #    You may either add the executable yourself through :ref:`add_executable`
 #    and pass it to the :code:`TARGET` option, or you may rely on :ref:`dune_add_test`
