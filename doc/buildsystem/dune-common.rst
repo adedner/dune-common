@@ -193,7 +193,8 @@ not want to see any policy warnings and just stick with the defaults, the global
 Policies Introduced by Dune 2.10
 --------------------------------
 
-Here we will list and explain the introduced policies.
+* DP0001: Link all <ProjectName>_LIBRARIES in dune_add_test. The "OLD" behavior is to link only ``Dune::Common``.
+          The "NEW" behavior will be enabled by default in dune-common version 2.12.
 
 
 .. _faq:
