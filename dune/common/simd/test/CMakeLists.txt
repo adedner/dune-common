@@ -6,6 +6,8 @@
 # to stay below 1GByte (with g++ 4.9.2 -O0 -g on x86_64 GNU/Linux, looking at
 # standardtest).
 include(DuneInstance)
+include(DunePolicy)
+dune_policy(SET DP0001 "NEW") # link all dune-common_LIBRARIES automatically
 
 set(TYPES
   char "unsigned char" "signed char"

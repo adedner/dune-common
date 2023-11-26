@@ -226,6 +226,9 @@ include_guard(GLOBAL)
 enable_testing()
 include(CTest)
 
+include(DunePolicy)
+dune_define_policy(DP0001 DUNE_COMMON 2.12 "Link all <ProjectName>_LIBRARIES in dune_add_test.")
+
 # Introduce a target that triggers the building of all tests
 add_custom_target(build_tests)
 
@@ -350,15 +353,19 @@ function(dune_add_test)
   endif()
 
   # add some default libraries to link against
-  if(NOT ADDTEST_NO_LINK_PROJECT_LIBRARIES)
+  dune_policy(GET DP0001 _policy_link_project_libraries)
+  if(_policy_link_project_libraries STREQUAL "OLD")
+    list(APPEND ADDTEST_LINK_LIBRARIES Dune::Common)
+  elseif(NOT ADDTEST_NO_LINK_PROJECT_LIBRARIES)
     get_property(PROJECT_INTERFACE_LIBRARIES GLOBAL PROPERTY ${ProjectName}_INTERFACE_LIBRARIES)
     if(${PROJECT_INTERFACE_LIBRARIES})
       list(APPEND ADDTEST_LINK_LIBRARIES ${PROJECT_INTERFACE_LIBRARIES})
     else()
       list(APPEND ADDTEST_LINK_LIBRARIES Dune::Common)
     endif()
-    list(REMOVE_DUPLICATES ADDTEST_LINK_LIBRARIES)
   endif()
+
+  list(REMOVE_DUPLICATES ADDTEST_LINK_LIBRARIES)
 
   # Add the executable if it is not already present
   if(ADDTEST_SOURCES)

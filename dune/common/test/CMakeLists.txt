@@ -2,6 +2,9 @@
 # SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
 
 include(DuneInstance)
+include(DunePolicy)
+
+dune_policy(SET DP0001 "NEW") # link all dune-common_LIBRARIES automatically
 
 dune_add_test(SOURCES arithmetictestsuitetest.cc
               LABELS quick)
