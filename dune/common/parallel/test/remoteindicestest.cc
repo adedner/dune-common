@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include <mpi.h>
+#include <dune/common/parallel/mpi.hh>
 
 #include <dune/common/enumset.hh>
 #include <dune/common/parallel/communicator.hh>

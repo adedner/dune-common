@@ -3,8 +3,6 @@
 #include <iostream>
 #include <vector>
 
-#include <dune-common-config.hh>
-
 #if ! HAVE_METIS
 #error "METIS is required for this test"
 #endif

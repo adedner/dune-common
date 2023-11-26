@@ -5,8 +5,6 @@
 
 #include <iostream>
 
-#include <dune-common-config.hh>
-
 #include <dune/common/parallel/mpihelper.hh>
 
 int main(int argc, char** argv)

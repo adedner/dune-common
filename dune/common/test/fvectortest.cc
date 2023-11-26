@@ -10,8 +10,6 @@
 #include <typeinfo>
 #include <type_traits>
 
-#include <dune-common-config.hh>
-
 #include <dune/common/classname.hh>
 #include <dune/common/exceptions.hh>
 #include <dune/common/fvector.hh>

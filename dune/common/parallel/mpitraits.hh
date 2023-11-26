@@ -15,8 +15,6 @@
  * @author Markus Blatt
  */
 
-#include <dune-common-config.hh>
-
 #if HAVE_MPI
 
 #include <cstddef>
@@ -25,7 +23,7 @@
 #include <utility>
 #include <complex>
 
-#include <mpi.h>
+#include <dune/common/parallel/mpi.hh>
 
 namespace Dune
 {

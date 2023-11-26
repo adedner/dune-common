@@ -69,8 +69,6 @@
 #include <iomanip>
 #include <thread>
 
-#include <dune-common-config.hh>
-
 #include <dune/common/parallel/mpihelper.hh>
 #include <dune/common/timer.hh>
 #include <dune/common/parametertree.hh>

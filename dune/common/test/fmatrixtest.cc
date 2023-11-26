@@ -14,7 +14,7 @@
 #include <iostream>
 #include <vector>
 
-#include <dune-common-config.hh>
+#include <dune-common-config.hh> // HAVE_LAPACK
 
 #include <dune/common/classname.hh>
 #include <dune/common/fmatrix.hh>

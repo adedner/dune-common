@@ -5,15 +5,10 @@
 #ifndef DUNE_MPIHELPER
 #define DUNE_MPIHELPER
 
-#include <dune-common-config.hh>
-
-#if HAVE_MPI
 #include <cassert>
-#include <mpi.h>
-#endif
-
 #include <mutex>
 
+#include <dune/common/parallel/mpi.hh>
 #include <dune/common/parallel/communication.hh>
 #if HAVE_MPI
 #include <dune/common/parallel/mpicommunication.hh>

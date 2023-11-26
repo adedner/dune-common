@@ -5,8 +5,6 @@
 #ifndef DUNE_QUADMATH_HH
 #define DUNE_QUADMATH_HH
 
-#include <dune-common-config.hh>
-
 #if HAVE_QUADMATH
 #include <quadmath.h>
 

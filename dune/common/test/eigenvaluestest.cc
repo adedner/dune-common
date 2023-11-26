@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightInfo: Copyright © DUNE Project contributors, see file LICENSE.md in module root
 // SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
 
-#include <dune-common-config.hh>
+#include <dune-common-config.hh> // HAVE_LAPACK
 
 #include <dune/common/fvector.hh>
 #include <dune/common/fmatrix.hh>

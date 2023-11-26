@@ -13,7 +13,6 @@
 #include <cstdlib>
 #include <type_traits>
 
-#include <dune-common-config.hh>
 #include <dune/common/exceptions.hh>
 #include <dune/common/hash.hh>
 

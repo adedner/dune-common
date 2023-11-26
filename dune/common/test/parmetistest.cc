@@ -4,13 +4,11 @@
 #include <iostream>
 #include <vector>
 
-#include <dune-common-config.hh>
-
 #if ! HAVE_PARMETIS
 #error "ParMETIS is required for this test."
 #endif
 
-#include <mpi.h>
+#include <dune/common/parallel/mpi.hh>
 
 #if HAVE_PTSCOTCH_PARMETIS
 extern "C" {

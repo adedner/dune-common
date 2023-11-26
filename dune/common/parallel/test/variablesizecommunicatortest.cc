@@ -8,9 +8,8 @@
 #include <utility>
 #include <vector>
 
-#include <mpi.h>
-
 #include <dune/common/parallel/interface.hh>
+#include <dune/common/parallel/mpi.hh>
 #include <dune/common/parallel/variablesizecommunicator.hh>
 
 // For each communicated index, send convert the index to a `double` and send

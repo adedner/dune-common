@@ -5,8 +5,6 @@
 #ifndef DUNE_COMMON_PARALLEL_VARIABLESIZECOMMUNICATOR_HH // Still fits the line!
 #define DUNE_COMMON_PARALLEL_VARIABLESIZECOMMUNICATOR_HH
 
-#include <dune-common-config.hh>
-
 #if HAVE_MPI
 
 #include <algorithm>
@@ -19,10 +17,9 @@
 #include <vector>
 #include <algorithm>
 
-#include <mpi.h>
-
 #include <dune/common/concept.hh>
 #include <dune/common/parallel/interface.hh>
+#include <dune/common/parallel/mpi.hh>
 #include <dune/common/parallel/mpitraits.hh>
 
 /**

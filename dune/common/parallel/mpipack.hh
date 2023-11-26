@@ -22,10 +22,8 @@
 
 #include <vector>
 
-#include <dune-common-config.hh>
-
 #if HAVE_MPI
-#include <mpi.h>
+#include <dune/common/parallel/mpi.hh>
 #include <dune/common/parallel/mpicommunication.hh>
 #include <dune/common/parallel/mpidata.hh>
 

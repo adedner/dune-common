@@ -9,8 +9,6 @@
 #include <type_traits>
 #include <utility>
 
-#include <dune-common-config.hh>
-
 #if HAVE_DUNE_TYPETREE
 #include <dune/typetree/compositenode.hh>
 #include <dune/typetree/powernode.hh>

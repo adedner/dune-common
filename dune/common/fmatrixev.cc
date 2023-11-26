@@ -9,7 +9,7 @@
 #include <cmath>
 #include <cassert>
 
-#include <dune-common-config.hh>
+#include <dune-common-config.hh>  // HAVE_LAPACK, LAPACK_NEEDS_UNDERLINE
 
 #include <dune/common/exceptions.hh>
 #include <dune/common/fmatrixev.hh>

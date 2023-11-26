@@ -4,8 +4,6 @@
 
 #include <complex>
 
-#include <dune-common-config.hh>
-
 #include <dune/common/boundschecking.hh>
 #include <dune/common/diagonalmatrix.hh>
 #include <dune/common/dynmatrix.hh>
@@ -385,7 +383,7 @@ int main() {
   bool passed = true;
   passed = passed && run<double>();
   passed = passed && run<std::complex<double>>();
-#ifdef HAVE_GMP
+#if HAVE_GMP
   passed = passed && run<Dune::GMPField<128u>>();
 #endif
   return passed ? 0 : 1;
