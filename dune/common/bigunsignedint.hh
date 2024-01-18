@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <type_traits>
+
 #include <dune/common/exceptions.hh>
 #include <dune/common/hash.hh>
 

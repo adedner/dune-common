@@ -16,10 +16,9 @@
 #include <utility>
 #include <vector>
 
-#include <mpi.h>
-
 #include <dune/common/exceptions.hh>
 #include <dune/common/parallel/indexset.hh>
+#include <dune/common/parallel/mpi.hh>
 #include <dune/common/parallel/mpitraits.hh>
 #include <dune/common/parallel/plocalindex.hh>
 #include <dune/common/sllist.hh>

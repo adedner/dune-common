@@ -1,6 +1,5 @@
 // SPDX-FileCopyrightInfo: Copyright © DUNE Project contributors, see file LICENSE.md in module root
 // SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
-#include <config.h>
 #include <cassert>
 #include <iostream>
 #include <vector>
@@ -9,7 +8,7 @@
 #error "ParMETIS is required for this test."
 #endif
 
-#include <mpi.h>
+#include <dune/common/parallel/mpi.hh>
 
 #if HAVE_PTSCOTCH_PARMETIS
 extern "C" {

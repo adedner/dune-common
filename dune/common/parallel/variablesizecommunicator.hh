@@ -17,10 +17,9 @@
 #include <vector>
 #include <algorithm>
 
-#include <mpi.h>
-
 #include <dune/common/concept.hh>
 #include <dune/common/parallel/interface.hh>
+#include <dune/common/parallel/mpi.hh>
 #include <dune/common/parallel/mpitraits.hh>
 
 /**

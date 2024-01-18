@@ -19,11 +19,10 @@
 #include <functional>
 #include <memory>
 
-#include <mpi.h>
-
 #include <dune/common/binaryfunctions.hh>
 #include <dune/common/exceptions.hh>
 #include <dune/common/parallel/communication.hh>
+#include <dune/common/parallel/mpi.hh>
 #include <dune/common/parallel/mpitraits.hh>
 #include <dune/common/parallel/mpifuture.hh>
 #include <dune/common/parallel/mpidata.hh>

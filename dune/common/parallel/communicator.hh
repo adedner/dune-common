@@ -14,10 +14,9 @@
 #include <type_traits>
 #include <utility>
 
-#include <mpi.h>
-
 #include <dune/common/exceptions.hh>
 #include <dune/common/parallel/interface.hh>
+#include <dune/common/parallel/mpi.hh>
 #include <dune/common/parallel/remoteindices.hh>
 #include <dune/common/stdstreams.hh>
 

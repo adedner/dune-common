@@ -1,7 +1,5 @@
 // SPDX-FileCopyrightInfo: Copyright © DUNE Project contributors, see file LICENSE.md in module root
 // SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
-#include "config.h"
-
 #define DUNE_CHECK_BOUNDS
 
 #include <complex>
@@ -385,7 +383,7 @@ int main() {
   bool passed = true;
   passed = passed && run<double>();
   passed = passed && run<std::complex<double>>();
-#ifdef HAVE_GMP
+#if HAVE_GMP
   passed = passed && run<Dune::GMPField<128u>>();
 #endif
   return passed ? 0 : 1;

@@ -23,7 +23,7 @@
 #include <utility>
 #include <complex>
 
-#include <mpi.h>
+#include <dune/common/parallel/mpi.hh>
 
 namespace Dune
 {
