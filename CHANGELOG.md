@@ -134,6 +134,9 @@ In order to build the DUNE core modules you need at least the following software
 - Remove deprecated macros `DUNE_VERSION_NEWER` and `DUNE_VERSION_NEWER_REV`, use `DUNE_VERSION_GTE`
   and `DUNE_VERSION_GTE_REV` instead. There was no deprecation compiler warning.
 
+- Deprecated CMake variable `DUNE_INSTALL_LIBDIR`. It is an internal variable, but if required
+  use `CMAKE_INSTALL_LIBDIR` instead. Will be removed after Dune 2.10.
+
 ## Deprecations and removals
 
 - The deprecated header `dune/common/function.hh` has been removed. Use C++ function

@@ -248,16 +248,8 @@ endif()")
   endif()
   get_property(${ProjectName}_INTERFACE_LIBRARIES GLOBAL PROPERTY ${ProjectName}_INTERFACE_LIBRARIES)
 
-  # compute under which libdir the package configuration files are to be installed.
-  # If the module installs an object library we use CMAKE_INSTALL_LIBDIR
-  # to capture the multiarch triplet of Debian/Ubuntu.
-  # Otherwise we fall back to DUNE_INSTALL_NONOBJECTLIB which is lib
-  # if not set otherwise.
-  if(${ProjectName}_INTERFACE_LIBRARIES)
-    set(DUNE_INSTALL_LIBDIR ${CMAKE_INSTALL_LIBDIR})
-  else()
-    set(DUNE_INSTALL_LIBDIR ${DUNE_INSTALL_NONOBJECTLIBDIR})
-  endif()
+  # Deprecated, use CMAKE_INSTALL_LIBDIR instead. Will be removed after Dune 2.10.
+  set(DUNE_INSTALL_LIBDIR ${CMAKE_INSTALL_LIBDIR})
 
   # Set the location of the doc file source. Needed by custom package configuration
   # file section of dune-grid.
@@ -277,7 +269,7 @@ endif()")
 
   configure_package_config_file(${CONFIG_SOURCE_FILE}
     ${PROJECT_BINARY_DIR}/cmake/pkg/${ProjectName}-config.cmake
-    INSTALL_DESTINATION  ${DUNE_INSTALL_LIBDIR}/cmake/${ProjectName}
+    INSTALL_DESTINATION  ${CMAKE_INSTALL_LIBDIR}/cmake/${ProjectName}
     PATH_VARS CMAKE_INSTALL_DATAROOTDIR DUNE_INSTALL_MODULEDIR CMAKE_INSTALL_INCLUDEDIR DUNE_PYTHON_WHEELHOUSE
     DOXYSTYLE_DIR SCRIPT_DIR)
 
@@ -429,7 +421,7 @@ endif()")
     ${PROJECT_BINARY_DIR}/cmake/pkg/${ProjectName}-config.cmake
     ${PROJECT_BINARY_DIR}/${ProjectName}-targets.cmake
     ${PROJECT_BINARY_DIR}/${ProjectName}-config-version.cmake
-    DESTINATION ${DUNE_INSTALL_LIBDIR}/cmake/${ProjectName})
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${ProjectName})
 
   # install config.h
   if(EXISTS ${PROJECT_SOURCE_DIR}/config.h.cmake)
@@ -437,7 +429,7 @@ endif()")
   endif()
 
   # install pkg-config files
-  create_and_install_pkconfig(${DUNE_INSTALL_LIBDIR})
+  create_and_install_pkconfig(${CMAKE_INSTALL_LIBDIR})
 
   ###########################
   ### HEADER CONFIG FILEs ###
