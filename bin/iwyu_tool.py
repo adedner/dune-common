@@ -122,7 +122,7 @@ GENERAL, ADD, REMOVE, LIST = range(4)
 def clang_formatter(output, prefix):
     """ Process iwyu's output into something clang-like. """
     formatted = []
-    trim = lambda path: os.path.relpath(path, prefix) if prefix else path
+    trim = lambda path: os.path.relpath(os.path.abspath(path), prefix) if prefix else os.path.abspath(path)
 
     state = (GENERAL, None)
     for line in output.splitlines():
@@ -166,7 +166,7 @@ def clang_formatter(output, prefix):
 def codeclimate_formatter(output, prefix):
     """ Process iwyu's output into something codeclimate-like. """
     formatted = []
-    trim = lambda path: os.path.relpath(path, prefix) if prefix else path
+    trim = lambda path: os.path.relpath(os.path.abspath(path), prefix) if prefix else os.path.abspath(path)
 
     state = (GENERAL, None)
     for line in output.splitlines():
