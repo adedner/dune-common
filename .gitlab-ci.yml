@@ -81,3 +81,19 @@ reuse:
   before_script: ""
   script:
     - reuse lint
+
+ubuntu:23.04 include-what-you-use:
+  stage: .pre
+  tags: [duneci]
+  image: registry.dune-project.org/docker/ci/ubuntu:23.04
+  allow_failure: true
+  variables:
+    DUNECI_TOOLCHAIN: clang-14-20
+    CMAKE_EXPORT_COMPILE_COMMANDS: "ON"
+    DUNECI_CONFIGURE_ONLY: "ON"
+  script:
+    - duneci-standard-test
+    - python3 bin/iwyu_tool.py --trim-path-prefix $PWD -r codeclimate -o clang -p build-cmake -j$(nproc)
+  artifacts:
+    reports:
+      codequality: ./iwyu.json
