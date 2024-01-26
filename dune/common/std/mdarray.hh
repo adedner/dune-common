@@ -493,16 +493,18 @@ public:
   constexpr const extents_type& extents () const noexcept { return mapping_.extents(); }
 
   /// \brief Index mapping of a layout policy
-  constexpr mapping_type& mapping () noexcept { return mapping_; }
-
-  /// \brief Index mapping of a layout policy
   constexpr const mapping_type& mapping () const noexcept { return mapping_; }
 
   /// \brief The underlying storage container
-  constexpr container_type& container () noexcept { return container_; }
-
-  /// \brief The underlying storage container
   constexpr const container_type& container () const noexcept { return container_; }
+
+  /**
+   * \brief Move the container out of the mdarray.
+   *
+   * Note that after moving out the container the mdarray remains in a valid but an unspecified state.
+   * One can destruct it or move-assign to it (i.e. restore the container in some way).
+   **/
+  constexpr container_type&& extract_container () && noexcept { return std::move(container_); }
 
 
   /// \name Size information
@@ -530,7 +532,7 @@ public:
   }
 
   /// \brief Size of the underlying container
-  constexpr std::size_t container_size () const { return container().size(); }
+  constexpr std::size_t container_size () const { return container_.size(); }
 
   /// \brief Check whether the index space is empty
   [[nodiscard]] constexpr bool empty () const noexcept { return size() == 0; }
@@ -554,10 +556,10 @@ public:
   /// @{
 
   /// \brief Direct access to the underlying data in the container
-  constexpr pointer container_data () noexcept { return Std::to_address(container().begin()); }
+  constexpr pointer container_data () noexcept { return Std::to_address(container_.begin()); }
 
   /// \brief Direct access to the underlying const data in the container
-  constexpr const_pointer container_data () const noexcept { return Std::to_address(container().begin()); }
+  constexpr const_pointer container_data () const noexcept { return Std::to_address(container_.begin()); }
 
   /// @}
 
