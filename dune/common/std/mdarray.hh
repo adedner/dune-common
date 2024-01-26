@@ -469,9 +469,6 @@ public:
   constexpr const extents_type& extents () const noexcept { return mapping_.extents(); }
 
   /// \brief Index mapping of a layout policy
-  constexpr mapping_type& mapping () noexcept { return mapping_; }
-
-  /// \brief Index mapping of a layout policy
   constexpr const mapping_type& mapping () const noexcept { return mapping_; }
 
   /// \brief The underlying storage container
