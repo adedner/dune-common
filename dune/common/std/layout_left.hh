@@ -62,7 +62,6 @@ struct layout_left
     using size_type = typename extents_type::size_type;
     using rank_type = typename extents_type::rank_type;
     using index_type = typename extents_type::index_type;
-    using result_type = size_type;
     using layout_type = layout_left;
 
     /// \brief The default construction is possible for default constructible extents
@@ -90,7 +89,9 @@ struct layout_left
 
     /// \brief Compute the offset i0 + E(0)*(i1 + E(1)*(i2 + E(2)*i3))
     template <class... Indices,
-      std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0>
+      std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
+      std::enable_if_t<(... && std::is_convertible_v<Indices, index_type>), int> = 0,
+      std::enable_if_t<(... && std::is_nothrow_constructible_v<Indices, index_type>), int> = 0>
     constexpr index_type operator() (Indices... ii) const noexcept
     {
       const std::array indices{index_type(std::move(ii))...};
@@ -125,7 +126,8 @@ struct layout_left
       return extents()._fwd_product(i);
     }
 
-    template <class OtherExtents>
+    template <class OtherExtents,
+      std::enable_if_t<(Extents::rank() == OtherExtents::rank()), int> = 0>
     friend constexpr bool operator== (const mapping& a, const mapping<OtherExtents>& b) noexcept
     {
       return a.extents_ == b.extents_;

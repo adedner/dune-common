@@ -61,6 +61,7 @@ public:
   using offset_policy = default_accessor;
 
 public:
+  // [mdspan.accessor.default.overview]
   /// \brief Default constructor
   constexpr default_accessor () noexcept = default;
 
@@ -70,13 +71,13 @@ public:
   constexpr default_accessor (default_accessor<OtherElement>) noexcept {}
 
   /// \brief Return a reference to the i'th element in the data range starting at `p`
-  constexpr reference access (data_handle_type p, std::ptrdiff_t i) const noexcept
+  constexpr reference access (data_handle_type p, std::size_t i) const noexcept
   {
     return p[i];
   }
 
   /// \brief Return a data handle to the i'th element in the data range starting at `p`
-  constexpr data_handle_type offset (data_handle_type p, std::ptrdiff_t i) const noexcept
+  constexpr data_handle_type offset (data_handle_type p, std::size_t i) const noexcept
   {
     return p + i;
   }

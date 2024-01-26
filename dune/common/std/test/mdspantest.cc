@@ -74,7 +74,7 @@ void test_accessor (Dune::TestSuite& testSuite, std::string name, const M& mappi
   Span span4{dh, mapping, A{}};
 
   // construction with explicitly listed extents
-  auto const& e = mapping.extents();
+  const typename M::extents_type& e = mapping.extents();
   if constexpr(Span::rank() == 1)
     Span span5{dh, e.extent(0)};
   else if constexpr(Span::rank() == 2)

@@ -16,7 +16,7 @@
 #include <dune/common/test/testsuite.hh>
 
 template <class E, class L, class L0>
-void test_strided_layout (Dune::TestSuite& testSuite, std::string name, E const& e)
+void test_strided_layout (Dune::TestSuite& testSuite, std::string name, const E& e)
 {
   Dune::TestSuite subTestSuite(name);
   using Mapping0 = typename L0::template mapping<E>;
@@ -65,7 +65,7 @@ void test_layout (Dune::TestSuite& testSuite, std::string name, Args&&... args)
   Mapping mapping(std::forward<Args>(args)...);
 
   // get the extents from the mapping
-  E const& e = mapping.extents();
+  const E& e = mapping.extents();
 
   // compare the layout type the mapping was created from
   using layout_type = typename Mapping::layout_type;

@@ -55,16 +55,19 @@ struct layout_stride
   class mapping
   {
     template <class> friend class mapping;
-    static constexpr auto _rank = Extents::rank();
+    static constexpr typename Extents::rank_type rank_ = Extents::rank();
 
   public:
     using extents_type = Extents;
     using index_type = typename extents_type::index_type;
     using size_type = typename extents_type::size_type;
     using rank_type = typename extents_type::rank_type;
-    using result_type = index_type;
     using layout_type = layout_stride;
-    using strides_type = std::array<index_type,_rank>;
+
+  private:
+    using strides_type = std::array<index_type,rank_>;
+
+  public:
 
     /// \brief The default construction initializes the strides from layout_right
     constexpr mapping () noexcept
@@ -79,12 +82,25 @@ struct layout_stride
 
     /// \brief Construct the mapping from given extents and strides
     template <class OtherIndexType,
-      std::enable_if_t<std::is_convertible_v<OtherIndexType, index_type>, int> = 0>
-    constexpr mapping (const extents_type& e, const std::array<OtherIndexType,_rank>& s) noexcept
+      std::enable_if_t<std::is_convertible_v<const OtherIndexType&, index_type>, int> = 0,
+      std::enable_if_t<std::is_nothrow_constructible_v<index_type, const OtherIndexType&>, int> = 0>
+    constexpr mapping (const extents_type& e, const std::array<OtherIndexType,rank_>& s) noexcept
       : extents_(e)
       , strides_{}
     {
-      for (rank_type r = 0; r < _rank; ++r)
+      for (rank_type r = 0; r < rank_; ++r)
+        strides_[r] = s[r];
+    }
+
+    /// \brief Construct the mapping from given extents and strides
+    template <class OtherIndexType,
+      std::enable_if_t<std::is_convertible_v<const OtherIndexType&, index_type>, int> = 0,
+      std::enable_if_t<std::is_nothrow_constructible_v<index_type, const OtherIndexType&>, int> = 0>
+    constexpr mapping (const extents_type& e, const Std::span<OtherIndexType,rank_>& s) noexcept
+      : extents_(e)
+      , strides_{}
+    {
+      for (rank_type r = 0; r < rank_; ++r)
         strides_[r] = s[r];
     }
 
@@ -105,32 +121,36 @@ struct layout_stride
     /// \brief Construct the mapping from another mapping with different extents and different strides
     template <class M,
       std::enable_if_t<(M::extents_type::rank() == extents_type::rank()), int> = 0,
+      std::enable_if_t<(M::is_always_unique()), int> = 0,
+      std::enable_if_t<(M::is_always_strided()), int> = 0,
       decltype(std::declval<M>().extents(), bool{}) = true,
       decltype(std::declval<M>().stride(std::declval<rank_type>()), bool{}) = true>
     constexpr mapping (const M& m) noexcept
       : extents_(m.extents())
       , strides_{}
     {
-      for (rank_type r = 0; r < _rank; ++r)
+      for (rank_type r = 0; r < rank_; ++r)
         strides_[r] = m.stride(r);
     }
 
     constexpr const extents_type& extents () const noexcept { return extents_; }
 
     /// \brief Return the sum `1 + (E(0)-1)*S(0) + (E(1)-1)*S(1) + ...`
-    constexpr std::size_t required_span_size () const noexcept
+    constexpr index_type required_span_size () const noexcept
     {
       return _size(extents_,strides_);
     }
 
     /// \brief Compute the offset by folding with index-array with the strides array
     template <class... Indices,
-      std::enable_if_t<(sizeof...(Indices) == _rank), int> = 0>
+      std::enable_if_t<(sizeof...(Indices) == rank_), int> = 0,
+      std::enable_if_t<(std::is_convertible_v<Indices, index_type> && ...), int> = 0,
+      std::enable_if_t<(std::is_nothrow_constructible_v<index_type, Indices> && ...), int> = 0>
     constexpr index_type operator() (Indices... ii) const noexcept
     {
       return unpackIntegerSequence([&](auto... r) {
         return ((static_cast<index_type>(ii)*strides_[r]) + ... + 0); },
-        std::make_index_sequence<_rank>{});
+        std::make_index_sequence<rank_>{});
     }
 
     /// \brief The default offset for rank-0 tensors is 0
@@ -168,9 +188,10 @@ struct layout_stride
       return strides_[i];
     }
 
-    template <class OtherExtents,
-      std::enable_if_t<(OtherExtents::rank() == extents_type::rank()), int> = 0>
-    friend constexpr bool operator== (const mapping& a, const mapping<OtherExtents>& b) noexcept
+    template <class OtherMapping,
+      std::enable_if_t<(OtherMapping::extents_type::rank() == extents_type::rank()), int> = 0,
+      std::enable_if_t<(OtherMapping::is_always_strided()), int> = 0>
+    friend constexpr bool operator== (const mapping& a, const OtherMapping& b) noexcept
     {
       if (_offset(b))
         return false;

@@ -89,38 +89,38 @@ class extents
 
   static_assert(std::is_integral_v<IndexType>);
 
-  static inline constexpr std::size_t _rank = sizeof...(exts);
-  static inline constexpr std::size_t _rank_dynamic = ((exts == Std::dynamic_extent) + ... + 0);
+  static inline constexpr std::size_t rank_ = sizeof...(exts);
+  static inline constexpr std::size_t rank_dynamic_ = ((exts == Std::dynamic_extent) + ... + 0);
 
-  using array_type = std::array<std::size_t,_rank>;
+  using array_type = std::array<std::size_t,rank_>;
 
 public:
   using rank_type = std::size_t;
   using index_type = IndexType;
   using size_type = std::make_unsigned_t<index_type>;
 
-public:
   /// \name Observers
+  /// [mdspan.extents.obs], observers of the multidimensional index space
   /// @{
 
   /// \brief The total number of dimensions
-  static constexpr rank_type rank () noexcept { return _rank; }
+  static constexpr rank_type rank () noexcept { return rank_; }
 
   /// \brief The number of dimensions with dynamic extent
-  static constexpr rank_type rank_dynamic () noexcept { return _rank_dynamic; }
+  static constexpr rank_type rank_dynamic () noexcept { return rank_dynamic_; }
 
   /// \brief Return the static extent of dimension `r` or `Std::dynamic_extent`
   static constexpr std::size_t static_extent (rank_type r) noexcept
   {
-    return _rank == 0 ? 1 : array_type{exts...}[r];
+    assert(rank() > 0 && r < rank());
+    return array_type{exts...}[r];
   }
 
   /// \brief Return the extent of dimension `i`
   constexpr index_type extent (rank_type r) const noexcept
   {
-    if constexpr(rank() == 0)
-      return 1;
-    else if (std::size_t e = static_extent(r); e != Std::dynamic_extent)
+    assert(rank() > 0 && r < rank());
+    if (std::size_t e = static_extent(r); e != Std::dynamic_extent)
       return index_type(e);
     else
       return dynamic_extents_[dynamic_index(r)];
@@ -139,8 +139,9 @@ public:
   /// [[pre: all static extents correspond to the given value e]]
   template <class... IndexTypes,
     std::enable_if_t<(... && std::is_convertible_v<IndexTypes,index_type>), int> = 0,
-    std::enable_if_t<(sizeof...(IndexTypes) == rank() || sizeof...(IndexTypes) == rank_dynamic()), int> = 0>
-  constexpr extents (const IndexTypes&... e) noexcept
+    std::enable_if_t<(sizeof...(IndexTypes) == rank() || sizeof...(IndexTypes) == rank_dynamic()), int> = 0,
+    std::enable_if_t<(... && std::is_nothrow_constructible_v<index_type, IndexTypes>), int> = 0>
+  constexpr explicit extents (IndexTypes... e) noexcept
   {
     init_dynamic_extents<sizeof...(e)>(std::array<index_type,sizeof...(e)>{index_type(e)...});
   }
@@ -149,7 +150,7 @@ public:
   /// [[pre: all static extents correspond to the given values in e]]
   template <class I, std::size_t N,
     std::enable_if_t<std::is_convertible_v<I, index_type>, int> = 0,
-    std::enable_if_t<(N == rank()  || N == rank_dynamic()), int> = 0>
+    std::enable_if_t<(N == rank() || N == rank_dynamic()), int> = 0>
   #if __cpp_conditional_explicit >= 201806L
   explicit(N != rank_dynamic())
   #endif
@@ -162,7 +163,8 @@ public:
   /// [[pre: all static extents correspond to the given values in e]]
   template <class I, std::size_t N,
     std::enable_if_t<std::is_convertible_v<I, index_type>, int> = 0,
-    std::enable_if_t<(N == rank()  || N == rank_dynamic()), int> = 0>
+    std::enable_if_t<(N == rank() || N == rank_dynamic()), int> = 0,
+    std::enable_if_t<std::is_nothrow_constructible_v<index_type, const I&>, int> = 0>
   #if __cpp_conditional_explicit >= 201806L
   explicit(N != rank_dynamic())
   #endif
@@ -300,6 +302,7 @@ struct DExtentsImpl<IndexType, std::integer_sequence<std::size_t,I...>>
 
 /**
  * \brief Alias of `extents` of given rank `R` and purely dynamic extents.
+ * See [mdspan.extents.dextents]
  * \ingroup CxxUtilities
  **/
 template <class IndexType, std::size_t R>

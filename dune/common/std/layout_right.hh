@@ -63,7 +63,6 @@ struct layout_right
     using size_type = typename extents_type::size_type;
     using rank_type = typename extents_type::rank_type;
     using index_type = typename extents_type::index_type;
-    using result_type = index_type;
     using layout_type = layout_right;
 
     /// \brief The default construction is possible for default constructible extents
@@ -87,11 +86,13 @@ struct layout_right
     {}
 
     constexpr const extents_type& extents () const noexcept { return extents_; }
-    constexpr std::size_t required_span_size () const noexcept { return extents_._product();  }
+    constexpr index_type required_span_size () const noexcept { return extents_._product();  }
 
     /// \brief Compute the offset i3 + E(3)*(i2 + E(2)*(i1 + E(1)*i0))
     template <class... Indices,
-      std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0>
+      std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
+      std::enable_if_t<(std::is_convertible_v<Indices, index_type> && ...), int> = 0,
+      std::enable_if_t<(std::is_nothrow_constructible_v<Indices, index_type> && ...), int> = 0>
     constexpr index_type operator() (Indices... ii) const noexcept
     {
       const std::array indices{index_type(std::move(ii))...};

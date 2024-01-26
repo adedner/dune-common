@@ -127,6 +127,8 @@ public:
   using const_pointer = decltype(Std::to_address(std::declval<container_type>().cbegin()));
   using const_reference = typename container_type::const_reference;
 
+  static_assert(std::is_constructible_v<mapping_type, extents_type>);
+
 private:
   // helper function to construct the container
   template <class C, class... Args>
@@ -158,7 +160,8 @@ public:
   /// \brief Construct from the dynamic extents
   template <class... IndexTypes,
     std::enable_if_t<(... && std::is_convertible_v<IndexTypes,index_type>), int> = 0,
-    std::enable_if_t<std::is_constructible_v<extents_type,IndexTypes...>, int> = 0>
+    std::enable_if_t<std::is_constructible_v<extents_type,IndexTypes...>, int> = 0,
+    std::enable_if_t<(... && std::is_nothrow_constructible_v<index_type,IndexTypes>), int> = 0>
   explicit constexpr mdarray (IndexTypes... exts)
     : mdarray(extents_type(index_type(std::move(exts))...))
   {}
@@ -198,13 +201,17 @@ public:
   // constructors with a given container
 
   /// \brief Construct from extents and the storage container
-  constexpr mdarray (const extents_type& e, const container_type& c)
+  template <class E = extents_type,
+    std::enable_if_t<std::is_constructible_v<mapping_type,const E&>, int> = 0>
+  constexpr mdarray (const E& e, const container_type& c)
     : container_(c)
     , mapping_(e)
   {}
 
   /// \brief Construct from extents and the storage container
-  constexpr mdarray (const extents_type& e, container_type&& c)
+  template <class E = extents_type,
+    std::enable_if_t<std::is_constructible_v<mapping_type,const E&>, int> = 0>
+  constexpr mdarray (const E& e, container_type&& c)
     : container_(std::move(c))
     , mapping_(e)
   {}
@@ -226,30 +233,33 @@ public:
   // converting constructors
 
   /// \brief Converting constructor from other mdarray
-  template <class V, class E, class L, class C,
-    class M = typename L::template mapping<E>>
+  template <class OtherElementType, class OtherExtents, class OtherLayoutPolicy, class OtherContainer,
+    std::enable_if_t<std::is_constructible_v<Container,const OtherContainer&>, int> = 0,
+    std::enable_if_t<std::is_constructible_v<extents_type,OtherExtents>, int> = 0,
+    std::enable_if_t<std::is_constructible_v<mapping_type,const typename OtherLayoutPolicy::template mapping<OtherExtents>&>, int> = 0>
   #if __cpp_conditional_explicit >= 201806L
   explicit(
-    !std::is_convertible_v<const M&, mapping_type> ||
-    !std::is_convertible_v<const C&, container_type>)
+    !std::is_convertible_v<const typename OtherLayoutPolicy::template mapping<OtherExtents>&, mapping_type> ||
+    !std::is_convertible_v<const OtherContainer&, container_type>)
   #endif
-  constexpr mdarray (const mdarray<V,E,L,C>& other)
+  constexpr mdarray (const mdarray<OtherElementType,OtherExtents,OtherLayoutPolicy,OtherContainer>& other)
     : container_(other.container_)
     , mapping_(other.mapping_)
   {}
 
   /// \brief Converting constructor from mdspan
-  template <class V, class E, class L, class A,
-    class C = container_type,
-    class M = typename L::template mapping<E>,
-    decltype(construct_container<C>(std::declval<std::size_t>()), bool{}) = true>
+  template <class OtherElementType, class OtherExtents, class OtherLayoutPolicy, class Accessor,
+    std::enable_if_t<std::is_constructible_v<value_type,typename Accessor::reference>, int> = 0,
+    std::enable_if_t<std::is_assignable_v<typename Accessor::reference, value_type>, int> = 0,
+    std::enable_if_t<std::is_constructible_v<mapping_type, const typename OtherLayoutPolicy::template mapping<OtherExtents>&>, int> = 0,
+    decltype(construct_container<container_type>(std::declval<std::size_t>()), bool{}) = true>
   #if __cpp_conditional_explicit >= 201806L
   explicit(
-    !std::is_convertible_v<const M&, mapping_type> ||
-    !std::is_convertible_v<typename A::reference, value_type>)
+    !std::is_convertible_v<const typename OtherLayoutPolicy::template mapping<OtherExtents>&, mapping_type> ||
+    !std::is_convertible_v<typename Accessor::reference, value_type>)
   #endif
-  constexpr mdarray (const mdspan<V,E,L,A>& other)
-    : container_(construct_container<C>(other.size()))
+  constexpr mdarray (const mdspan<OtherElementType,OtherExtents,OtherLayoutPolicy,Accessor>& other)
+    : container_(construct_container<container_type>(other.size()))
     , mapping_(other.mapping_)
   {
     init_from_mdspan(other);
@@ -260,15 +270,15 @@ public:
   // constructors with allocators
 
   /// \brief Construct from the extents of the array and allocator
-  template <class Alloc, class C = container_type,
-    std::enable_if_t<std::is_constructible_v<C, std::size_t, Alloc>, int> = 0>
+  template <class Alloc,
+    std::enable_if_t<std::is_constructible_v<container_type, std::size_t, Alloc>, int> = 0>
   constexpr mdarray (const extents_type& e, const Alloc& a)
     : mdarray(mapping_type(e), a)
   {}
 
   /// \brief Construct from the layout mapping of the array and allocator
-  template <class Alloc, class C = container_type,
-    std::enable_if_t<std::is_constructible_v<C, std::size_t, Alloc>, int> = 0>
+  template <class Alloc,
+    std::enable_if_t<std::is_constructible_v<container_type, std::size_t, Alloc>, int> = 0>
   constexpr mdarray (const mapping_type& m, const Alloc& a)
     : container_(m.required_span_size(), a)
     , mapping_(m)
@@ -281,40 +291,40 @@ public:
   {}
 
   /// \brief Construct from layout mapping, initial value and allocator
-  template <class Alloc, class C = container_type,
-    std::enable_if_t<std::is_constructible_v<C, std::size_t, value_type, Alloc>, int> = 0>
+  template <class Alloc,
+    std::enable_if_t<std::is_constructible_v<container_type, std::size_t, value_type, Alloc>, int> = 0>
   constexpr mdarray (const mapping_type& m, const value_type& v, const Alloc& a)
     : container_(m.required_span_size(), v, a)
     , mapping_(m)
   {}
 
   /// \brief Construct from extents, container and allocator
-  template <class Alloc, class C = container_type,
-    std::enable_if_t<std::is_constructible_v<C, container_type, Alloc>, int> = 0>
+  template <class Alloc,
+    std::enable_if_t<std::is_constructible_v<container_type, container_type, Alloc>, int> = 0>
   constexpr mdarray (const extents_type& e, const container_type& c, const Alloc& a)
     : container_(c, a)
     , mapping_(e)
   {}
 
   /// \brief Construct from extents, container and allocator
-  template <class Alloc, class C = container_type,
-    std::enable_if_t<std::is_constructible_v<C, container_type, Alloc>, int> = 0>
+  template <class Alloc,
+    std::enable_if_t<std::is_constructible_v<container_type, container_type, Alloc>, int> = 0>
   constexpr mdarray (const extents_type& e, container_type&& c, const Alloc& a)
     : container_(std::move(c), a)
     , mapping_(e)
   {}
 
   /// \brief Construct from layout mapping, container and allocator
-  template <class Alloc, class C = container_type,
-    std::enable_if_t<std::is_constructible_v<C, container_type, Alloc>, int> = 0>
+  template <class Alloc,
+    std::enable_if_t<std::is_constructible_v<container_type, container_type, Alloc>, int> = 0>
   constexpr mdarray (const mapping_type& m, const container_type& c, const Alloc& a)
     : container_(c, a)
     , mapping_(m)
   {}
 
   /// \brief Construct from layout mapping, container and allocator
-  template <class Alloc, class C = container_type,
-    std::enable_if_t<std::is_constructible_v<C, container_type, Alloc>, int> = 0>
+  template <class Alloc,
+    std::enable_if_t<std::is_constructible_v<container_type, container_type, Alloc>, int> = 0>
   constexpr mdarray (const mapping_type& m, container_type&& c, const Alloc& a)
     : container_(std::move(c), a)
     , mapping_(m)
@@ -322,10 +332,11 @@ public:
 
   /// \brief Converting constructor with alternative allocator
   template <class V, class E, class L, class C, class Alloc,
-    class M = typename L::template mapping<E>,
     std::enable_if_t<std::is_constructible_v<container_type, C, Alloc>, int> = 0>
   #if __cpp_conditional_explicit >= 201806L
-  explicit(!std::is_convertible_v<const M&, mapping_type> || !std::is_convertible_v<const C&, container_type>)
+  explicit(
+    !std::is_convertible_v<const typename L::template mapping<E>&, mapping_type> ||
+    !std::is_convertible_v<const C&, container_type>)
   #endif
   constexpr mdarray (const mdarray<V,E,L,C>& other, const Alloc& a) noexcept
     : container_(other.container_, a)
@@ -334,13 +345,12 @@ public:
 
   /// \brief Converting constructor from mdspan
   template <class V, class E, class L, class A, class Alloc,
-    class M = typename L::template mapping<E>,
     class C = container_type,
     class Al = typename C::allocator_type,
     std::enable_if_t<std::is_constructible_v<C, std::size_t, Alloc>, int> = 0>
   #if __cpp_conditional_explicit >= 201806L
   explicit(
-    !std::is_convertible_v<const M&, mapping_type> ||
+    !std::is_convertible_v<const typename L::template mapping<E>&, mapping_type> ||
     !std::is_convertible_v<typename A::reference, value_type> ||
     !std::is_convertible_v<Alloc, Al>)
   #endif
@@ -416,6 +426,7 @@ public:
 #else
 
   /// \brief Access specified element at position [i0]
+  /// For a rank one mdarray, the operator[i] is added to support bracket access before __cpp_multidimensional_subscript is supported.
   template <class Index, class E = extents_type,
     std::enable_if_t<std::is_convertible_v<Index,index_type>, int> = 0,
     std::enable_if_t<(E::rank() == 1), int> = 0>
@@ -425,6 +436,7 @@ public:
   }
 
   /// \brief Access specified element at position [i0]
+  /// For a rank one mdarray, the operator[i] is added to support bracket access before __cpp_multidimensional_subscript is supported.
   template <class Index, class E = extents_type,
     std::enable_if_t<std::is_convertible_v<Index,index_type>, int> = 0,
     std::enable_if_t<(E::rank() == 1), int> = 0>
@@ -438,7 +450,7 @@ public:
 
   /// \brief Access element at position [{i0,i1,...}]
   template <class Index,
-    std::enable_if_t<std::is_convertible_v<Index, index_type>, int> = 0>
+    std::enable_if_t<std::is_convertible_v<const Index&, index_type>, int> = 0>
   constexpr reference operator[] (Std::span<Index,extents_type::rank()> indices)
   {
     return unpackIntegerSequence([&](auto... ii) -> reference {
@@ -448,7 +460,7 @@ public:
 
   /// \brief Access element at position [{i0,i1,...}]
   template <class Index,
-    std::enable_if_t<std::is_convertible_v<Index, index_type>, int> = 0>
+    std::enable_if_t<std::is_convertible_v<const Index&, index_type>, int> = 0>
   constexpr const_reference operator[] (Std::span<Index,extents_type::rank()> indices) const
   {
     return unpackIntegerSequence([&](auto... ii) -> const_reference {
@@ -458,7 +470,7 @@ public:
 
   /// \brief Access element at position [{i0,i1,...}]
   template <class Index,
-    std::enable_if_t<std::is_convertible_v<Index, index_type>, int> = 0>
+    std::enable_if_t<std::is_convertible_v<const Index&, index_type>, int> = 0>
   constexpr reference operator[] (const std::array<Index,extents_type::rank()>& indices)
   {
     return std::apply([&](auto... ii) -> reference {
@@ -467,7 +479,7 @@ public:
 
   /// \brief Access element at position [{i0,i1,...}]
   template <class Index,
-    std::enable_if_t<std::is_convertible_v<Index, index_type>, int> = 0>
+    std::enable_if_t<std::is_convertible_v<const Index&, index_type>, int> = 0>
   constexpr const_reference operator[] (const std::array<Index,extents_type::rank()>& indices) const
   {
     return std::apply([&](auto... ii) -> const_reference {

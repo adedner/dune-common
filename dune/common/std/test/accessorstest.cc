@@ -25,11 +25,11 @@ int main(int argc, char** argv)
   B const_accessor;
 
   { // check (converting) copy constructor
-    A accessor2(accessor);
+    [[maybe_unused]] A accessor2(accessor);
     // A accessor2(const_accessor); // this conversion is not allowed!
 
-    B const_accessor2(const_accessor);
-    B const_accessor3(accessor);
+    [[maybe_unused]] B const_accessor2(const_accessor);
+    [[maybe_unused]] B const_accessor3(accessor);
   }
 
   auto dh = arr.data();

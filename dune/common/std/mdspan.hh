@@ -116,13 +116,24 @@ public:
   using data_handle_type = typename accessor_type::data_handle_type;
   using reference = typename accessor_type::reference;
 
+private:
+  // [mdspan.layout.reqmts]
+  static_assert(std::is_nothrow_move_constructible_v<mapping_type>);
+  static_assert(std::is_nothrow_move_assignable_v<mapping_type>);
+  static_assert(std::is_nothrow_swappable_v<mapping_type>);
+
+  // [mdspan.accessor.reqmts]
+  static_assert(std::is_nothrow_move_constructible_v<accessor_type>);
+  static_assert(std::is_nothrow_move_assignable_v<accessor_type>);
+  static_assert(std::is_nothrow_swappable_v<accessor_type>);
+
 public:
-  /// \name mdspan constructors
+  /// \name mdspan constructors [mdspan.mdspan.cons]
   /// @{
 
   /// \brief Default constructor value-initializes all members
   template <class E = extents_type, class D = data_handle_type, class M = mapping_type, class A = accessor_type,
-    std::enable_if_t<(E::rank_dynamic() != 0), int> = 0,
+    std::enable_if_t<(E::rank_dynamic() > 0), int> = 0,
     std::enable_if_t<std::is_default_constructible_v<D>, int> = 0,
     std::enable_if_t<std::is_default_constructible_v<M>, int> = 0,
     std::enable_if_t<std::is_default_constructible_v<A>, int> = 0>
@@ -137,8 +148,8 @@ public:
     class E = extents_type, class M = mapping_type, class A = accessor_type,
     std::enable_if_t<(sizeof...(IndexTypes) == E::rank() || sizeof...(IndexTypes) == E::rank_dynamic()), int> = 0,
     std::enable_if_t<(... && std::is_convertible_v<IndexTypes, index_type>), int> = 0,
-    std::enable_if_t<std::is_constructible_v<E, IndexTypes...>, int> = 0,
-    std::enable_if_t<std::is_constructible_v<M, extents_type>, int> = 0,
+    std::enable_if_t<(... && std::is_nothrow_constructible_v<index_type, IndexTypes>), int> = 0,
+    std::enable_if_t<std::is_constructible_v<M, E>, int> = 0,
     std::enable_if_t<std::is_default_constructible_v<A>, int> = 0>
   explicit constexpr mdspan (data_handle_type p, IndexTypes... exts)
     : mdspan(std::move(p), extents_type(index_type(std::move(exts))...))
@@ -146,8 +157,8 @@ public:
 
   /// \brief Construct from the dynamic extents given as an array
   template <class IndexType, std::size_t N,
-    class M = mapping_type, class A = accessor_type,
-    std::enable_if_t<std::is_convertible_v<IndexType, index_type>, int> = 0,
+    std::enable_if_t<std::is_convertible_v<const IndexType&, index_type>, int> = 0,
+    std::enable_if_t<std::is_nothrow_constructible_v<index_type,const IndexType&>, int> = 0,
     std::enable_if_t<(N == extents_type::rank_dynamic() || N == extents_type::rank()), int> = 0>
   #if __cpp_conditional_explicit >= 201806L
   explicit(N != extents_type::rank_dynamic())
@@ -158,7 +169,6 @@ public:
 
   /// \brief Construct from the dynamic extents given as an array
   template <class IndexType, std::size_t N,
-    class M = mapping_type, class A = accessor_type,
     std::enable_if_t<std::is_convertible_v<IndexType, index_type>, int> = 0,
     std::enable_if_t<(N == extents_type::rank_dynamic() || N == extents_type::rank()), int> = 0>
   #if __cpp_conditional_explicit >= 201806L
@@ -170,7 +180,7 @@ public:
 
   /// \brief Construct from the pointer to the data of the tensor and its extents
   template <class M = mapping_type,
-    std::enable_if_t<std::is_constructible_v<M, extents_type>, int> = 0>
+    std::enable_if_t<std::is_constructible_v<M, const extents_type&>, int> = 0>
   constexpr mdspan (data_handle_type p, const extents_type& e)
     : mdspan(std::move(p), mapping_type(e))
   {}
@@ -191,14 +201,14 @@ public:
 
 
   /// \brief Converting constructor
-  template <class T, class E, class L, class A,
-    class M = typename L::template mapping<E>,
-    std::enable_if_t<std::is_constructible_v<mapping_type, const M&>, int> = 0,
-    std::enable_if_t<std::is_constructible_v<accessor_type, const A&>, int> = 0>
+  template <class OtherElementType, class OtherExtends, class OtherLayoutPolicy, class OtherAccessor,
+    std::enable_if_t<std::is_constructible_v<mapping_type, const typename OtherElementType::template mapping<OtherExtends>&>, int> = 0,
+    std::enable_if_t<std::is_constructible_v<accessor_type, const OtherAccessor&>, int> = 0>
   #if __cpp_conditional_explicit >= 201806L
-  explicit(!std::is_convertible_v<const M&, mapping_type> || !std::is_convertible_v<const A&, accessor_type>)
+  explicit(!std::is_convertible_v<const typename OtherElementType::template mapping<OtherExtends>&, mapping_type>
+    || !std::is_convertible_v<const OtherAccessor&, accessor_type>)
   #endif
-  constexpr mdspan (const mdspan<T,E,L,A>& other) noexcept
+  constexpr mdspan (const mdspan<OtherElementType,OtherExtends,OtherLayoutPolicy,OtherAccessor>& other) noexcept
     : mdspan(data_handle_type(other.data_handle()), mapping_type(other.mapping()),
         accessor_type(other.accessor()))
   {}
@@ -210,9 +220,11 @@ public:
   /// @{
 
   /// \brief Access specified element at position i0,i1,...
+  /// operator() is not in the proposal, but is provided for using mdspan without c++23.
   template <class... Indices,
     std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
-    std::enable_if_t<(... && std::is_convertible_v<Indices, index_type>), int> = 0>
+    std::enable_if_t<(... && std::is_convertible_v<Indices, index_type>), int> = 0,
+    std::enable_if_t<(... && std::is_nothrow_constructible_v<index_type,Indices>), int> = 0>
   constexpr reference operator() (Indices... indices) const
   {
     return accessor_.access(data_handle_, mapping_(index_type(std::move(indices))...));
@@ -222,8 +234,9 @@ public:
 
   /// \brief Access specified element at position i0,i1,...
   template <class... Indices,
-    std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
-    std::enable_if_t<(... && std::is_convertible_v<Indices, index_type>), int> = 0>
+  std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
+  std::enable_if_t<(... && std::is_convertible_v<Indices, index_type>), int> = 0,
+  std::enable_if_t<(... && std::is_nothrow_constructible_v<index_type,Indices>), int> = 0>
   constexpr reference operator[] (Indices... indices) const
   {
     return accessor_.access(data_handle_, mapping_(index_type(std::move(indices))...));
@@ -232,6 +245,7 @@ public:
 #else // __cpp_multidimensional_subscript
 
   /// \brief Access specified element at position [i0]
+  /// For a rank one mdspan, the operator[i] is added to support bracket access before __cpp_multidimensional_subscript is supported.
   template <class Index, class E = extents_type,
     std::enable_if_t<std::is_convertible_v<Index,index_type>, int> = 0,
     std::enable_if_t<(E::rank() == 1), int> = 0>
@@ -244,7 +258,8 @@ public:
 
   /// \brief Access specified element at position [i0,i1,...]
   template <class Index,
-    std::enable_if_t<std::is_convertible_v<Index, index_type>, int> = 0>
+    std::enable_if_t<std::is_convertible_v<const Index&, index_type>, int> = 0,
+    std::enable_if_t<std::is_nothrow_constructible_v<index_type, const Index&>, int> = 0>
   constexpr reference operator[] (Std::span<Index,extents_type::rank()> indices) const
   {
     return unpackIntegerSequence([&](auto... ii) -> reference {
@@ -254,7 +269,8 @@ public:
 
   /// \brief Access specified element at position [i0,i1,...]
   template <class Index,
-    std::enable_if_t<std::is_convertible_v<Index, index_type>, int> = 0>
+    std::enable_if_t<std::is_convertible_v<const Index&, index_type>, int> = 0,
+    std::enable_if_t<std::is_nothrow_constructible_v<index_type, const Index&>, int> = 0>
   constexpr reference operator[] (const std::array<Index,extents_type::rank()>& indices) const
   {
     return std::apply([&](auto... ii) -> reference {
@@ -262,7 +278,6 @@ public:
   }
 
   /// @}
-
 
   /// \brief Number of elements in all dimensions of the tensor, \related extents
   constexpr const extents_type& extents () const noexcept { return mapping_.extents(); }
@@ -326,7 +341,7 @@ public:
   /**
    * \brief Return true only if for every rank index r of extents there exists an integer sr such that,
    * for all i where (i+dr) is a multidimensional index in extents, mapping((i+dr)...) - mapping(i...) equals sr. *
-   * \note This implies that for a strided layout mapping(i0, ..., ik) = mapping(0, ..., 0) + i0 * s0 + ... + ik * sk.
+   * \note This implies that for a strided layout mapping(i0, ..., ik) = mapping(0, ..., 0) + i0 * s0 + ... + ik * sk.
    **/
   constexpr bool is_strided () const { return mapping_.is_strided(); }
 

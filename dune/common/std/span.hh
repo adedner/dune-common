@@ -153,21 +153,30 @@ template <class Element, std::size_t Extent = Std::dynamic_extent>
 class span
     : public Impl::SpanSize<Extent>
 {
-  using base_type = Impl::SpanSize<Extent>;
+  using base_type = Impl::SpanSize<Extent>; // base_type implements the member variable size()
 
   static_assert(std::is_object_v<Element> && !std::is_abstract_v<Element>);
 
 public:
   using element_type = Element;
   using value_type = std::remove_cv_t<element_type>;
-  using size_type = typename base_type::size_type;
+  using size_type = std::size_t;
   using difference_type = std::ptrdiff_t;
-  using pointer = Element*;
-  using reference = Element&;
+  using pointer = element_type*;
+  using reference = element_type&;
+  using const_reference  = const element_type&;
   using iterator = pointer;
   using reverse_iterator = std::reverse_iterator<iterator>;
+#if __cpp_lib_ranges_as_const >202311L
+  using const_iterator = std::const_iterator<iterator>;
+  using const_reverse_iterator = std::const_iterator<reverse_iterator>;
+#else
+  using const_iterator = const iterator;
+  using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+#endif
 
-  static constexpr std::size_t extent = Extent;
+
+  static constexpr size_type extent = Extent;
 
 public:
   /// \name Span constructors
@@ -257,8 +266,8 @@ public:
   constexpr span (const span& other) noexcept = default;
 
   /// \brief Converting copy constructor
-  template <class OtherElementType, std::size_t OtherExtent, std::size_t e = extent,
-    std::enable_if_t<(e == Std::dynamic_extent || OtherExtent == Std::dynamic_extent || e == OtherExtent), int> = 0,
+  template <class OtherElementType, std::size_t OtherExtent,
+    std::enable_if_t<(extent == Std::dynamic_extent || OtherExtent == Std::dynamic_extent || extent == OtherExtent), int> = 0,
     std::enable_if_t<std::is_convertible_v<OtherElementType(*)[], element_type(*)[]>, int> = 0>
   #if __cpp_conditional_explicit >= 201806L
   explicit(extent != Std::dynamic_extent && OtherExtent == Std::dynamic_extent)
@@ -283,11 +292,23 @@ public:
   /// \brief Returns an iterator to the end.
   constexpr iterator end () const noexcept { return data_ + size(); }
 
+  /// \brief Returns an iterator to the beginning.
+  constexpr const_iterator cbegin () const noexcept { return data_; }
+
+  /// \brief Returns an iterator to the end.
+  constexpr const_iterator cend () const noexcept { return data_ + size(); }
+
   /// \brief Returns a reverse iterator starting at the end.
   constexpr reverse_iterator rbegin() const noexcept { return reverse_iterator{end()}; }
 
   /// \brief Returns a reverse iterator ending at the beginning.
   constexpr reverse_iterator rend() const noexcept { return reverse_iterator{begin()}; }
+
+  /// \brief Returns a reverse iterator starting at the end.
+  constexpr const_reverse_iterator  crbegin() const noexcept { return reverse_iterator{end()}; }
+
+  /// \brief Returns a reverse iterator ending at the beginning.
+  constexpr const_reverse_iterator  crend() const noexcept { return reverse_iterator{begin()}; }
 
   /// @}
 
@@ -296,10 +317,18 @@ public:
   /// @{
 
   /// \brief Access the first element.
-  constexpr reference front () const { return data_[0]; }
+  constexpr reference front () const
+  {
+    assert(not empty() && "front of empty span does not exist");
+    return data_[0];
+  }
 
   /// \brief Access the last element.
-  constexpr reference back () const { return data_[size()-1]; }
+  constexpr reference back () const
+  {
+    assert(not empty() && "front of empty span does not exist");
+    return data_[size()-1];
+  }
 
   /// \brief Access specified element with bounds checking.
   constexpr reference at (size_type i) const
@@ -410,7 +439,7 @@ private:
   pointer data_;
 };
 
-// deduction guides
+// deduction guide
 // @{
 
 template <class T, std::size_t N>
