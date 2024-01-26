@@ -219,8 +219,12 @@ public:
   /// \name Multi index access
   /// @{
 
-  /// \brief Access specified element at position i0,i1,...
-  /// operator() is not in the proposal, but is provided for using mdspan without c++23.
+  /**
+   * \brief Access specified element at position i0,i1,...
+   * \note The `operator()` is not in the std proposal, but is provided for using mdspan without c++23.
+   * For compatibility reasons it should only be used if the macro DUNE_HAVE_CXX_STD_MDSPAN is explicitly
+   * set to 0.
+   **/
   template <class... Indices,
     std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
     std::enable_if_t<(... && std::is_convertible_v<Indices, index_type>), int> = 0,

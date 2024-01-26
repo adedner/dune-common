@@ -384,7 +384,12 @@ public:
   /// \name Multi index access
   /// @{
 
-  /// \brief Access element at position (i0,i1,...)
+  /**
+   * \brief Access element at position (i0,i1,...)
+   * \note The `operator()` is not in the std proposal, but is provided for using mdspan without c++23.
+   * For compatibility reasons it should only be used if the macro DUNE_HAVE_CXX_STD_MDARRAY is explicitly
+   * set to 0.
+   **/
   template <class... Indices,
     std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
     std::enable_if_t<(... && std::is_convertible_v<Indices,index_type>), int> = 0>
@@ -393,7 +398,12 @@ public:
     return container_[mapping_(index_type(std::move(indices))...)];
   }
 
-  /// \brief Access element at position (i0,i1,...)
+  /**
+   * \brief Access element at position (i0,i1,...)
+   * \note The `operator()` is not in the std proposal, but is provided for using mdspan without c++23.
+   * For compatibility reasons it should only be used if the macro DUNE_HAVE_CXX_STD_MDARRAY is explicitly
+   * set to 0.
+   **/
   template <class... Indices,
     std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
     std::enable_if_t<(... && std::is_convertible_v<Indices,index_type>), int> = 0>
