@@ -80,6 +80,13 @@ void test_container (Dune::TestSuite& testSuite, std::string name, const M& mapp
   else if constexpr(Tensor::rank() == 3)
     [[maybe_unused]] Tensor tensor5{e.extent(0), e.extent(1), e.extent(2)};
 
+
+  // convert to mdspan
+  auto tensor_span = tensor3.to_mdspan();
+
+  // construct from mdspan
+  Tensor tensor6{tensor_span};
+
   checkAccess(subTestSuite, tensor3);
   testSuite.subTest(subTestSuite);
 }

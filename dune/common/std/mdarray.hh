@@ -260,7 +260,7 @@ public:
   #endif
   constexpr mdarray (const mdspan<OtherElementType,OtherExtents,OtherLayoutPolicy,Accessor>& other)
     : container_(construct_container<container_type>(other.size()))
-    , mapping_(other.mapping_)
+    , mapping_(other.mapping())
   {
     init_from_mdspan(other);
   }
@@ -365,18 +365,17 @@ public:
 
 private:
 
-  template <class V, class E, class L, class A>
-  void init_from_mdspan (const mdspan<V,E,L,A>& other)
+  template <class V, class E, class L, class A, class... Indices>
+  void init_from_mdspan (const mdspan<V,E,L,A>& other, Indices... ii)
   {
-    assert(other.is_exhaustive()); // otherwise we might copy the wrong data
-    const auto& accessor = other.accessor();
-    const auto& data_handle = other.data_handle();
-    auto accessorRange = Dune::transformedRangeView(Dune::range<std::ptrdiff_t>(other.size()),
-      [&](std::ptrdiff_t i) -> decltype(auto) {
-        return accessor.access(data_handle, i);
-      });
-
-    std::copy(accessorRange.begin(), accessorRange.end(), container_.begin());
+    constexpr rank_type pos = sizeof...(Indices);
+    if constexpr(pos < rank()) {
+      for (typename E::index_type i = 0; i < other.extent(pos); ++i)
+        init_from_mdspan(other,ii...,i);
+    } else {
+      using I = std::array<typename E::index_type,E::rank()>;
+      container_[mapping_(index_type(ii)...)] = other[I{ii...}];
+    }
   }
 
 public:
