@@ -141,9 +141,6 @@ using TypeIdentity_t = typename TypeIdentity<T>::type;
       s1[i] = 2*i;
  * \endcode
  *
- * \note The interface of `Std::span` is not complete, compared with the standard implementation
- *       in `std::span`. What is missing are the subviews and some constructors.
- *
  * \tparam Element  The element type; a complete object type that is not an abstract class type.
  * \tparam Extent   Specifies number of elements in the sequence, or `Std::dynamic_extent` if dynamic.
  *
