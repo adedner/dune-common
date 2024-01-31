@@ -122,7 +122,7 @@ public:
   /// \brief Return the sum `1 + (E(0)-1)*S(0) + (E(1)-1)*S(1) + ...`
   constexpr index_type required_span_size () const noexcept
   {
-    return _size(extents_,strides_);
+    return size(extents_,strides_);
   }
 
   /// \brief Compute the offset by folding with index-array with the strides array
@@ -155,7 +155,7 @@ public:
     // Actually this could be improved. A strided layout can still be exhaustive.
     // This test is more complicated to implement, though. See §24.7.3.4.7.4 line (5.2)
     // in the C++ standard document N4971
-    return extents_type::rank() == 0 || (required_span_size() > 0 && required_span_size() == extents()._product());
+    return extents_type::rank() == 0 || (required_span_size() > 0 && required_span_size() == extents().product());
   }
 
   /// \brief Get the array of all strides
@@ -177,7 +177,7 @@ public:
     std::enable_if_t<(OtherMapping::is_always_strided()), int> = 0>
   friend constexpr bool operator== (const mapping& a, const OtherMapping& b) noexcept
   {
-    if (_offset(b))
+    if (offset(b))
       return false;
     if constexpr(extents_type::rank() == 0)
       return true;
@@ -186,12 +186,12 @@ public:
 
 private:
   template <class E, class S>
-  static constexpr index_type _size (const E& extents, const S& strides) noexcept
+  static constexpr index_type size (const E& extents, const S& strides) noexcept
   {
     if constexpr (E::rank() == 0)
       return 1;
     else {
-      if (extents._product() == 0)
+      if (extents.product() == 0)
         return 0;
       else {
         index_type result = 1;
@@ -203,7 +203,7 @@ private:
   }
 
   template <class M>
-  static constexpr size_type _offset (const M& m) noexcept
+  static constexpr size_type offset (const M& m) noexcept
   {
     if constexpr (M::extents_type::rank() == 0)
       return m();

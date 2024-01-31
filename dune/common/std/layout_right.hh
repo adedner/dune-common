@@ -107,8 +107,12 @@ public:
   {
 #ifndef NDEBUG
     if constexpr(extents_type::rank() > 0) {
-      for (rank_type r = 0; r < extents_type::rank(); ++r)
-        assert(m.strides(r) == m.extents()._rev_product(r));
+      index_type prod = 1;
+      for (rank_type r = extents_type::rank()-1; r > 0; --r) {
+        assert(m.strides(r) == prod);
+        prod *= m.extents().extent(r);
+      }
+      assert(m.strides(0) == prod);
     }
 #endif
   }
@@ -117,7 +121,7 @@ public:
   constexpr mapping& operator= (const mapping&) noexcept = default;
 
   constexpr const extents_type& extents () const noexcept { return extents_; }
-  constexpr index_type required_span_size () const noexcept { return extents_._product();  }
+  constexpr index_type required_span_size () const noexcept { return extents_.product();  }
 
   /// \brief Compute the offset i3 + E(3)*(i2 + E(2)*(i1 + E(1)*i0))
   template <class... Indices,
@@ -154,7 +158,10 @@ public:
   constexpr index_type stride (rank_type i) const noexcept
   {
     assert(i < extents_type::rank());
-    return extents()._rev_product(i);
+    index_type prod = 1;
+    for (rank_type r = i+1; r < extents_type::rank(); ++r)
+      prod *= extents().extent(r);
+    return prod;
   }
 
   template <class OtherExtents>

@@ -31,6 +31,7 @@
 
 #include <dune/common/indices.hh>
 #include <dune/common/std/span.hh>
+#include <dune/common/std/impl/fwd_layouts.hh>
 #endif
 
 namespace Dune::Std {
@@ -85,14 +86,27 @@ struct DynamicExtentsArray<IndexType,0>
 template <class IndexType, std::size_t... exts>
 class extents
 {
-  template <class, std::size_t...> friend class extents;
-
   static_assert(std::is_integral_v<IndexType>);
 
-  static inline constexpr std::size_t rank_ = sizeof...(exts);
-  static inline constexpr std::size_t rank_dynamic_ = ((exts == Std::dynamic_extent) + ... + 0);
+private:
+  static constexpr std::size_t rank_ = sizeof...(exts);
+  static constexpr std::size_t rank_dynamic_ = ((exts == Std::dynamic_extent) + ... + 0);
 
+  // this type is used internally to extract the static extents by index
   using array_type = std::array<std::size_t,rank_>;
+
+  // store at position i how many extents in {exts[0],...,exts[i]} are dynamic_extent
+  static constexpr std::array<std::size_t,rank_+1> make_dynamic_index()
+  {
+    std::array<std::size_t,rank_+1> di{{}};
+    for (std::size_t i = 0; i < rank_; ++i)
+      di[i+1] = di[i] + (array_type{exts...}[i] == Std::dynamic_extent);
+    return di;
+  }
+
+  // An index mapping computed by `make_dynamic_index()` to get the position of a dynamic
+  // extent in {exts...} within the array dynamic_extents.
+  static constexpr std::array<std::size_t,rank_+1> dynamic_index_{make_dynamic_index()};
 
 public:
   using rank_type = std::size_t;
@@ -123,7 +137,7 @@ public:
     if (std::size_t e = static_extent(r); e != Std::dynamic_extent)
       return index_type(e);
     else
-      return dynamic_extents_[dynamic_index(r)];
+      return dynamic_extents_[dynamic_index_[r]];
   }
 
   /// @}
@@ -202,51 +216,15 @@ public:
     return true;
   }
 
-
-#ifndef DOXYGEN
-
-  // ---------------------------
-  // Some implementation details
-
-  // The product of all extents
-  constexpr size_type _product () const noexcept
-  {
-    return _fwd_product(rank());
-  }
-
-  // The product of all extents up to r-1
-  constexpr size_type _fwd_product (rank_type r) const noexcept
-  {
-    // [[pre: r <= rank()]]
-    size_type prod = 1;
-    for (rank_type i = 0; i < r; ++i)
-      prod *= extent(i);
-    return prod;
-  }
-
-  // The product of all extents down to r+1
-  constexpr size_type _rev_product (rank_type r) const noexcept
-  {
-    // [[pre: r < rank()]]
-    size_type prod = 1;
-    for (rank_type i = r+1; i < rank(); ++i)
-      prod *= extent(i);
-    return prod;
-  }
-
-#endif
-
 private:
-  // Compute the index within dynamic_extents corresponding to the total index `i` in extents.
-  // This corresponds to the j'th occurrence of `Std::dynamic_extent` within `exts...`.
-  static constexpr rank_type dynamic_index (rank_type i) noexcept
+#ifndef DOXYGEN
+  // The product of all extents
+  constexpr size_type product () const noexcept
   {
-    // [[pre: i <= rank()]];
-    rank_type j = 0;
-    for (rank_type r = 0; r < i; ++r)
-      if (static_extent(r) == Std::dynamic_extent)
-        ++j;
-    return j;
+    size_type prod = 1;
+    for (rank_type i = 0; i < rank(); ++i)
+      prod *= extent(i);
+    return prod;
   }
 
   // A representation of all extents as an array
@@ -277,10 +255,16 @@ private:
       }
     }
   }
+#endif // DOXYGEN
 
 private:
   using dynamic_extents_type = typename Impl::DynamicExtentsArray<index_type,rank_dynamic()>::type;
   [[no_unique_address]] dynamic_extents_type dynamic_extents_;
+
+  template <class, std::size_t...> friend class extents;
+  friend struct layout_left;
+  friend struct layout_right;
+  friend struct layout_stride;
 };
 
 
