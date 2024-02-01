@@ -68,7 +68,8 @@ void test_accessor (Dune::TestSuite& testSuite, std::string name, const M& mappi
   auto dh = coefficients.data();
 
   // construction
-  Span span1{dh};
+  if constexpr(Span::rank() == 0 || Span::rank_dynamic() == 0)
+    Span span1{dh};
   Span span2{dh, mapping.extents()};
   Span span3{dh, mapping};
   Span span4{dh, mapping, A{}};
@@ -82,7 +83,7 @@ void test_accessor (Dune::TestSuite& testSuite, std::string name, const M& mappi
   else if constexpr(Span::rank() == 3)
     Span span5{dh, e.extent(0), e.extent(1), e.extent(2)};
 
-  checkAccess(subTestSuite, span1);
+  checkAccess(subTestSuite, span2);
   testSuite.subTest(subTestSuite);
 }
 
@@ -100,10 +101,10 @@ void test_layout (Dune::TestSuite& testSuite, std::string name, const E& extent)
 }
 
 
-template <class E>
-void test_extents (Dune::TestSuite& testSuite, std::string name)
+template <class E, class... Args>
+void test_extents (Dune::TestSuite& testSuite, std::string name, Args&&... args)
 {
-  E extent{};
+  E extent{std::forward<Args>(args)...};
 
   Dune::TestSuite subTestSuite(name);
   test_layout<Dune::Std::layout_left>(subTestSuite, "layout_left", extent);
@@ -120,6 +121,10 @@ int main(int argc, char** argv)
   test_extents<Dune::Std::extents<int,7>>(testSuite, "rank=1");
   test_extents<Dune::Std::extents<int,7,7>>(testSuite, "rank=2");
   test_extents<Dune::Std::extents<int,7,7,7>>(testSuite, "rank=3");
+
+  test_extents<Dune::Std::dextents<int,1>>(testSuite, "rank=1", 7);
+  test_extents<Dune::Std::dextents<int,2>>(testSuite, "rank=2", 7,7);
+  test_extents<Dune::Std::dextents<int,3>>(testSuite, "rank=3", 7,7,7);
 
   return testSuite.exit();
 }
