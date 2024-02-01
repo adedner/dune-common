@@ -5,41 +5,9 @@
 #ifndef DUNE_COMMON_STD_DEFAULT_ACCESSOR_HH
 #define DUNE_COMMON_STD_DEFAULT_ACCESSOR_HH
 
-#if __has_include(<mdspan>)
-  #include <mdspan>
-#endif
-
-#if __cpp_lib_mdspan >= 202207L
-  #ifndef DUNE_HAVE_CXX_STD_MDSPAN
-  #define DUNE_HAVE_CXX_STD_MDSPAN 1
-  #endif
-#elif __has_include(<experimental/mdspan>)
-  #include <experimental/mdspan>
-  #ifndef DUNE_HAVE_CXX_STD_MDSPAN
-  #define DUNE_HAVE_CXX_STD_MDSPAN 1
-  #endif
-#endif
-
-#if !DUNE_HAVE_CXX_STD_MDSPAN
 #include <type_traits>
-#endif
 
 namespace Dune::Std {
-
-/*
- * The utilities std::default_accessor is part of the <mdspan> header
- * introduced in c++23. It might also be available in Kokkos-mdspan proposal
- * implementation library.
- *
- * The utilities should be deprecated once the minimal compiler version supported
- * by Dune have mdspan support, e.g., clang libc++ >= 17.
- */
-
-#if DUNE_HAVE_CXX_STD_MDSPAN
-
-using std::default_accessor;
-
-#else // DUNE_HAVE_CXX_STD_MDSPAN
 
 /**
  * \brief A type for indexed access to elements of mdspan.
@@ -82,8 +50,6 @@ public:
     return p + i;
   }
 };
-
-#endif // DUNE_HAVE_CXX_STD_MDSPAN
 
 } // end namespace Dune::Std
 

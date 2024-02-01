@@ -5,17 +5,6 @@
 #ifndef DUNE_COMMON_STD_SPAN_HH
 #define DUNE_COMMON_STD_SPAN_HH
 
-#if __has_include(<span>)
-  #include <span>
-#endif
-
-#if __cpp_lib_span >= 202002L
-  #ifndef DUNE_HAVE_CXX_STD_SPAN
-  #define DUNE_HAVE_CXX_STD_SPAN 1
-  #endif
-#endif
-
-#if !DUNE_HAVE_CXX_STD_SPAN
 #include <cassert>
 #include <cstddef>
 #include <exception>
@@ -30,23 +19,8 @@
 
 #include <dune/common/exceptions.hh>
 #include <dune/common/std/memory.hh>
-#endif
 
 namespace Dune::Std {
-
-/*
- * The utility std::span is part of the <span> header introduced in c++20.
- *
- * The utility should be deprecated once the minimal compiler version supported
- * by Dune have mdspan support, e.g., gcc libstdc++ >= 10 or clang libc++ >= 7.
- */
-
-#if DUNE_HAVE_CXX_STD_SPAN
-
-using std::dynamic_extent;
-using std::span;
-
-#else // DUNE_HAVE_CXX_STD_SPAN
 
 /// \brief A constant of type std::size_t that is used to differentiate std::span of static and dynamic extent.
 inline constexpr std::size_t dynamic_extent = std::numeric_limits<std::size_t>::max();
@@ -473,8 +447,6 @@ template <class T, size_t N>
 span (const std::array<T, N>&) -> span<const T, N>;
 
 // @}
-
-#endif // DUNE_HAVE_CXX_STD_SPAN
 
 } // end namespace Dune::Std
 

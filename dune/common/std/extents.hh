@@ -5,22 +5,6 @@
 #ifndef DUNE_COMMON_STD_EXTENTS_HH
 #define DUNE_COMMON_STD_EXTENTS_HH
 
-#if __has_include(<mdspan>)
-  #include <mdspan>
-#endif
-
-#if __cpp_lib_mdspan >= 202207L
-  #ifndef DUNE_HAVE_CXX_STD_MDSPAN
-  #define DUNE_HAVE_CXX_STD_MDSPAN 1
-  #endif
-#elif __has_include(<experimental/mdspan>)
-  #include <experimental/mdspan>
-  #ifndef DUNE_HAVE_CXX_STD_MDSPAN
-  #define DUNE_HAVE_CXX_STD_MDSPAN 1
-  #endif
-#endif
-
-#if !DUNE_HAVE_CXX_STD_MDSPAN
 #include <array>
 #include <cassert>
 #include <limits>
@@ -32,26 +16,8 @@
 #include <dune/common/indices.hh>
 #include <dune/common/std/span.hh>
 #include <dune/common/std/impl/fwd_layouts.hh>
-#endif
 
 namespace Dune::Std {
-
-/*
- * The utilities std::extents and std::dextents are part of the <mdspan> header
- * introduced in c++23. It might also be available in Kokkos-mdspan proposal
- * implementation library.
- *
- * The utilities should be deprecated once the minimal compiler version supported
- * by Dune have mdspan support, e.g., clang libc++ >= 17.
- */
-
-#if DUNE_HAVE_CXX_STD_MDSPAN
-
-using std::extents;
-using std::dextents;
-
-#else // DUNE_HAVE_CXX_STD_MDSPAN
-
 namespace Impl {
 
 template <class IndexType, std::size_t n>
@@ -291,8 +257,6 @@ struct DExtentsImpl<IndexType, std::integer_sequence<std::size_t,I...>>
  **/
 template <class IndexType, std::size_t R>
 using dextents = typename Impl::DExtentsImpl<IndexType, std::make_integer_sequence<std::size_t,R>>::type;
-
-#endif // DUNE_HAVE_CXX_STD_MDSPAN
 
 } // end namespace Dune::Std
 

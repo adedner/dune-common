@@ -5,22 +5,37 @@
 #ifndef DUNE_COMMON_STD_IMPL_FWD_LAYOUTS_HH
 #define DUNE_COMMON_STD_IMPL_FWD_LAYOUTS_HH
 
-#if ! DUNE_HAVE_CXX_STD_MDSPAN
-
 namespace Dune::Std {
 
+/**
+ * \brief A layout where the leftmost extent has stride 1.
+ * \ingroup CxxUtilities
+ *
+ * For two-dimensional tensors this corresponds to column-major indexing.
+ **/
 struct layout_left
 {
   template <class Extents>
   class mapping;
 };
 
+/**
+ * \brief A layout where the rightmost extent has stride 1, and strides
+ *        increase right-to-left as the product of extents.
+ * \ingroup CxxUtilities
+ *
+ * For two-dimensional tensors this corresponds to row-major indexing.
+ **/
 struct layout_right
 {
   template <class Extents>
   class mapping;
 };
 
+/**
+ * \brief A layout mapping where the strides are user-defined.
+ * \ingroup CxxUtilities
+ **/
 struct layout_stride
 {
   template <class Extents>
@@ -28,7 +43,5 @@ struct layout_stride
 };
 
 } // end namespace Dune::Std
-
-#endif // ! DUNE_HAVE_CXX_STD_MDSPAN
 
 #endif // DUNE_COMMON_STD_IMPL_FWD_LAYOUTS_HH

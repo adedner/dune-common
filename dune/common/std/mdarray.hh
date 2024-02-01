@@ -5,19 +5,6 @@
 #ifndef DUNE_COMMON_STD_MDARRAY_HH
 #define DUNE_COMMON_STD_MDARRAY_HH
 
-#if __has_include(<mdarray>)
-  #include <mdarray>
-  #ifndef DUNE_HAVE_CXX_STD_MDARRAY
-  #define DUNE_HAVE_CXX_STD_MDARRAY 1
-  #endif
-#elif __has_include(<experimental/mdarray>)
-  #include <experimental/mdarray>
-  #ifndef DUNE_HAVE_CXX_STD_MDARRAY
-  #define DUNE_HAVE_CXX_STD_MDARRAY 1
-  #endif
-#endif
-
-#if !DUNE_HAVE_CXX_STD_MDARRAY
 #include <algorithm>
 #include <array>
 #include <memory>
@@ -35,27 +22,8 @@
 #include <dune/common/std/memory.hh>
 #include <dune/common/std/span.hh>
 #include <dune/common/std/impl/containerconstructiontraits.hh>
-#endif
 
 namespace Dune::Std {
-
-/*
- * The utility std::mdarray is part of the <mdarray> header that might be introduced
- * in c++26. It might also be available in Kokkos-mdspan proposal implementation library.
- *
- * The utilities should be deprecated once the minimal compiler version supported
- * by Dune have mdarray support.
- */
-
-#if DUNE_HAVE_CXX_STD_MDARRAY && __has_include(<mdarray>)
-
-using std::mdarray;
-
-#elif DUNE_HAVE_CXX_STD_MDARRAY && __has_include(<experimental/mdarray>)
-
-using std::experimental::mdarray;
-
-#else // DUNE_HAVE_CXX_STD_MDARRAY
 
 /**
  * \brief An owning multi-dimensional array analog of mdspan.
@@ -400,8 +368,6 @@ public:
   /**
    * \brief Access element at position (i0,i1,...)
    * \note The `operator()` is not in the std proposal, but is provided for using mdspan without c++23.
-   * For compatibility reasons it should only be used if the macro DUNE_HAVE_CXX_STD_MDARRAY is explicitly
-   * set to 0.
    **/
   template <class... Indices,
     std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
@@ -681,8 +647,6 @@ mdarray (const mdspan<Element, Extents, Layout, Accessor>&, const Alloc&)
 
 /// @}
 
-#if !DUNE_HAVE_CXX_STD_MDSPAN
-
 /// \name Additional deduction guide for mdspan
 /// \relates mdspan
 /// @{
@@ -695,10 +659,6 @@ mdspan (mdarray<Element, Extents, Layout, Container>) -> mdspan<
   typename decltype(std::declval<mdarray<Element, Extents, Layout, Container>>().to_mdspan())::accessor_type>;
 
 /// @}
-
-#endif // !DUNE_HAVE_CXX_STD_MDARRAY
-
-#endif // DUNE_HAVE_CXX_STD_MDARRAY
 
 } // end namespace Dune::Std
 

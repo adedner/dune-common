@@ -5,22 +5,6 @@
 #ifndef DUNE_COMMON_STD_MDSPAN_HH
 #define DUNE_COMMON_STD_MDSPAN_HH
 
-#if __has_include(<mdspan>)
-  #include <mdspan>
-  #endif
-
-#if __cpp_lib_mdspan >= 202207L
-  #ifndef DUNE_HAVE_CXX_STD_MDSPAN
-  #define DUNE_HAVE_CXX_STD_MDSPAN 1
-  #endif
-#elif __has_include(<experimental/mdspan>)
-  #include <experimental/mdspan>
-  #ifndef DUNE_HAVE_CXX_STD_MDSPAN
-  #define DUNE_HAVE_CXX_STD_MDSPAN 1
-  #endif
-#endif
-
-#if !DUNE_HAVE_CXX_STD_MDSPAN
 #include <array>
 #include <type_traits>
 #include <utility>
@@ -33,27 +17,8 @@
 #include <dune/common/std/extents.hh>
 #include <dune/common/std/layout_right.hh>
 #include <dune/common/std/span.hh>
-#endif
 
 namespace Dune::Std {
-
-/*
- * The utility std::mdspan is part of the <mdspan> header introduced in c++23.
- * It might also be available in Kokkos-mdspan proposal implementation library.
- *
- * The utilities should be deprecated once the minimal compiler version supported
- * by Dune have mdspan support, e.g., clang libc++ >= 17.
- */
-
-#if DUNE_HAVE_CXX_STD_MDSPAN && __cpp_lib_mdspan >= 202207L
-
-using std::mdspan;
-
-#elif DUNE_HAVE_CXX_STD_MDSPAN && __has_include(<experimental/mdspan>)
-
-using std::experimental::mdspan;
-
-#else // DUNE_HAVE_CXX_STD_MDSPAN
 
 /**
  * \brief A multi-dimensional non-owning array view.
@@ -222,8 +187,6 @@ public:
   /**
    * \brief Access specified element at position i0,i1,...
    * \note The `operator()` is not in the std proposal, but is provided for using mdspan without c++23.
-   * For compatibility reasons it should only be used if the macro DUNE_HAVE_CXX_STD_MDSPAN is explicitly
-   * set to 0.
    **/
   template <class... Indices,
     std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
@@ -416,8 +379,6 @@ mdspan (const DataHandle&, const Mapping&, const Accessor&)
   -> mdspan<Element, Extents, Layout, Accessor>;
 
 // @}
-
-#endif // DUNE_HAVE_CXX_STD_MDSPAN
 
 } // end namespace Dune::Std
 
