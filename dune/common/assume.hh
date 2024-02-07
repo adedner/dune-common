@@ -21,10 +21,12 @@
 
 // if ompiler intrinsics/attributes for assumptions are available
 #ifndef DUNE_ASSUME
-  #if defined(__clang__)
-    #define DUNE_ASSUME(...) do { __builtin_assume(__VA_ARGS__); } while(0)
+  #if defined(__clang__) && defined(__has_builtin)
+    #if __has_builtin(__builtin_assume)
+      #define DUNE_ASSUME(...) __builtin_assume(__VA_ARGS__)
+    #endif
   #elif defined(_MSC_VER)
-    #define DUNE_ASSUME(...) do { __assume(__VA_ARGS__); } while(0)
+    #define DUNE_ASSUME(...) __assume(__VA_ARGS__)
   #elif defined(__GNUC__)
     #if __GNUC__ >= 13
       #define DUNE_ASSUME(...) __attribute__((__assume__(__VA_ARGS__)))
@@ -35,15 +37,23 @@
 // if we are in release mode, use undefined behavior as a way to enforce an assumption
 #if !defined(DUNE_ASSUME) && defined(NDEBUG)
   #include <utility>
-  #if defined(__GNUC__)
-    #define DUNE_ASSUME(...) do { if (!bool(__VA_ARGS__)) __builtin_unreachable(); } while(0)
-  #elif __cpp_lib_unreachable >= 202202L
+  #if __cpp_lib_unreachable >= 202202L
     #define DUNE_ASSUME(...) do { if (!bool(__VA_ARGS__)) ::std::unreachable(); } while(0)
+  #elif defined(__GNUC__)
+    #define DUNE_ASSUME(...) do { if (!bool(__VA_ARGS__)) __builtin_unreachable(); } while(0)
+  #elif defined(__has_builtin)
+    #if __has_builtin(__builtin_unreachable)
+      #define DUNE_ASSUME(...) do { if (!bool(__VA_ARGS__)) __builtin_unreachable(); } while(0)
+    #endif
+  #else
+    #include <cstdlib>
+    #define DUNE_ASSUME(...) do { if (!bool(__VA_ARGS__)) std::abort(); } while(0)
   #endif
 #endif
 
 // in debug mode and if not defined before, use the assert macro
 #ifndef DUNE_ASSUME
+  #include <cassert>
   #define DUNE_ASSUME(...) assert(bool(__VA_ARGS__))
 #endif
 
