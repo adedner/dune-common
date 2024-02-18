@@ -11,6 +11,7 @@
 
 #include <dune/python/common/fmatrix.hh>
 #include <dune/python/common/fvector.hh>
+#include <dune/python/common/tuplevector.hh>
 
 namespace Dune
 {
