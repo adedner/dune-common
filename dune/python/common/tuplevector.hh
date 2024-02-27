@@ -10,10 +10,11 @@
 #include <tuple>
 #include <utility>
 
+#include <dune/common/hybridutilities.hh>
 #include <dune/common/indices.hh>
+#include <dune/common/rangeutilities.hh>
 #include <dune/common/tuplevector.hh>
 
-#include <dune/python/common/fvector.hh>
 #include <dune/python/common/typeregistry.hh>
 #include <dune/python/pybind11/pybind11.h>
 #include <dune/python/pybind11/operators.h>
@@ -83,7 +84,7 @@ namespace Dune
       cls.def("__len__", [](const TV &v) { return v.size();  });
 
       // element access
-      Hybrid::forEach(std::make_index_sequence<sizeof...(K)>{},[&](auto i)
+      Dune::Hybrid::forEach(std::make_index_sequence<sizeof...(K)>{},[&](auto i)
       {
         using I = decltype(i);
         using KI = std::decay_t<decltype(std::declval<TV>()[i])>;
