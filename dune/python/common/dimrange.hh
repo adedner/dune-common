@@ -16,6 +16,7 @@
 
 #include <dune/python/common/fmatrix.hh>
 #include <dune/python/common/fvector.hh>
+#include <dune/python/common/tuplevector.hh>
 
 namespace Dune
 {
@@ -55,7 +56,12 @@ namespace Dune
 
       template< class... T >
       struct DimRange< std::tuple< T... >, void >
-        : public std::integral_constant< std::size_t, sum< std::size_t >( DimRange< T >::value... ) >
+        : public std::integral_constant< std::size_t, (DimRange< T >::value + ...) >
+      {};
+
+      template< class... T >
+      struct DimRange< TupleVector< T... >, void >
+        : public std::integral_constant< std::size_t, (DimRange< T >::value + ...) >
       {};
 
       template< class K, int n >

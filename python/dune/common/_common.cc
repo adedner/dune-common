@@ -11,6 +11,7 @@
 #include <dune/python/common/dynvector.hh>
 #include <dune/python/common/fmatrix.hh>
 #include <dune/python/common/fvector.hh>
+#include <dune/python/common/tuplevector.hh>
 #include <dune/python/common/mpihelper.hh>
 
 #include <dune/python/pybind11/pybind11.h>
@@ -25,6 +26,12 @@ PYBIND11_MODULE( _common, module )
 
   Dune::Python::registerDynamicVector<double>(module);
   Dune::Python::registerDynamicMatrix<double>(module);
+
+  Dune::Python::registerFieldVector<double,1>(module);
+  Dune::Python::registerFieldVector<double,2>(module);
+  Dune::Python::registerFieldVector<double,3>(module);
+
+  Dune::Python::registerTupleVector<Dune::FieldVector<double,2>,double>(module);
 
   Dune::MPIHelper::instance();
   Dune::Python::registerCommunication(module);

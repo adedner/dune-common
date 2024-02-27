@@ -57,6 +57,10 @@ In order to build the DUNE core modules you need at least the following software
 - Add the utility `IsCompileTimeConstant` to check for integral constants and anything with
   the same interface.
 
+- Export python bindings for `TupleVector`.
+
+- In `dune/python/common/dimrange.hh` add specialization of `DimRange` for `TupleVector`.
+
 ## Build System
 
 - Documentation files in `doc/buildsystem/${ModuleName}.rst` are now only copied.
