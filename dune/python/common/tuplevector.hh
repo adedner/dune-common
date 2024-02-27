@@ -43,58 +43,58 @@ namespace Dune
     }
 
 
-    template< class... K >
-    void registerTupleVector ( pybind11::handle scope )
+    template <class... K>
+    void registerTupleVector (pybind11::handle scope)
     {
       using namespace Dune::Indices;
       using pybind11::operator""_a;
 
-      typedef Dune::TupleVector< K... > TV;
+      using T = std::tuple<K...>;
+      using TV = Dune::TupleVector<K...>;
 
-      auto cls = insertClass< TV >( scope, "TupleVector",
+      auto cls = insertClass<TV>( scope, "TupleVector",
           GenerateTypeName("Dune::TupleVector",MetaType<K>()...),
           IncludeFiles{"dune/common/tuplevector.hh"} ).first;
 
       // default constructor
       cls.def( pybind11::init( []{ return new TV(); } ) );
 
-      // constructor from a "list" of values
-      cls.def( pybind11::init( []( pybind11::args x ) {
+      // constructors from a "list" of values
+      cls.def( pybind11::init( [](pybind11::args x) {
           assert(sizeof...(K) == x.size());
           return Dune::unpackIntegerSequence([&](auto... i) {
             return new TV((x[i].template cast<K>())...);
           }, std::make_index_sequence<sizeof...(K)>{});
         } ) );
-      cls.def( pybind11::init( []( pybind11::list x ) {
+      cls.def( pybind11::init( [](pybind11::list x) {
           assert(sizeof...(K) == x.size());
           return Dune::unpackIntegerSequence([&](auto... i) {
             return new TV((x[i].template cast<K>())...);
           }, std::make_index_sequence<sizeof...(K)>{});
         } ), "x"_a );
-      cls.def( pybind11::init( []( pybind11::tuple x ) {
+      cls.def( pybind11::init( [](pybind11::tuple x) {
           assert(sizeof...(K) == x.size());
           return Dune::unpackIntegerSequence([&](auto... i) {
             return new TV((x[i].template cast<K>())...);
           }, std::make_index_sequence<sizeof...(K)>{});
         } ), "x"_a );
 
-      // numer of elements in the tuple
+      // number of elements in the tuple
       cls.def("__len__", [](const TV &v) { return v.size();  });
 
       // element access
       Hybrid::forEach(std::make_index_sequence<sizeof...(K)>{},[&](auto i)
       {
-        using Ki = std::decay_t<decltype(std::declval<TV>()[i])>;
-        cls.def("__getitem__", [i](const TV& v, decltype(i)) { return v[i]; });
-        cls.def("__setitem__", [i](TV& v, decltype(i), const Ki& x) { v[i] = x; });
+        using I = decltype(i);
+        using KI = std::decay_t<decltype(std::declval<TV>()[i])>;
+        cls.def("__getitem__", [i](const TV& v, I /*idx*/) { return v[i]; });
+        cls.def("__setitem__", [i](TV& v, I /*idx*/, const KI& x) { v[i] = x; });
       });
 
       // check whether two tuples are equal
       cls.def("__eq__",
           [](const TV& self, const TV& other) {
-            const std::tuple<K...>& self_tuple(self);
-            const std::tuple<K...>& other_tuple(other);
-            return self == other;
+            return static_cast<const T&>(self) == static_cast<const T&>(other);
           });
 
       // return a string representation
