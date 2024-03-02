@@ -21,6 +21,12 @@
 
 #include <dune/common/exceptions.hh>
 
+#if HAVE_PYTHON3_EMBED
+#include <dune/python/pybind11/embed.h>
+#include <dune/python/pybind11/stl.h>
+#include <dune/python/pybind11/numpy.h>
+#endif
+
 std::string Dune::ParameterTreeParser::ltrim(const std::string& s)
 {
   std::size_t firstNonWS = s.find_first_not_of(" \t\n\r");
@@ -261,3 +267,47 @@ std::string Dune::ParameterTreeParser::generateHelpString(
   }
   return helpstr;
 }
+
+#if HAVE_PYTHON3_DEV
+void Dune::ParameterTreeParser::readPythonDict(const pybind11::dict& scope,
+                                               Dune::ParameterTree& pt,
+                                               bool overwrite){
+  for (const auto& [key, value] : scope){
+    const std::string& key_str = key.cast<std::string>();
+    // if the value is a dict create a sub-ParameterTree
+    if(pybind11::isinstance<pybind11::dict>(value)){
+      const pybind11::dict& dict = value.cast<pybind11::dict>();
+      readPythonDict(dict, pt.sub(key_str), overwrite);
+      continue;
+    }
+    // skip if overwrite is false and key is already contained in the ParameterTree
+    if(!overwrite and pt.hasKey(key_str))
+      continue;
+    // otherwise add the python string representation as value
+    std::string val_str = "";
+    if(pybind11::isinstance<pybind11::list>(value)
+      || pybind11::isinstance<pybind11::array>(value)
+      || pybind11::isinstance<pybind11::tuple>(value))
+    {
+      std::vector<double> vec = value.cast<std::vector<double>>();
+      for (double v : vec) val_str += std::to_string(v) + " ";
+    }
+    else
+      val_str = pybind11::str(value);
+    pt[key_str] = val_str;
+  }
+}
+#endif
+
+#if HAVE_PYTHON3_EMBED
+void Dune::ParameterTreeParser::readPythonFile(std::string file,
+                                               ParameterTree& pt,
+                                               bool overwrite,
+                                               const char* dict)
+{
+  pybind11::scoped_interpreter guard{};
+  pybind11::eval_file(file);
+  pybind11::dict scope = pybind11::module_::import("__main__").attr(dict);
+  readPythonDict(scope, pt, overwrite);
+}
+#endif

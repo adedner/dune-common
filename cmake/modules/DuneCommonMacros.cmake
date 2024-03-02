@@ -53,3 +53,4 @@ include(AddVcFlags)
 
 # Run the python extension of the Dune cmake build system
 include(DunePythonCommonMacros)
+include(AddPythonFlags)

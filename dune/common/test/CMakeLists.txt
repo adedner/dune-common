@@ -275,6 +275,13 @@ dune_add_test(SOURCES parametertreetest.cc
               LINK_LIBRARIES dunecommon
               LABELS quick)
 
+# add a symlink to the python file, we will read it in the test
+dune_symlink_to_source_files(FILES readpythonparametertree.py)
+dune_add_test(SOURCES readpythonparametertreetest.cc
+              LINK_LIBRARIES dunecommon
+              LABELS quick
+              CMAKE_GUARD HAVE_PYTHON3_EMBED)
+
 dune_add_test(SOURCES parmetistest.cc
               MPI_RANKS 3
               TIMEOUT 300

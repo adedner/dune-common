@@ -22,6 +22,7 @@ target_compile_features(dunecommon PUBLIC cxx_std_17)
 # Set properties to the dunecommon target
 add_dune_blas_lapack_flags(dunecommon)
 add_dune_tbb_flags(dunecommon)
+add_dune_python3_dev_flags(dunecommon)
 
 # add subdirectories to execute CMakeLists.txt there
 add_subdirectory(bin)

@@ -16,6 +16,10 @@
 #include <dune/common/parametertree.hh>
 #include <dune/common/exceptions.hh>
 
+#if HAVE_PYTHON3_DEV
+#include <dune/python/pybind11/pybind11.h>
+#endif
+
 namespace Dune {
 
   /** \brief report parser error while reading ParameterTree */
@@ -181,6 +185,53 @@ namespace Dune {
       bool allow_more = true,
       bool overwrite = true,
       std::vector<std::string> help = std::vector<std::string>());
+
+#if HAVE_PYTHON3_DEV
+    /** \brief parse Python dict as ParameterTree
+     *
+     *  converts the python dictionary into a ParameterTree.
+     *
+     * \param dict python dict to be read
+     * \param[out] pt The parameter tree to store the config structure.
+     * \param overwrite Whether to overwrite already existing values,
+     *                  If false, values in the stream will be ignored
+     *                  if the key is already present.
+     *
+     * \warning If there are cycles in the dictionary-tree, meaning a
+     * sub-dictionary contains itself, this function leads to an infinite
+     * recurison.
+     */
+    static void readPythonDict(const pybind11::dict& dict,
+                               Dune::ParameterTree& pt,
+                               bool overwrite);
+#endif
+
+#if HAVE_PYTHON3_EMBED
+    /** \brief parse Python script as ParameterTree
+     *
+     *  Evaluates the python script and converts the variables into a ParameterTree.
+     *
+     *  This function uses `pybind11::scoped_interpreter`, meaning the Python
+     *  interpreter must not to be running. Furthermore, depending on
+     *  third-party modules and global-user data, it may leak memory. For further
+     *  information see pybind11 or CPython documentation.
+     *
+     * \param file filename
+     * \param[out] pt The parameter tree to store the config structure.
+     * \param overwrite Whether to overwrite already existing values,
+     *                  If false, values in the stream will be ignored
+     *                  if the key is already present.
+     * \param dict name of the variable to be parsed. Default is "__dict__" which
+     *             means that the dict of the global scope is parsed.
+     *
+     * \throws std::runtime_error is thrown if the Python interpreter was initialized before
+     */
+    static void readPythonFile(std::string file,
+                               ParameterTree& pt,
+                               bool overwrite = true,
+                               const char* dict = "__dict__");
+#endif
+
 
   private:
     static std::string generateHelpString(std::string progname, std::vector<std::string> keywords, unsigned int required, std::vector<std::string> help);
