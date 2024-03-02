@@ -104,6 +104,7 @@ install(FILES
         typelist.hh
         typetraits.hh
         typeutilities.hh
+        unreachable.hh
         unused.hh
         vc.hh
         version.hh
