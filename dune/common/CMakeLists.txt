@@ -26,6 +26,7 @@ install(FILES
         alignedallocator.hh
         arraylist.hh
         assertandreturn.hh
+        assume.hh
         bartonnackmanifcheck.hh
         bigunsignedint.hh
         binaryfunctions.hh
