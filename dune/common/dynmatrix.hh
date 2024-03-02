@@ -138,6 +138,42 @@ namespace Dune
       return AT;
     }
 
+    //! Multiplies M from the left to this matrix, this matrix is not modified
+    DynamicMatrix<K> leftmultiplyany (const DynamicMatrix<K>& M) const
+    {
+      const size_type l = M.rows();
+      const size_type cols = this->cols();
+      const size_type rows = this->rows();
+      assert(M.cols() == rows);
+      DynamicMatrix<K> C(l, cols);
+      for (size_type i=0; i<l; i++) {
+        for (size_type j=0; j<cols; j++) {
+          C[i][j] = 0;
+          for (size_type k=0; k<rows; k++)
+            C[i][j] += M[i][k]*(*this)[k][j];
+        }
+      }
+      return C;
+    }
+
+    //! Multiplies M from the right to this matrix, this matrix is not modified
+    DynamicMatrix<K> rightmultiplyany (const DynamicMatrix<K>& M) const
+    {
+      const size_type l = M.cols();
+      const size_type cols = this->cols();
+      const size_type rows = this->rows();
+      assert(M.rows() == cols);
+      DynamicMatrix<K> C(rows, l);
+      for (size_type i=0; i<rows; i++) {
+        for (size_type j=0; j<l; j++) {
+          C[i][j] = 0;
+          for (size_type k=0; k<cols; k++)
+            C[i][j] += (*this)[i][k]*M[k][j];
+        }
+      }
+      return C;
+    }
+
     // make this thing a matrix
     size_type mat_rows() const { return _data.size(); }
     size_type mat_cols() const {
