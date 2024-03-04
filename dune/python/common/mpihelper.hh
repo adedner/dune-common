@@ -45,6 +45,7 @@ namespace Dune
 
       cls.def( "broadcast", [] ( const Comm &self, double x, int root ) { self.broadcast( &x, 1, root); return x; }, "x"_a, "root"_a );
       cls.def( "broadcast", [] ( const Comm &self, std::vector<double> x, int root ) { self.broadcast( x.data(), x.size(), root); return x; }, "x"_a, "root"_a );
+      cls.def( "broadcast", [] ( const Comm &self, std::string x, int root ) { self.broadcast( x.data(), x.size(), root); return x; }, "x"_a, "root"_a );
 
       cls.def( "gather", [] ( const Comm &self, double x, int root )
           {
