@@ -39,8 +39,16 @@ namespace Dune
         col_(col)
       {}
 
-      constexpr size_type N () const {
-        return matrix_.N();
+      constexpr auto N () const {
+        return matrix_.size();
+      }
+
+      constexpr auto dim () const {
+        return matrix_.size();
+      }
+
+      constexpr auto size () const {
+        return matrix_.size();
       }
 
       template<class M_ = M,
