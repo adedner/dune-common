@@ -39,8 +39,16 @@ namespace Dune
         col_(col)
       {}
 
-      constexpr size_type N () const {
-        return matrix_.N();
+      constexpr auto N () const {
+        return matrix_.size();
+      }
+
+      constexpr auto dim () const {
+        return matrix_.size();
+      }
+
+      constexpr auto size () const {
+        return matrix_.size();
       }
 
       template<class M_ = M,
@@ -362,8 +370,8 @@ namespace Dune
     }
 
     // make this thing a matrix
-    static constexpr size_type mat_rows() { return ROWS; }
-    static constexpr size_type mat_cols() { return COLS; }
+    static constexpr auto mat_rows () { return std::integral_constant<size_type,rows>(); }
+    static constexpr auto mat_cols () { return std::integral_constant<size_type,cols>(); }
 
     row_reference mat_access ( size_type i )
     {
@@ -604,8 +612,8 @@ namespace Dune
     }
 
     // make this thing a matrix
-    static constexpr size_type mat_rows() { return 1; }
-    static constexpr size_type mat_cols() { return 1; }
+    static constexpr auto mat_rows () { return std::integral_constant<size_type,rows>(); }
+    static constexpr auto mat_cols () { return std::integral_constant<size_type,cols>(); }
 
     row_reference mat_access ([[maybe_unused]] size_type i)
     {
