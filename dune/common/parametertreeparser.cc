@@ -81,7 +81,7 @@ void Dune::ParameterTreeParser::readINITree(std::istream& in,
 
 void Dune::ParameterTreeParser::readINITree(std::istream& in,
                                             ParameterTree& pt,
-                                            const std::string srcname,
+                                            const std::string& srcname,
                                             bool overwrite)
 {
   std::string prefix;
@@ -174,11 +174,11 @@ void Dune::ParameterTreeParser::readOptions(int argc, char* argv [],
 
 void Dune::ParameterTreeParser::readNamedOptions(int argc, char* argv[],
                                                  ParameterTree& pt,
-                                                 std::vector<std::string> keywords,
+                                                 const std::vector<std::string>& keywords,
                                                  unsigned int required,
                                                  bool allow_more,
                                                  bool overwrite,
-                                                 std::vector<std::string> help)
+                                                 const std::vector<std::string>& help)
 {
   std::string helpstr = generateHelpString(argv[0], keywords, required, help);
   std::vector<bool> done(keywords.size(),false);
@@ -238,7 +238,7 @@ void Dune::ParameterTreeParser::readNamedOptions(int argc, char* argv[],
 }
 
 std::string Dune::ParameterTreeParser::generateHelpString(
-  std::string progname, std::vector<std::string> keywords, unsigned int required, std::vector<std::string> help)
+  const std::string& progname, const std::vector<std::string>& keywords, unsigned int required, const std::vector<std::string>& help)
 {
   static const char braces[] = "<>[]";
   std::string helpstr = "";

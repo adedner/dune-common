@@ -45,7 +45,7 @@ namespace Dune{
     {
       F _future;
     public:
-      FutureModel(F&& f)
+      explicit FutureModel(F&& f)
         : _future(std::forward<F>(f))
       {}
 
@@ -71,11 +71,13 @@ namespace Dune{
 
     std::unique_ptr<FutureBase> _future;
   public:
+    // NOTE: implicit conversion intended
     template<class F>
     Future(F&& f)
       : _future(std::make_unique<FutureModel<F>>(std::forward<F>(f)))
     {}
 
+    // NOTE: implicit conversion intended
     template<class U, std::enable_if_t<std::is_same<U,T>::value && !std::is_same<T,void>::value>>
     Future(U&& data)
       : _future(std::make_unique<FutureModel<PseudoFuture<T>>>(PseudoFuture<T>(std::forward<U>(data))))
@@ -130,7 +132,7 @@ namespace Dune{
     {}
 
     template<class U>
-    PseudoFuture(U&& u) :
+    explicit PseudoFuture(U&& u) :
       valid_(true),
       data_(std::forward<U>(u))
     {}
@@ -162,7 +164,7 @@ namespace Dune{
   class PseudoFuture<void>{
     bool valid_;
   public:
-    PseudoFuture(bool valid = false) :
+    explicit PseudoFuture(bool valid = false) :
       valid_(valid)
     {}
 
