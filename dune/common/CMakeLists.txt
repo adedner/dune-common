@@ -74,6 +74,7 @@ install(FILES
         math.hh
         matrixconcepts.hh
         matvectraits.hh
+        mpfrfield.hh
         overloadset.hh
         parameterizedobject.hh
         parametertree.hh

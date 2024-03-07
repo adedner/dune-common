@@ -17,6 +17,7 @@
 
 #include <gmpxx.h>
 
+#include <dune/common/deprecated.hh>
 #include <dune/common/promotiontraits.hh>
 #include <dune/common/typetraits.hh>
 
@@ -28,7 +29,7 @@ namespace Dune
    * \brief Number class for high precision floating point number using the GMP library mpf_class implementation
    */
   template< unsigned int precision >
-  class GMPField
+  class [[deprecated("GMPField is deprecated. Use MPFRField instead.")]] GMPField
     : public mpf_class
   {
     typedef mpf_class Base;
@@ -71,6 +72,7 @@ namespace Dune
 
   };
 
+DUNE_NO_DEPRECATED_BEGIN
   template <unsigned int precision>
   struct IsNumber<GMPField<precision>>
     : public std::integral_constant<bool, true> {
@@ -99,6 +101,7 @@ namespace Dune
   {
     typedef GMPField<precision> PromotedType;
   };
+DUNE_NO_DEPRECATED_END
 }
 
 #endif // HAVE_GMP
