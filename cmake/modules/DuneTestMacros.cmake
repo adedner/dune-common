@@ -192,6 +192,12 @@
 #       place to make it easy to construct regular expressions from the label
 #       names for :code:`ctest -L ${label_regex}`.
 #
+#    .. cmake_param:: NO_LINK_PROJECT_LIBRARIES
+#       :option:
+#
+#       Disable the automatic linking of all `<ProjectName>_INTERFACE_LIBRARIES`
+#       and instead just link against `Dune::Common`.
+#
 #    This function defines the Dune way of adding a test to the testing suite.
 #    You may either add the executable yourself through :ref:`add_executable`
 #    and pass it to the :code:`TARGET` option, or you may rely on :ref:`dune_add_test`
@@ -219,6 +225,9 @@ include_guard(GLOBAL)
 # enable the testing suite on the CMake side.
 enable_testing()
 include(CTest)
+
+include(DunePolicy)
+dune_define_policy(DP0001 DUNE_COMMON 2.12 "Link all <ProjectName>_LIBRARIES in dune_add_test.")
 
 # Introduce a target that triggers the building of all tests
 add_custom_target(build_tests)
@@ -257,7 +266,7 @@ if(NOT DUNE_MAX_TEST_CORES)
 endif()
 
 function(dune_add_test)
-  set(OPTIONS EXPECT_COMPILE_FAIL EXPECT_FAIL SKIP_ON_77 COMPILE_ONLY PYTHON_TEST)
+  set(OPTIONS EXPECT_COMPILE_FAIL EXPECT_FAIL SKIP_ON_77 COMPILE_ONLY PYTHON_TEST NO_LINK_PROJECT_LIBRARIES)
   set(SINGLEARGS NAME TARGET TIMEOUT WORKING_DIRECTORY)
   set(MULTIARGS SOURCES COMPILE_DEFINITIONS COMPILE_FLAGS LINK_LIBRARIES CMD_ARGS MPI_RANKS COMMAND CMAKE_GUARD LABELS)
   cmake_parse_arguments(ADDTEST "${OPTIONS}" "${SINGLEARGS}" "${MULTIARGS}" ${ARGN})
@@ -344,7 +353,18 @@ function(dune_add_test)
   endif()
 
   # add some default libraries to link against
-  list(APPEND ADDTEST_LINK_LIBRARIES Dune::Common)
+  dune_policy(GET DP0001 _policy_link_project_libraries)
+  if(_policy_link_project_libraries STREQUAL "OLD")
+    list(APPEND ADDTEST_LINK_LIBRARIES Dune::Common)
+  elseif(NOT ADDTEST_NO_LINK_PROJECT_LIBRARIES)
+    get_property(PROJECT_INTERFACE_LIBRARIES GLOBAL PROPERTY ${ProjectName}_INTERFACE_LIBRARIES)
+    if(${PROJECT_INTERFACE_LIBRARIES})
+      list(APPEND ADDTEST_LINK_LIBRARIES ${PROJECT_INTERFACE_LIBRARIES})
+    else()
+      list(APPEND ADDTEST_LINK_LIBRARIES Dune::Common)
+    endif()
+  endif()
+
   list(REMOVE_DUPLICATES ADDTEST_LINK_LIBRARIES)
 
   # Add the executable if it is not already present
