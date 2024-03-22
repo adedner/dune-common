@@ -22,9 +22,29 @@ try:
     from numpy import amin, amax, linspace, linalg, random
     _addPlot = True
 
+    def triangulationOfNetwork(grid, level=0, linewidth=0.01):
+        from matplotlib.tri import Triangulation
+        x, t = grid.tessellate(level)
+        n, m = len(x), len(t)
+        t = append(t.T, [zeros(m, dtype=int32)], axis=0).T
+        t = append(t, zeros((m,3), dtype=int32), axis=0)
+        x = append(x, zeros((2*m,2)), axis=0)
+        for i in range(m):
+            i0 = n+2*i
+            t[i][2] = i0
+            t[m+i] = [t[i][1], i0, i0+1]
+            xs = [x[t[i][0]], x[t[i][1]]]
+            d = (xs[1] - xs[0])
+            d *= 0.5 * linewidth / linalg.norm(d)
+            d = [d[1], -d[0]]
+            x[i0], x[i0+1] = xs[0] + d, xs[1] + d
+            x[t[i][0]], x[t[i][1]] = xs[0] - d, xs[1] - d
+        return Triangulation(x[:,0], x[:,1], t)
+
+
     def _plotGrid(fig, grid, gridLines="black"):
         for p in grid.polygons():
-            coll = PolyCollection(p, facecolor='none', edgecolor=gridLines, linewidth=0.5, zorder=2)
+            coll = PolyCollection(p, facecolor='none', edgecolor=gridLines, linewidth=1., zorder=2)
             pyplot.gca().add_collection(coll)
 
     def _plotData(fig, grid, solution, level=0, gridLines="black",
@@ -32,14 +52,43 @@ try:
             xlim=None, ylim=None, clim=None, cmap=None, colorbar=True,
             on="cell"):
 
-        if (gridLines is not None) and (gridLines != ""):
+        if grid.dimGrid > 1 and (gridLines is not None) and (gridLines != ""):
             _plotGrid(fig, grid, gridLines=gridLines)
 
         if solution is not None:
             if on == "points":
-                assert not any(gt.isNone for gt in grid.indexSet.types(0)), "Can't plot point data with polygonal grids, use `on=\"cells\" in plotting command"
-                triangulation = grid.triangulation(level)
-                data = solution.pointData(level)
+                if grid.dimGrid == 1 and grid.dimWorld == 1:
+                    try:
+                        from dune.grid import Partitions
+                        partition = Partitions.interior
+                    except ImportError:
+                        pass
+                    if xlim:
+                        fig.gca().set_xlim(xlim)
+                    fig.tight_layout()
+                    triang = grid.tessellate(level, partition=partition)
+                    if triang is None: # parition set is empty
+                        return
+                    if solution.dimRange > 1:
+                        data = linalg.norm(solution.pointData(level, partition=partition),axis=1)
+                    else:
+                        data = solution.pointData(level)[:,0]
+                    pyplot.plot(triang[0], data, '-p')
+                    return
+
+                if grid.dimGrid == 1:
+                    triangulation = triangulationOfNetwork(grid, level, linewidth)
+                    data = solution.pointData(level, partition=partition)
+                    n = len(data)
+                    data = append(data.T, [zeros(len(triangulation.triangles))], axis=1).T
+                    for i in range(n//2):
+                        for j in range(2):
+                            data[n+2*i+j] = data[2*i+j]
+                else:
+                    assert not any(gt.isNone for gt in grid.indexSet.types(0)), "Can't plot point data with polygonal grids, use `on=\"cells\" in plotting command"
+                    triangulation = grid.triangulation(level)
+                    data = solution.pointData(level)
+
                 try:
                     x1 = vectors[0]
                     x2 = vectors[1]
@@ -193,7 +242,7 @@ def plotPointData(solution, level=0, gridLines="black",
     except:
         grid = solution
         solution = None
-    if not grid.dimension == 2:
+    if grid.dimension > 2:
         raise ValueError("inline plotting so far only available for 2d grids")
 
     if figure is None:
