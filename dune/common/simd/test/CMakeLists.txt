@@ -33,7 +33,6 @@ dune_instance_end()
 list(FILTER DUNE_INSTANCE_GENERATED INCLUDE REGEX [[\.cc$]])
 dune_add_test(NAME looptest
   SOURCES ${DUNE_INSTANCE_GENERATED}
-  LINK_LIBRARIES dunecommon
 )
 # no need to install looptest.hh, used by looptest*.cc only
 
@@ -58,7 +57,6 @@ dune_instance_end()
 list(FILTER DUNE_INSTANCE_GENERATED INCLUDE REGEX [[\.cc$]])
 dune_add_test(NAME standardtest
   SOURCES ${DUNE_INSTANCE_GENERATED}
-  LINK_LIBRARIES dunecommon
 )
 # no need to install standardtest.hh, used by standardtest*.cc only
 
@@ -84,7 +82,6 @@ dune_instance_end()
 list(FILTER DUNE_INSTANCE_GENERATED INCLUDE REGEX [[\.cc$]])
 dune_add_test(NAME vcarraytest
   SOURCES ${DUNE_INSTANCE_GENERATED}
-  LINK_LIBRARIES dunecommon
   CMAKE_GUARD Vc_FOUND
 )
 add_dune_vc_flags(vcarraytest)
@@ -107,7 +104,6 @@ dune_instance_end()
 list(FILTER DUNE_INSTANCE_GENERATED INCLUDE REGEX [[\.cc$]])
 dune_add_test(NAME vcvectortest
   SOURCES ${DUNE_INSTANCE_GENERATED}
-  LINK_LIBRARIES dunecommon
   CMAKE_GUARD Vc_FOUND
 )
 add_dune_vc_flags(vcvectortest)
