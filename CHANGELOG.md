@@ -15,6 +15,9 @@ In order to build the DUNE core modules you need at least the following software
 
 ## Changelog
 
+- Python: Add `TupleVector` Python bindings
+- `TupleVector` now implements the standard protocol for tuple-like types.
+
 - Add utilities `Std::span`, `Std::mdspan`, `Std::mdarray` and all its related classes into the `Dune::Std` namespace
   for working with multidimensional arrays. See core/dune-common!1334 for further details.
 
