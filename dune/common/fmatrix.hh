@@ -557,6 +557,9 @@ namespace Dune
     static constexpr size_type mat_rows() { return 1; }
     static constexpr size_type mat_cols() { return 1; }
 
+    static constexpr std::size_t static_rows() { return 1; }
+    static constexpr std::size_t static_cols() { return 1; }
+
     row_reference mat_access ([[maybe_unused]] size_type i)
     {
       DUNE_ASSERT_BOUNDS(i == 0);

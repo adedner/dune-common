@@ -669,9 +669,11 @@ namespace Dune
     }
 
     //! Multiplies M from the left to this matrix, this matrix is not modified
-    template<class Matrix>
-    auto leftmultiplyany (const Matrix& M) const
+    template<class Derived>
+    auto leftmultiplyany (const DenseMatrix<Derived>& M) const
     {
+      using Matrix = DenseMatrix<Derived>;
+
       // check for valid dimensions
       static_assert(Matrix::static_cols() == static_rows() ||
                     Matrix::static_cols() == Std::dynamic_extent || static_rows() == Std::dynamic_extent);
@@ -681,17 +683,19 @@ namespace Dune
       using K = typename Dune::PromotionTraits<typename Dune::FieldTraits<Matrix>::field_type,field_type>::PromotedType;
       auto C = MatrixFactory<K, Matrix::static_rows(), static_cols()>::create(M.rows(), cols());
 
-      for (size_type i=0; i<C.rows(); i++)
+      for (size_type i=0; i<M.rows(); i++)
         for (size_type k=0; k<M.cols(); k++)
-          for (size_type j=0; j<C.cols(); j++)
+          for (size_type j=0; j<cols(); j++)
             C[i][j] += M[i][k]*(*this)[k][j];
       return C;
     }
 
     //! Multiplies M from the right to this matrix, this matrix is not modified
-    template<class Matrix>
-    auto rightmultiplyany (const Matrix& M) const
+    template<class Derived>
+    auto rightmultiplyany (const DenseMatrix<Derived>& M) const
     {
+      using Matrix = DenseMatrix<Derived>;
+
       // check for valid dimensions
       static_assert(static_cols() == Matrix::static_rows() ||
                     static_cols() == Std::dynamic_extent || Matrix::static_rows() == Std::dynamic_extent);
@@ -701,9 +705,9 @@ namespace Dune
       using K = typename Dune::PromotionTraits<field_type,typename Dune::FieldTraits<Matrix>::field_type>::PromotedType;
       auto C = MatrixFactory<K, static_rows(), Matrix::static_cols()>::create(rows(), M.cols());
 
-      for (size_type i=0; i<C.rows(); i++)
-        for (size_type k=0; k<M.cols(); k++)
-          for (size_type j=0; j<C.cols(); j++)
+      for (size_type i=0; i<rows(); i++)
+        for (size_type k=0; k<cols(); k++)
+          for (size_type j=0; j<M.cols(); j++)
             C[i][j] += (*this)[i][k]*M[k][j];
       return C;
     }
