@@ -24,6 +24,11 @@
 
 namespace Dune
 {
+  namespace Std
+  {
+    /// \brief A constant of type std::size_t that is used to differentiate static and dynamic extents.
+    inline constexpr std::size_t dynamic_extent = std::size_t(-1);
+  }
 
   template<typename M> class DenseMatrix;
 
@@ -36,6 +41,12 @@ namespace Dune
 
   template<class K, int N, int M> class FieldMatrix;
   template<class K, int N> class FieldVector;
+
+  template<class K> class DynamicMatrix;
+  template<class K, class Allocator> class DynamicVector;
+
+  template<class K, std::size_t N, std::size_t M> struct MatrixFactory;
+  template<class K, std::size_t N> struct VectorFactory;
 
   /**
       @addtogroup DenseMatVec
@@ -657,39 +668,45 @@ namespace Dune
       return asImp();
     }
 
-#if 0
     //! Multiplies M from the left to this matrix, this matrix is not modified
-    template<int l>
-    DenseMatrix<K,l,cols> leftmultiplyany (const FieldMatrix<K,l,rows>& M) const
+    template<class Matrix>
+    auto leftmultiplyany (const Matrix& M) const
     {
-      FieldMatrix<K,l,cols> C;
+      // check for valid dimensions
+      static_assert(Matrix::static_cols() == static_rows() ||
+                    Matrix::static_cols() == Std::dynamic_extent || static_rows() == Std::dynamic_extent);
+      DUNE_ASSERT_BOUNDS(M.cols() == rows());
 
-      for (size_type i=0; i<l; i++) {
-        for (size_type j=0; j<cols(); j++) {
-          C[i][j] = 0;
-          for (size_type k=0; k<rows(); k++)
+      // define the return matrix type that is either static or dynamic
+      using K = typename Dune::PromotionTraits<typename Dune::FieldTraits<Matrix>::field_type,field_type>::PromotedType;
+      auto C = MatrixFactory<K, Matrix::static_rows(), static_cols()>::create(M.rows(), cols());
+
+      for (size_type i=0; i<C.rows(); i++)
+        for (size_type k=0; k<M.cols(); k++)
+          for (size_type j=0; j<C.cols(); j++)
             C[i][j] += M[i][k]*(*this)[k][j];
-        }
-      }
       return C;
     }
 
     //! Multiplies M from the right to this matrix, this matrix is not modified
-    template<int l>
-    FieldMatrix<K,rows,l> rightmultiplyany (const FieldMatrix<K,cols,l>& M) const
+    template<class Matrix>
+    auto rightmultiplyany (const Matrix& M) const
     {
-      FieldMatrix<K,rows,l> C;
+      // check for valid dimensions
+      static_assert(static_cols() == Matrix::static_rows() ||
+                    static_cols() == Std::dynamic_extent || Matrix::static_rows() == Std::dynamic_extent);
+      DUNE_ASSERT_BOUNDS(cols() == M.rows());
 
-      for (size_type i=0; i<rows(); i++) {
-        for (size_type j=0; j<l; j++) {
-          C[i][j] = 0;
-          for (size_type k=0; k<cols(); k++)
+      // define the return matrix type that is either static or dynamic
+      using K = typename Dune::PromotionTraits<field_type,typename Dune::FieldTraits<Matrix>::field_type>::PromotedType;
+      auto C = MatrixFactory<K, static_rows(), Matrix::static_cols()>::create(rows(), M.cols());
+
+      for (size_type i=0; i<C.rows(); i++)
+        for (size_type k=0; k<M.cols(); k++)
+          for (size_type j=0; j<C.cols(); j++)
             C[i][j] += (*this)[i][k]*M[k][j];
-        }
-      }
       return C;
     }
-#endif
 
     //===== sizes
 
@@ -715,6 +732,19 @@ namespace Dune
     constexpr size_type cols() const
     {
       return asImp().mat_cols();
+    }
+
+
+    //! number of rows or Std::dynamic_extent if this number is dynamic
+    static constexpr std::size_t static_rows()
+    {
+      return MAT::static_rows();
+    }
+
+    //! number of columns or Std::dynamic_extent if this number is dynamic
+    static constexpr std::size_t static_cols()
+    {
+      return MAT::static_cols();
     }
 
     //===== query
@@ -1161,6 +1191,41 @@ namespace Dune
   }
 
 #endif // DOXYGEN
+
+
+  template<class K, std::size_t N, std::size_t M>
+  struct MatrixFactory
+  {
+    static_assert(N != Std::dynamic_extent && M != Std::dynamic_extent);
+    using type = FieldMatrix<K,int(N),int(M)>;
+
+    static FieldMatrix<K,N,M> create(int n, int m, K value = K(0))
+    {
+      assert(n == N && m == M);
+      return FieldMatrix<K,N,M>(value);
+    }
+  };
+
+  template<class K>
+  struct DynamicMatrixFactory
+  {
+    using type = DynamicMatrix<K>;
+
+    static DynamicMatrix<K> create(std::size_t n, std::size_t m, K value = K(0))
+    {
+      return  DynamicMatrix<K>(n,m,value);
+    }
+  };
+
+  template<class K, std::size_t N>
+  struct MatrixFactory<K,N,Std::dynamic_extent> : DynamicMatrixFactory<K> {};
+
+  template<class K, std::size_t M>
+  struct MatrixFactory<K,Std::dynamic_extent,M> : DynamicMatrixFactory<K> {};
+
+  template<class K>
+  struct MatrixFactory<K,Std::dynamic_extent,Std::dynamic_extent> : DynamicMatrixFactory<K> {};
+
 
   namespace DenseMatrixHelp {
 

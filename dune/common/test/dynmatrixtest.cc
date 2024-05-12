@@ -343,20 +343,20 @@ void test_matrix()
         C[i][j] = i;
     [[maybe_unused]] const DynamicMatrix<K>& Cref = C;
 
-#if 0
     DynamicMatrix<K> AB = Aref.rightmultiplyany(B);
     for(size_type i=0; i<AB.N(); ++i)
       for(size_type j=0; j<AB.M(); ++j)
-        if (std::abs<double>(AB[i][j] - i*n*(n+1)/2) > 1e-10)
+        if (std::abs(AB[i][j] - K(i*n*(n+1)/2)) > 1e-10)
           DUNE_THROW(FMatrixError,"Rightmultiplyany test failed!");
 
-    DynamicMatrix<K> AB2 = A;
+    DynamicMatrix<K> AB2 = A2;
     AB2.rightmultiply(B);
     AB2 -= AB;
     if (std::abs(AB2.infinity_norm() > 1e-10))
       DUNE_THROW(FMatrixError,"Rightmultiply test failed!");
 
-    DynamicMatrix<K> AB3 = Bref.leftmultiplyany(A);
+    std::cout << "A * B\nA = " << A2 << "\nB = " << Bref << std::endl;
+    DynamicMatrix<K> AB3 = Bref.leftmultiplyany(A2);
     AB3 -= AB;
     if (std::abs(AB3.infinity_norm() > 1e-10))
       DUNE_THROW(FMatrixError,"Leftmultiplyany test failed!");
@@ -367,17 +367,16 @@ void test_matrix()
         if (std::abs<double>(CA[i][j] - i*n*(n-1)/2) > 1e-10)
           DUNE_THROW(FMatrixError,"Leftmultiplyany test failed!");
 
-    DynamicMatrix<K> CA2 = A;
+    DynamicMatrix<K> CA2 = A2;
     CA2.leftmultiply(C);
     CA2 -= CA;
     if (std::abs(CA2.infinity_norm() > 1e-10))
       DUNE_THROW(FMatrixError,"Leftmultiply test failed!");
 
-    DynamicMatrix<K> CA3 = Cref.rightmultiplyany(A);
+    DynamicMatrix<K> CA3 = Cref.rightmultiplyany(A2);
     CA3 -= CA;
     if (std::abs(CA3.infinity_norm() > 1e-10))
       DUNE_THROW(FMatrixError,"Rightmultiplyany test failed!");
-#endif
   }
 }
 
