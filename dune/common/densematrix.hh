@@ -39,10 +39,8 @@ namespace Dune
   template<class K, int N> class FieldVector;
 
   template<class K> class DynamicMatrix;
-  template<class K, class Allocator> class DynamicVector;
 
   template<class K, std::size_t N, std::size_t M> struct MatrixFactory;
-  template<class K, std::size_t N> struct VectorFactory;
 
   /**
       @addtogroup DenseMatVec
