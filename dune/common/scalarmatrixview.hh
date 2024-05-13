@@ -60,10 +60,10 @@ namespace Impl {
 
     //! \brief The number of rows.
     //! This is always one for this type.
-    constexpr static int rows = 1;
+    static constexpr std::integral_constant<int,1> rows = {};
     //! \brief The number of columns.
     //! This is always one for this type.
-    constexpr static int cols = 1;
+    static constexpr std::integral_constant<int,1> cols = {};
 
     //===== constructors
     /** \brief Default constructor
