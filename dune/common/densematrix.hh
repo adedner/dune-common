@@ -668,47 +668,43 @@ namespace Dune
       return asImp();
     }
 
-    //! Multiplies M from the left to this matrix, this matrix is not modified
-    template<class Derived>
-    auto leftmultiplyany (const DenseMatrix<Derived>& M) const
+    //! Multiplies mat from the left to this matrix, this matrix is not modified
+    template<class M>
+    auto leftmultiplyany (const DenseMatrix<M>& mat) const
     {
-      using Matrix = DenseMatrix<Derived>;
-
       // check for valid dimensions
-      static_assert(Matrix::static_cols() == static_rows() ||
-                    Matrix::static_cols() == Std::dynamic_extent || static_rows() == Std::dynamic_extent);
-      DUNE_ASSERT_BOUNDS(M.cols() == rows());
+      static_assert(M::static_cols() == static_rows() ||
+                    M::static_cols() == Std::dynamic_extent || static_rows() == Std::dynamic_extent);
+      DUNE_ASSERT_BOUNDS(mat.cols() == rows());
 
       // define the return matrix type that is either static or dynamic
-      using K = typename Dune::PromotionTraits<typename Dune::FieldTraits<Matrix>::field_type,field_type>::PromotedType;
-      auto C = MatrixFactory<K, Matrix::static_rows(), static_cols()>::create(M.rows(), cols());
+      using K = typename Dune::PromotionTraits<typename Dune::FieldTraits<M>::field_type,field_type>::PromotedType;
+      auto C = MatrixFactory<K, M::static_rows(), static_cols()>::create(mat.rows(), cols());
 
-      for (size_type i=0; i<M.rows(); i++)
-        for (size_type k=0; k<M.cols(); k++)
+      for (size_type i=0; i<mat.rows(); i++)
+        for (size_type k=0; k<mat.cols(); k++)
           for (size_type j=0; j<cols(); j++)
-            C[i][j] += M[i][k]*(*this)[k][j];
+            C[i][j] += mat[i][k]*(*this)[k][j];
       return C;
     }
 
-    //! Multiplies M from the right to this matrix, this matrix is not modified
-    template<class Derived>
-    auto rightmultiplyany (const DenseMatrix<Derived>& M) const
+    //! Multiplies mat from the right to this matrix, this matrix is not modified
+    template<class M>
+    auto rightmultiplyany (const DenseMatrix<M>& mat) const
     {
-      using Matrix = DenseMatrix<Derived>;
-
       // check for valid dimensions
-      static_assert(static_cols() == Matrix::static_rows() ||
-                    static_cols() == Std::dynamic_extent || Matrix::static_rows() == Std::dynamic_extent);
-      DUNE_ASSERT_BOUNDS(cols() == M.rows());
+      static_assert(static_cols() == M::static_rows() ||
+                    static_cols() == Std::dynamic_extent || M::static_rows() == Std::dynamic_extent);
+      DUNE_ASSERT_BOUNDS(cols() == mat.rows());
 
       // define the return matrix type that is either static or dynamic
-      using K = typename Dune::PromotionTraits<field_type,typename Dune::FieldTraits<Matrix>::field_type>::PromotedType;
-      auto C = MatrixFactory<K, static_rows(), Matrix::static_cols()>::create(rows(), M.cols());
+      using K = typename Dune::PromotionTraits<field_type,typename Dune::FieldTraits<M>::field_type>::PromotedType;
+      auto C = MatrixFactory<K, static_rows(), M::static_cols()>::create(rows(), mat.cols());
 
       for (size_type i=0; i<rows(); i++)
         for (size_type k=0; k<cols(); k++)
-          for (size_type j=0; j<M.cols(); j++)
-            C[i][j] += (*this)[i][k]*M[k][j];
+          for (size_type j=0; j<mat.cols(); j++)
+            C[i][j] += (*this)[i][k]*mat[k][j];
       return C;
     }
 
@@ -1201,9 +1197,9 @@ namespace Dune
   struct MatrixFactory
   {
     static_assert(N != Std::dynamic_extent && M != Std::dynamic_extent);
-    using type = FieldMatrix<K,int(N),int(M)>;
+    using type = FieldMatrix<K,N,M>;
 
-    static FieldMatrix<K,N,M> create(int n, int m, K value = K(0))
+    static FieldMatrix<K,N,M> create(std::size_t n, std::size_t m, K value = K(0))
     {
       assert(n == N && m == M);
       return FieldMatrix<K,N,M>(value);
