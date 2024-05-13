@@ -262,7 +262,7 @@ namespace Dune
     friend auto operator* ( const FieldMatrix& matrixA,
                             const FieldMatrix<OtherScalar, COLS, otherCols>& matrixB)
     {
-      FieldMatrix<typename PromotionTraits<K,OtherScalar>::PromotedType,matrixA.rows(),otherCols> result;
+      FieldMatrix<typename PromotionTraits<K,OtherScalar>::PromotedType,ROWS,otherCols> result;
 
       for (int i = 0; i < matrixA.rows(); ++i)
         for (int j = 0; j < matrixB.cols(); ++j)
@@ -289,7 +289,7 @@ namespace Dune
                             const OtherMatrix& matrixB)
     {
       using Field = typename PromotionTraits<K, typename OtherMatrix::field_type>::PromotedType;
-      Dune::FieldMatrix<Field, matrixA.rows(), OtherMatrix::cols()> result;
+      Dune::FieldMatrix<Field, ROWS, OtherMatrix::cols()> result;
       for (int j=0; j<matrixA.rows(); ++j)
         matrixB.mtv(matrixA[j], result[j]);
       return result;
@@ -309,7 +309,7 @@ namespace Dune
                             const FieldMatrix& matrixB)
     {
       using Field = typename PromotionTraits<K, typename OtherMatrix::field_type>::PromotedType;
-      Dune::FieldMatrix<Field, OtherMatrix::rows(), matrixB.cols()> result;
+      Dune::FieldMatrix<Field, OtherMatrix::rows(), COLS> result;
       for (int j=0; j<matrixB.cols(); ++j)
       {
         auto B_j = Impl::ColumnVectorView(matrixB, j);
@@ -560,7 +560,7 @@ namespace Dune
                             const OtherMatrix& matrixB)
     {
       using Field = typename PromotionTraits<K, typename OtherMatrix::field_type>::PromotedType;
-      Dune::FieldMatrix<Field, matrixA.rows(), OtherMatrix::cols()> result;
+      Dune::FieldMatrix<Field, 1, OtherMatrix::cols()> result;
       for (int j=0; j<matrixA.rows(); ++j)
         matrixB.mtv(matrixA[j], result[j]);
       return result;
@@ -581,7 +581,7 @@ namespace Dune
                             const FieldMatrix& matrixB)
     {
       using Field = typename PromotionTraits<K, typename OtherMatrix::field_type>::PromotedType;
-      Dune::FieldMatrix<Field, OtherMatrix::rows(), matrixB.cols()> result;
+      Dune::FieldMatrix<Field, OtherMatrix::rows(), 1> result;
       for (int j=0; j<matrixB.cols(); ++j)
       {
         auto B_j = Impl::ColumnVectorView(matrixB, j);
