@@ -15,6 +15,7 @@
 #include <dune/common/dynvector.hh>
 #include <dune/common/densematrix.hh>
 #include <dune/common/typetraits.hh>
+#include <dune/common/std/span.hh>
 
 namespace Dune
 {

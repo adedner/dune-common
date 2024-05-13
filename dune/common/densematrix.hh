@@ -21,14 +21,10 @@
 #include <dune/common/simd/simd.hh>
 #include <dune/common/typetraits.hh>
 #include <dune/common/scalarvectorview.hh>
+#include <dune/common/std/span.hh>
 
 namespace Dune
 {
-  namespace Std
-  {
-    /// \brief A constant of type std::size_t that is used to differentiate static and dynamic extents.
-    inline constexpr std::size_t dynamic_extent = std::size_t(-1);
-  }
 
   template<typename M> class DenseMatrix;
 
