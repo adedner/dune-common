@@ -37,9 +37,7 @@ namespace Dune
 
   template<class K, int N, int M> class FieldMatrix;
   template<class K, int N> class FieldVector;
-
   template<class K> class DynamicMatrix;
-
   template<class K, std::size_t N, std::size_t M> struct MatrixFactory;
 
   /**
