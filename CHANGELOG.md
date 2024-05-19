@@ -34,6 +34,9 @@ In order to build the DUNE core modules you need at least the following software
   Add the option to both 'remove' and 'make' commands to read
   module list from a file.
 
+- Python: pybind11 is no longer provided, the user has to provide this dependency.
+  Adjust pybind11 paths from `dune/python/pybind/*` to `pybind/*`.
+
 - Add concepts directory `dune/common/concepts/` and some fundamental concept definitions using
   c++20-concepts. Those concepts are still experimental and are marked with the new `doxygen`
   command `\experimental`. Additionally, the preprocessor constant `DUNE_ENABLE_CONCEPTS` is
