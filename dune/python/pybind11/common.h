@@ -1,2 +1,5 @@
-#include "detail/common.h"
-#warning "Including 'common.h' is deprecated. It will be removed in v3.0. Use 'pybind11.h'."
+#pragma once
+
+#warning This header is deprecated and will be removed after Dune 2.10, use pybind11 header direclty.
+
+#include <pybind11/common.h>
