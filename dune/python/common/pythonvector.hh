@@ -5,9 +5,9 @@
 
 #include <cstddef>
 
-#include <dune/common/densevector.hh>
+#include <pybind11/pybind11.h>
 
-#include <dune/python/pybind11/pybind11.h>
+#include <dune/common/densevector.hh>
 
 namespace Dune
 {

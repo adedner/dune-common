@@ -6,9 +6,9 @@
 #include <string>
 #include <utility>
 
-#include <dune/common/visibility.hh>
+#include <pybind11/pybind11.h>
 
-#include <dune/python/pybind11/pybind11.h>
+#include <dune/common/visibility.hh>
 
 namespace Dune
 {

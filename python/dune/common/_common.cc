@@ -6,14 +6,14 @@
 
 #include <utility>
 
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+
 #include <dune/python/common/dynmatrix.hh>
 #include <dune/python/common/dynvector.hh>
 #include <dune/python/common/fmatrix.hh>
 #include <dune/python/common/fvector.hh>
 #include <dune/python/common/mpihelper.hh>
-
-#include <dune/python/pybind11/pybind11.h>
-#include <dune/python/pybind11/stl.h>
 
 #ifdef DUNE_ENABLE_PYTHONMODULE_PRECOMPILE
 #include "registerfvector.hh"

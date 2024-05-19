@@ -31,13 +31,13 @@ def cppType(arg):
             elif arg.dtype.type == numpy.float64:
                 dtype="double"
             if dtype is None:
-                t, i = "pybind11::array", ["dune/python/pybind11/numpy.h"]
+                t, i = "pybind11::array", ["pybind11/numpy.h"]
             else:
-                t, i = "pybind11::array_t<"+dtype+">", ["dune/python/pybind11/numpy.h"]
+                t, i = "pybind11::array_t<"+dtype+">", ["pybind11/numpy.h"]
         elif isinstance(arg, str):
             t, i = "std::string", ["string"]
         elif callable(arg):
-            t, i = "pybind11::function", ["dune/python/pybind11/pybind11.h"]
+            t, i = "pybind11::function", ["pybind11/pybind11.h"]
         elif isinstance(arg,tuple) or isinstance(arg,list):
             t, i = cppType(arg[0])
             t = "std::vector<"+t+">"
@@ -112,7 +112,7 @@ def load(functionName, includes, *args, pythonName=None):
     source += "".join(["#include <" + i + ">\n" for i in includes])
     source += "\n"
     source += '#include <dune/python/common/typeregistry.hh>\n'
-    source += '#include <dune/python/pybind11/pybind11.h>\n'
+    source += '#include <pybind11/pybind11.h>\n'
     source += '\n'
 
     source += "PYBIND11_MODULE( " + moduleName + ", module )\n"

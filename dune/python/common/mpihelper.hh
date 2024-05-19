@@ -9,11 +9,12 @@
 
 #include <vector>
 
+#include <pybind11/pybind11.h>
+
 #include <dune/common/parallel/communication.hh>
 #include <dune/common/parallel/mpihelper.hh>
 
 #include <dune/python/common/typeregistry.hh>
-#include <dune/python/pybind11/pybind11.h>
 
 namespace Dune
 {

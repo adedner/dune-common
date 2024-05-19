@@ -10,6 +10,9 @@
 #include <tuple>
 #include <utility>
 
+#include <pybind11/pybind11.h>
+#include <pybind11/operators.h>
+
 #include <dune/common/fmatrix.hh>
 #include <dune/common/classname.hh>
 
@@ -17,8 +20,6 @@
 #include <dune/python/common/fmatrix.hh>
 #include <dune/python/common/densematrix.hh>
 #include <dune/python/common/string.hh>
-#include <dune/python/pybind11/pybind11.h>
-#include <dune/python/pybind11/operators.h>
 
 namespace Dune
 {
