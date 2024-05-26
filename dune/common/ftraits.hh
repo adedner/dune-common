@@ -12,7 +12,30 @@
 #include <complex>
 #include <vector>
 
+#include <dune/common/typetraits.hh>
+
 namespace Dune {
+
+#ifndef DOXYGEN
+
+namespace Impl {
+
+  template<class T, bool isNumber>
+  struct FieldTraitsDefault {};
+
+  template<class T>
+  struct FieldTraitsDefault<T, true>
+  {
+    typedef T field_type;
+    typedef T real_type;
+  };
+} // namespace Impl
+
+  template<class T>
+  struct FieldTraits : public Impl::FieldTraitsDefault<T, Dune::IsNumber<T>::value>
+  {};
+
+#else
 
   /**
      @addtogroup DenseMatVec
@@ -29,6 +52,8 @@ namespace Dune {
     //! export the type representing the real type of the field
     typedef T real_type;
   };
+
+#endif
 
   template<class T>
   struct FieldTraits<const T>
@@ -57,6 +82,25 @@ namespace Dune {
     typedef typename FieldTraits<T>::field_type field_type;
     typedef typename FieldTraits<T>::real_type real_type;
   };
+
+namespace Impl {
+
+  // This traits class allows to check if FieldTraits is empty
+  // This may be helful when constraining overloads, because
+  // any overload incorporation FieldTraits<T>::field_type
+  // in some enable_if check will be rules out due to SFINAE.
+  //
+  // This can be circumvented using FieldTraitsEmpty which
+  // would e.g. catch GMPField expression templates.
+  template<class T, class=void>
+  struct FieldTraitsEmpty : public std::true_type
+  {};
+
+  template<class T>
+  struct FieldTraitsEmpty<T, std::void_t<typename FieldTraits<T>::field_type>> : public std::false_type
+  {};
+
+}
 
 } // end namespace Dune
 
