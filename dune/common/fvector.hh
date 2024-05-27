@@ -177,7 +177,7 @@ namespace Dune {
     using Base::operator=;
 
     // make this thing a vector
-    static constexpr size_type size () { return SIZE; }
+    static constexpr auto size () { return std::integral_constant<size_type,dimension>(); }
 
     K & operator[](size_type i) {
       DUNE_ASSERT_BOUNDS(i < SIZE);
@@ -360,7 +360,7 @@ namespace Dune {
     }
 
     //===== forward methods to container
-    static constexpr size_type size () { return 1; }
+    static constexpr auto size () { return std::integral_constant<size_type,dimension>(); }
 
     K & operator[]([[maybe_unused]] size_type i)
     {
