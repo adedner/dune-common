@@ -26,6 +26,7 @@ namespace Dune
   /**
    * \ingroup Numbers
    * \brief Number class for high precision floating point number using the GMP library mpf_class implementation
+   * \deprecated
    */
   template< unsigned int precision >
   class GMPField
