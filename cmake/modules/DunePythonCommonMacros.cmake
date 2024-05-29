@@ -132,8 +132,22 @@ if(Python3_Interpreter_FOUND)
     return()
   endif()
 
+  # check for pybind 11
+  set(DUNE_PYTHON_BINDINGS_MIN_PYBIND11_VERSION 2.10.1)
+  find_package(pybind11 ${DUNE_PYTHON_BINDINGS_MIN_PYBIND11_VERSION} CONFIG)
+  if(NOT ${pybind11_FOUND})
+    message(STATUS "Python bindings disabled")
+    message(NOTICE
+      "   ----------------------------------------------------------------------------------------\n"
+      "   Python bindings require pybind11 ${DUNE_PYTHON_BINDINGS_MIN_PYBIND11_VERSION} which was not found.\n"
+      "   ----------------------------------------------------------------------------------------\n"
+    )
+    set(DUNE_ENABLE_PYTHONBINDINGS OFF CACHE BOOL "Disabled Python bindings (requirements not satisfied)" FORCE)
+    return()
+  endif()
+
   if(DUNE_ENABLE_PYTHONBINDINGS)
-    include_directories("${Python3_INCLUDE_DIRS}")
+    include_directories("${Python3_INCLUDE_DIRS}" "${pybind11_INCLUDE_DIR}")
     include(DuneAddPybind11Module)
   endif()
   ##### Python bindings end ################
