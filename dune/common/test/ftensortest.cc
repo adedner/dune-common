@@ -257,5 +257,14 @@ int main(int argc, char** argv)
   checkArithmetic<Tensor2>(testSuite);
   checkArithmetic<Tensor3>(testSuite);
 
+  Tensor3 A{1.0};
+  double sumA = 0.0;
+  for (auto&& [Ai,i] : sparseRange(A))
+    for (auto&& [Aij,j] : sparseRange(Ai))
+      for (auto&& [Aijk,k] : sparseRange(Aij))
+        sumA += Aijk;
+
+  testSuite.check(sumA == A.extent(0)*A.extent(1)*A.extent(2));
+
   return testSuite.exit();
 }
