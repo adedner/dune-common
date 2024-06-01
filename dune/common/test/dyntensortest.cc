@@ -127,6 +127,8 @@ void checkAccess(Dune::TestSuite& testSuite)
     subTestSuite.check(tensor[std::array<std::size_t,0>{}] == 42.0);
     subTestSuite.check(tensor() == 42.0);
     subTestSuite.check(tensor == 42.0);
+    double value = tensor;
+    subTestSuite.check(value == 42.0);
   }
   else if constexpr(Tensor::rank() == 1) {
     for (int i = 0; i < tensor.extent(0); ++i) {

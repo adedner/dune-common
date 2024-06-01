@@ -35,6 +35,19 @@ class DenseTensor
   using self_type = DenseTensor;
   using derived_type = Derived;
 
+private:
+  template <class D>
+  using HasContainerData = decltype(std::declval<D>().container_data());
+
+  template <class D>
+  static constexpr bool is_mdarray = Std::is_detected_v<HasContainerData,D>;
+
+  template <class D>
+  using HasAccessorAndDataHandle = decltype(std::declval<D>().accessor(), std::declval<D>().data_handle());
+
+  template <class D>
+  static constexpr bool is_mdspan = Std::is_detected_v<HasAccessorAndDataHandle,D>;
+
 public:
   using element_type = typename Traits::element_type;
   using value_type = std::remove_cv_t<element_type>;
@@ -123,41 +136,15 @@ public:
   /// \name Conversion to the underlying value if rank is zero
   // @{
 
-  // specialization for mdarray
   template <class ScalarType, class E = extents_type, class D = derived_type,
     std::enable_if_t<std::is_convertible_v<value_type,ScalarType>, int> = 0,
-    std::enable_if_t<(E::rank() == 0), int> = 0,
-    decltype(std::declval<D>().container_data(), bool{}) = true >
+    std::enable_if_t<(E::rank() == 0), int> = 0>
   constexpr operator ScalarType () const noexcept
   {
-    return ScalarType(*asDerived().container_data());
-  }
-
-  // specialization for mdspan
-  template <class ScalarType, class E = extents_type, class D = derived_type,
-    std::enable_if_t<std::is_convertible_v<value_type,ScalarType>, int> = 0,
-    std::enable_if_t<(E::rank() == 0), int> = 0,
-    decltype(std::declval<D>().accessor(), bool{}) = true,
-    decltype(std::declval<D>().data_handle(), bool{}) = true >
-  constexpr operator ScalarType () const noexcept
-  {
-    return ScalarType(asDerived().accessor().access(asDerived().data_handle(),0));
+    return ScalarType(asDerived()[std::array<index_type,0>{}]);
   }
 
   /// @}
-
-private:
-  template <class D>
-  using HasContainerData = decltype(std::declval<D>().container_data());
-
-  template <class D>
-  static constexpr bool is_mdarray = Std::is_detected_v<HasContainerData,D>;
-
-  template <class D>
-  using HasAccessorAndDataHandle = decltype(std::declval<D>().accessor(), std::declval<D>().data_handle());
-
-  template <class D>
-  static constexpr bool is_mdspan = Std::is_detected_v<HasAccessorAndDataHandle,D>;
 
 private:
   // obtain a sub-mdspan with fixed first index
