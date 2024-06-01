@@ -88,6 +88,7 @@ install(FILES
         quadmath.hh
         rangeutilities.hh
         referencehelper.hh
+        regularoptional.hh
         reservedvector.hh
         scalarvectorview.hh
         scalarmatrixview.hh

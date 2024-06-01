@@ -5,11 +5,13 @@
 #ifndef DUNE_COMMON_RANGE_UTILITIES_HH
 #define DUNE_COMMON_RANGE_UTILITIES_HH
 
-#include <dune/common/typetraits.hh>
 #include <algorithm>
 #include <utility>
 #include <type_traits>
 #include <bitset>
+
+#include <dune/common/regularoptional.hh>
+#include <dune/common/typetraits.hh>
 
 /**
  * \file
@@ -375,16 +377,12 @@ namespace Dune
       using reference = decltype(transform(std::declval<F>(), std::declval<I>()));
       using value_type = std::decay_t<reference>;
       using pointer = PointerProxy<value_type>;
+      using Function = F;
 
-      // If we later want to allow standalone TransformedRangeIterators,
-      // we could customize the FunctionPointer to be a default-constructible,
-      // copy-assignable type storing a function but acting like a pointer
-      // to function.
-      using FunctionPointer = const F*;
-
-      constexpr TransformedRangeIterator(const I& it, FunctionPointer f) noexcept :
+      template <class F_>
+      constexpr TransformedRangeIterator(const I& it, F_&& f) noexcept :
         it_(it),
-        f_(f)
+        f_(std::forward<F_>(f))
       {}
 
       // Explicitly initialize members. Using a plain
@@ -437,7 +435,7 @@ namespace Dune
 
     protected:
       I it_;
-      FunctionPointer f_;
+      RegularOptional<Function> f_;
     };
 
 
@@ -455,8 +453,7 @@ namespace Dune
       using reference = typename Base::reference;
       using value_type = typename Base::value_type;
       using pointer = typename Base::pointer;
-
-      using FunctionPointer = typename Base::FunctionPointer;
+      using Function = typename Base::Function;
 
       using Base::Base;
 
@@ -505,8 +502,7 @@ namespace Dune
       using value_type = typename Base::value_type;
       using pointer = typename Base::pointer;
       using difference_type = typename std::iterator_traits<I>::difference_type;
-
-      using FunctionPointer = typename Base::FunctionPointer;
+      using Function = typename Base::Function;
 
       using Base::Base;
 
@@ -686,11 +682,11 @@ namespace Dune
      * in the range.
      */
     constexpr const_iterator begin() const noexcept {
-      return const_iterator(rawRange_.begin(), &f_);
+      return const_iterator(rawRange_.begin(), f_);
     }
 
     constexpr iterator begin() noexcept {
-      return iterator(rawRange_.begin(), &f_);
+      return iterator(rawRange_.begin(), f_);
     }
 
     /**
@@ -702,11 +698,11 @@ namespace Dune
      * in the range.
      */
     constexpr const_iterator end() const noexcept {
-      return const_iterator(rawRange_.end(), &f_);
+      return const_iterator(rawRange_.end(), f_);
     }
 
     constexpr iterator end() noexcept {
-      return iterator(rawRange_.end(), &f_);
+      return iterator(rawRange_.end(), f_);
     }
 
     /**

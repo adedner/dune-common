@@ -38,6 +38,17 @@ class CopyableOptional
 
   using Base = std::optional<Type>;
 
+protected:
+
+  // A tag to allow derived classes to call the Base constructor directly
+  struct derived_constructor {};
+
+  // A constructor to be called by derived classes only
+  template <class... Args>
+  constexpr CopyableOptional (derived_constructor, Args&&... args)
+    : Base{std::forward<Args>(args)...}
+  {}
+
 public:
 
   /**
