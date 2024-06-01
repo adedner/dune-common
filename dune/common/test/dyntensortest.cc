@@ -83,6 +83,31 @@ void checkConstructors(Dune::TestSuite& testSuite)
   tensor5 = std::move(tensor4);
   checkEqual(subTestSuite, tensor1,tensor5);
 
+  extents_type ext2{Dune::filledArray<Tensor::rank()>(2)};
+  if constexpr(Tensor::rank() == 1) {
+    Tensor tensor6(ext2, {6,7});
+    Tensor tensor7{ext2, {6.0,7.0}};
+
+    subTestSuite.check(tensor6(0) == 6.0);
+    subTestSuite.check(tensor6(1) == 7.0);
+    subTestSuite.check(tensor7(0) == 6.0);
+    subTestSuite.check(tensor7(1) == 7.0);
+  }
+  else
+  if constexpr(Tensor::rank() == 2) {
+    Tensor tensor6(ext2, {{6,7},{8,9}});
+    Tensor tensor7(ext2, {{6.0,7.0},{8.0,9.0}});
+
+    subTestSuite.check(tensor6(0,0) == 6.0);
+    subTestSuite.check(tensor6(0,1) == 7.0);
+    subTestSuite.check(tensor6(1,0) == 8.0);
+    subTestSuite.check(tensor6(1,1) == 9.0);
+    subTestSuite.check(tensor7(0,0) == 6.0);
+    subTestSuite.check(tensor7(0,1) == 7.0);
+    subTestSuite.check(tensor7(1,0) == 8.0);
+    subTestSuite.check(tensor7(1,1) == 9.0);
+  }
+
   testSuite.subTest(subTestSuite);
 }
 
