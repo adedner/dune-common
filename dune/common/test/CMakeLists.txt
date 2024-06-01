@@ -173,6 +173,10 @@ dune_add_test(SOURCES dynmatrixtest.cc
               LINK_LIBRARIES dunecommon
               LABELS quick)
 
+dune_add_test(SOURCES dyntensortest.cc
+              LINK_LIBRARIES dunecommon
+              LABELS quick)
+
 dune_add_test(SOURCES dynvectortest.cc
               LINK_LIBRARIES dunecommon
               LABELS quick)
@@ -322,6 +326,10 @@ dune_add_test(SOURCES singletontest.cc
               LABELS quick)
 
 dune_add_test(SOURCES sllisttest.cc
+              LABELS quick)
+
+dune_add_test(SOURCES statictensortest.cc
+              LINK_LIBRARIES dunecommon
               LABELS quick)
 
 dune_add_test(SOURCES stdidentity.cc
