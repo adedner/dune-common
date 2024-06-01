@@ -41,12 +41,14 @@ install(FILES
         debugstream.hh
         deprecated.hh
         densematrix.hh
+        densetensor.hh
         densevector.hh
         diagonalmatrix.hh
         documentation.hh
         dotproduct.hh
         dynmatrix.hh
         dynmatrixev.hh
+        dyntensor.hh
         dynvector.hh
         enumset.hh
         exceptions.hh
@@ -94,11 +96,13 @@ install(FILES
         shared_ptr.hh
         simd.hh
         singleton.hh
+        statictensor.hh
         sllist.hh
         stdstreams.hh
         stdthread.hh
         streamoperators.hh
         stringutility.hh
+        tensorspan.hh
         timer.hh
         transpose.hh
         tupleutility.hh
