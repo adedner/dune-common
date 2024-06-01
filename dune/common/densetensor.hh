@@ -204,7 +204,7 @@ private:
         derived.extent(ii)...);
     }
     else {
-      DUNE_THROW(Dune::NotImplemented, "Tensor must be derived from mdarray or mdspan.");
+      throw std::runtime_error("NotImplemented: Tensor must be derived from mdarray or mdspan.");
       return 0;
     }
   }
@@ -213,7 +213,7 @@ private:
     std::enable_if_t<not std::is_same_v<L, Std::layout_right>, int> = 0>
   static constexpr auto access (D&& derived, index_type index, std::index_sequence<i0,ii...>)
   {
-    DUNE_THROW(Dune::NotImplemented, "SubTensor access not implemented for layouts other than layout_right.");
+    throw std::runtime_error("NotImplemented: SubTensor access not implemented for layouts other than layout_right.");
     return 0;
   }
 
