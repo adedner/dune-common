@@ -5,8 +5,12 @@
 #ifndef DUNE_COMMON_DENSETENSOR_HH
 #define DUNE_COMMON_DENSETENSOR_HH
 
+#include <cassert>
+#include <stdexcept>
 #include <type_traits>
+#include <utility>
 
+#include <dune/common/indices.hh>
 #include <dune/common/tensorspan.hh>
 #include <dune/common/std/default_accessor.hh>
 #include <dune/common/std/extents.hh>
@@ -66,6 +70,34 @@ public:
     std::enable_if_t<(... && std::is_convertible_v<Indices, index_type>), int> = 0>
   constexpr decltype(auto) operator() (Indices... indices) const
   {
+    return asDerived()[std::array<index_type,sizeof...(Indices)>{index_type(indices)...}];
+  }
+
+  /**
+   * \brief Access specified element at position (i0,i1,...) with mutable access
+   * \throws std::out_of_range if the indices are out of the index space `[0,extent_0)x...x[0,extent_{r-1})`.
+   */
+  template <class... Indices,
+    std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
+    std::enable_if_t<(... && std::is_convertible_v<Indices, index_type>), int> = 0>
+  constexpr decltype(auto) at (Indices... indices)
+  {
+    if (not indexInIndexSpace(indices...))
+      throw std::out_of_range("Indices out of index space");
+    return asDerived()[std::array<index_type,sizeof...(Indices)>{index_type(indices)...}];
+  }
+
+  /**
+   * \brief Access specified element at position (i0,i1,...) with const access
+   * \throws std::out_of_range if the indices are out of the index space `[0,extent_0)x...x[0,extent_{r-1})`.
+   */
+  template <class... Indices,
+    std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
+    std::enable_if_t<(... && std::is_convertible_v<Indices, index_type>), int> = 0>
+  constexpr decltype(auto) at (Indices... indices) const
+  {
+    if (not indexInIndexSpace(indices...))
+      throw std::out_of_range("Indices out of index space");
     return asDerived()[std::array<index_type,sizeof...(Indices)>{index_type(indices)...}];
   }
 
@@ -141,11 +173,21 @@ private:
   using HasAccessorAndDataHandle = decltype(std::declval<D>().accessor(), std::declval<D>().data_handle());
 
 private:
+  // Check whether a tuple of indices is in the index space `[0,extent_0)x...x[0,extent_{r-1})`.
+  template <class... Indices>
+  [[nodiscard]] constexpr bool indexInIndexSpace (Indices... indices) const noexcept
+  {
+    return unpackIntegerSequence([&](auto... i) {
+      return ( (0 <= indices && indices < asDerived().extent(i)) && ... );
+    }, std::make_index_sequence<sizeof...(Indices)>{});
+  }
+
   // obtain a sub-mdspan with fixed first index
   template <class L = layout_type, class D, std::size_t i0, std::size_t... ii,
     std::enable_if_t<std::is_same_v<L, Std::layout_right>, int> = 0>
   static constexpr auto access (D&& derived, index_type index, std::index_sequence<i0,ii...>)
   {
+    assert(0 <= index && index < derived.extent(0));
     using E = Std::extents<index_type, extents_type::static_extent(ii)...>;
     if constexpr (Std::is_detected_v<HasContainerData,D>) {
       using A = Std::default_accessor<value_type>;
