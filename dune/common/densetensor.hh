@@ -35,19 +35,6 @@ class DenseTensor
   using self_type = DenseTensor;
   using derived_type = Derived;
 
-private:
-  template <class D>
-  using HasContainerData = decltype(std::declval<D>().container_data());
-
-  template <class D>
-  static constexpr bool is_mdarray = Std::is_detected_v<HasContainerData,D>;
-
-  template <class D>
-  using HasAccessorAndDataHandle = decltype(std::declval<D>().accessor(), std::declval<D>().data_handle());
-
-  template <class D>
-  static constexpr bool is_mdspan = Std::is_detected_v<HasAccessorAndDataHandle,D>;
-
 public:
   using element_type = typename Traits::element_type;
   using value_type = std::remove_cv_t<element_type>;
@@ -147,20 +134,27 @@ public:
   /// @}
 
 private:
+  template <class D>
+  using HasContainerData = decltype(std::declval<D>().container_data());
+
+  template <class D>
+  using HasAccessorAndDataHandle = decltype(std::declval<D>().accessor(), std::declval<D>().data_handle());
+
+private:
   // obtain a sub-mdspan with fixed first index
   template <class L = layout_type, class D, std::size_t i0, std::size_t... ii,
     std::enable_if_t<std::is_same_v<L, Std::layout_right>, int> = 0>
   static constexpr auto access (D&& derived, index_type index, std::index_sequence<i0,ii...>)
   {
     using E = Std::extents<index_type, extents_type::static_extent(ii)...>;
-    if constexpr (is_mdarray<D>) {
+    if constexpr (Std::is_detected_v<HasContainerData,D>) {
       using A = Std::default_accessor<value_type>;
       using V = std::conditional_t<std::is_const_v<std::remove_reference_t<D>>, const value_type, value_type>;
       return TensorSpan<V,E,L,A>(
         derived.container_data() + derived.mapping().stride(0)*index,
         derived.extent(ii)...);
     }
-    else if constexpr (is_mdspan<D>) {
+    else if constexpr (Std::is_detected_v<HasAccessorAndDataHandle,D>) {
       using A = typename std::decay_t<decltype(derived.accessor())>::offset_policy;
       using V = typename A::element_type;
       return TensorSpan<V,E,L,A>(
@@ -168,7 +162,7 @@ private:
         derived.extent(ii)...);
     }
     else {
-      DUNE_THROW(Dune::NotImplemented, "SubTensor access not implemented for unknown tensor type. Must be derived from mdarray or mdspan.");
+      DUNE_THROW(Dune::NotImplemented, "Tensor must be derived from mdarray or mdspan.");
       return 0;
     }
   }
@@ -177,7 +171,7 @@ private:
     std::enable_if_t<not std::is_same_v<L, Std::layout_right>, int> = 0>
   static constexpr auto access (D&& derived, index_type index, std::index_sequence<i0,ii...>)
   {
-    DUNE_THROW(Dune::NotImplemented, "SubTensor access not implemented for layouts oher than layout_right.");
+    DUNE_THROW(Dune::NotImplemented, "SubTensor access not implemented for layouts other than layout_right.");
     return 0;
   }
 
