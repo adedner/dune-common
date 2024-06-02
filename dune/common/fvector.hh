@@ -301,25 +301,17 @@ namespace Dune {
       : _data()
     {}
 
-    /** \brief Constructor with a given scalar */
-    template<typename T,
-             std::enable_if_t<
-               std::is_convertible<T, K>::value &&
-               ! std::is_base_of<DenseVector<typename FieldTraits<T>::field_type>, K
-                                 >::value
-             , int> = 0>
-    FieldVector (const T& k) : _data(k) {}
-
     /** \brief Constructor with a given scalar
      *
      * This overload matches types T that are convertible to
      * K but for which FieldTraits<T>::field_type is not
-     * defined, e.g. expression templates of GMPField.
+     * defined, e.g. expression templates of GMPField, or which
+     * are number types.
      */
     template<typename T,
              std::enable_if_t<
                std::is_convertible<T, K>::value &&
-               Impl::FieldTraitsEmpty<T>::value
+               (Impl::FieldTraitsEmpty<T>::value || IsNumber<T>::value)
              , int> = 0>
     FieldVector (const T& k) : _data(k) {}
 
