@@ -145,14 +145,28 @@ public:
     return base_type::operator[](std::array<index_type,extents_type::rank()>{index_type(indices)...});
   }
 
-  /// \brief Access specified element at position [i0][i1]... with mutable access
-  constexpr auto operator[] (index_type index) noexcept
+  /**
+   * \brief Access specified element or sub-tensor at position [i0] with mutable access.
+   *
+   * This returns either a reference to the `index`th element if rank == 1,
+   * otherwise it returns a sub-Tensorspace with fixed first index.
+   *
+   * \throws std::domain_error if rank is zero.
+   */
+  constexpr decltype(auto) operator[] (index_type index) noexcept
   {
     return access(asBase(), index, std::make_index_sequence<extents_type::rank()>{});
   }
 
-  /// \brief Access specified element at position [i0][i1]... with const access
-  constexpr auto operator[] (index_type index) const noexcept
+  /**
+   * \brief Access specified element or sub-tensor at position [i0] with const access.
+   *
+   * This returns either a const_reference to the `index`th element if rank == 1,
+   * otherwise it returns a sub-Tensorspace with fixed first index.
+   *
+   * \throws std::domain_error if rank is zero.
+   */
+  constexpr decltype(auto) operator[] (index_type index) const noexcept
   {
     return access(asBase(), index, std::make_index_sequence<extents_type::rank()>{});
   }
@@ -224,6 +238,13 @@ public:
   }
 
   /// @}
+
+
+  /// \brief Comparison of two DenseTensors for equality
+  friend constexpr bool operator== (const DenseTensor& lhs, const DenseTensor& rhs) noexcept
+  {
+    return static_cast<const base_type&>(lhs) == static_cast<const base_type&>(rhs);
+  }
 
 private:
   template <class D>
@@ -316,6 +337,26 @@ private:
     return static_cast<base_type&>(*this);
   }
 };
+
+// specialization for rank-0 tensor and comparison with scalar
+template <class D, class B, class V, class E = typename B::extents_type,
+  std::enable_if_t<(E::rank() == 0), int> = 0,
+  std::enable_if_t<std::is_convertible_v<V, typename B::value_type>, int> = 0,
+  std::enable_if_t<std::is_constructible_v<typename B::value_type, V>, int> = 0>
+constexpr bool operator== (const DenseTensor<D,B>& lhs, const V& rhs) noexcept
+{
+  return lhs() == rhs;
+}
+
+// specialization for rank-0 tensor and comparison with scalar
+template <class V, class D, class B, class E = typename B::extents_type,
+  std::enable_if_t<(E::rank() == 0), int> = 0,
+  std::enable_if_t<std::is_convertible_v<V, typename B::value_type>, int> = 0,
+  std::enable_if_t<std::is_constructible_v<typename B::value_type, V>, int> = 0>
+constexpr bool operator== (const V& lhs, const DenseTensor<D,B>& rhs) noexcept
+{
+  return lhs == rhs();
+}
 
 template <class D, class B>
 struct FieldTraits< DenseTensor<D,B> >

@@ -42,32 +42,18 @@ public:
   using value_type = typename base_type::value_type;
 
 public:
-  /// Inherit constructor from DenseTensor
+  /// \brief Inherit constructor from DenseTensor
   using base_type::base_type;
+
+  /// \name Additional FieldTensor constructors
+  /// @{
 
   explicit FieldTensor (const value_type& value)
     : base_type{extents_type{}, value}
   {}
 
-  friend constexpr bool operator== (const FieldTensor& lhs, const FieldTensor& rhs) noexcept
-  {
-    return static_cast<const base_type&>(lhs) == static_cast<const base_type&>(rhs);
-  }
+  /// @}
 };
-
-// specialization for rank-0 tensor and comparison with scalar
-template <class V>
-constexpr bool operator== (const FieldTensor<V>& lhs, const V& rhs) noexcept
-{
-  return *lhs.container_data() == rhs;
-}
-
-// specialization for rank-0 tensor and comparison with scalar
-template <class V>
-constexpr bool operator== (const V& lhs, const FieldTensor<V>& rhs) noexcept
-{
-  return lhs == *rhs.container_data();
-}
 
 template <class V, int... exts>
 struct FieldTraits< FieldTensor<V,exts...> >

@@ -46,7 +46,7 @@ public:
   using mapping_type = typename base_type::mapping_type;
 
 public:
-  /// Inherit the constructors from DenseTensor
+  /// \brief Inherit the constructors from DenseTensor
   using base_type::base_type;
 
   /// \name Modifiers
@@ -91,27 +91,7 @@ public:
   }
 
   /// @}
-
-  friend constexpr bool operator== (const DynamicTensor& lhs, const DynamicTensor& rhs) noexcept
-  {
-    return static_cast<const base_type&>(lhs) == static_cast<const base_type&>(rhs);
-  }
 };
-
-// specialization for rank-0 tensor and comparison with scalar
-template <class V>
-constexpr bool operator== (const DynamicTensor<V,0>& lhs, const V& rhs) noexcept
-{
-  return *lhs.container_data() == rhs;
-}
-
-// specialization for rank-0 tensor and comparison with scalar
-template <class V>
-constexpr bool operator== (const V& lhs, const DynamicTensor<V,0>& rhs) noexcept
-{
-  return lhs == *rhs.container_data();
-}
-
 
 template <class V, std::size_t ran>
 struct FieldTraits< DynamicTensor<V,ran> >
