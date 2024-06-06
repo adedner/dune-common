@@ -12,6 +12,7 @@
 #include <dune/common/densetensor.hh>
 #include <dune/common/ftraits.hh>
 #include <dune/common/std/extents.hh>
+#include <dune/common/std/layout_right.hh>
 #include <dune/common/std/mdarray.hh>
 
 namespace Dune {
@@ -31,10 +32,12 @@ namespace Dune {
  **/
 template <class Value, std::size_t rank, class Allocator = std::allocator<Value>>
 class DynamicTensor
-    : public DenseTensor<Value,Std::dextents<int,rank>,std::vector<Value,Allocator>>
+    : public DenseTensor<DynamicTensor<Value,rank,Allocator>,
+        Std::mdarray<Value,Std::dextents<int,rank>,Std::layout_right,std::vector<Value,Allocator>>>
 {
   using self_type = DynamicTensor;
-  using base_type = DenseTensor<Value,Std::dextents<int,rank>,std::vector<Value>>;
+  using storage_type = Std::mdarray<Value,Std::dextents<int,rank>,Std::layout_right,std::vector<Value,Allocator>>;
+  using base_type = DenseTensor<self_type,storage_type>;
 
 public:
   using value_type = typename base_type::value_type;

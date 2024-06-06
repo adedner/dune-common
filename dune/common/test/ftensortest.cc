@@ -38,6 +38,11 @@ void checkEqualValue(Dune::TestSuite& testSuite, Tensor const& a, typename Tenso
   testSuite.subTest(subTestSuite);
 }
 
+template <class D, class B>
+void call (const DenseTensor<D,B>& tensor)
+{
+  // it is possible to call a function that expects the DenseTensor base class
+}
 
 template <class Tensor>
 void checkConstructors(Dune::TestSuite& testSuite)
@@ -133,6 +138,7 @@ void checkConstructors(Dune::TestSuite& testSuite)
     subTestSuite.check(tensor10(1,1) == 9.0);
   }
 
+  call(tensor);
   testSuite.subTest(subTestSuite);
 }
 
@@ -146,7 +152,7 @@ void checkAccess(Dune::TestSuite& testSuite)
   checkEqualValue(subTestSuite, tensor, 42.0);
 
   if constexpr(Tensor::rank() == 0) {
-    // subTestSuite.check(tensor[std::array<int,0>{}] == 42.0);
+    subTestSuite.check(tensor[std::array<int,0>{}] == 42.0);
     subTestSuite.check(tensor() == 42.0);
     subTestSuite.check(tensor == 42.0);
     double value = tensor;
@@ -154,7 +160,7 @@ void checkAccess(Dune::TestSuite& testSuite)
   }
   else if constexpr(Tensor::rank() == 1) {
     for (std::size_t i = 0; i < Tensor::static_extent(0); ++i) {
-      // subTestSuite.check(tensor[std::array{i}] == 42.0);
+      subTestSuite.check(tensor[std::array{i}] == 42.0);
       subTestSuite.check(tensor(i) == 42.0);
       subTestSuite.check(tensor[i] == 42.0);
       subTestSuite.check(tensor.at(i) == 42.0);
@@ -165,7 +171,7 @@ void checkAccess(Dune::TestSuite& testSuite)
   else if constexpr(Tensor::rank() == 2) {
     for (std::size_t i = 0; i < Tensor::static_extent(0); ++i) {
       for (std::size_t j = 0; j < Tensor::static_extent(1); ++j) {
-        // subTestSuite.check(tensor[std::array{i,j}] == 42.0);
+        subTestSuite.check(tensor[std::array{i,j}] == 42.0);
         subTestSuite.check(tensor(i,j) == 42.0);
         subTestSuite.check(tensor[i][j] == 42.0);
         subTestSuite.check(tensor.at(i,j) == 42.0);
@@ -178,7 +184,7 @@ void checkAccess(Dune::TestSuite& testSuite)
     for (std::size_t i = 0; i < Tensor::static_extent(0); ++i) {
       for (std::size_t j = 0; j < Tensor::static_extent(1); ++j) {
         for (std::size_t k = 0; k < Tensor::static_extent(2); ++k) {
-          // subTestSuite.check(tensor[std::array{i,j,k}] == 42.0);
+          subTestSuite.check(tensor[std::array{i,j,k}] == 42.0);
           subTestSuite.check(tensor(i,j,k) == 42.0);
           subTestSuite.check(tensor[i][j][k] == 42.0);
           subTestSuite.check(tensor.at(i,j,k) == 42.0);

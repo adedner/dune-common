@@ -5,76 +5,56 @@
 #ifndef DUNE_COMMON_DENSETENSOR_HH
 #define DUNE_COMMON_DENSETENSOR_HH
 
-#include <array>
 #include <cassert>
 #include <stdexcept>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 
 #include <dune/common/indices.hh>
 #include <dune/common/initializerlist.hh>
-#include <dune/common/tensorinterface.hh>
 #include <dune/common/tensorspan.hh>
 #include <dune/common/std/default_accessor.hh>
 #include <dune/common/std/extents.hh>
 #include <dune/common/std/layout_right.hh>
-#include <dune/common/std/mdarray.hh>
-#include <dune/common/std/mdspan.hh>
 #include <dune/common/std/type_traits.hh>
 
 namespace Dune {
-
-namespace Impl {
-
-template <class Element, class Extents>
-struct DenseTensorTraits
-{
-  using element_type = Element;
-  using extents_type = Extents;
-  using layout_type = Std::layout_right;
-};
-
-} // end namespace Impl
-
 
 /**
  * \brief A tensor interface-class providing common functionality.
  *
  * \nosubgrouping
  *
- * The CRTP interface class for tensors extends the mdarray and mdspan implementations
+ * The CRTP interface mixin-class for tensors extends the mdarray and mdspan implementations
  * by common functionality for element access and size information and mathematical
  * operations.
  *
  * \tparam Derived  The tensor type derived from this class.
- * \tparam Traits   Type containing the type aliases of a tensor, see TensorTraits.
+ * \tparam Base     Either mdarray or mdspan base type for storage.
  **/
-template <class Element, class Extents, class Container>
+template <class Derived, class Base>
 class DenseTensor
-    : public Std::mdarray<Element,Extents,Std::layout_right,Container>
-    , public TensorInterface<DenseTensor<Element,Extents,Container>,
-        Impl::DenseTensorTraits<Element,Extents>>
+    : public Base
 {
   using self_type = DenseTensor;
-  using base_type = Std::mdarray<Element,Extents,Std::layout_right,Container>;
-  using interface_type = TensorInterface<self_type, Impl::DenseTensorTraits<Element,Extents>>;
+  using derived_type = Derived;
+  using base_type = Base;
+
+  template <class B>
+  using const_reference_t = typename B::const_reference;
 
 public:
   using element_type = typename base_type::element_type;
+  using value_type = typename base_type::element_type;
   using extents_type = typename base_type::extents_type;
-  using layout_type = typename base_type::layout_type;
-  using container_type = typename base_type::container_type;
-  using value_type = typename base_type::value_type;
-  using mapping_type = typename base_type::mapping_type;
-  using index_type = typename base_type::index_type;
   using size_type = typename base_type::size_type;
   using rank_type = typename base_type::rank_type;
-  using mdspan_type = typename base_type::mdspan_type;
-  using const_mdspan_type = typename base_type::const_mdspan_type;
-  using pointer = typename base_type::pointer;
+  using index_type = typename base_type::index_type;
+  using layout_type = typename base_type::layout_type;
+  using mapping_type = typename base_type::mapping_type;
   using reference = typename base_type::reference;
-  using const_pointer = typename base_type::const_pointer;
-  using const_reference = typename base_type::const_reference;
+  using const_reference = Std::detected_or_t<reference,const_reference_t,base_type>;
 
 public:
   /// Derive constructors from base class
@@ -107,28 +87,11 @@ public:
   }
 
   /// \brief Converting constructor from another DenseTensor
-  template <class V, class E, class C,
-    std::enable_if_t<std::is_constructible_v<base_type, typename DenseTensor<V,E,C>::base_type>, int> = 0>
-  constexpr DenseTensor (const DenseTensor<V,E,C>& other)
+  template <class D, class B,
+    std::enable_if_t<std::is_constructible_v<base_type, B>, int> = 0>
+  constexpr DenseTensor (const DenseTensor<D,B>& other)
     : base_type{other}
   {}
-
-  /// @}
-
-
-  /// \name Assignment operators
-  /// @{
-
-  /// \brief Copy assignment from a different mdarray
-  template <class V, class E, class L, class C,
-    std::enable_if_t<std::is_constructible_v<base_type, Std::mdarray<V,E,L,C>>, int> = 0>
-  constexpr self_type& operator= (const Std::mdarray<V,E,L,C>& other)
-  {
-    return *this = base_type(other);
-  }
-
-  /// \brief Assignment of a scalar value
-  using interface_type::operator=;
 
   /// @}
 
@@ -136,42 +99,11 @@ public:
   /// \name Multi index access
   /// @{
 
-  /**
-   * \brief Nested subscript operator to access either a subdimension or an element.
-   *
-   * The bracket operator can be nested to successively access more dimensions.
-   * Each subscript operator returns an mdspan over the sub-tensor with fixed
-   * first index.
-   *
-   * \b Examples:
-   * \code{c++}
-     DynamicTensor<double,2> matrix(3,3);
-     auto row = matrix[0]; // 0th row
-     row[1] = 56;          // the row is an mdspan
-     matrix[0][1] = 42;    // element at (0,1)
-     matrix[0,1] = 7.0;    // only with c++23
-     \endcode
-   **/
-  using interface_type::operator[];
-
-  /**
-   * \brief Access an element of the tensor using a variadic list of indices.
-   * \b Examples:
-   * \code{c++}
-     DynamicTensor<double,3> tensor(3,3,3);
-     tensor(0,1,2) = 42.0;
-     \endcode
-   **/
-  using interface_type::operator();
-
-  /// @}
-
-
   /// \brief Access specified element at position (i0,i1,...) with mutable access
   template <class... Indices,
     std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
     std::enable_if_t<(... && std::is_convertible_v<Indices, index_type>), int> = 0>
-  constexpr reference access (typename interface_type::accessor_type, Indices... indices)
+  constexpr reference operator() (Indices... indices)
   {
     return base_type::operator[](std::array<index_type,extents_type::rank()>{index_type(indices)...});
   }
@@ -180,10 +112,216 @@ public:
   template <class... Indices,
     std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
     std::enable_if_t<(... && std::is_convertible_v<Indices, index_type>), int> = 0>
-  constexpr const_reference access (typename interface_type::accessor_type, Indices... indices) const
+  constexpr const_reference operator() (Indices... indices) const
   {
     return base_type::operator[](std::array<index_type,extents_type::rank()>{index_type(indices)...});
   }
+
+  /**
+   * \brief Access specified element at position (i0,i1,...) with mutable access
+   * \throws std::out_of_range if the indices are out of the index space `[0,extent_0)x...x[0,extent_{r-1})`.
+   */
+  template <class... Indices,
+    std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
+    std::enable_if_t<(... && std::is_convertible_v<Indices, index_type>), int> = 0>
+  constexpr reference at (Indices... indices)
+  {
+    if (not indexInIndexSpace(indices...))
+      throw std::out_of_range("Indices out of index space");
+    return base_type::operator[](std::array<index_type,extents_type::rank()>{index_type(indices)...});
+  }
+
+  /**
+   * \brief Access specified element at position (i0,i1,...) with const access
+   * \throws std::out_of_range if the indices are out of the index space `[0,extent_0)x...x[0,extent_{r-1})`.
+   */
+  template <class... Indices,
+    std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
+    std::enable_if_t<(... && std::is_convertible_v<Indices, index_type>), int> = 0>
+  constexpr const_reference at (Indices... indices) const
+  {
+    if (not indexInIndexSpace(indices...))
+      throw std::out_of_range("Indices out of index space");
+    return base_type::operator[](std::array<index_type,extents_type::rank()>{index_type(indices)...});
+  }
+
+  /// \brief Access specified element at position [i0][i1]... with mutable access
+  constexpr auto operator[] (index_type index) noexcept
+  {
+    return access(asBase(), index, std::make_index_sequence<extents_type::rank()>{});
+  }
+
+  /// \brief Access specified element at position [i0][i1]... with const access
+  constexpr auto operator[] (index_type index) const noexcept
+  {
+    return access(asBase(), index, std::make_index_sequence<extents_type::rank()>{});
+  }
+
+  /// \brief Access element at position [{i0,i1,...}]
+  template <class Index,
+    std::enable_if_t<std::is_convertible_v<const Index&, index_type>, int> = 0>
+  constexpr reference operator[] (const std::array<Index,extents_type::rank()>& indices)
+  {
+    return std::apply([&](auto... ii) -> reference {
+      return base_type::operator[](indices); }, indices);
+  }
+
+  /// \brief Access element at position [{i0,i1,...}]
+  template <class Index,
+    std::enable_if_t<std::is_convertible_v<const Index&, index_type>, int> = 0>
+  constexpr const_reference operator[] (const std::array<Index,extents_type::rank()>& indices) const
+  {
+    return std::apply([&](auto... ii) -> const_reference {
+      return base_type::operator[](indices); }, indices);
+  }
+
+  /**
+   * \brief Return true when (i0,i1,...) is in pattern.
+   * This is always true for dense tensors.
+   **/
+  template <class... Indices,
+    std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
+    std::enable_if_t<(... && std::is_convertible_v<Indices, index_type>), int> = 0>
+  constexpr bool exists ([[maybe_unused]] Indices... indices) const noexcept
+  {
+    return true;
+  }
+
+  /// @}
+
+
+  /// \name Size information
+  /// @{
+
+  /// \brief Number of rows of a rank-2 tensor
+  template <class E = extents_type,
+    std::enable_if_t<(E::rank() == 2), int> = 0>
+  constexpr index_type rows () const noexcept
+  {
+    return asBase().extent(0);
+  }
+
+  /// \brief Number of columns of a rank-2 tensor
+  template <class E = extents_type,
+    std::enable_if_t<(E::rank() == 2), int> = 0>
+  constexpr index_type cols () const noexcept
+  {
+    return asBase().extent(1);
+  }
+
+  /// @}
+
+
+  /// \name Conversion to the underlying value if rank is zero
+  // @{
+
+  template <class ScalarType, class E = extents_type, class D = derived_type,
+    std::enable_if_t<std::is_convertible_v<value_type,ScalarType>, int> = 0,
+    std::enable_if_t<(E::rank() == 0), int> = 0>
+  constexpr operator ScalarType () const noexcept
+  {
+    return ScalarType(base_type::operator[](std::array<index_type,0>{}));
+  }
+
+  /// @}
+
+private:
+  template <class D>
+  using HasContainerData = decltype(std::declval<D>().container_data());
+
+  template <class D>
+  using HasAccessorAndDataHandle = decltype(std::declval<D>().accessor(), std::declval<D>().data_handle());
+
+private:
+  // Check whether a tuple of indices is in the index space `[0,extent_0)x...x[0,extent_{r-1})`.
+  template <class... Indices>
+  [[nodiscard]] constexpr bool indexInIndexSpace (Indices... indices) const noexcept
+  {
+    return unpackIntegerSequence([&](auto... i) {
+      return ( (0 <= indices && index_type(indices) < asBase().extent(i)) && ... );
+    }, std::make_index_sequence<sizeof...(Indices)>{});
+  }
+
+  // Obtain a sub-mdspan with fixed first index for tensors of rank >= 2
+  template <class L = layout_type, class B, std::size_t i0, std::size_t... ii,
+    std::enable_if_t<(sizeof...(ii) >= 1), int> = 0,
+    std::enable_if_t<std::is_same_v<L, Std::layout_right>, int> = 0>
+  static constexpr auto access (B&& base, index_type index, std::index_sequence<i0,ii...>)
+  {
+    assert(0 <= index && index < base.extent(0));
+    using E = Std::extents<index_type, extents_type::static_extent(ii)...>;
+    if constexpr (Std::is_detected_v<HasContainerData,B>) {
+      using A = Std::default_accessor<value_type>;
+      using V = std::conditional_t<std::is_const_v<std::remove_reference_t<B>>, const value_type, value_type>;
+      return TensorSpan<V,E,L,A>(
+        base.container_data() + base.mapping().stride(0)*index,
+        base.extent(ii)...);
+    }
+    else if constexpr (Std::is_detected_v<HasAccessorAndDataHandle,B>) {
+      using A = typename std::decay_t<decltype(base.accessor())>::offset_policy;
+      using V = typename A::element_type;
+      return TensorSpan<V,E,L,A>(
+        base.accessor().offset(base.data_handle(), base.mapping().stride(0)*index),
+        base.extent(ii)...);
+    }
+    else {
+      throw std::runtime_error("NotImplemented: Tensor must be derived from mdarray or mdspan.");
+      return 0;
+    }
+  }
+
+  // Specialization for tensors with layout != layout_right and rank >= 2
+  template <class L = layout_type, class B, std::size_t i0, std::size_t i1, std::size_t... ii,
+    std::enable_if_t<not std::is_same_v<L, Std::layout_right>, int> = 0>
+  static constexpr auto access (B&& /*base*/, index_type /*index*/, std::index_sequence<i0,i1,ii...>)
+  {
+    throw std::runtime_error("NotImplemented: SubTensor access not implemented for layouts other than layout_right.");
+    return 0;
+  }
+
+  // Specialization for rank==1
+  template <class B, std::size_t i0>
+  static constexpr decltype(auto) access (B&& base, index_type index, std::index_sequence<i0>)
+  {
+    return base[index];
+  }
+
+  // Specialization for rank==0
+  template <class B>
+  static constexpr value_type access (B&& /*base*/, index_type /*index*/, std::index_sequence<>)
+  {
+    throw std::domain_error("Rank-0 tensors cannot be accessed by index.");
+    return 0;
+  }
+
+private:
+
+  derived_type const& asDerived () const
+  {
+    return static_cast<derived_type const&>(*this);
+  }
+
+  derived_type& asDerived ()
+  {
+    return static_cast<derived_type&>(*this);
+  }
+
+  base_type const& asBase () const
+  {
+    return static_cast<base_type const&>(*this);
+  }
+
+  base_type& asBase ()
+  {
+    return static_cast<base_type&>(*this);
+  }
+};
+
+template <class D, class B>
+struct FieldTraits< DenseTensor<D,B> >
+{
+  using field_type = typename FieldTraits<D>::field_type;
+  using real_type = typename FieldTraits<D>::real_type;
 };
 
 } // end namespace Dune

@@ -5,6 +5,7 @@
 #ifndef DUNE_COMMON_TENSORSPAN_HH
 #define DUNE_COMMON_TENSORSPAN_HH
 
+#include <array>
 #include <type_traits>
 
 #include <dune/common/ftraits.hh>
@@ -16,8 +17,8 @@
 namespace Dune {
 
 // forward declaration
-template <class Derived, class Traits>
-class TensorInterface;
+template <class Derived, class Base>
+class DenseTensor;
 
 // forward declrataion
 template <class Element, class Extents,
@@ -31,18 +32,6 @@ struct FieldTraits< TensorSpan<Element,Extents,Layout,Accessor> >
   using field_type = typename FieldTraits<Element>::field_type;
   using real_type = typename FieldTraits<Element>::real_type;
 };
-
-namespace Impl {
-
-template <class Element, class Extents, class Layout>
-struct TensorSpanTraits
-{
-  using element_type = Element;
-  using extents_type = Extents;
-  using layout_type = Layout;
-};
-
-} // end namespace Impl
 
 
 /**
@@ -60,13 +49,11 @@ struct TensorSpanTraits
  **/
 template <class Element, class Extents, class LayoutPolicy, class AccessorPolicy>
 class TensorSpan
-    : public Std::mdspan<Element,Extents,LayoutPolicy,AccessorPolicy>
-    , public TensorInterface<TensorSpan<Element,Extents,LayoutPolicy,AccessorPolicy>,
-        Impl::TensorSpanTraits<Element,Extents,LayoutPolicy>>
+    : public DenseTensor<TensorSpan<Element,Extents,LayoutPolicy,AccessorPolicy>,
+        Std::mdspan<Element,Extents,LayoutPolicy,AccessorPolicy>>
 {
   using self_type = TensorSpan;
-  using base_type = Std::mdspan<Element,Extents,LayoutPolicy,AccessorPolicy>;
-  using interface_type = TensorInterface<self_type,Impl::TensorSpanTraits<Element,Extents,LayoutPolicy>>;
+  using base_type = DenseTensor<self_type, Std::mdspan<Element,Extents,LayoutPolicy,AccessorPolicy>>;
 
 public:
   using element_type =	Element;
@@ -138,7 +125,7 @@ public:
      matrix[0,1] = 7.0;    // only with c++23
      \endcode
    **/
-  using interface_type::operator[];
+  using base_type::operator[];
 
   /**
    * \brief Access an element of the tensor using a variadic list of indices.
@@ -148,19 +135,23 @@ public:
      tensor(0,1,2) = 42.0;
      \endcode
    **/
-  using interface_type::operator();
+  using base_type::operator();
 
   /// @}
 
 
-  /// \brief Access specified element at position (i0,i1,...) with const access
-  template <class... Indices,
-    std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
-    std::enable_if_t<(... && std::is_convertible_v<Indices, index_type>), int> = 0>
-  constexpr reference access (typename interface_type::accessor_type, Indices... indices) const
-  {
-    return base_type::operator[](std::array<index_type,extents_type::rank()>{index_type(indices)...});
-  }
+// #ifndef DOXYGEN
+//   // The following methods are only accessible by the interface base class
+
+//   /// \brief Access specified element at position (i0,i1,...) with const access
+//   template <class... Indices,
+//     std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
+//     std::enable_if_t<(... && std::is_convertible_v<Indices, index_type>), int> = 0>
+//   constexpr reference access (typename interface_type::protector, Indices... indices) const
+//   {
+//     return base_type::operator[](std::array<index_type,extents_type::rank()>{index_type(indices)...});
+//   }
+// #endif
 };
 
 // deduction guides
