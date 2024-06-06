@@ -57,6 +57,7 @@ install(FILES
         float_cmp.hh
         fmatrix.hh
         fmatrixev.hh
+        ftensor.hh
         ftraits.hh
         fvector.hh
         genericiterator.hh
@@ -96,12 +97,12 @@ install(FILES
         shared_ptr.hh
         simd.hh
         singleton.hh
-        statictensor.hh
         sllist.hh
         stdstreams.hh
         stdthread.hh
         streamoperators.hh
         stringutility.hh
+        tensorinterface.hh
         tensorspan.hh
         timer.hh
         transpose.hh
