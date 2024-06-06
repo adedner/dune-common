@@ -138,20 +138,6 @@ public:
   using base_type::operator();
 
   /// @}
-
-
-// #ifndef DOXYGEN
-//   // The following methods are only accessible by the interface base class
-
-//   /// \brief Access specified element at position (i0,i1,...) with const access
-//   template <class... Indices,
-//     std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
-//     std::enable_if_t<(... && std::is_convertible_v<Indices, index_type>), int> = 0>
-//   constexpr reference access (typename interface_type::protector, Indices... indices) const
-//   {
-//     return base_type::operator[](std::array<index_type,extents_type::rank()>{index_type(indices)...});
-//   }
-// #endif
 };
 
 // deduction guides
