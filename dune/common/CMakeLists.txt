@@ -102,7 +102,6 @@ install(FILES
         stdthread.hh
         streamoperators.hh
         stringutility.hh
-        tensorinterface.hh
         tensorspan.hh
         timer.hh
         transpose.hh

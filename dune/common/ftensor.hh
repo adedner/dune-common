@@ -12,6 +12,7 @@
 #include <dune/common/ftraits.hh>
 #include <dune/common/initializerlist.hh>
 #include <dune/common/std/extents.hh>
+#include <dune/common/std/mdarray.hh>
 
 namespace Dune {
 
@@ -28,13 +29,17 @@ namespace Dune {
  **/
 template <class Value, int... exts>
 class FieldTensor
-    : public DenseTensor<Value,Std::extents<int,exts...>,std::array<Value,(exts * ... * 1)>>
+    : public DenseTensor<FieldTensor<Value,exts...>,
+        Std::mdarray<Value,Std::extents<int,exts...>,Std::layout_right,std::array<Value,(exts * ... * 1)>>>
 {
-  using base_type = DenseTensor<Value,Std::extents<int,exts...>,std::array<Value,(exts * ... * 1)>>;
+  using self_type = FieldTensor;
+  using storage_type = Std::mdarray<Value,Std::extents<int,exts...>,Std::layout_right,
+    std::array<Value,(exts * ... * 1)>>;
+  using base_type = DenseTensor<self_type,storage_type>;
 
 public:
-  using value_type = typename base_type::value_type;
   using extents_type = typename base_type::extents_type;
+  using value_type = typename base_type::value_type;
 
 public:
   /// Inherit constructor from DenseTensor
