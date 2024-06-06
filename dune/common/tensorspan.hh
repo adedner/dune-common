@@ -17,7 +17,7 @@ namespace Dune {
 
 // forward declaration
 template <class Derived, class Traits>
-class DenseTensor;
+class TensorInterface;
 
 // forward declrataion
 template <class Element, class Extents,
@@ -61,12 +61,12 @@ struct TensorSpanTraits
 template <class Element, class Extents, class LayoutPolicy, class AccessorPolicy>
 class TensorSpan
     : public Std::mdspan<Element,Extents,LayoutPolicy,AccessorPolicy>
-    , public DenseTensor<TensorSpan<Element,Extents,LayoutPolicy,AccessorPolicy>,
+    , public TensorInterface<TensorSpan<Element,Extents,LayoutPolicy,AccessorPolicy>,
         Impl::TensorSpanTraits<Element,Extents,LayoutPolicy>>
 {
   using self_type = TensorSpan;
   using base_type = Std::mdspan<Element,Extents,LayoutPolicy,AccessorPolicy>;
-  using interface_type = DenseTensor<self_type,Impl::TensorSpanTraits<Element,Extents,LayoutPolicy>>;
+  using interface_type = TensorInterface<self_type,Impl::TensorSpanTraits<Element,Extents,LayoutPolicy>>;
 
 public:
   using element_type =	Element;
@@ -138,7 +138,6 @@ public:
      matrix[0,1] = 7.0;    // only with c++23
      \endcode
    **/
-  using base_type::operator[];
   using interface_type::operator[];
 
   /**
@@ -152,6 +151,16 @@ public:
   using interface_type::operator();
 
   /// @}
+
+
+  /// \brief Access specified element at position (i0,i1,...) with const access
+  template <class... Indices,
+    std::enable_if_t<(sizeof...(Indices) == extents_type::rank()), int> = 0,
+    std::enable_if_t<(... && std::is_convertible_v<Indices, index_type>), int> = 0>
+  constexpr reference access (typename interface_type::accessor_type, Indices... indices) const
+  {
+    return base_type::operator[](std::array<index_type,extents_type::rank()>{index_type(indices)...});
+  }
 };
 
 // deduction guides
