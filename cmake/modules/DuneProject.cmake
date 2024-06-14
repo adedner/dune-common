@@ -140,7 +140,8 @@ macro(dune_project)
         endif()
       endforeach()
     endif()
-    variable_watch(ALL_DEPENDENCIES dune_deprecate_variable)
+    # HELP: this is too verbose in super builds!
+    # variable_watch(ALL_DEPENDENCIES dune_deprecate_variable)
   else()
     message(AUTHOR_WARNING "This needs to be removed!")
   endif()
@@ -318,10 +319,10 @@ set(HAVE_${_upcase_module} TRUE)
 ${DUNE_CUSTOM_PKG_CONFIG_SECTION}
 
 #import the target
-if(${ProjectName}_LIBRARIES)
-  get_filename_component(_dir \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)
-  include(\"\${_dir}/${ProjectName}-targets.cmake\")
-endif()
+# if(${ProjectName}_LIBRARIES)
+#   get_filename_component(_dir \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)
+#   include(\"\${_dir}/${ProjectName}-targets.cmake\")
+# endif()
 
 endif()")
       set(CONFIG_SOURCE_FILE ${PROJECT_BINARY_DIR}/CMakeFiles/${ProjectName}-config.cmake.in)
