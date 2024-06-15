@@ -8,6 +8,7 @@
 #include <vector>
 #include <numeric>
 #include <type_traits>
+#include <optional>
 
 #include <dune/common/hybridutilities.hh>
 #include <dune/common/iteratorrange.hh>
@@ -288,6 +289,18 @@ auto testTransformedRangeView()
     const auto& rc = r;
     suite.check(checkSameRange(rc, std::vector{1, 2, 3}))
       << "accessing mutable range via const reference failed";
+  }
+  {
+    auto transformedIterator = [](auto&& it, auto&& f) {
+      using It = std::decay_t<decltype(it)>;
+      using F = std::decay_t<decltype(f)>;
+      using TIt = Dune::Impl::TransformedRangeIterator<It, std::optional<F>, Dune::ValueTransformationTag>;
+      return TIt(std::forward<decltype(it)>(it), std::forward<decltype(f)>(f));
+    };
+    auto it = transformedIterator(Dune::range(0,5).begin(), [](auto x) { return 2*x; });
+    auto end = transformedIterator(Dune::range(0,4).end(), [](auto x) {return 0;});
+    for(; it!=end; ++it)
+      std::cout << *it << std::endl;
   }
   return suite;
 }

@@ -415,11 +415,13 @@ namespace Dune
 
       constexpr TransformedRangeIterator& operator=(const TransformedRangeIterator& other) = default;
 
-      constexpr bool operator==(const TransformedRangeIterator& other) const noexcept {
+      template <class OtherF, class OtherT, class OtherC>
+      constexpr bool operator==(const TransformedRangeIterator<I, OtherF, OtherT, OtherC>& other) const noexcept {
         return (it_ == other.it_);
       }
 
-      constexpr bool operator!=(const TransformedRangeIterator& other) const noexcept {
+      template <class OtherF, class OtherT, class OtherC>
+      constexpr bool operator!=(const TransformedRangeIterator<I, OtherF, OtherT, OtherC>& other) const noexcept {
         return (it_ != other.it_);
       }
 
@@ -433,6 +435,9 @@ namespace Dune
         ++(*this);
         return copy;
       }
+
+      template <class OtherI, class OtherF, class OtherT, class OtherC>
+      friend class TransformedRangeIterator;
 
     protected:
       I it_;
@@ -458,6 +463,8 @@ namespace Dune
       using FunctionPointer = typename Base::FunctionPointer;
 
       using Base::Base;
+      using Base::operator==;
+      using Base::operator!=;
 
       // Member functions of the forward_iterator that need
       // to be redefined because the base class methods return a
@@ -486,6 +493,9 @@ namespace Dune
         --(*this);
         return copy;
       }
+
+      template <class OtherI, class OtherF, class OtherT, class OtherC>
+      friend class TransformedRangeIterator;
     };
 
 
@@ -508,6 +518,8 @@ namespace Dune
       using FunctionPointer = typename Base::FunctionPointer;
 
       using Base::Base;
+      using Base::operator==;
+      using Base::operator!=;
 
       // Member functions of the forward_iterator that need
       // to be redefined because the base class methods return a
@@ -589,6 +601,9 @@ namespace Dune
       difference_type operator-(const TransformedRangeIterator& first, const TransformedRangeIterator& second) noexcept {
         return first.it_-second.it_;
       }
+
+      template <class OtherI, class OtherF, class OtherT, class OtherC>
+      friend class TransformedRangeIterator;
     };
 
 
