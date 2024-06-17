@@ -318,11 +318,15 @@ set(HAVE_${_upcase_module} TRUE)
 # Lines that are set by the CMake build system via the variable DUNE_CUSTOM_PKG_CONFIG_SECTION
 ${DUNE_CUSTOM_PKG_CONFIG_SECTION}
 
+# If this file is being found within a super-build that includes ${ProjectName}, the targets file
+# has not been yet generated. So this variable finds whether configuration of ${ProjectName} is already finished
+get_property(${ProjectName}_IN_CONFIG_MODE GLOBAL PROPERTY ${ProjectName}_LIBRARIES DEFINED)
+
 #import the target
-# if(${ProjectName}_LIBRARIES)
-#   get_filename_component(_dir \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)
-#   include(\"\${_dir}/${ProjectName}-targets.cmake\")
-# endif()
+if(${ProjectName}_LIBRARIES AND NOT ${ProjectName}_IN_CONFIG_MODE)
+  get_filename_component(_dir \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)
+  include(\"\${_dir}/${ProjectName}-targets.cmake\")
+endif()
 
 endif()")
       set(CONFIG_SOURCE_FILE ${PROJECT_BINARY_DIR}/CMakeFiles/${ProjectName}-config.cmake.in)
