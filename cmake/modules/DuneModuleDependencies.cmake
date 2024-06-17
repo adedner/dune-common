@@ -62,7 +62,6 @@ include_guard(GLOBAL)
 include(DuneEnableAllPackages)
 include(DuneModuleInformation)
 include(DuneUtilities)
-include(DunePkgConfig)
 
 # checks that a module version is compatible with the found version of a module
 # notice that this has the side effect of populating the ${module}_VERSION information
