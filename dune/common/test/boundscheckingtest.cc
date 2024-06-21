@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
 #include <config.h>
 
+#include <stdexcept>
+
 #include <dune/common/bitsetvector.hh>
 #include <dune/common/diagonalmatrix.hh>
 #include <dune/common/dynvector.hh>
@@ -20,7 +22,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -32,7 +34,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -44,7 +46,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -54,7 +56,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -66,7 +68,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -76,7 +78,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -89,7 +91,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -101,7 +103,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -113,7 +115,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -123,7 +125,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -135,7 +137,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -145,7 +147,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -157,7 +159,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -168,7 +170,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -180,7 +182,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -191,7 +193,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -203,7 +205,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -215,7 +217,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -227,7 +229,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -239,7 +241,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -251,7 +253,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -263,7 +265,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -275,7 +277,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
@@ -287,7 +289,7 @@ int main() try {
     std::cout << "(line " << __LINE__ << ") Error: No exception thrown."
               << std::endl;
     passed = false;
-  } catch (const Dune::RangeError&) {
+  } catch (const std::out_of_range&) {
     std::cout << "(line " << __LINE__
               << ") All good: Exception thrown as expected." << std::endl;
   }
