@@ -138,7 +138,7 @@ namespace Dune {
      * Private as it should only be called from within Indexset.
      * @param attribute The attribute of the index on the remote processor.
      */
-    RemoteIndex(const T2& attribute);
+    explicit RemoteIndex(const T2& attribute);
 
     bool operator==(const RemoteIndex& ri) const;
 

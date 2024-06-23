@@ -53,7 +53,7 @@ namespace Dune{
   protected:
     T& data_;
 
-    MPIData(T& t)
+    explicit MPIData(T& t)
       : data_(t)
     {}
 
@@ -105,7 +105,7 @@ namespace Dune{
 
   protected:
     friend auto getMPIData<T>(T&);
-    MPIData(T& t)
+    explicit MPIData(T& t)
       : data_(t)
     {}
   public:

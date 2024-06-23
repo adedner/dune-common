@@ -16,7 +16,7 @@ class Double {
 public:
   double val;
   Double() : val(0){}
-  Double(double d) : val(d){}
+  explicit Double(double d) : val(d){}
   Double& operator=(double d){
     val=d;
     return *this;

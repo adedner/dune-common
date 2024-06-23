@@ -23,7 +23,7 @@ struct MyDataHandle
     std::set<int> dataSendAt;
     std::set<int> dataRecievedAt;
 
-    MyDataHandle(int r)
+    explicit MyDataHandle(int r)
     : rank(r)
     {
     }
@@ -127,7 +127,7 @@ struct MyDataHandle
 
 struct MyDataHandle1D : public MyDataHandle
 {
-    MyDataHandle1D(int r) : MyDataHandle(r) {}
+    explicit MyDataHandle1D(int r) : MyDataHandle(r) {}
 
     template<class B>
     void scatter(B& buffer, int i, int size)
@@ -166,7 +166,7 @@ struct VarDataHandle
     std::set<int> dataSendAt;
     std::set<int> dataRecievedAt;
 
-    VarDataHandle(int r)
+    explicit VarDataHandle(int r)
     : rank(r)
     {}
     int rank;
@@ -268,7 +268,7 @@ struct VarDataHandle
 
 struct VarDataHandle1D : public VarDataHandle
 {
-    VarDataHandle1D(int r) : VarDataHandle(r) {}
+    explicit VarDataHandle1D(int r) : VarDataHandle(r) {}
 
     template<class B>
     void scatter(B& buffer, int i, int size)

@@ -264,7 +264,7 @@ namespace Dune
      */
     const InformationMap& interfaces() const;
 
-    Interface(MPI_Comm comm)
+    explicit Interface(MPI_Comm comm)
       : communicator_(comm), interfaces_()
     {}
 
@@ -338,7 +338,7 @@ namespace Dune
     class InformationBuilder
     {
     public:
-      InformationBuilder(InformationMap& interfaces)
+      explicit InformationBuilder(InformationMap& interfaces)
         : interfaces_(interfaces)
       {}
 

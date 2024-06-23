@@ -42,7 +42,7 @@ namespace Dune {
      * \param name A name to identify this TestSuite. Defaults to "".
      * \param policy If AlwaysThrow any failing check will throw, otherwise only required checks will do.
      */
-    TestSuite(ThrowPolicy policy, std::string name="") :
+    explicit TestSuite(ThrowPolicy policy, std::string name="") :
       name_(name),
       checks_(0),
       failedChecks_(0),
@@ -55,7 +55,7 @@ namespace Dune {
      * \param name A name to identify this TestSuite. Defaults to "".
      * \param policy If AlwaysThrow any failing check will throw, otherwise only required checks will do. Defaults to ThrowOnRequired
      */
-    TestSuite(std::string name="", ThrowPolicy policy=ThrowOnRequired) :
+    explicit TestSuite(std::string name="", ThrowPolicy policy=ThrowOnRequired) :
       name_(name),
       checks_(0),
       failedChecks_(0),

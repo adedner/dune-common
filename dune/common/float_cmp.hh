@@ -313,7 +313,7 @@ namespace Dune {
     /**
      * @param epsilon Use the specified epsilon for comparing
      */
-    FloatCmpOps(EpsilonType epsilon = DefaultEpsilon::value());
+    explicit FloatCmpOps(EpsilonType epsilon = DefaultEpsilon::value());
 
     //! return the current epsilon
     EpsilonType epsilon() const;

@@ -18,7 +18,7 @@ class CopyCounter
 {
 public:
   CopyCounter() : count_(0) {}
-  CopyCounter(std::size_t count) : count_(count) {}
+  explicit CopyCounter(std::size_t count) : count_(count) {}
   CopyCounter(const CopyCounter& other) :
     count_(other.count_ + 1)
   {}

@@ -186,7 +186,7 @@ namespace Dune
     /** \brief construct integer range [0, to) **/
     constexpr explicit IntegralRange(value_type to) noexcept : from_(0), to_(to) {}
     /** \brief construct integer range std::pair **/
-    constexpr IntegralRange(std::pair<value_type, value_type> range) noexcept : from_(range.first), to_(range.second) {}
+    constexpr explicit IntegralRange(std::pair<value_type, value_type> range) noexcept : from_(range.first), to_(range.second) {}
 
     /** \brief obtain a random-access iterator to the first element **/
     constexpr iterator begin() const noexcept { return iterator(from_); }

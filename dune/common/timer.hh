@@ -47,7 +47,7 @@ namespace Dune {
      *
      * \param startImmediately If true (default) the timer starts counting immediately
      */
-    Timer (bool startImmediately=true) noexcept
+    explicit Timer (bool startImmediately=true) noexcept
     {
       isRunning_ = startImmediately;
       reset();

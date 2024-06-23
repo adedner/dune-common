@@ -19,7 +19,7 @@ using namespace Dune;
 template <class T>
 struct Comparator
 {
-  Comparator(T tol)
+  explicit Comparator(T tol)
     : tol_(tol)
   {}
 

@@ -45,7 +45,7 @@ namespace Dune {
      *       the ios_base object must remain valid until the destructor of
      *       this object has been called.
      */
-    ios_base_all_saver(state_type& ios_);
+    explicit ios_base_all_saver(state_type& ios_);
 
     /**
      * @brief Destructor that restores the flags stored by the constructor.

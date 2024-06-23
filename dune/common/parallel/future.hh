@@ -130,7 +130,7 @@ namespace Dune{
     {}
 
     template<class U>
-    PseudoFuture(U&& u) :
+    explicit PseudoFuture(U&& u) :
       valid_(true),
       data_(std::forward<U>(u))
     {}
@@ -162,7 +162,7 @@ namespace Dune{
   class PseudoFuture<void>{
     bool valid_;
   public:
-    PseudoFuture(bool valid = false) :
+    explicit PseudoFuture(bool valid = false) :
       valid_(valid)
     {}
 

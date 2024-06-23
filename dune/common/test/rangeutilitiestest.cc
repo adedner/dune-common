@@ -62,7 +62,7 @@ class Capture
   }
 
 public:
-  Capture(T&&... t) :
+  explicit Capture(T&&... t) :
     t_(std::move(t)...)
   {}
 

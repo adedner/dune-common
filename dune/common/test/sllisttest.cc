@@ -14,7 +14,7 @@
 class DoubleWrapper
 {
 public:
-  DoubleWrapper(double b)
+  explicit DoubleWrapper(double b)
     : d(b)
   {
     std::cout<<"Constructed "<<this<<std::endl;

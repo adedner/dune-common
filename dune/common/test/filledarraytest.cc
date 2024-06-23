@@ -14,7 +14,7 @@
 #include <dune/common/filledarray.hh>
 
 struct A {
-  A(int i) : value(i) {}
+  explicit A(int i) : value(i) {}
   int value;
   bool operator==(A const& a) const { return value == a.value; }
   bool operator!=(A const& a) const { return value != a.value; }

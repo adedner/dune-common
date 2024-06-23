@@ -211,7 +211,7 @@ namespace Dune
        */
       MemberType item_;
 
-      Element(const MemberType& item, Element* next_=0);
+      explicit Element(const MemberType& item, Element* next_=0);
 
       Element();
 

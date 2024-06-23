@@ -137,7 +137,7 @@ namespace Dune
      * The local index will be 0.
      * @param global The global index.
      */
-    IndexPair(const GlobalIndex& global);
+    explicit IndexPair(const GlobalIndex& global);
 
     /**
      * @brief Get the global index.
@@ -541,7 +541,7 @@ namespace Dune
      * @param indexset The index set we want to be able to lookup the corresponding
      * global index of a local index.
      */
-    GlobalLookupIndexSet(const ParallelIndexSet& indexset);
+    explicit GlobalLookupIndexSet(const ParallelIndexSet& indexset);
 
     /**
      * @brief Destructor.

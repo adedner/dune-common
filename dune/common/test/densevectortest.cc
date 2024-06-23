@@ -28,7 +28,7 @@ namespace Dune
 class MyVector : public Dune::DenseVector< MyVector >
 {
 public:
-  MyVector ( unsigned int size, double v = 0 )
+  explicit MyVector ( unsigned int size, double v = 0 )
     : data_( size, v ) {}
 
   unsigned int size () const { return data_.size(); }

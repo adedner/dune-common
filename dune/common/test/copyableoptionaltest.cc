@@ -18,7 +18,7 @@ template <class F>
 class FunctionWrapper
 {
 public:
-  FunctionWrapper (const F& fct)
+  explicit FunctionWrapper (const F& fct)
     : fct_{fct}
   {}
 

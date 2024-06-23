@@ -17,7 +17,7 @@ class WithViolatedAlignmentHandler {
   Dune::ViolatedAlignmentHandler oldhandler;
 public:
   template<class H>
-  WithViolatedAlignmentHandler(H &&newhandler) :
+  explicit WithViolatedAlignmentHandler(H &&newhandler) :
     oldhandler(Dune::violatedAlignmentHandler())
   {
     Dune::violatedAlignmentHandler() = std::forward<H>(newhandler);

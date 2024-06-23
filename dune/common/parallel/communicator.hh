@@ -403,7 +403,7 @@ namespace Dune
        * @brief Constructor.
        * @param data The data we construct an MPI data type for.
        */
-      MPIDatatypeInformation(const V& data) : data_(data)
+      explicit MPIDatatypeInformation(const V& data) : data_(data)
       {}
 
       /**

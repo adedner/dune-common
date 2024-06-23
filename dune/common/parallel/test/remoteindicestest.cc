@@ -35,7 +35,7 @@ public:
   Array() : vals_(0), size_(0)
   {}
 
-  Array(int size) : size_(size)
+  explicit Array(int size) : size_(size)
   {
     vals_ = new double[size];
   }
