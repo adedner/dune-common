@@ -24,7 +24,6 @@ include(AddThreadsFlags)
 # find the MPI library
 if(NOT TARGET Dune::Imported::MPI_C)
   find_package(MPI 3.0 COMPONENTS C)
-  include(AddMPIFlags)
 
   # create global imported target
   if(TARGET MPI::MPI_C)
@@ -33,6 +32,8 @@ if(NOT TARGET Dune::Imported::MPI_C)
     target_compile_definitions(Dune::Imported::MPI_C INTERFACE
       HAVE_MPI=1 MPICH_SKIP_MPICXX=1 OMPI_SKIP_MPICXX=1 MPI_NO_CPPBIND=1 MPIPP_H _MPICC_H)
   endif()
+
+  include(AddMPIFlags)
 endif()
 
 
@@ -48,7 +49,6 @@ include(AddMETISFlags)
 
 if(NOT TARGET Dune::Imported::ParMETIS)
   find_package(ParMETIS 4.0)
-  include(AddParMETISFlags)
 
   # create global imported target
   if(TARGET ParMETIS::ParMETIS)
@@ -61,12 +61,13 @@ if(NOT TARGET Dune::Imported::ParMETIS)
       target_compile_definitions(Dune::Imported::ParMETIS INTERFACE HAVE_PTSCOTCH_PARMETIS=1)
     endif()
   endif()
+
+  include(AddParMETISFlags)
 endif()
 
 # find libraries for sparse matrix factorizations
 if(NOT TARGET Dune::Imported::SuiteSparse)
   find_package(SuiteSparse OPTIONAL_COMPONENTS CHOLMOD LDL SPQR UMFPACK)
-  include(AddSuiteSparseFlags)
 
   # create global imported target
   if(TARGET SuiteSparse::SuiteSparse)
@@ -76,6 +77,8 @@ if(NOT TARGET Dune::Imported::SuiteSparse)
       target_compile_definitions(Dune::Imported::SuiteSparse INTERFACE HAVE_SUITESPARSE_${_component}=1)
     endforeach(_component)
   endif()
+
+  include(AddSuiteSparseFlags)
 endif()
 
 
