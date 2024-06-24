@@ -610,8 +610,8 @@ function(dune_parse_module_config_file module)
   set(HAVE_${upper} ${${module}_FOUND} PARENT_SCOPE)
   set(${module}_CONFIG_HH
 "
-#ifndef ${upper}_CONFIG_HH
-#define ${upper}_CONFIG_HH
+#ifndef ${upper}_CONFIG_HH_GENERATAED
+#define ${upper}_CONFIG_HH_GENERATAED
 
 /* Define to 1 if you have module ${module} available */
 #ifndef HAVE_${upper}
@@ -622,20 +622,20 @@ ${_config}
 
 ${_headers}
 
-#endif // ${upper}_CONFIG_HH
+#endif // ${upper}_CONFIG_HH_GENERATAED
 " PARENT_SCOPE)
 
   # resolve private header part
   set(${module}_CONFIG_PRIVATE_HH
 "
-#ifndef ${upper}_CONFIG_PRIVATE_HH
-#define ${upper}_CONFIG_PRIVATE_HH
+#ifndef ${upper}_CONFIG_PRIVATE_HH_GENERATAED
+#define ${upper}_CONFIG_PRIVATE_HH_GENERATAED
 
 ${_config_private}
 
 #include <${module}-config.hh>
 
-#endif // ${upper}_CONFIG_PRIVATE_HH
+#endif // ${upper}_CONFIG_PRIVATE_HH_GENERATAED
 " PARENT_SCOPE)
 
   # resolve bottom header part
@@ -643,12 +643,12 @@ ${_config_private}
   # merged into one, with dependency headers in between
   set(${module}_CONFIG_BOTTOM_HH
 "
-#ifndef ${upper}_CONFIG_BOTTOM_HH
-#define ${upper}_CONFIG_BOTTOM_HH
+#ifndef ${upper}_CONFIG_BOTTOM_HH_GENERATAED
+#define ${upper}_CONFIG_BOTTOM_HH_GENERATAED
 
 ${_config_bottom}
 
-#endif // ${upper}_CONFIG_BOTTOM_HH
+#endif // ${upper}_CONFIG_BOTTOM_HH_GENERATAED
 " PARENT_SCOPE)
 endfunction()
 
