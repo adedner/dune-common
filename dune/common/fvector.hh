@@ -9,22 +9,20 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdlib>
-#include <complex>
 #include <cstring>
+#include <stdexcept>
 #include <type_traits>
 #include <utility>
 #include <initializer_list>
 #include <algorithm>
 
-#include "typetraits.hh"
-#include "exceptions.hh"
-
-#include "ftraits.hh"
-#include "densevector.hh"
-#include "boundschecking.hh"
-
+#include <dune/common/boundschecking.hh>
+#include <dune/common/densevector.hh>
+#include <dune/common/ftraits.hh>
 #include <dune/common/math.hh>
 #include <dune/common/promotiontraits.hh>
+#include <dune/common/typetraits.hh>
+#include <dune/common/typeutilities.hh>
 
 namespace Dune {
 
@@ -110,103 +108,161 @@ namespace Dune {
     typedef const value_type& const_reference;
 
     //! Constructor making default-initialized vector
-    constexpr FieldVector()
-      : _data{{}}
+    constexpr FieldVector () noexcept
+      : _data{}
     {}
 
     //! Constructor making vector with identical coordinates
-    explicit FieldVector (const K& t)
+    template <int S = SIZE,
+      std::enable_if_t<(S != 1), int> = 0>
+    explicit constexpr FieldVector (const K& k)
+        noexcept(std::is_nothrow_copy_assignable_v<K>)
     {
-      std::fill(_data.begin(),_data.end(),t);
+      for (auto& d : _data)
+        d = k;
     }
 
-    //! Copy constructor
-    FieldVector (const FieldVector&) = default;
+    //! Constructor with a given scalar
+    template <class T, int S = SIZE,
+      std::enable_if_t<(S == 1), int> = 0,
+      std::enable_if_t<std::is_constructible_v<K, T>, int> = 0>
+    /* implicit */ constexpr FieldVector (const T& t)
+        noexcept(std::is_nothrow_constructible_v<K, T>)
+      : _data{K(t)}
+    {}
 
-    /** \brief Construct from a std::initializer_list */
-    constexpr FieldVector (std::initializer_list<K> const &l)
+    //! Construct from a std::initializer_list
+    constexpr FieldVector (const std::initializer_list<K>& l)
       : _data{}
     {
-      assert(l.size() == dimension);// Actually, this is not needed any more!
-      for(std::size_t i=0; i<std::min(static_cast<std::size_t>(dimension), l.size()); ++i)
+      assert(l.size() == dimension);
+      for (int i = 0; i < SIZE; ++i)
         _data[i] = std::data(l)[i];
     }
 
-    //! copy assignment operator
-    FieldVector& operator= (const FieldVector&) = default;
-
-    template <typename T>
-    FieldVector& operator= (const FieldVector<T, SIZE>& x)
+    //! Constructor from another dense vector
+    template<class T,
+      std::enable_if_t<IsFieldVectorSizeCorrect<T,SIZE>::value, int> = 0,
+      decltype(std::declval<K&>() = std::declval<const T&>()[0], bool{}) = true>
+    FieldVector (const DenseVector<T>& x)
     {
-      std::copy_n(x.begin(), SIZE, _data.begin());
+      assert(x.size() == SIZE);
+      for (int i = 0; i < SIZE; ++i)
+        _data[i] = x[i];
+    }
+
+    //! Converting constructor from FieldVector with different element type
+    template<class T,
+      std::enable_if_t<std::is_assignable_v<K&, const T&>, int> = 0>
+    explicit constexpr FieldVector (const FieldVector<T, SIZE>& x)
+        noexcept(std::is_nothrow_assignable_v<K&, const T&>)
+    {
+      for (int i = 0; i < SIZE; ++i)
+        _data[i] = x[i];
+    }
+
+    //! Converting constructor with FieldVector of different size (deleted)
+    template<class K1, int SIZE1,
+      std::enable_if_t<(SIZE1 != SIZE), int> = 0>
+    FieldVector (const FieldVector<K1, SIZE1>&) = delete;
+
+    //! Copy constructor with default behavior
+    constexpr FieldVector (const FieldVector&) = default;
+
+
+    //! Assignment from another dense vector
+    template<class T,
+      std::enable_if_t<IsFieldVectorSizeCorrect<T,SIZE>::value, int> = 0,
+      decltype(std::declval<K&>() = std::declval<const T&>()[0], bool{}) = true>
+    FieldVector& operator= (const DenseVector<T>& x)
+    {
+      assert(x.size() == SIZE);
+      for (int i = 0; i < SIZE; ++i)
+        _data[i] = x[i];
       return *this;
     }
 
-    template<typename T, int N>
-    FieldVector& operator=(const FieldVector<T, N>&) = delete;
-
-    /**
-     * \brief Copy constructor from a second vector of possibly different type
-     *
-     * If the DenseVector type of the this constructor's argument
-     * is implemented by a FieldVector, it is statically checked
-     * if it has the correct size. If this is not the case
-     * the constructor is removed from the overload set using SFINAE.
-     *
-     * \param[in]  x  A DenseVector with correct size.
-     * \param[in]  dummy  A void* dummy argument needed by SFINAE.
-     */
-    template<class C>
-    FieldVector (const DenseVector<C> & x,
-                 [[maybe_unused]] typename std::enable_if<IsFieldVectorSizeCorrect<C,SIZE>::value>::type* dummy=0)
+    //! Assignment operator from scalar
+    template<class T, int S = SIZE,
+      std::enable_if_t<(S == 1), int> = 0,
+      std::enable_if_t<std::is_assignable_v<K&, const T&>, int> = 0>
+    constexpr FieldVector& operator= (const T& t)
+        noexcept(std::is_nothrow_assignable_v<K&, const T&>)
     {
-      // do a run-time size check, for the case that x is not a FieldVector
-      assert(x.size() == SIZE); // Actually this is not needed any more!
-      std::copy_n(x.begin(), std::min(static_cast<std::size_t>(SIZE),x.size()), _data.begin());
+      for (int i = 0; i < SIZE; ++i)
+        _data[i] = t;
+      return *this;
     }
 
-    //! Constructor making vector with identical coordinates
-    template<class K1>
-    explicit FieldVector (const FieldVector<K1,SIZE> & x)
+    //! Converting assignment operator from FieldVector with different element type
+    template<class T,
+      std::enable_if_t<std::is_assignable_v<K&, const T&>, int> = 0>
+    FieldVector& operator= (const FieldVector<T, SIZE>& x)
+        noexcept(std::is_nothrow_assignable_v<K&, const T&>)
     {
-      std::copy_n(x.begin(), SIZE, _data.begin());
+      for (int i = 0; i < SIZE; ++i)
+        _data[i] = x[i];
+      return *this;
     }
 
-    template<typename T, int N>
-    explicit FieldVector(const FieldVector<T, N>&) = delete;
+    //! Converting assignment operator with FieldVector of different size (deleted)
+    template<class K1, int SIZE1,
+      std::enable_if_t<(SIZE1 != SIZE), int> = 0>
+    FieldVector& operator= (const FieldVector<K1, SIZE1>&) = delete;
+
+    //! Copy assignment operator with default behavior
+    constexpr FieldVector& operator= (const FieldVector&) = default;
 
     using Base::operator=;
 
-    // make this thing a vector
-    static constexpr size_type size () { return SIZE; }
 
-    K & operator[](size_type i) {
+    //! Obtain the number of elements stored in the vector
+    static constexpr size_type size () noexcept { return SIZE; }
+
+
+    //! Return a reference to the `i`th element
+    reference operator[] (size_type i)
+    {
       DUNE_ASSERT_BOUNDS(i < SIZE);
       return _data[i];
     }
-    const K & operator[](size_type i) const {
+
+    //! Return a (const) reference to the `i`th element
+    const_reference operator[] (size_type i) const
+    {
       DUNE_ASSERT_BOUNDS(i < SIZE);
       return _data[i];
     }
 
-    //! return pointer to underlying array
-    K* data() noexcept
+    //! Return pointer to underlying array
+    constexpr K* data () noexcept
     {
       return _data.data();
     }
 
-    //! return pointer to underlying array
-    const K* data() const noexcept
+    //! Return pointer to underlying array
+    constexpr const K* data () const noexcept
     {
       return _data.data();
     }
 
-    //! vector space multiplication with scalar
-    template <class Scalar,
-              std::enable_if_t<IsNumber<Scalar>::value, int> = 0>
-    friend auto operator* ( const FieldVector& vector, Scalar scalar)
+    //! Conversion operator
+    constexpr operator std::conditional_t<(SIZE==1),const_reference,void> () const noexcept(SIZE == 1)
+      /* requires(SIZE == 1) */
     {
-      FieldVector<typename PromotionTraits<value_type,Scalar>::PromotedType,SIZE> result;
+      if constexpr(SIZE == 1)
+        return _data[0];
+      else
+        return;
+    }
+
+    //! Vector space multiplication with scalar
+    template<class Scalar,
+      std::enable_if_t<IsNumber<Scalar>::value, int> = 0>
+    friend constexpr auto operator* (const FieldVector& vector, Scalar scalar)
+    {
+      using T = typename PromotionTraits<value_type,Scalar>::PromotedType;
+      FieldVector<T,SIZE> result;
 
       for (size_type i = 0; i < vector.size(); ++i)
         result[i] = vector[i] * scalar;
@@ -214,12 +270,13 @@ namespace Dune {
       return result;
     }
 
-    //! vector space multiplication with scalar
-    template <class Scalar,
-              std::enable_if_t<IsNumber<Scalar>::value, int> = 0>
-    friend auto operator* ( Scalar scalar, const FieldVector& vector)
+    //! Vector space multiplication with scalar
+    template<class Scalar,
+      std::enable_if_t<IsNumber<Scalar>::value, int> = 0>
+    friend constexpr auto operator* (Scalar scalar, const FieldVector& vector)
     {
-      FieldVector<typename PromotionTraits<value_type,Scalar>::PromotedType,SIZE> result;
+      using T = typename PromotionTraits<value_type,Scalar>::PromotedType;
+      FieldVector<T,SIZE> result;
 
       for (size_type i = 0; i < vector.size(); ++i)
         result[i] = scalar * vector[i];
@@ -227,12 +284,13 @@ namespace Dune {
       return result;
     }
 
-    //! vector space division by scalar
+    //! Vector space division by scalar
     template <class Scalar,
-              std::enable_if_t<IsNumber<Scalar>::value, int> = 0>
-    friend auto operator/ ( const FieldVector& vector, Scalar scalar)
+      std::enable_if_t<IsNumber<Scalar>::value, int> = 0>
+    friend constexpr auto operator/ (const FieldVector& vector, Scalar scalar)
     {
-      FieldVector<typename PromotionTraits<value_type,Scalar>::PromotedType,SIZE> result;
+      using T = typename PromotionTraits<value_type,Scalar>::PromotedType;
+      FieldVector<T,SIZE> result;
 
       for (size_type i = 0; i < vector.size(); ++i)
         result[i] = vector[i] / scalar;
@@ -254,158 +312,17 @@ namespace Dune {
    *  \returns the input stream (in)
    */
   template<class K, int SIZE>
-  inline std::istream &operator>> ( std::istream &in,
-                                    FieldVector<K, SIZE> &v )
+  std::istream& operator>> (std::istream& in, FieldVector<K, SIZE>& v)
   {
     FieldVector<K, SIZE> w;
-    for( typename FieldVector<K, SIZE>::size_type i = 0; i < SIZE; ++i )
-      in >> w[ i ];
-    if(in)
+    for (int i = 0; i < SIZE; ++i)
+      in >> w[i];
+    if (in)
       v = w;
     return in;
   }
 
 #ifndef DOXYGEN
-  template< class K >
-  struct DenseMatVecTraits< FieldVector<K,1> >
-  {
-    typedef FieldVector<K,1> derived_type;
-    typedef K container_type;
-    typedef K value_type;
-    typedef size_t size_type;
-  };
-
-  /** \brief Vectors containing only one component
-   */
-  template<class K>
-  class FieldVector<K, 1> :
-    public DenseVector< FieldVector<K,1> >
-  {
-    K _data;
-    typedef DenseVector< FieldVector<K,1> > Base;
-  public:
-    //! The size of this vector.
-    constexpr static int dimension = 1;
-
-    typedef typename Base::size_type size_type;
-
-    /** \brief The type used for references to the vector entry */
-    typedef K& reference;
-
-    /** \brief The type used for const references to the vector entry */
-    typedef const K& const_reference;
-
-    //===== construction
-
-    /** \brief Default constructor */
-    constexpr FieldVector () noexcept
-      : _data()
-    {}
-
-    /** \brief Constructor with a given scalar */
-    template<class T,
-      std::enable_if_t<std::is_constructible_v<K,T>, int> = 0>
-    constexpr FieldVector (const T& k) noexcept
-      : _data(k)
-    {}
-
-    /** \brief Construct from a std::initializer_list */
-    constexpr FieldVector (const std::initializer_list<K>& l)
-    {
-      assert(l.size() == 1);
-      _data = *l.begin();
-    }
-
-    //! Constructor from static vector of different type
-    template<class T,
-      std::enable_if_t<std::is_constructible_v<K,T>, int> = 0>
-    constexpr FieldVector (const FieldVector<T,1>& x) noexcept
-      : _data(x[0])
-    {}
-
-    //! Constructor from other dense vector
-    template<class T,
-      std::enable_if_t<IsFieldVectorSizeCorrect<T,1>::value, int> = 0,
-      decltype(std::declval<K&>() = std::declval<const T&>()[0], bool{}) = true>
-    FieldVector (const DenseVector<T>& x)
-    {
-      assert(x.size() == 1);
-      _data = x[0];
-    }
-
-    //! copy constructor
-    constexpr FieldVector (const FieldVector&) = default;
-
-    //! copy assignment operator
-    constexpr FieldVector& operator= (const FieldVector&) = default;
-
-    //! assignment from static vector of different type
-    template<class T,
-      decltype(std::declval<K&>() = std::declval<const T&>(), bool{}) = true>
-    constexpr FieldVector& operator= (const FieldVector<T,1>& other) noexcept
-    {
-      _data = other[0];
-      return *this;
-    }
-
-    //! assignment from other dense vector
-    template<class T,
-      std::enable_if_t<IsFieldVectorSizeCorrect<T,1>::value, int> = 0,
-      decltype(std::declval<K&>() = std::declval<const T&>()[0], bool{}) = true>
-    FieldVector& operator= (const DenseVector<T>& other)
-    {
-      assert(other.size() == 1);
-      _data = other[0];
-      return *this;
-    }
-
-    //! Assignment operator for scalar
-    template<class T,
-      decltype(std::declval<K&>() = std::declval<const T&>(), bool{}) = true>
-    constexpr FieldVector& operator= (const T& k) noexcept
-    {
-      _data = k;
-      return *this;
-    }
-
-    //===== forward methods to container
-    static constexpr size_type size () noexcept { return 1; }
-
-    reference operator[] ([[maybe_unused]] size_type i)
-    {
-      DUNE_ASSERT_BOUNDS(i == 0);
-      return _data;
-    }
-    const_reference operator[] ([[maybe_unused]] size_type i) const
-    {
-      DUNE_ASSERT_BOUNDS(i == 0);
-      return _data;
-    }
-
-    //! return pointer to underlying array
-    constexpr K* data () noexcept
-    {
-      return &_data;
-    }
-
-    //! return pointer to underlying array
-    constexpr const K* data () const noexcept
-    {
-      return &_data;
-    }
-
-    //===== conversion operator
-
-    /** \brief Conversion operator */
-    constexpr operator reference () noexcept { return _data; }
-
-    /** \brief Const conversion operator */
-    constexpr operator const_reference () const noexcept { return _data; }
-  };
-
-  /* ----- FV / FV ----- */
-  /* mostly not necessary as these operations are already covered via the cast operator */
-
   //! Binary compare, when using FieldVector<K,1> like K
   template<class K>
   constexpr bool operator> (const FieldVector<K,1>& a, const FieldVector<K,1>& b) noexcept
@@ -448,20 +365,6 @@ namespace Dune {
   constexpr FieldVector<K,1> operator- (const FieldVector<K,1>& a, const K b) noexcept
   {
     return a[0]-b;
-  }
-
-  //! Binary multiplication, when using FieldVector<K,1> like K
-  template<class K>
-  constexpr FieldVector<K,1> operator* (const FieldVector<K,1>& a, const K b) noexcept
-  {
-    return a[0]*b;
-  }
-
-  //! Binary division, when using FieldVector<K,1> like K
-  template<class K>
-  constexpr FieldVector<K,1> operator/ (const FieldVector<K,1>& a, const K b) noexcept
-  {
-    return a[0]/b;
   }
 
   //! Binary compare, when using FieldVector<K,1> like K
@@ -520,13 +423,6 @@ namespace Dune {
   constexpr FieldVector<K,1> operator- (const K a, const FieldVector<K,1>& b) noexcept
   {
     return a-b[0];
-  }
-
-  //! Binary multiplication, when using FieldVector<K,1> like K
-  template<class K>
-  constexpr FieldVector<K,1> operator* (const K a, const FieldVector<K,1>& b) noexcept
-  {
-    return a*b[0];
   }
 
   //! Binary division, when using FieldVector<K,1> like K
@@ -624,4 +520,4 @@ namespace Dune {
 
 } // end namespace
 
-#endif
+#endif // DUNE_FVECTOR_HH
