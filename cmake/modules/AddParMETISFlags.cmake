@@ -18,7 +18,7 @@ include_guard(GLOBAL)
 set(HAVE_PARMETIS ${ParMETIS_FOUND})
 
 # register all ParMETIS related flags
-if(TARGET ParMETIS::ParMETIS)
+if(TARGET Dune::Imported::ParMETIS)
   dune_register_package_flags(LIBRARIES Dune::Imported::ParMETIS)
 endif()
 
