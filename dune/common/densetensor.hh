@@ -11,14 +11,16 @@
 #include <type_traits>
 #include <utility>
 
-#include <dune/common/indexediterator.hh>
 #include <dune/common/indices.hh>
 #include <dune/common/initializerlist.hh>
+#include <dune/common/iteratorfacades.hh>
 #include <dune/common/rangeutilities.hh>
 #include <dune/common/tensorspan.hh>
 #include <dune/common/std/default_accessor.hh>
 #include <dune/common/std/extents.hh>
+#include <dune/common/std/layout_left.hh>
 #include <dune/common/std/layout_right.hh>
+#include <dune/common/std/layout_stride.hh>
 #include <dune/common/std/type_traits.hh>
 
 namespace Dune {
@@ -317,15 +319,14 @@ private:
 
 namespace Impl {
 
-template <class L, class B, class S>
+template <class B, class S>
 class SubTensorAccessImpl;
 
-// specialization for rank=1
-template <class L, class B, std::size_t i0>
-class SubTensorAccessImpl<L, B, std::index_sequence<i0>>
+// specialization for rank == 1
+template <class B, std::size_t i0>
+class SubTensorAccessImpl<B, std::index_sequence<i0>>
 {
 public:
-  using layout_type = L;
   using base_type = B;
   using index_type = typename base_type::index_type;
 
@@ -344,8 +345,9 @@ private:
   base_type* base_ = nullptr;
 };
 
+// specialization for rank >= 2
 template <class B, std::size_t i0, std::size_t i1, std::size_t... ii>
-class SubTensorAccessImpl<Std::layout_right, B, std::index_sequence<i0,i1,ii...>>
+class SubTensorAccessImpl<B, std::index_sequence<i0,i1,ii...>>
 {
 private:
   template <class D>
@@ -355,9 +357,10 @@ private:
   using HasAccessorAndDataHandle = decltype(std::declval<D>().accessor(), std::declval<D>().data_handle());
 
 public:
-  using layout_type = Std::layout_right;
   using base_type = B;
   using extents_type = typename base_type::extents_type;
+  using layout_type = typename base_type::layout_type;
+  using mapping_type = typename base_type::mapping_type;
   using index_type = typename base_type::index_type;
 
 public:
@@ -366,24 +369,40 @@ public:
     : base_(base)
   {}
 
-  constexpr decltype(auto) operator() (index_type index) const
+  static constexpr auto extents (const extents_type& originalExtents)
+  {
+    using E = Std::extents<index_type, extents_type::static_extent(i1),extents_type::static_extent(ii)...>;
+    return E{originalExtents.extent(i1),originalExtents.extent(ii)...};
+  }
+
+  static constexpr auto mapping (Std::layout_right, const mapping_type& originalMapping)
+  {
+    return Std::layout_right::mapping{extents(originalMapping.extents())};
+  }
+
+  static constexpr auto mapping (Std::layout_left, const mapping_type& originalMapping)
+  {
+    return Std::layout_stride::mapping{extents(originalMapping.extents()),
+      std::array{originalMapping.stride(i1), originalMapping.stride(ii)...} };
+  }
+
+  static constexpr index_type offset (const mapping_type& originalMapping, index_type index)
+  {
+    return originalMapping(index, 0, (void(ii),0)...);
+  }
+
+  constexpr auto operator() (index_type index) const
   {
     assert(0 <= index && index < base_->extent(0));
-    using E = Std::extents<index_type, extents_type::static_extent(i1),extents_type::static_extent(ii)...>;
+    auto m = mapping(layout_type{}, base_->mapping());
     if constexpr (Std::is_detected_v<HasContainerData,B>) {
-      using T = typename base_type::value_type;
-      using A = Std::default_accessor<T>;
-      using V = std::conditional_t<std::is_const_v<std::remove_reference_t<B>>, const T, T>;
-      return TensorSpan<V,E,layout_type,A>(
-        base_->container_data() + base_->mapping().stride(0)*index,
-        base_->extent(i1),base_->extent(ii)...);
+      auto* data_handle = base_->container_data() + offset(base_->mapping(),index);
+      return TensorSpan{data_handle, std::move(m)};
     }
     else if constexpr (Std::is_detected_v<HasAccessorAndDataHandle,B>) {
-      using A = typename std::decay_t<decltype(base_->accessor())>::offset_policy;
-      using V = typename A::element_type;
-      return TensorSpan<V,E,layout_type,A>(
-        base_->accessor().offset(base_->data_handle(), base_->mapping().stride(0)*index),
-        base_->extent(i1),base_->extent(ii)...);
+      auto data_handle = base_->accessor().offset(base_->data_handle(), offset(base_->mapping(),index));
+      using accessor_type = typename base_type::accessor_type::offset_policy;
+      return TensorSpan{data_handle, std::move(m), accessor_type{}};
     }
     else {
       throw std::runtime_error("NotImplemented: Tensor must be derived from mdarray or mdspan.");
@@ -397,10 +416,10 @@ private:
 
 template <class B>
 class SubTensorAccess
-    : public SubTensorAccessImpl<typename B::layout_type, B, std::make_index_sequence<B::rank()>>
+    : public SubTensorAccessImpl<B, std::make_index_sequence<B::rank()>>
 {
   using self_type = SubTensorAccess;
-  using base_type = SubTensorAccessImpl<typename B::layout_type, B, std::make_index_sequence<B::rank()>>;
+  using base_type = SubTensorAccessImpl<B, std::make_index_sequence<B::rank()>>;
 
 public:
   using base_type::base_type;
