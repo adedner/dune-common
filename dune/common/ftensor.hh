@@ -53,6 +53,32 @@ public:
   {}
 
   /// @}
+
+
+  /// \name Multi index access
+  /// @{
+
+  /**
+   * \brief Subscript operator to access the tensor components using an array of indices.
+   * \b Examples:
+   * \code{c++}
+     FieldTensor<double,3,3> matrix;
+     matrix[std::array{0,1}] = 7.0;
+     \endcode
+   **/
+  using base_type::operator[];
+
+  /**
+   * \brief Access an element of the tensor using a variadic list of indices.
+   * \b Examples:
+   * \code{c++}
+     FieldTensor<double,3,3,3> tensor;
+     tensor(0,1,2) = 42.0;
+     \endcode
+   **/
+  using base_type::operator();
+
+  /// @}
 };
 
 template <class V, int... exts>

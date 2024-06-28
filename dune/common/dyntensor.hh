@@ -49,6 +49,33 @@ public:
   /// \brief Inherit the constructors from DenseTensor
   using base_type::base_type;
 
+
+  /// \name Multi index access
+  /// @{
+
+  /**
+   * \brief Subscript operator to access the tensor components using an array of indices.
+   * \b Examples:
+   * \code{c++}
+     DynamicTensor<double,2> matrix(3,3);
+     matrix[std::array{0,1}] = 7.0;
+     \endcode
+   **/
+  using base_type::operator[];
+
+  /**
+   * \brief Access an element of the tensor using a variadic list of indices.
+   * \b Examples:
+   * \code{c++}
+     DynamicTensor<double,3> tensor(4,4,4);
+     tensor(0,1,2) = 42.0;
+     \endcode
+   **/
+  using base_type::operator();
+
+  /// @}
+
+
   /// \name Modifiers
   /// @{
 

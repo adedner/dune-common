@@ -104,40 +104,6 @@ public:
   {}
 
   /// @}
-
-
-  /// \name Multi index access
-  /// @{
-
-  /**
-   * \brief Nested subscript operator to access either a subdimension or an element.
-   *
-   * The bracket operator can be nested to successively access more dimensions.
-   * Each subscript operator returns an mdspan over the sub-tensor with fixed
-   * first index.
-   *
-   * \b Examples:
-   * \code{c++}
-     StaticTensor<double,3,3> matrix;
-     auto row = matrix[0]; // 0th row
-     row[1] = 56;          // the row is an mdspan
-     matrix[0][1] = 42;    // element at (0,1)
-     matrix[0,1] = 7.0;    // only with c++23
-     \endcode
-   **/
-  using base_type::operator[];
-
-  /**
-   * \brief Access an element of the tensor using a variadic list of indices.
-   * \b Examples:
-   * \code{c++}
-     StaticTensor<double,3,3,3> tensor;
-     tensor(0,1,2) = 42.0;
-     \endcode
-   **/
-  using base_type::operator();
-
-  /// @}
 };
 
 // deduction guides
