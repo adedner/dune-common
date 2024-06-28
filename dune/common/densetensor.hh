@@ -174,9 +174,9 @@ public:
    *
    * This returns either a reference to the `index`th element if rank == 1,
    * otherwise it returns a sub-Tensorspace with fixed first index.
-   *
-   * \throws std::domain_error if rank is zero.
    */
+  template <class E = extents_type,
+    std::enable_if_t<(E::rank() > 0), int> = 0>
   constexpr decltype(auto) operator[] (index_type index) noexcept
   {
     return SubTensorAccess{&asBase()}(index);
@@ -187,9 +187,9 @@ public:
    *
    * This returns either a const_reference to the `index`th element if rank == 1,
    * otherwise it returns a sub-Tensorspace with fixed first index.
-   *
-   * \throws std::domain_error if rank is zero.
    */
+  template <class E = extents_type,
+    std::enable_if_t<(E::rank() > 0), int> = 0>
   constexpr decltype(auto) operator[] (index_type index) const noexcept
   {
     return ConstSubTensorAccess{&asBase()}(index);
@@ -200,8 +200,7 @@ public:
     std::enable_if_t<std::is_convertible_v<const Index&, index_type>, int> = 0>
   constexpr reference operator[] (const std::array<Index,extents_type::rank()>& indices)
   {
-    return std::apply([&](auto... ii) -> reference {
-      return base_type::operator[](indices); }, indices);
+    return base_type::operator[](indices);
   }
 
   /// \brief Access element at position [{i0,i1,...}]
@@ -209,8 +208,7 @@ public:
     std::enable_if_t<std::is_convertible_v<const Index&, index_type>, int> = 0>
   constexpr const_reference operator[] (const std::array<Index,extents_type::rank()>& indices) const
   {
-    return std::apply([&](auto... ii) -> const_reference {
-      return base_type::operator[](indices); }, indices);
+    return base_type::operator[](indices);
   }
 
   /**
