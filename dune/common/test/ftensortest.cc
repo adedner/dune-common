@@ -162,6 +162,7 @@ void checkAccess(Dune::TestSuite& testSuite)
     for (std::size_t i = 0; i < Tensor::static_extent(0); ++i) {
       subTestSuite.check(tensor[std::array{i}] == 42.0);
       subTestSuite.check(tensor(i) == 42.0);
+      subTestSuite.check(tensor[i] == 42.0);
       subTestSuite.check(tensor.at(i) == 42.0);
     }
     subTestSuite.checkThrow<std::out_of_range>([&]{tensor.at(-1);});
@@ -172,6 +173,7 @@ void checkAccess(Dune::TestSuite& testSuite)
       for (std::size_t j = 0; j < Tensor::static_extent(1); ++j) {
         subTestSuite.check(tensor[std::array{i,j}] == 42.0);
         subTestSuite.check(tensor(i,j) == 42.0);
+        subTestSuite.check(tensor[i][j] == 42.0);
         subTestSuite.check(tensor.at(i,j) == 42.0);
       }
       subTestSuite.checkThrow<std::out_of_range>([&]{tensor.at(-1,-2);});
@@ -184,6 +186,7 @@ void checkAccess(Dune::TestSuite& testSuite)
         for (std::size_t k = 0; k < Tensor::static_extent(2); ++k) {
           subTestSuite.check(tensor[std::array{i,j,k}] == 42.0);
           subTestSuite.check(tensor(i,j,k) == 42.0);
+          subTestSuite.check(tensor[i][j][k] == 42.0);
           subTestSuite.check(tensor.at(i,j,k) == 42.0);
         }
         subTestSuite.checkThrow<std::out_of_range>([&]{tensor.at(-1,-2,-3);});
@@ -253,6 +256,15 @@ int main(int argc, char** argv)
   checkArithmetic<Tensor1>(testSuite);
   checkArithmetic<Tensor2>(testSuite);
   checkArithmetic<Tensor3>(testSuite);
+
+  Tensor3 A{1.0};
+  double sumA = 0.0;
+  for (auto&& [Ai,i] : sparseRange(A))
+    for (auto&& [Aij,j] : sparseRange(Ai))
+      for (auto&& [Aijk,k] : sparseRange(Aij))
+        sumA += Aijk;
+
+  testSuite.check(sumA == A.extent(0)*A.extent(1)*A.extent(2));
 
   return testSuite.exit();
 }

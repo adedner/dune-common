@@ -13,9 +13,27 @@
 
 #include <dune/common/indices.hh>
 #include <dune/common/initializerlist.hh>
+#include <dune/common/iteratorfacades.hh>
+#include <dune/common/rangeutilities.hh>
+#include <dune/common/tensorspan.hh>
+#include <dune/common/std/default_accessor.hh>
+#include <dune/common/std/extents.hh>
+#include <dune/common/std/layout_left.hh>
+#include <dune/common/std/layout_right.hh>
+#include <dune/common/std/layout_stride.hh>
 #include <dune/common/std/type_traits.hh>
 
 namespace Dune {
+namespace Impl {
+
+template <class B>
+class SubTensorAccess;
+
+template <class A>
+class DenseTensorIterator;
+
+} // end namespace Impl
+
 
 /**
  * \brief A tensor interface-class providing common functionality.
@@ -53,6 +71,14 @@ public:
   using mapping_type = typename base_type::mapping_type;
   using reference = typename base_type::reference;
   using const_reference = Std::detected_or_t<reference,const_reference_t,base_type>;
+
+private:
+  using SubTensorAccess = Impl::SubTensorAccess<base_type>;
+  using ConstSubTensorAccess = Impl::SubTensorAccess<const base_type>;
+
+public:
+  using iterator = Impl::DenseTensorIterator<SubTensorAccess>;
+  using const_iterator = Impl::DenseTensorIterator<ConstSubTensorAccess>;
 
 public:
   /// Derive constructors from base class
@@ -143,6 +169,32 @@ public:
     return base_type::operator[](std::array<index_type,extents_type::rank()>{index_type(indices)...});
   }
 
+  /**
+   * \brief Access specified element or sub-tensor at position [i0] with mutable access.
+   *
+   * This returns either a reference to the `index`th element if rank == 1,
+   * otherwise it returns a sub-Tensorspace with fixed first index.
+   */
+  template <class E = extents_type,
+    std::enable_if_t<(E::rank() > 0), int> = 0>
+  constexpr decltype(auto) operator[] (index_type index) noexcept
+  {
+    return SubTensorAccess{&asBase()}(index);
+  }
+
+  /**
+   * \brief Access specified element or sub-tensor at position [i0] with const access.
+   *
+   * This returns either a const_reference to the `index`th element if rank == 1,
+   * otherwise it returns a sub-Tensorspace with fixed first index.
+   */
+  template <class E = extents_type,
+    std::enable_if_t<(E::rank() > 0), int> = 0>
+  constexpr decltype(auto) operator[] (index_type index) const noexcept
+  {
+    return ConstSubTensorAccess{&asBase()}(index);
+  }
+
   /// \brief Access element at position [{i0,i1,...}]
   template <class Index,
     std::enable_if_t<std::is_convertible_v<const Index&, index_type>, int> = 0>
@@ -192,6 +244,20 @@ public:
   {
     return asBase().extent(1);
   }
+
+  /// @}
+
+
+  /// \name Iterators
+  /// @{
+
+  constexpr iterator begin () noexcept { return iterator(0, &asBase()); }
+  constexpr const_iterator begin () const noexcept { return const_iterator(0, &asBase()); }
+  constexpr const_iterator cbegin () const noexcept { return const_iterator(0, &asBase()); }
+
+  constexpr iterator end () noexcept { return iterator(asBase().extent(0), &asBase()); }
+  constexpr const_iterator end () const noexcept { return const_iterator(asBase().extent(0), &asBase()); }
+  constexpr const_iterator cend () const noexcept { return const_iterator(asBase().extent(0), &asBase()); }
 
   /// @}
 
@@ -248,6 +314,167 @@ private:
     return static_cast<base_type&>(*this);
   }
 };
+
+namespace Impl {
+
+template <class B, class S>
+class SubTensorAccessImpl;
+
+// specialization for rank == 1
+template <class B, std::size_t i0>
+class SubTensorAccessImpl<B, std::index_sequence<i0>>
+{
+public:
+  using base_type = B;
+  using index_type = typename base_type::index_type;
+
+public:
+  constexpr SubTensorAccessImpl () = default;
+  constexpr SubTensorAccessImpl (base_type* base) noexcept
+    : base_(base)
+  {}
+
+  constexpr decltype(auto) operator() (index_type index) const
+  {
+    return (*base_)[index];
+  }
+
+private:
+  base_type* base_ = nullptr;
+};
+
+// specialization for rank >= 2
+template <class B, std::size_t i0, std::size_t i1, std::size_t... ii>
+class SubTensorAccessImpl<B, std::index_sequence<i0,i1,ii...>>
+{
+private:
+  template <class D>
+  using HasContainerData = decltype(std::declval<D>().container_data());
+
+  template <class D>
+  using HasAccessorAndDataHandle = decltype(std::declval<D>().accessor(), std::declval<D>().data_handle());
+
+public:
+  using base_type = B;
+  using extents_type = typename base_type::extents_type;
+  using layout_type = typename base_type::layout_type;
+  using mapping_type = typename base_type::mapping_type;
+  using index_type = typename base_type::index_type;
+
+public:
+  constexpr SubTensorAccessImpl () = default;
+  constexpr SubTensorAccessImpl (base_type* base) noexcept
+    : base_(base)
+  {}
+
+  static constexpr auto extents (const extents_type& originalExtents)
+  {
+    using E = Std::extents<index_type, extents_type::static_extent(i1),extents_type::static_extent(ii)...>;
+    return E{originalExtents.extent(i1),originalExtents.extent(ii)...};
+  }
+
+  static constexpr auto mapping (Std::layout_right, const mapping_type& originalMapping)
+  {
+    return Std::layout_right::mapping{extents(originalMapping.extents())};
+  }
+
+  static constexpr auto mapping (Std::layout_left, const mapping_type& originalMapping)
+  {
+    return Std::layout_stride::mapping{extents(originalMapping.extents()),
+      std::array{originalMapping.stride(i1), originalMapping.stride(ii)...} };
+  }
+
+  static constexpr index_type offset (const mapping_type& originalMapping, index_type index)
+  {
+    return originalMapping(index, 0, (void(ii),0)...);
+  }
+
+  constexpr auto operator() (index_type index) const
+  {
+    assert(0 <= index && index < base_->extent(0));
+    auto m = mapping(layout_type{}, base_->mapping());
+    if constexpr (Std::is_detected_v<HasContainerData,B>) {
+      auto* data_handle = base_->container_data() + offset(base_->mapping(),index);
+      return TensorSpan{data_handle, std::move(m)};
+    }
+    else if constexpr (Std::is_detected_v<HasAccessorAndDataHandle,B>) {
+      auto data_handle = base_->accessor().offset(base_->data_handle(), offset(base_->mapping(),index));
+      using accessor_type = typename base_type::accessor_type::offset_policy;
+      return TensorSpan{data_handle, std::move(m), accessor_type{}};
+    }
+    else {
+      throw std::runtime_error("NotImplemented: Tensor must be derived from mdarray or mdspan.");
+      return 0;
+    }
+  }
+
+private:
+  base_type* base_ = nullptr;
+};
+
+template <class B>
+class SubTensorAccess
+    : public SubTensorAccessImpl<B, std::make_index_sequence<B::rank()>>
+{
+  using self_type = SubTensorAccess;
+  using base_type = SubTensorAccessImpl<B, std::make_index_sequence<B::rank()>>;
+
+public:
+  using base_type::base_type;
+  using base_type::operator();
+};
+
+
+template <class A>
+struct DenseTensorIteratorTraits
+{
+  using accessor_type = A;
+  using index_type = typename A::index_type;
+  using reference = decltype(std::declval<accessor_type>()(std::declval<index_type>()));
+  using value_type = std::decay_t<reference>;
+  using pointer = ProxyArrowResult<reference>;
+  using facade_type = IteratorFacade<DenseTensorIterator<A>, std::random_access_iterator_tag,
+    value_type, reference, pointer>;
+};
+
+
+template <class A>
+class DenseTensorIterator
+    : public DenseTensorIteratorTraits<A>::facade_type
+{
+  using accessor_type = A;
+  using traits_type = DenseTensorIteratorTraits<A>;
+  using facade_type = typename traits_type::facade_type;
+
+public:
+  using reference = typename facade_type::reference;
+  using index_type = typename traits_type::index_type;
+
+public:
+  constexpr DenseTensorIterator () = default;
+
+  template <class... Args,
+    std::enable_if_t<std::is_constructible_v<accessor_type,Args...>, int> = 0>
+  constexpr explicit DenseTensorIterator (index_type pos, Args&&... args) noexcept
+    : pos_(pos)
+    , access_(std::forward<Args>(args)...)
+  {}
+
+  constexpr index_type index () const noexcept { return pos_; }
+  constexpr reference operator* () const { return access_(pos_); }
+
+private:
+  constexpr index_type& baseIterator() noexcept { return pos_; }
+  constexpr const index_type& baseIterator() const noexcept { return pos_; }
+
+private:
+  index_type pos_ = 0;
+  accessor_type access_ = {};
+
+  friend IteratorFacadeAccess;
+};
+
+} // end namespace Impl
 
 // specialization for rank-0 tensor and comparison with scalar
 template <class D, class B, class V, class E = typename B::extents_type,
