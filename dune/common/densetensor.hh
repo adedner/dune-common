@@ -199,7 +199,7 @@ public:
   /// \name Conversion to the underlying value if rank is zero
   // @{
 
-  template <class ScalarType, class E = extents_type, class D = derived_type,
+  template <class ScalarType, class E = extents_type,
     std::enable_if_t<std::is_convertible_v<value_type,ScalarType>, int> = 0,
     std::enable_if_t<(E::rank() == 0), int> = 0>
   constexpr operator ScalarType () const noexcept
