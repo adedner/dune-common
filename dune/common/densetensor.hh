@@ -159,6 +159,22 @@ public:
     return base_type::operator[](indices);
   }
 
+  /// \brief Access vector-element at position [i0] with mutable access.
+  template <class E = extents_type,
+    std::enable_if_t<(E::rank() == 0), int> = 0>
+  constexpr reference operator[] (index_type index) noexcept
+  {
+    return base_type::operator[](std::array{index});
+  }
+
+  /// \brief Access vector-element at position [i0] with const access.
+  template <class E = extents_type,
+    std::enable_if_t<(E::rank() == 0), int> = 0>
+  constexpr const_reference operator[] (index_type index) const noexcept
+  {
+    return base_type::operator[](std::array{index});
+  }
+
   /**
    * \brief Return true when (i0,i1,...) is in pattern.
    * This is always true for dense tensors.
