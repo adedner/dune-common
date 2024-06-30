@@ -126,6 +126,7 @@ void checkAccess(Dune::TestSuite& testSuite)
   if constexpr(Tensor::rank() == 0) {
     subTestSuite.check(tensor[std::array<std::size_t,0>{}] == 42.0);
     subTestSuite.check(tensor() == 42.0);
+    subTestSuite.check(tensor.at() == 42.0);
     subTestSuite.check(tensor == 42.0);
     double value = tensor;
     subTestSuite.check(value == 42.0);
@@ -133,7 +134,9 @@ void checkAccess(Dune::TestSuite& testSuite)
   else if constexpr(Tensor::rank() == 1) {
     for (int i = 0; i < tensor.extent(0); ++i) {
       subTestSuite.check(tensor[std::array{i}] == 42.0);
+      subTestSuite.check(tensor[i] == 42.0);
       subTestSuite.check(tensor(i) == 42.0);
+      subTestSuite.check(tensor.at(i) == 42.0);
     }
   }
   else if constexpr(Tensor::rank() == 2) {
@@ -141,6 +144,7 @@ void checkAccess(Dune::TestSuite& testSuite)
       for (int j = 0; j < tensor.extent(1); ++j) {
         subTestSuite.check(tensor[std::array{i,j}] == 42.0);
         subTestSuite.check(tensor(i,j) == 42.0);
+        subTestSuite.check(tensor.at(i,j) == 42.0);
       }
     }
   }
@@ -150,6 +154,7 @@ void checkAccess(Dune::TestSuite& testSuite)
         for (int k = 0; k < tensor.extent(2); ++k) {
           subTestSuite.check(tensor[std::array{i,j,k}] == 42.0);
           subTestSuite.check(tensor(i,j,k) == 42.0);
+          subTestSuite.check(tensor.at(i,j,k) == 42.0);
         }
       }
     }

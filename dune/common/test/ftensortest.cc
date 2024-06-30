@@ -162,6 +162,7 @@ void checkAccess(Dune::TestSuite& testSuite)
     for (std::size_t i = 0; i < Tensor::static_extent(0); ++i) {
       subTestSuite.check(tensor[std::array{i}] == 42.0);
       subTestSuite.check(tensor(i) == 42.0);
+      subTestSuite.check(tensor[i] == 42.0);
       subTestSuite.check(tensor.at(i) == 42.0);
     }
     subTestSuite.checkThrow<std::out_of_range>([&]{tensor.at(-1);});
