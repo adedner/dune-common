@@ -94,7 +94,7 @@ int run(const std::optional<int>& a = std::nullopt)
     return 0;
 }
 """
-    assert(run("run",StringIO(runCode),None,pybindDefaultArgs={"a": "pybind11::none"})==0)
+    assert(run("run",StringIO(runCode),a=None,pybindDefaultArgs={"a": "pybind11::none()"})==0)
     assert(run("run",StringIO(runCode),3)==6)
     assert(run("run",StringIO(runCode))==6)
 
