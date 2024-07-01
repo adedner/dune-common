@@ -86,7 +86,7 @@ def test_optional_argument():
     from dune.generator.algorithm   import run
     runCode="""
 #include <dune/python/common/numpyvector.hh>
-int run(const std::optional<int>& a)
+int run(const std::optional<int>& a = std::nullopt)
 {
   if(a.has_value())
    return 2*a.value();
@@ -94,7 +94,7 @@ int run(const std::optional<int>& a)
     return 0;
 }
 """
-    assert(run("run",StringIO(runCode),None)==0)
+    assert(run("run",StringIO(runCode),None,pybindDefaultArgs={"a": "pybind11::none"})==0)
     assert(run("run",StringIO(runCode),3)==6)
     assert(run("run",StringIO(runCode))==6)
 

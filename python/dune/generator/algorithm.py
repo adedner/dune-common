@@ -48,7 +48,7 @@ def cppType(arg):
             raise Exception("Cannot deduce C++ type for the following argument: " + repr(arg))
     return t,i
 
-def load(functionName, includes, *args, pythonName=None):
+def load(functionName, includes, *args, **kwargs):
     '''Just in time compile an algorithm.
 
     Generates binding for a single (template) function. The name of the
@@ -122,14 +122,20 @@ def load(functionName, includes, *args, pythonName=None):
 
     source += "  module.def( \"run\", [] ( " + ", ".join([argTypes[i] + " arg" + str(i) for i in range(len(argTypes))]) + " ) {\n"
     source += "      return " + functionName + "( " + ", ".join(["arg" + str(i) for i in range(len(argTypes))]) + " );\n"
-    source += "    } );\n"
+    source += " }" # end of lambda
+    if 'pybindDefaultArgs' in kwargs:
+        source += ", ".join([f"pybind::arg(\"{key}\")={value}" for key, value in kwargs['pybindDefArgs'].items()])
+    if 'pybindOptions' in kwargs:
+        source += ", " + ", ".join([f"{e}" for e in kwargs['pybindOptions']])
+    source += "  );\n"
 
-    source += "}\n"
     source += "#endif\n"
 
     # Use signature as python name if none was expicitely provided
-    if not pythonName:
-      pythonName = signature
+    if 'pythonName' in kwargs:
+        pythonName = kwargs['pythonName']
+    else:
+        pythonName = signature
 
     # make sure to reload the builder here in case it got updated
     from . import builder
