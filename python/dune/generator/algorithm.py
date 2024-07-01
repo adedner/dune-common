@@ -129,6 +129,7 @@ def load(functionName, includes, *args, **kwargs):
         source += ", " + ", ".join([f"{e}" for e in kwargs['pybindOptions']])
     source += "  );\n"
 
+    source += "}\n"
     source += "#endif\n"
 
     # Use signature as python name if none was expicitely provided
