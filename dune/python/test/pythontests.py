@@ -82,8 +82,25 @@ def test_class_export():
     # the 'B' class still keeps the old vector 'x' alive
     assert run("run",StringIO(runCode),cls) == 10**2*10*3
 
+def test_optional_argument():
+    from dune.generator.algorithm   import run
+    runCode="""
+#include <dune/python/common/numpyvector.hh>
+int run(const std::optional<int>& a)
+{
+  if(a.has_value())
+   return 2*a.value();
+   else
+    return 0;
+}
+"""
+    assert(run("run",StringIO(runCode),None)==0)
+    assert(run("run",StringIO(runCode),3)==6)
+    assert(run("run",StringIO(runCode))==6)
+
 if __name__ == "__main__":
     from dune.packagemetadata import getDunePyDir
     _ = getDunePyDir()
     test_class_export()
     test_numpyvector()
+    test_optional_argument()

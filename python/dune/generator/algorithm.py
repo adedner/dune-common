@@ -20,6 +20,8 @@ def cppType(arg):
             t, i = "std::size_t", []
         elif isinstance(arg, float) or isinstance(arg,numpy.float64):
             t, i = "double", []
+        elif arg is None:
+            t, i = "pybind11::none", ["dune/python/pybind11/pybind11.h"]
         elif isinstance(arg, numpy.ndarray):
             dtype = None
             if arg.dtype.type == numpy.intc:
