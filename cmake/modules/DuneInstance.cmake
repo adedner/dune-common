@@ -593,9 +593,14 @@ endfunction(dune_instance_from_id)
 # current binary dir
 macro(dune_instance_apply_bindir fname_var)
   if(NOT (IS_ABSOLUTE ${fname_var}))
-    set(${fname_var} "${CMAKE_CURRENT_BINARY_DIR}/${${fname_var}}")
+    set(_fname "${CMAKE_CURRENT_BINARY_DIR}/${${fname_var}}")
+  else()
+    set(_fname "${fname_var}")
   endif()
-  string(REPLACE "${PROJECT_BINARY_DIR}" "${PROJECT_BINARY_DIR}/generated/" ${fname_var} "${${fname_var}}")
+  file(RELATIVE_PATH _relfname ${PROJECT_BINARY_DIR} "${fname}")
+  set(${fname_var} "${PROJECT_BINARY_DIR}/generated/${_relfname}")
+  unset(_relfname)
+  unset(_fname)
 endmacro(dune_instance_apply_bindir)
 
 
