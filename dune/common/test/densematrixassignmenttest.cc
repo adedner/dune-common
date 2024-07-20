@@ -8,7 +8,7 @@
 #include <dune/common/diagonalmatrix.hh>
 #include <dune/common/dynmatrix.hh>
 #include <dune/common/fmatrix.hh>
-#include <dune/common/gmpfield.hh>
+#include <dune/common/mpfrfield.hh>
 
 template <class M>
 void populateMatrix(M &A, int rows, int cols) {
@@ -383,8 +383,8 @@ int main() {
   bool passed = true;
   passed = passed && run<double>();
   passed = passed && run<std::complex<double>>();
-#ifdef HAVE_GMP
-  passed = passed && run<Dune::GMPField<128u>>();
+#if HAVE_MPFR
+  passed = passed && run<Dune::MPFRField<128u>>();
 #endif
   return passed ? 0 : 1;
 }

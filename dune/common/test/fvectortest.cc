@@ -13,7 +13,7 @@
 #include <dune/common/classname.hh>
 #include <dune/common/exceptions.hh>
 #include <dune/common/fvector.hh>
-#include <dune/common/gmpfield.hh>
+#include <dune/common/mpfrfield.hh>
 #include <dune/common/quadmath.hh>
 #include <dune/common/typetraits.hh>
 
@@ -581,10 +581,11 @@ int main()
     FieldVectorTest<float, 3>();
     FieldVectorTest<double, 3>();
     FieldVectorTest<long double, 3>();
-#if HAVE_GMP
+
+#if HAVE_MPFR
     {
-      // we skip the complex test and the int test, as these will be very hard to implement with GMPField
-      typedef Dune::GMPField<128u> ft;
+      // we skip the complex test and the int test, as these will be very hard to implement with MPFRField
+      typedef Dune::MPFRField<128u> ft;
       FieldVectorMainTest<ft,ft,3>();
       FieldVectorMainTest<ft,ft,2>();
       FieldVectorMainTest<ft,ft,1>();
@@ -593,7 +594,7 @@ int main()
       ScalarOrderingTest<ft>();
       DotProductTest<ft,3>();
     }
-#endif // HAVE_GMP
+#endif // HAVE_MPFR
 
 #if HAVE_QUADMATH
     {
