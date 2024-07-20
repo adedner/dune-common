@@ -73,7 +73,7 @@ namespace Impl {
     {}
 
     /** \brief Construct from a pointer to a scalar */
-    ScalarMatrixView (K* p) :
+    explicit ScalarMatrixView (K* p) :
       data_(p)
     {}
 
