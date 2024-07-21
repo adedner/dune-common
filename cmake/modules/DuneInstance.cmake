@@ -591,11 +591,17 @@ endfunction(dune_instance_from_id)
 
 # mimic the behaviour of configure_file(), placing relative paths in the
 # current binary dir
-function(dune_instance_apply_bindir fname_var)
+macro(dune_instance_apply_bindir fname_var)
   if(NOT (IS_ABSOLUTE ${fname_var}))
-    set(${fname_var} "${CMAKE_CURRENT_BINARY_DIR}/${${fname_var}}" PARENT_SCOPE)
+    set(_fname "${CMAKE_CURRENT_BINARY_DIR}/${${fname_var}}")
+  else()
+    set(_fname "${fname_var}")
   endif()
-endfunction(dune_instance_apply_bindir)
+  file(RELATIVE_PATH _relfname ${PROJECT_BINARY_DIR} "${fname}")
+  set(${fname_var} "${PROJECT_BINARY_DIR}/generated/${_relfname}")
+  unset(_relfname)
+  unset(_fname)
+endmacro(dune_instance_apply_bindir)
 
 
 ######################################################################
