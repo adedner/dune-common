@@ -50,6 +50,7 @@ include(CMakePackageConfigHelpers)
 include(DuneModuleDependencies)
 include(DuneModuleInformation)
 include(DuneSymlinkOrCopy)
+include(DunePkgConfig)
 include(DuneUtilities)
 include(FeatureSummary)
 include(GNUInstallDirs)
@@ -140,7 +141,8 @@ macro(dune_project)
         endif()
       endforeach()
     endif()
-    variable_watch(ALL_DEPENDENCIES dune_deprecate_variable)
+    # HELP: this is too verbose in super builds!
+    # variable_watch(ALL_DEPENDENCIES dune_deprecate_variable)
   else()
     message(AUTHOR_WARNING "This needs to be removed!")
   endif()
@@ -317,8 +319,12 @@ set(HAVE_${_upcase_module} TRUE)
 # Lines that are set by the CMake build system via the variable DUNE_CUSTOM_PKG_CONFIG_SECTION
 ${DUNE_CUSTOM_PKG_CONFIG_SECTION}
 
+# If this file is being found within a super-build that includes ${ProjectName}, the targets file
+# has not been yet generated. So this variable finds whether configuration of ${ProjectName} is already finished
+get_property(${ProjectName}_IN_CONFIG_MODE GLOBAL PROPERTY ${ProjectName}_LIBRARIES DEFINED)
+
 #import the target
-if(${ProjectName}_LIBRARIES)
+if(${ProjectName}_LIBRARIES AND NOT ${ProjectName}_IN_CONFIG_MODE)
   get_filename_component(_dir \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)
   include(\"\${_dir}/${ProjectName}-targets.cmake\")
 endif()

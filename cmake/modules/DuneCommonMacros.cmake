@@ -22,8 +22,20 @@ find_package(Threads)
 include(AddThreadsFlags)
 
 # find the MPI library
-find_package(MPI 3.0 COMPONENTS C)
-include(AddMPIFlags)
+if(NOT TARGET Dune::Imported::MPI_C)
+  find_package(MPI 3.0 COMPONENTS C)
+
+  # create global imported target
+  if(TARGET MPI::MPI_C)
+    add_library(Dune::Imported::MPI_C IMPORTED INTERFACE GLOBAL)
+    target_link_libraries(Dune::Imported::MPI_C INTERFACE MPI::MPI_C)
+    target_compile_definitions(Dune::Imported::MPI_C INTERFACE
+      HAVE_MPI=1 MPICH_SKIP_MPICXX=1 OMPI_SKIP_MPICXX=1 MPI_NO_CPPBIND=1 MPIPP_H _MPICC_H)
+  endif()
+
+  include(AddMPIFlags)
+endif()
+
 
 # find library for Threading Building Blocks
 find_package(TBB)
@@ -34,12 +46,41 @@ find_package(PTScotch)
 include(AddPTScotchFlags)
 find_package(METIS)
 include(AddMETISFlags)
-find_package(ParMETIS 4.0)
-include(AddParMETISFlags)
+
+if(NOT TARGET Dune::Imported::ParMETIS)
+  find_package(ParMETIS 4.0)
+
+  # create global imported target
+  if(TARGET ParMETIS::ParMETIS)
+    add_library(Dune::Imported::ParMETIS IMPORTED INTERFACE GLOBAL)
+    target_link_libraries(Dune::Imported::ParMETIS INTERFACE ParMETIS::ParMETIS)
+    if(HAVE_PARMETIS)
+      target_compile_definitions(Dune::Imported::ParMETIS INTERFACE HAVE_PARMETIS=1)
+    endif()
+    if(HAVE_SCOTCH_METIS)
+      target_compile_definitions(Dune::Imported::ParMETIS INTERFACE HAVE_PTSCOTCH_PARMETIS=1)
+    endif()
+  endif()
+
+  include(AddParMETISFlags)
+endif()
 
 # find libraries for sparse matrix factorizations
-find_package(SuiteSparse OPTIONAL_COMPONENTS CHOLMOD LDL SPQR UMFPACK)
-include(AddSuiteSparseFlags)
+if(NOT TARGET Dune::Imported::SuiteSparse)
+  find_package(SuiteSparse OPTIONAL_COMPONENTS CHOLMOD LDL SPQR UMFPACK)
+
+  # create global imported target
+  if(TARGET SuiteSparse::SuiteSparse)
+    add_library(Dune::Imported::SuiteSparse IMPORTED INTERFACE GLOBAL)
+    target_link_libraries(Dune::Imported::SuiteSparse INTERFACE SuiteSparse::SuiteSparse)
+    foreach(_component ${SuiteSparse_FOUND_COMPONENTS})
+      target_compile_definitions(Dune::Imported::SuiteSparse INTERFACE HAVE_SUITESPARSE_${_component}=1)
+    endforeach(_component)
+  endif()
+
+  include(AddSuiteSparseFlags)
+endif()
+
 
 # try to find the Vc library
 set(MINIMUM_VC_VERSION)
