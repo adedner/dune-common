@@ -172,6 +172,12 @@ In order to build the DUNE core modules you need at least the following software
 - Rename `<module>_INTERFACE_LIBRARIES` into `<module>_LIBRARIES` (representing all module-libraries)
   and introduce `<module>_EXPORTED_LIBRARIES` as a list of all libraries exported by the module.
 
+- Change the way include directories are set in dune projects. OLD behavior: use `include_directories`
+  in `dune_project` to globally set include dirs for all targets. NEW behavior: Provide a utility
+  `dune_default_include_directories` to set include dirs on targets manually. Which behavior to
+  activate can be decided in each module by using the new dune policy `DP0001`, which can be set
+  to `OLD` or `NEW` correspondingly.
+
 ## Deprecations and removals
 
 - The deprecated header `dune/common/function.hh` has been removed. Use C++ function
