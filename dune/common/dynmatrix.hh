@@ -15,6 +15,7 @@
 #include <dune/common/dynvector.hh>
 #include <dune/common/densematrix.hh>
 #include <dune/common/typetraits.hh>
+#include <dune/common/std/span.hh>
 
 namespace Dune
 {
@@ -144,6 +145,12 @@ namespace Dune
       assert(this->rows());
       return _data.front().size();
     }
+
+    // a dynamic matrix has only dynamic size information. This is encoded in the
+    // special value Std::dynamic_extent = -1
+    static constexpr std::size_t static_rows() { return Std::dynamic_extent; }
+    static constexpr std::size_t static_cols() { return Std::dynamic_extent; }
+
     row_type & mat_access(size_type i) {
       DUNE_ASSERT_BOUNDS(i < _data.size());
       return _data[i];
