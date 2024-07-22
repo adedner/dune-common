@@ -24,7 +24,7 @@ namespace Impl {
   template<class M, bool = IsStaticSizeMatrix<M>::value>
   struct TransposedDenseMatrixTraits
   {
-    using type = Dune::FieldMatrix<typename FieldTraits<M>::field_type, M::cols, M::rows>;
+    using type = Dune::FieldMatrix<typename FieldTraits<M>::field_type, M::cols(), M::rows()>;
   };
 
   template<class M>
@@ -49,9 +49,9 @@ namespace Impl {
   public:
 
     //! The number of rows.
-    constexpr static int rows = WM::cols;
+    static constexpr std::integral_constant<int,WM::cols()> rows = {};
     //! The number of columns.
-    constexpr static int cols = WM::rows;
+    static constexpr std::integral_constant<int,WM::rows()> cols = {};
   };
 
 
