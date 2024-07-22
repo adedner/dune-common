@@ -173,6 +173,10 @@ dune_add_test(SOURCES dynmatrixtest.cc
               LINK_LIBRARIES dunecommon
               LABELS quick)
 
+dune_add_test(SOURCES dyntensortest.cc
+              LINK_LIBRARIES dunecommon
+              LABELS quick)
+
 dune_add_test(SOURCES dynvectortest.cc
               LINK_LIBRARIES dunecommon
               LABELS quick)
@@ -191,6 +195,10 @@ dune_add_test(SOURCES fmatrixtest.cc
               LINK_LIBRARIES dunecommon
               LABELS quick)
 add_dune_vc_flags(fmatrixtest)
+
+dune_add_test(SOURCES ftensortest.cc
+              LINK_LIBRARIES dunecommon
+              LABELS quick)
 
 dune_add_test(SOURCES fvectortest.cc
               LINK_LIBRARIES dunecommon

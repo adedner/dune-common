@@ -41,12 +41,14 @@ install(FILES
         debugstream.hh
         deprecated.hh
         densematrix.hh
+        densetensor.hh
         densevector.hh
         diagonalmatrix.hh
         documentation.hh
         dotproduct.hh
         dynmatrix.hh
         dynmatrixev.hh
+        dyntensor.hh
         dynvector.hh
         enumset.hh
         exceptions.hh
@@ -55,6 +57,7 @@ install(FILES
         float_cmp.hh
         fmatrix.hh
         fmatrixev.hh
+        ftensor.hh
         ftraits.hh
         fvector.hh
         genericiterator.hh
@@ -99,6 +102,7 @@ install(FILES
         stdthread.hh
         streamoperators.hh
         stringutility.hh
+        tensorspan.hh
         timer.hh
         transpose.hh
         tupleutility.hh
