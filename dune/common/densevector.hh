@@ -724,13 +724,13 @@ namespace Dune {
     //===== sizes
 
     //! number of blocks in the vector (are of size 1 here)
-    size_type N () const
+    constexpr auto N () const
     {
       return size();
     }
 
     //! dimension of the vector space
-    size_type dim () const
+    constexpr auto dim () const
     {
       return size();
     }
