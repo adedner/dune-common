@@ -68,8 +68,7 @@ namespace Dune
     {};
 
     template< class DenseMatrix, class RHS >
-    class DenseMatrixAssigner< DenseMatrix, RHS,
-      std::enable_if_t< Dune::IsNumber<RHS>::value > >
+    class DenseMatrixAssigner< DenseMatrix, RHS, std::enable_if_t< Dune::IsNumber< RHS >::value > >
     {
     public:
       static void apply ( DenseMatrix &denseMatrix, const RHS &rhs )
@@ -81,9 +80,7 @@ namespace Dune
 
     template <class A, class B>
     using MatrixElementsAssignable = decltype(
-        std::declval<A const>().N(), std::declval<B const>().N(),
-        std::declval<A const>().M(), std::declval<B const>().M(),
-        *std::begin(*std::begin(std::declval<A&>())) = *std::begin(*std::begin(std::declval<B const&>())));
+        *std::begin(*std::declval<typename A::iterator>()) = *std::begin(*std::declval<typename B::const_iterator>()));
 
     template< class DenseMatrix, class RHS >
     class DenseMatrixAssigner< DenseMatrix, RHS,
