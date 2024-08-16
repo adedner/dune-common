@@ -69,7 +69,7 @@ namespace Dune
 
     template< class DenseMatrix, class RHS >
     class DenseMatrixAssigner< DenseMatrix, RHS,
-      std::enable_if_t< std::is_convertible_v<RHS, typename DenseMatrix::field_type> > >
+      std::enable_if_t< Dune::IsNumber<RHS>::value > >
     {
     public:
       static void apply ( DenseMatrix &denseMatrix, const RHS &rhs )
@@ -83,7 +83,7 @@ namespace Dune
     using MatrixElementsAssignable = decltype(
         std::declval<A const>().N(), std::declval<B const>().N(),
         std::declval<A const>().M(), std::declval<B const>().M(),
-        *std::begin(*std::begin(std::declval<A>())) = *std::begin(*std::begin(std::declval<B const>())));
+        *std::begin(*std::begin(std::declval<A&>())) = *std::begin(*std::begin(std::declval<B const&>())));
 
     template< class DenseMatrix, class RHS >
     class DenseMatrixAssigner< DenseMatrix, RHS,
