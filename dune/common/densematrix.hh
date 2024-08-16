@@ -21,6 +21,7 @@
 #include <dune/common/simd/simd.hh>
 #include <dune/common/typetraits.hh>
 #include <dune/common/scalarvectorview.hh>
+#include <dune/common/std/type_traits.hh>
 
 namespace Dune
 {
@@ -67,7 +68,8 @@ namespace Dune
     {};
 
     template< class DenseMatrix, class RHS >
-    class DenseMatrixAssigner< DenseMatrix, RHS, std::enable_if_t< Dune::IsNumber< RHS >::value > >
+    class DenseMatrixAssigner< DenseMatrix, RHS,
+      std::enable_if_t< std::is_convertible_v<RHS, typename DenseMatrix::field_type> > >
     {
     public:
       static void apply ( DenseMatrix &denseMatrix, const RHS &rhs )
@@ -77,9 +79,15 @@ namespace Dune
       }
     };
 
+    template <class A, class B>
+    using MatrixElementsAssignable = decltype(
+        std::declval<A const>().N(), std::declval<B const>().N(),
+        std::declval<A const>().M(), std::declval<B const>().M(),
+        *std::begin(*std::begin(std::declval<A>())) = *std::begin(*std::begin(std::declval<B const>())));
+
     template< class DenseMatrix, class RHS >
-    class DenseMatrixAssigner< DenseMatrix, RHS, std::enable_if_t< !std::is_same< typename RHS::const_iterator, void >::value
-        && std::is_convertible< typename RHS::const_iterator::value_type, typename DenseMatrix::iterator::value_type >::value > >
+    class DenseMatrixAssigner< DenseMatrix, RHS,
+      std::enable_if_t<Dune::Std::is_detected_v<MatrixElementsAssignable,DenseMatrix,RHS>>>
     {
     public:
       static void apply ( DenseMatrix &denseMatrix, const RHS &rhs )
