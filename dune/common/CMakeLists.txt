@@ -25,6 +25,7 @@ target_sources(dunecommon PRIVATE
 install(FILES
         alignedallocator.hh
         arraylist.hh
+        assert.hh
         assertandreturn.hh
         bartonnackmanifcheck.hh
         bigunsignedint.hh
@@ -108,6 +109,7 @@ install(FILES
         typeutilities.hh
         unused.hh
         vc.hh
+        vector.hh
         version.hh
         visibility.hh
 DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/common)
