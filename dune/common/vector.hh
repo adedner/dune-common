@@ -30,7 +30,7 @@ namespace Dune {
  * do not allow incremental size changes. The `resize()` function creates a new
  * storage even if the size is reduced.
  *
- * \tparam Element The type of the elements stored in the conatainer.
+ * \tparam Element The type of the elements stored in the container.
  * \tparam An allocator that is used to acquire/release memory and to construct/destroy
  *         the elements in that memory.
  */
@@ -123,7 +123,7 @@ public:
       data_[i] = std::move(other[i]);
   }
 
-  /// \brief Constrct the vector from the provided initializer list
+  /// \brief Construct the vector from the provided initializer list
   constexpr Vector (std::initializer_list<ElementType> init, const AllocatorType& alloc = AllocatorType())
     : Vector(init.begin(), init.end(), alloc)
   {}
@@ -175,7 +175,7 @@ public:
   /// \brief Replaces the contents with the elements from the initializer list `ilist`.
   constexpr void assign (std::initializer_list<ElementType> ilist)
   {
-    assert(ilist.begin(), ilist.end());
+    assign(ilist.begin(), ilist.end());
   }
 
   /// \brief Returns the associated allocator.
@@ -328,6 +328,12 @@ public:
   [[nodiscard]] constexpr SizeType capacity () const noexcept
   {
     return size_;
+  }
+
+  /// \brief Reserves storage
+  constexpr void reserve (SizeType count)
+  {
+    /* do nothing */
   }
 
   /// @}
