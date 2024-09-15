@@ -13,6 +13,7 @@
 #include <vector>
 
 #include <dune/common/ftraits.hh>
+#include <dune/common/rangeutilities.hh>
 
 namespace Dune {
 
@@ -51,6 +52,8 @@ class Vector<bool, Allocator>
   using AllocatorType = typename std::allocator_traits<Allocator>::template rebind_alloc<std::byte>;
   using BaseType = std::vector<std::byte, AllocatorType>;
 
+  static_assert(sizeof(bool) == sizeof(std::byte));
+
 public:
   using allocator_type = AllocatorType;
   using size_type = typename BaseType::size_type;
@@ -61,6 +64,27 @@ public:
   using pointer = value_type*;
   using const_pointer = const value_type*;
 
+private:
+  struct ByteToBool
+  {
+    reference operator() (std::byte& value) const
+    {
+      return reinterpret_cast<reference>(value);
+    }
+
+    const_reference operator() (const std::byte& value) const
+    {
+      return reinterpret_cast<const_reference>(value);
+    }
+  };
+
+public:
+  using iterator = Impl::TransformedRangeIterator<typename BaseType::iterator, ByteToBool, ValueTransformationTag>;
+  using const_iterator = Impl::TransformedRangeIterator<typename BaseType::const_iterator, ByteToBool, ValueTransformationTag>;
+  using reverse_iterator = Impl::TransformedRangeIterator<typename BaseType::reverse_iterator, ByteToBool, ValueTransformationTag>;
+  using const_reverse_iterator = Impl::TransformedRangeIterator<typename BaseType::const_reverse_iterator, ByteToBool, ValueTransformationTag>;
+
+public:
   /// \name Constructors and Destructor
   /// @{
 
@@ -160,6 +184,84 @@ public:
   constexpr const_pointer data () const noexcept
   {
     return reinterpret_cast<const_pointer>(BaseType::data());
+  }
+
+  /// @}
+
+
+  /// \name Iterators
+  /// @{
+
+  /// \brief Returns an iterator to the beginning
+  constexpr iterator begin () noexcept
+  {
+    return iterator{BaseType::begin(), ByteToBool{}};
+  }
+
+  /// \brief Returns an iterator to the beginning
+  constexpr const_iterator begin () const noexcept
+  {
+    return const_iterator{BaseType::begin(), ByteToBool{}};
+  }
+
+  /// \brief Returns an iterator to the beginning
+  constexpr const_iterator cbegin () const noexcept
+  {
+    return const_iterator{BaseType::cbegin(), ByteToBool{}};
+  }
+
+  /// \brief Returns an iterator to the end
+  constexpr iterator end () noexcept
+  {
+    return iterator{BaseType::end(), ByteToBool{}};
+  }
+
+  /// \brief Returns an iterator to the end
+  constexpr const_iterator end () const noexcept
+  {
+    return const_iterator{BaseType::end(), ByteToBool{}};
+  }
+
+  /// \brief Returns an iterator to the end
+  constexpr const_iterator cend () const noexcept
+  {
+    return const_iterator{BaseType::cend(), ByteToBool{}};
+  }
+
+  /// \brief Returns an iterator to the beginning
+  constexpr reverse_iterator rbegin () noexcept
+  {
+    return reverse_iterator{BaseType::rbegin(), ByteToBool{}};
+  }
+
+  /// \brief Returns an iterator to the beginning
+  constexpr const_reverse_iterator rbegin () const noexcept
+  {
+    return const_reverse_iterator{BaseType::rbegin(), ByteToBool{}};
+  }
+
+  /// \brief Returns an iterator to the beginning
+  constexpr const_reverse_iterator crbegin () const noexcept
+  {
+    return const_reverse_iterator{BaseType::crbegin(), ByteToBool{}};
+  }
+
+  /// \brief Returns an iterator to the end
+  constexpr reverse_iterator rend () noexcept
+  {
+    return reverse_iterator{BaseType::rend(), ByteToBool{}};
+  }
+
+  /// \brief Returns an iterator to the end
+  constexpr const_reverse_iterator rend () const noexcept
+  {
+    return const_reverse_iterator{BaseType::rend(), ByteToBool{}};
+  }
+
+  /// \brief Returns an iterator to the end
+  constexpr const_reverse_iterator crend () const noexcept
+  {
+    return const_reverse_iterator{BaseType::crend(), ByteToBool{}};
   }
 
   /// @}
