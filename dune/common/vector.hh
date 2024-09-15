@@ -5,6 +5,10 @@
 #ifndef DUNE_COMMON_VECTOR_HH
 #define DUNE_COMMON_VECTOR_HH
 
+#include <algorithm>
+#if __has_include(<compare>)
+  #include <compare>
+#endif
 #include <cstddef>
 #include <initializer_list>
 #include <limits>
@@ -109,7 +113,7 @@ public:
 
   /// \brief Construct a copy of the vector `other`
   constexpr Vector (const Vector& other)
-    : Vector(other, other.alloc_)
+    : Vector(other, std::allocator_traits<Allocator>::select_on_container_copy_construction(other.alloc_))
   {}
 
   /// \brief Construct a copy of the vector `other`using a provided allocator
@@ -334,7 +338,7 @@ public:
   /// \brief Returns the maximum possible number of elements
   [[nodiscard]] constexpr SizeType max_size () const noexcept
   {
-    return std::numeric_limits<DifferenceType>::max();
+    return std::allocator_traits<AllocatorType>::max_size();
   }
 
   /// \brief Returns the number of elements that can be held in currently allocated storage.
@@ -405,6 +409,76 @@ private:
   DUNE_NO_UNIQUE_ADDRESS AllocatorType alloc_ = {};
   ElementType* data_ = nullptr;
 };
+
+
+/// \name Comparison operations
+/// \relates Vector
+/// @{
+
+/// \brief Check if the content of the two Vectors is equal
+template <class Element, class Allocator>
+constexpr bool operator== (const Dune::Vector<Element, Allocator>& lhs,
+                           const Dune::Vector<Element, Allocator>& rhs)
+{
+  return (lhs.size() != rhs.size()) && std::equal(lhs.begin(), lhs.end(), rhs.begin());
+}
+
+#if  __cpp_impl_three_way_comparison >= 201907L && __cpp_lib_three_way_comparison >= 201907L
+
+/// \brief Lexicographically compares the values of two Vectors
+template <class Element, class Allocator>
+constexpr auto operator<=> (const Dune::Vector<Element, Allocator>& lhs,
+                            const Dune::Vector<Element, Allocator>& rhs)
+{
+  return std::lexicographical_compare_three_way(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+#else
+
+/// \brief Check if the content of the two Vectors is unequal
+template <class Element, class Allocator>
+bool operator!= (const Dune::Vector<Element, Allocator>& lhs,
+                 const Dune::Vector<Element, Allocator>& rhs)
+{
+  return !(lhs == rhs);
+}
+
+/// \brief Lexicographically compares the values of two Vectors by <
+template <class Element, class Allocator>
+bool operator< (const Dune::Vector<Element, Allocator>& lhs,
+                const Dune::Vector<Element, Allocator>& rhs)
+{
+  return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), std::less<>{});
+}
+
+/// \brief Lexicographically compares the values of two Vectors by <=
+template <class Element, class Allocator>
+bool operator<= (const Dune::Vector<Element, Allocator>& lhs,
+                 const Dune::Vector<Element, Allocator>& rhs)
+{
+  return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), std::less_equal<>{});
+}
+
+/// \brief Lexicographically compares the values of two Vectors by >
+template <class Element, class Allocator>
+bool operator> (const Dune::Vector<Element, Allocator>& lhs,
+                const Dune::Vector<Element, Allocator>& rhs)
+{
+  return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), std::greater<>{});
+}
+
+/// \brief Lexicographically compares the values of two Vectors by >=
+template <class Element, class Allocator>
+bool operator>= (const Dune::Vector<Element, Allocator>& lhs,
+                 const Dune::Vector<Element, Allocator>& rhs)
+{
+  return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), std::greater_equal<>{});
+}
+
+#endif
+
+/// @}
+
 
 template<class T>
 struct FieldTraits< Dune::Vector<T> >
