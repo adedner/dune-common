@@ -15,6 +15,7 @@
 #include <dune/common/dynvector.hh>
 #include <dune/common/densematrix.hh>
 #include <dune/common/typetraits.hh>
+#include <dune/common/vector.hh>
 
 namespace Dune
 {
@@ -40,7 +41,7 @@ namespace Dune
     typedef row_type &row_reference;
     typedef const row_type &const_row_reference;
 
-    typedef std::vector<K> container_type;
+    typedef Dune::Vector<K> container_type;
     typedef K value_type;
     typedef typename container_type::size_type size_type;
   };
@@ -59,7 +60,7 @@ namespace Dune
   template<class K>
   class DynamicMatrix : public DenseMatrix< DynamicMatrix<K> >
   {
-    std::vector< DynamicVector<K> > _data;
+    Dune::Vector< DynamicVector<K> > _data;
     typedef DenseMatrix< DynamicMatrix<K> > Base;
   public:
     typedef typename Base::size_type size_type;

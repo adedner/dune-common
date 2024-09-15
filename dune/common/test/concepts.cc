@@ -15,6 +15,7 @@
 #include <dune/common/bigunsignedint.hh>
 #include <dune/common/fvector.hh>
 #include <dune/common/hash.hh>
+#include <dune/common/vector.hh>
 #include <dune/common/reservedvector.hh>
 #include <dune/common/parallel/mpihelper.hh>
 
@@ -35,6 +36,7 @@ int main (int argc, char **argv)
   static_assert(Concept::Container<std::list<double>>);
   static_assert(Concept::RandomAccessContainer<std::array<double,3>>);
   static_assert(Concept::RandomAccessContainer<std::vector<double>>);
+  static_assert(Concept::RandomAccessContainer<Dune::Vector<double>>);
   static_assert(Concept::RandomAccessContainer<Dune::ReservedVector<double,3>>);
 
   static_assert(not Concept::Container<double*>);

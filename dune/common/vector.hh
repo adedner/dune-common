@@ -14,6 +14,7 @@
 
 #include <dune/common/assert.hh>
 #include <dune/common/std/no_unique_address.hh>
+#include <dune/common/ftraits.hh>
 
 namespace Dune {
 
@@ -53,6 +54,18 @@ public:
   using Iterator = Pointer;
   using ConstIterator = ConstPointer;
 
+public: // typedefs following the std::vector interface
+  using value_type = ValueType;
+  using size_type = SizeType;
+  using difference_type = DifferenceType;
+  using allocator_type = AllocatorType;
+  using reference = Reference;
+  using const_reference = ConstReference;
+  using pointer = Pointer;
+  using const_pointer = ConstPointer;
+  using iterator = Iterator;
+  using const_iterator = ConstIterator;
+
 public:
 
   /// \name Constructors and Destructor
@@ -86,7 +99,7 @@ public:
 
   /// \brief Construct the vector from an iterator range `[first, last)`
   template <class InputIt,
-    decltype(*std::declval<InputIt>(), ++std::declval<InputIt>(), bool{}) = true>
+    decltype(*std::declval<const InputIt&>(), ++std::declval<InputIt&>(), bool{}) = true>
   constexpr Vector (InputIt first, InputIt last, const AllocatorType& alloc = AllocatorType())
     : Vector(SizeType(std::distance(first,last)), alloc)
   {
@@ -349,7 +362,7 @@ public:
   }
 
   /// \brief Changes the number of elements stored. If `count != size` allocate new storage.
-  void resize (SizeType count)
+  constexpr void resize (SizeType count)
   {
     if (size_ != count) {
       Vector tmp(count);
@@ -359,7 +372,7 @@ public:
 
   /// \brief Changes the number of elements stored and set the value of all elements to `value`.
   /// If `count != size` allocate new storage with the given initial value.
-  void resize (SizeType count, const ElementType& value)
+  constexpr void resize (SizeType count, const ElementType& value)
   {
     if (size_ != count) {
       Vector tmp(count, value);
@@ -379,7 +392,7 @@ public:
   /// @}
 
 private:
-  [[always_inline]] inline bool indexInRange (SizeType pos) const
+  constexpr inline bool indexInRange (SizeType pos) const
   {
     if constexpr (std::is_signed_v<SizeType>)
       return 0 <= pos && pos < size_;
@@ -391,6 +404,13 @@ private:
   SizeType size_ = 0;
   DUNE_NO_UNIQUE_ADDRESS AllocatorType alloc_ = {};
   ElementType* data_ = nullptr;
+};
+
+template<class T>
+struct FieldTraits< Dune::Vector<T> >
+{
+  typedef typename FieldTraits<T>::field_type field_type;
+  typedef typename FieldTraits<T>::real_type real_type;
 };
 
 } // end namespace Dune
