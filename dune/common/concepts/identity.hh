@@ -25,20 +25,20 @@ constexpr auto identity (T value, Op) noexcept
 
 // Overload for floating point types
 template <std::floating_point F>
-constexpr F identity (F /*value*/, std::plus<F>) noexcept
+constexpr F identity (F /*value*/, std::plus<>) noexcept
 {
   return F(0);
 }
 
 template <std::floating_point F>
-constexpr F identity (F /*value*/, std::multiplies<F>) noexcept
+constexpr F identity (F /*value*/, std::multiplies<>) noexcept
 {
   return F(1);
 }
 
 // Specialization for complex types
 template <std::floating_point F>
-struct Identity<std::complex<F>, std::plus<F>>
+struct Identity<std::complex<F>, std::plus<>>
 {
   constexpr std::complex<F> operator() (std::complex<F> /*value*/) const noexcept
   {
@@ -47,7 +47,7 @@ struct Identity<std::complex<F>, std::plus<F>>
 };
 
 template <std::floating_point F>
-struct Identity<std::complex<F>, std::multiplies<F>>
+struct Identity<std::complex<F>, std::multiplies<>>
 {
   constexpr std::complex<F> operator() (std::complex<F> /*value*/) const noexcept
   {

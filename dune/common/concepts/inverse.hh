@@ -26,13 +26,13 @@ constexpr auto inverse (T value, Op) noexcept
 
 // Overload for floating point types
 template <std::floating_point F>
-constexpr F inverse (F value, std::plus<F>) noexcept
+constexpr F inverse (F value, std::plus<>) noexcept
 {
   return -value;
 }
 
 template <std::floating_point F>
-constexpr F inverse (F value, std::multiplies<F>) noexcept
+constexpr F inverse (F value, std::multiplies<>) noexcept
 {
   assert(value != F(0));
   return F(1) / value;
@@ -40,7 +40,7 @@ constexpr F inverse (F value, std::multiplies<F>) noexcept
 
 // Specialization for complex types
 template <std::floating_point F>
-struct Inverse<std::complex<F>, std::plus<F>>
+struct Inverse<std::complex<F>, std::plus<>>
 {
   constexpr std::complex<F> operator() (std::complex<F> value) const noexcept
   {
@@ -49,7 +49,7 @@ struct Inverse<std::complex<F>, std::plus<F>>
 };
 
 template <std::floating_point F>
-struct Inverse<std::complex<F>, std::multiplies<F>>
+struct Inverse<std::complex<F>, std::multiplies<>>
 {
   constexpr std::complex<F> operator() (std::complex<F> value) const noexcept
   {

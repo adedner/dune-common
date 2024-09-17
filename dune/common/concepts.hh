@@ -18,6 +18,7 @@
 #if DUNE_ENABLE_CONCEPTS
 
 #include <dune/common/concepts/container.hh>
+#include <dune/common/concepts/field.hh>
 #include <dune/common/concepts/hashable.hh>
 
 #endif // DUNE_ENABLE_CONCEPTS

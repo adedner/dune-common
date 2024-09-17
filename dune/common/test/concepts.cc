@@ -39,6 +39,9 @@ int main (int argc, char **argv)
 
   static_assert(not Concept::Container<double*>);
   static_assert(not Concept::Container<Dune::FieldVector<double,3>>);
+
+  // test Field
+  static_assert(Concept::Field<double>);
 }
 
 #else // DUNE_ENABLE_CONCEPTS

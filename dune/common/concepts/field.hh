@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
 // -*- tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 2 -*-
 // vi: set et ts=4 sw=2 sts=2:
-#ifndef DUNE_COMMON_CONCEPTS_HASHABLE_HH
-#define DUNE_COMMON_CONCEPTS_HASHABLE_HH
+#ifndef DUNE_COMMON_CONCEPTS_FIELD_HH
+#define DUNE_COMMON_CONCEPTS_FIELD_HH
 
 // check whether c++20 concept can be used
 #if __has_include(<version>) && __has_include(<concepts>)
@@ -22,40 +22,45 @@
 
 #include <dune/common/concepts/identity.hh>
 #include <dune/common/concepts/inverse.hh>
+#include <dune/common/concepts/archetypes/field.hh>
 
 namespace Dune::Concept {
 
 template <class G>
-concept AdditiveGroup = std::regular<G> &&
-requires(G g, std::plus<G> op)
+concept AdditiveGroup = requires(G g, std::plus<> op)
 {
   { op(g, g) } -> std::convertible_to<G>;
   { g + g } -> std::convertible_to<G>;
   { g - g } -> std::convertible_to<G>;
   { -g }    -> std::convertible_to<G>;
 
-  { Concept::identity(g,op) } -> std::convertible_to<G>;
-  { Concept::inverse(g,op) } -> std::convertible_to<G>;
+  { identity(g,op) } -> std::convertible_to<G>;
+  { inverse(g,op) } -> std::convertible_to<G>;
 };
 
+static_assert(AdditiveGroup<Dune::Concept::Archetypes::AdditiveGroup<>>);
+
 template <class G>
-concept MultiplicativeGroup = std::regular<G> &&
-requires(G g, std::multiplies<G> op)
+concept MultiplicativeGroup = requires(G g, std::multiplies<> op)
 {
   { op(g, g) } -> std::convertible_to<G>;
   { g * g } -> std::convertible_to<G>;
   { g / g } -> std::convertible_to<G>;
 
-  { Concept::identity(g,op) } -> std::convertible_to<G>;
-  { Concept::inverse(g,op) } -> std::convertible_to<G>;
+  { identity(g,op) } -> std::convertible_to<G>;
+  { inverse(g,op) } -> std::convertible_to<G>;
 };
 
+static_assert(MultiplicativeGroup<Dune::Concept::Archetypes::MultiplicativeGroup<>>);
+
 template <class F>
-concept Field = AdditiveGroup<F> && MultiplicativeGroup<F>
+concept Field = std::regular<F> && AdditiveGroup<F> && MultiplicativeGroup<F>
   && std::numeric_limits<F>::is_specialized;
+
+static_assert(Field<Dune::Concept::Archetypes::Field>);
 
 } // end namespace Dune::Concept
 
 #endif // DUNE_ENABLE_CONCEPTS
 
-#endif // DUNE_COMMON_CONCEPTS_HASHABLE_HH
+#endif // DUNE_COMMON_CONCEPTS_FIELD_HH
