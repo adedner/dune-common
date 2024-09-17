@@ -5,11 +5,8 @@
 #ifndef DUNE_COMMON_VECTOR_HH
 #define DUNE_COMMON_VECTOR_HH
 
-#include <cstddef>
 #include <initializer_list>
 #include <memory>
-#include <stdexcept>
-#include <type_traits>
 #include <vector>
 
 #include <dune/common/ftraits.hh>
@@ -20,15 +17,13 @@ namespace Dune {
 /**
  * \brief Vector is a sequence container that encapsulates dynamic size arrays.
  *
- * This sequence container data structure is similar to the `std::vector` container
- * without the inremental size-changing operations, like `push_back`. The motivation
- * for developing our own data container is the unfortunate specialization of the
- * `std::vector<bool>` with proxy reference types. This leads to lots of codes where
- * boolean values are to be represented as `char` or `int`.
- *
- * This container is a more restrictive than the `std::vector` implementation. We
- * do not allow incremental size changes. The `resize()` function creates a new
- * storage even if the size is reduced.
+ * This sequence container derives from `std::vector`, except for the element type
+ * `bool`. There, a `bool`-wrapper type is used as element type to workaround the
+ * `std::vector<bool>` specialization issue. Note, in general you should prefer
+ * the `std::vector` container directly. Only if you are aware of the `bool`
+ * issue and it matters in your application, this derived type `Dune::Vector`
+ * could be a replacement. It is mainly used as internal data structure in other
+ * Dune containers.
  *
  * \tparam Element The type of the elements stored in the container.
  * \tparam An allocator that is used to acquire/release memory and to construct/destroy
@@ -288,8 +283,7 @@ public:
 
   using BaseType::resize;
 
-  /// \brief Changes the number of elements stored and set the value of all elements to `value`.
-  /// If `count != size` allocate new storage with the given initial value.
+  /// \brief Changes the number of elements stored
   constexpr void resize (size_type count, const value_type& value)
   {
     BaseType::resize(count, Impl::BoolType{value});
