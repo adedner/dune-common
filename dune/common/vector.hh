@@ -5,20 +5,15 @@
 #ifndef DUNE_COMMON_VECTOR_HH
 #define DUNE_COMMON_VECTOR_HH
 
-#include <algorithm>
-#if __has_include(<compare>)
-  #include <compare>
-#endif
 #include <cstddef>
 #include <initializer_list>
-#include <limits>
 #include <memory>
 #include <stdexcept>
 #include <type_traits>
+#include <vector>
 
-#include <dune/common/assert.hh>
-#include <dune/common/std/no_unique_address.hh>
 #include <dune/common/ftraits.hh>
+#include <dune/common/rangeutilities.hh>
 
 namespace Dune {
 
@@ -42,115 +37,84 @@ namespace Dune {
 template <class Element,
           class Allocator = std::allocator<Element>>
 class Vector
+    : public std::vector<Element,Allocator>
 {
-  static_assert(std::is_same_v<Element, typename Allocator::value_type>);
+  using BaseType = std::vector<Element,Allocator>;
 
 public:
-  using ElementType = Element;
-  using ValueType = std::remove_const_t<ElementType>;
-  using AllocatorType = Allocator;
-  using SizeType = typename AllocatorType::size_type;
-  using DifferenceType = typename AllocatorType::difference_type;
-  using Reference = ElementType&;
-  using ConstReference = const ElementType&;
-  using Pointer = ElementType*;
-  using ConstPointer = const ElementType*;
-  using Iterator = Pointer;
-  using ConstIterator = ConstPointer;
+  using BaseType::BaseType;
+};
 
-public: // typedefs following the std::vector interface
-  using value_type = ValueType;
-  using size_type = SizeType;
-  using difference_type = DifferenceType;
+
+namespace Impl {
+
+// Wrapper type around a bool
+struct alignas(bool) BoolType
+{
+  bool value_ = false;
+
+  constexpr BoolType operator= (bool b) noexcept { value_ = b; return *this; }
+  constexpr operator bool& () noexcept { return value_; }
+  constexpr operator const bool& () const noexcept { return value_; }
+};
+
+} // end namespace Impl
+
+
+template <class Allocator>
+class Vector<bool, Allocator>
+    : public std::vector<Impl::BoolType, typename std::allocator_traits<Allocator>::template rebind_alloc<Impl::BoolType>>
+{
+  using AllocatorType = typename std::allocator_traits<Allocator>::template rebind_alloc<Impl::BoolType>;
+  using BaseType = std::vector<Impl::BoolType, AllocatorType>;
+
+  static_assert(sizeof(bool) == sizeof(Impl::BoolType));
+
+public:
   using allocator_type = AllocatorType;
-  using reference = Reference;
-  using const_reference = ConstReference;
-  using pointer = Pointer;
-  using const_pointer = ConstPointer;
-  using iterator = Iterator;
-  using const_iterator = ConstIterator;
+  using size_type = typename BaseType::size_type;
+  using difference_type = typename BaseType::difference_type;
+  using value_type = bool;
+  using reference = value_type&;
+  using const_reference = const value_type&;
+  using pointer = value_type*;
+  using const_pointer = const value_type*;
+
+private:
+  struct BoolTypeToBool
+  {
+    reference operator() (Impl::BoolType& value) const
+    {
+      return value;
+    }
+
+    const_reference operator() (const Impl::BoolType& value) const
+    {
+      return value;
+    }
+  };
 
 public:
+  using iterator = Impl::TransformedRangeIterator<typename BaseType::iterator, BoolTypeToBool, ValueTransformationTag>;
+  using const_iterator = Impl::TransformedRangeIterator<typename BaseType::const_iterator, BoolTypeToBool, ValueTransformationTag>;
+  using reverse_iterator = Impl::TransformedRangeIterator<typename BaseType::reverse_iterator, BoolTypeToBool, ValueTransformationTag>;
+  using const_reverse_iterator = Impl::TransformedRangeIterator<typename BaseType::const_reverse_iterator, BoolTypeToBool, ValueTransformationTag>;
 
+public:
   /// \name Constructors and Destructor
   /// @{
 
-  /// \brief Construct an empty vector and default construct the allocator.
-  constexpr Vector () noexcept( noexcept(AllocatorType()) )
-  {}
-
-  /// \brief Construct an empty vector and construct the allocator from the argument.
-  constexpr explicit Vector (const AllocatorType& alloc) noexcept
-    : alloc_(alloc)
-  {}
-
-  /// \brief Construct a vector of size `size` using the default or provided allocator
-  constexpr explicit Vector (SizeType size, const AllocatorType& alloc = AllocatorType())
-    : size_(size)
-    , alloc_(alloc)
-    , data_(size_ > 0 ? alloc_.allocate(size_) : nullptr)
-  {}
+  using BaseType::BaseType;
 
   /// \brief Construct a vector of size `size` with all element initialized to `value`
-  constexpr Vector (SizeType size, ValueType value, const AllocatorType& alloc = AllocatorType())
-    : size_(size)
-    , alloc_(alloc)
-    , data_(size_ > 0 ? alloc_.allocate(size_) : nullptr)
-  {
-    for (SizeType i = 0; i < size_; ++i)
-      data_[i] = value;
-  }
-
-  /// \brief Construct the vector from an iterator range `[first, last)`
-  template <class InputIt,
-    decltype(*std::declval<const InputIt&>(), ++std::declval<InputIt&>(), bool{}) = true>
-  constexpr Vector (InputIt first, InputIt last, const AllocatorType& alloc = AllocatorType())
-    : Vector(SizeType(std::distance(first,last)), alloc)
-  {
-    for (SizeType i = 0; first != last; ++first, ++i)
-      data_[i] = *first;
-  }
-
-  /// \brief Construct a copy of the vector `other`
-  constexpr Vector (const Vector& other)
-    : Vector(other, std::allocator_traits<Allocator>::select_on_container_copy_construction(other.alloc_))
+  constexpr Vector (size_type size, value_type value, const AllocatorType& alloc = AllocatorType())
+    : BaseType(size, Impl::BoolType{value}, alloc)
   {}
-
-  /// \brief Construct a copy of the vector `other`using a provided allocator
-  constexpr Vector (const Vector& other, const AllocatorType& alloc)
-    : Vector(other.size_, alloc)
-  {
-    for (SizeType i = 0; i < size_; ++i)
-      data_[i] = other[i];
-  }
-
-  /// \brief Move construct the vector from `other` leaving `other` in an empty state
-  constexpr Vector (Vector&& other) noexcept
-    : Vector()
-  {
-    this->swap(other);
-  }
-
-  /// \brief Move construct the vector from using using a provided allocator by
-  /// move assigning all element to the new allocated memory.
-  constexpr Vector (Vector&& other, const AllocatorType& alloc)
-    : Vector(other.size_, alloc)
-  {
-    for (SizeType i = 0; i < size_; ++i)
-      data_[i] = std::move(other[i]);
-  }
 
   /// \brief Construct the vector from the provided initializer list
-  constexpr Vector (std::initializer_list<ElementType> init, const AllocatorType& alloc = AllocatorType())
-    : Vector(init.begin(), init.end(), alloc)
+  constexpr Vector (std::initializer_list<value_type> init, const AllocatorType& alloc = AllocatorType())
+    : BaseType(init.begin(), init.end(), alloc)
   {}
-
-  /// \brief The destructor frees all allocated memory
-  ~Vector () noexcept
-  {
-    if (data_)
-      alloc_.deallocate(data_, size_);
-  }
 
   /// @}
 
@@ -158,47 +122,18 @@ public:
   /// \name Assignment
   /// @{
 
-  /// \brief Copy-assign `other` to this
-  constexpr Vector& operator= (const Vector& other)
-  {
-    Vector that(other);
-    this->swap(that);
-    return *this;
-  }
-
-  /// \brief Move assign `other` to this.
-  constexpr Vector& operator= (Vector&& other)
-  {
-    Vector that(std::move(other));
-    this->swap(that);
-    return *this;
-  }
+  using BaseType::assign;
 
   /// \brief Replaces the contents with `count` copies of value `value`.
-  constexpr void assign (SizeType count, const ElementType& value)
+  constexpr void assign (size_type count, const value_type& value)
   {
-    for (SizeType i = 0; i < std::min(count,size_); ++i)
-      data_[i] = value;
-  }
-
-  /// \brief Replaces the contents with copies of those in the range `[first, last)`.
-  template <class InputIt>
-  constexpr void assign (InputIt first, InputIt last)
-  {
-    for (SizeType i = 0; i < size_ && first != last;  ++i, ++first)
-      data_[i] = *first;
+    BaseType::assign(count, Impl::BoolType{value});
   }
 
   /// \brief Replaces the contents with the elements from the initializer list `ilist`.
-  constexpr void assign (std::initializer_list<ElementType> ilist)
+  constexpr void assign (std::initializer_list<value_type> ilist)
   {
-    assign(ilist.begin(), ilist.end());
-  }
-
-  /// \brief Returns the associated allocator.
-  constexpr AllocatorType get_allocator () const noexcept
-  {
-    return alloc_;
+    BaseType::assign(ilist.begin(), ilist.end());
   }
 
   /// @}
@@ -208,71 +143,63 @@ public:
   /// @{
 
   /// \brief Access specified element at position `pos` with bounds checking
-  constexpr Reference at (SizeType pos)
+  constexpr reference at (size_type pos)
   {
-    if (indexInRange(pos))
-      return data_[pos];
-    else
-      throw std::out_of_range("Index out of range.");
+    return BaseType::at(pos);
   }
 
   /// \brief Access specified element at position `pos` with bounds checking
-  constexpr ConstReference at (SizeType pos) const
+  constexpr const_reference at (size_type pos) const
   {
-    if (indexInRange(pos))
-      return data_[pos];
-    else
-      throw std::out_of_range("Index out of range.");
+    return BaseType::at(pos);
   }
 
   /// \brief Access specified element at position `pos`
-  constexpr Reference operator[] (SizeType pos) noexcept
+  constexpr reference operator[] (size_type pos) noexcept
   {
-    DUNE_ASSERT_MSG(indexInRange(pos), "Index out of range.");
-    return data_[pos];
+    return BaseType::operator[](pos);
   }
 
   /// \brief Access specified element at position `pos`
-  constexpr ConstReference operator[] (SizeType pos) const noexcept
+  constexpr const_reference operator[] (size_type pos) const noexcept
   {
-    DUNE_ASSERT_MSG(indexInRange(pos), "Index out of range.");
-    return data_[pos];
+    return BaseType::operator[](pos);
   }
 
   /// \brief Access the first element
-  constexpr Reference front () noexcept
+  constexpr reference front () noexcept
   {
-    return data_[0];
+    return BaseType::front();
   }
 
   /// \brief Access the first element
-  constexpr ConstReference front () const noexcept
+  constexpr const_reference front () const noexcept
   {
-    return data_[0];
+    return BaseType::front();
   }
 
   /// \brief Access the last element
-  constexpr Reference back () noexcept
+  constexpr reference back () noexcept
   {
-    return data_[size_-1];
+    return BaseType::back();
   }
 
   /// \brief Access the last element
-  constexpr ConstReference back () const noexcept
+  constexpr const_reference back () const noexcept
   {
-    return data_[size_-1];
+    return BaseType::back();
   }
 
   /// \brief Direct access to the underlying contiguous storage
-  constexpr ElementType* data () noexcept
+  constexpr pointer data () noexcept
   {
-    return data_;
+    return &reference(*BaseType::data());
   }
 
   /// \brief Direct access to the underlying contiguous storage
-  constexpr const ElementType* data () const noexcept
+  constexpr const_pointer data () const noexcept
   {
-    return data_;
+    return &const_reference(*BaseType::data());
   }
 
   /// @}
@@ -282,75 +209,75 @@ public:
   /// @{
 
   /// \brief Returns an iterator to the beginning
-  constexpr Iterator begin () noexcept
+  constexpr iterator begin () noexcept
   {
-    return data_;
+    return iterator{BaseType::begin(), BoolTypeToBool{}};
   }
 
   /// \brief Returns an iterator to the beginning
-  constexpr ConstIterator begin () const noexcept
+  constexpr const_iterator begin () const noexcept
   {
-    return data_;
+    return const_iterator{BaseType::begin(), BoolTypeToBool{}};
   }
 
   /// \brief Returns an iterator to the beginning
-  constexpr ConstIterator cbegin () const noexcept
+  constexpr const_iterator cbegin () const noexcept
   {
-    return data_;
+    return const_iterator{BaseType::cbegin(), BoolTypeToBool{}};
   }
 
   /// \brief Returns an iterator to the end
-  constexpr Iterator end () noexcept
+  constexpr iterator end () noexcept
   {
-    return data_ + size_;
+    return iterator{BaseType::end(), BoolTypeToBool{}};
   }
 
   /// \brief Returns an iterator to the end
-  constexpr ConstIterator end () const noexcept
+  constexpr const_iterator end () const noexcept
   {
-    return data_ + size_;
+    return const_iterator{BaseType::end(), BoolTypeToBool{}};
   }
 
   /// \brief Returns an iterator to the end
-  constexpr ConstIterator cend () const noexcept
+  constexpr const_iterator cend () const noexcept
   {
-    return data_ + size_;
+    return const_iterator{BaseType::cend(), BoolTypeToBool{}};
   }
 
-  /// @}
-
-
-  /// \name Capacity
-  /// @{
-
-  /// \brief Checks whether the container is empty
-  [[nodiscard]] constexpr bool empty () const noexcept
+  /// \brief Returns an iterator to the beginning
+  constexpr reverse_iterator rbegin () noexcept
   {
-    return size_ == 0 || data_ == nullptr;
+    return reverse_iterator{BaseType::rbegin(), BoolTypeToBool{}};
   }
 
-  /// \brief Returns the number of elements
-  [[nodiscard]] constexpr SizeType size () const noexcept
+  /// \brief Returns an iterator to the beginning
+  constexpr const_reverse_iterator rbegin () const noexcept
   {
-    return size_;
+    return const_reverse_iterator{BaseType::rbegin(), BoolTypeToBool{}};
   }
 
-  /// \brief Returns the maximum possible number of elements
-  [[nodiscard]] constexpr SizeType max_size () const noexcept
+  /// \brief Returns an iterator to the beginning
+  constexpr const_reverse_iterator crbegin () const noexcept
   {
-    return std::allocator_traits<AllocatorType>::max_size();
+    return const_reverse_iterator{BaseType::crbegin(), BoolTypeToBool{}};
   }
 
-  /// \brief Returns the number of elements that can be held in currently allocated storage.
-  [[nodiscard]] constexpr SizeType capacity () const noexcept
+  /// \brief Returns an iterator to the end
+  constexpr reverse_iterator rend () noexcept
   {
-    return size_;
+    return reverse_iterator{BaseType::rend(), BoolTypeToBool{}};
   }
 
-  /// \brief Reserves storage
-  constexpr void reserve (SizeType count)
+  /// \brief Returns an iterator to the end
+  constexpr const_reverse_iterator rend () const noexcept
   {
-    /* do nothing */
+    return const_reverse_iterator{BaseType::rend(), BoolTypeToBool{}};
+  }
+
+  /// \brief Returns an iterator to the end
+  constexpr const_reverse_iterator crend () const noexcept
+  {
+    return const_reverse_iterator{BaseType::crend(), BoolTypeToBool{}};
   }
 
   /// @}
@@ -359,126 +286,17 @@ public:
   /// \name Modifiers
   /// @{
 
-  /// \brief Clears the contents
-  constexpr void clear () noexcept
-  {
-    resize(0);
-  }
-
-  /// \brief Changes the number of elements stored. If `count != size` allocate new storage.
-  constexpr void resize (SizeType count)
-  {
-    if (size_ != count) {
-      Vector tmp(count);
-      this->swap(tmp);
-    }
-  }
+  using BaseType::resize;
 
   /// \brief Changes the number of elements stored and set the value of all elements to `value`.
   /// If `count != size` allocate new storage with the given initial value.
-  constexpr void resize (SizeType count, const ElementType& value)
+  constexpr void resize (size_type count, const value_type& value)
   {
-    if (size_ != count) {
-      Vector tmp(count, value);
-      this->swap(tmp);
-    }
-  }
-
-  /// \brief Swaps the contents with `other`
-  constexpr void swap (Vector& other)
-  {
-    using std::swap;
-    swap(size_, other.size_);
-    swap(alloc_, other.alloc_);
-    swap(data_, other.data_);
+    BaseType::resize(count, Impl::BoolType{value});
   }
 
   /// @}
-
-private:
-  constexpr inline bool indexInRange (SizeType pos) const
-  {
-    if constexpr (std::is_signed_v<SizeType>)
-      return 0 <= pos && pos < size_;
-    else
-      return pos < size_;
-  }
-
-private:
-  SizeType size_ = 0;
-  DUNE_NO_UNIQUE_ADDRESS AllocatorType alloc_ = {};
-  ElementType* data_ = nullptr;
 };
-
-
-/// \name Comparison operations
-/// \relates Vector
-/// @{
-
-/// \brief Check if the content of the two Vectors is equal
-template <class Element, class Allocator>
-constexpr bool operator== (const Dune::Vector<Element, Allocator>& lhs,
-                           const Dune::Vector<Element, Allocator>& rhs)
-{
-  return (lhs.size() != rhs.size()) && std::equal(lhs.begin(), lhs.end(), rhs.begin());
-}
-
-#if  __cpp_impl_three_way_comparison >= 201907L && __cpp_lib_three_way_comparison >= 201907L
-
-/// \brief Lexicographically compares the values of two Vectors
-template <class Element, class Allocator>
-constexpr auto operator<=> (const Dune::Vector<Element, Allocator>& lhs,
-                            const Dune::Vector<Element, Allocator>& rhs)
-{
-  return std::lexicographical_compare_three_way(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-}
-
-#else
-
-/// \brief Check if the content of the two Vectors is unequal
-template <class Element, class Allocator>
-bool operator!= (const Dune::Vector<Element, Allocator>& lhs,
-                 const Dune::Vector<Element, Allocator>& rhs)
-{
-  return !(lhs == rhs);
-}
-
-/// \brief Lexicographically compares the values of two Vectors by <
-template <class Element, class Allocator>
-bool operator< (const Dune::Vector<Element, Allocator>& lhs,
-                const Dune::Vector<Element, Allocator>& rhs)
-{
-  return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), std::less<>{});
-}
-
-/// \brief Lexicographically compares the values of two Vectors by <=
-template <class Element, class Allocator>
-bool operator<= (const Dune::Vector<Element, Allocator>& lhs,
-                 const Dune::Vector<Element, Allocator>& rhs)
-{
-  return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), std::less_equal<>{});
-}
-
-/// \brief Lexicographically compares the values of two Vectors by >
-template <class Element, class Allocator>
-bool operator> (const Dune::Vector<Element, Allocator>& lhs,
-                const Dune::Vector<Element, Allocator>& rhs)
-{
-  return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), std::greater<>{});
-}
-
-/// \brief Lexicographically compares the values of two Vectors by >=
-template <class Element, class Allocator>
-bool operator>= (const Dune::Vector<Element, Allocator>& lhs,
-                 const Dune::Vector<Element, Allocator>& rhs)
-{
-  return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), std::greater_equal<>{});
-}
-
-#endif
-
-/// @}
-
 
 template<class T>
 struct FieldTraits< Dune::Vector<T> >

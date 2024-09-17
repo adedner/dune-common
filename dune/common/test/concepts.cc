@@ -37,6 +37,7 @@ int main (int argc, char **argv)
   static_assert(Concept::RandomAccessContainer<std::array<double,3>>);
   static_assert(Concept::RandomAccessContainer<std::vector<double>>);
   static_assert(Concept::RandomAccessContainer<Dune::Vector<double>>);
+  static_assert(Concept::RandomAccessContainer<Dune::Vector<bool>>);
   static_assert(Concept::RandomAccessContainer<Dune::ReservedVector<double,3>>);
 
   static_assert(not Concept::Container<double*>);
