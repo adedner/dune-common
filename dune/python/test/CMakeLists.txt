@@ -20,14 +20,16 @@ if(TARGET Python3::Python)
                 LABELS quick
                 COMMAND ${CMAKE_BINARY_DIR}/run-in-dune-env
                 CMD_ARGS $<TARGET_FILE:test_embed1>
+                OUTPUT_TARGET test_embed1
     )
-    target_compile_definitions(test_embed1 PRIVATE PYTHON_INTERPRETER=L"${DUNE_PYTHON_VIRTUALENV_EXECUTABLE}")
+    target_compile_definitions(${test_embed1} PRIVATE PYTHON_INTERPRETER=L"${DUNE_PYTHON_VIRTUALENV_EXECUTABLE}")
 
     dune_add_test(SOURCES test_embed2.cc
                 LINK_LIBRARIES ${DUNE_LIBS} Python3::Python
                 LABELS quick
                 COMMAND ${CMAKE_BINARY_DIR}/run-in-dune-env
                 CMD_ARGS $<TARGET_FILE:test_embed2>
+                OUTPUT_TARGET test_embed2
     )
-    target_compile_definitions(test_embed2 PRIVATE PYTHON_INTERPRETER=L"${DUNE_PYTHON_VIRTUALENV_EXECUTABLE}")
+    target_compile_definitions(${test_embed2} PRIVATE PYTHON_INTERPRETER=L"${DUNE_PYTHON_VIRTUALENV_EXECUTABLE}")
 endif()

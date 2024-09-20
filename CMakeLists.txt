@@ -15,6 +15,9 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 #include the dune macros
 include(DuneMacros)
 
+# Automatically prefix test and target names with `dune-common`
+dune_policy(SET DP0001 NEW)
+
 # start a dune project with information from dune.module
 dune_project()
 

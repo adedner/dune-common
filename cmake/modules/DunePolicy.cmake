@@ -110,7 +110,11 @@ function(dune_set_policy _policy _value)
       dune_policy_help(FATAL_ERROR "Undefined policy ${_policy}.")
     endif()
   endif()
-  set_property(GLOBAL PROPERTY DUNE_POLICY_${_policy} ${_value})
+  get_property(_policy_module GLOBAL PROPERTY DUNE_POLICY_${_policy}_MODULE)
+  if(_policy_module STREQUAL ProjectName)
+    # set the policy only if the module property matches the project-name
+    set_property(GLOBAL PROPERTY DUNE_POLICY_${_policy} ${_value})
+  endif()
 endfunction(dune_set_policy)
 
 # generic policy method to get, set, or list policies

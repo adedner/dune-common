@@ -208,7 +208,9 @@ not want to see any policy warnings and just stick with the defaults, the global
 Policies Introduced by Dune 2.10
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Here we will list and explain the introduced policies.
+``DP0001`` (dune-common, set to NEW by default in version 2.12)
+    *OLD behavior:* Target and test names are as specified in ``dune_add_test``, e.g. extracted from the SOURCE filename or given explicitly.
+    *NEW behavior:* Add a prefix ``<project-name>_`` to the target names and ``<project-name>.`` to the test names in ``dune_add_test`` for non-top-level projects. Additionally an output parameter ``OUTPUT_TARGET`` is provided to obtain the generated target name.
 
 
 .. _faq:

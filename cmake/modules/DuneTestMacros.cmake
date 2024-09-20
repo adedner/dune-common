@@ -220,6 +220,10 @@ include_guard(GLOBAL)
 enable_testing()
 include(CTest)
 
+include(DunePolicy)
+dune_define_policy(DP0001 dune-common 2.12
+  "OLD behavior: target and test names are as specified in dune_add_test. NEW behavior: Add a prefix to the target and test names in dune_add_test for non-top-level projects.")
+
 # Introduce a target that triggers the building of all tests
 add_custom_target(build_tests)
 
@@ -258,7 +262,7 @@ endif()
 
 function(dune_add_test)
   set(OPTIONS EXPECT_COMPILE_FAIL EXPECT_FAIL SKIP_ON_77 COMPILE_ONLY PYTHON_TEST)
-  set(SINGLEARGS NAME TARGET TIMEOUT WORKING_DIRECTORY)
+  set(SINGLEARGS NAME TARGET TIMEOUT WORKING_DIRECTORY OUTPUT_TARGET)
   set(MULTIARGS SOURCES COMPILE_DEFINITIONS COMPILE_FLAGS LINK_LIBRARIES CMD_ARGS MPI_RANKS COMMAND CMAKE_GUARD LABELS)
   cmake_parse_arguments(ADDTEST "${OPTIONS}" "${SINGLEARGS}" "${MULTIARGS}" ${ARGN})
 
@@ -347,16 +351,24 @@ function(dune_add_test)
   list(APPEND ADDTEST_LINK_LIBRARIES Dune::Common)
   list(REMOVE_DUPLICATES ADDTEST_LINK_LIBRARIES)
 
+  dune_policy(GET DP0001 _name_prefix_policy)
+
   # Add the executable if it is not already present
   if(ADDTEST_SOURCES)
-    add_executable(${ADDTEST_NAME} ${ADDTEST_SOURCES})
-    # add all flags to the target!
-    add_dune_all_flags(${ADDTEST_NAME})
-    # This is just a placeholder
-    target_compile_definitions(${ADDTEST_NAME} PUBLIC ${ADDTEST_COMPILE_DEFINITIONS})
-    target_compile_options(${ADDTEST_NAME} PUBLIC ${ADDTEST_COMPILE_FLAGS})
-    target_link_libraries(${ADDTEST_NAME} PUBLIC ${ADDTEST_LINK_LIBRARIES})
     set(ADDTEST_TARGET ${ADDTEST_NAME})
+    # if the project is not a top-level project add a prefix to the targetname
+    if(_name_prefix_policy STREQUAL "NEW")
+      if(NOT (PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR))
+        set(ADDTEST_TARGET ${PROJECT_NAME}_${ADDTEST_TARGET})
+      endif()
+    endif()
+    add_executable(${ADDTEST_TARGET} ${ADDTEST_SOURCES})
+    # add all flags to the target!
+    add_dune_all_flags(${ADDTEST_TARGET})
+    # This is just a placeholder
+    target_compile_definitions(${ADDTEST_TARGET} PUBLIC ${ADDTEST_COMPILE_DEFINITIONS})
+    target_compile_options(${ADDTEST_TARGET} PUBLIC ${ADDTEST_COMPILE_FLAGS})
+    target_link_libraries(${ADDTEST_TARGET} PUBLIC ${ADDTEST_LINK_LIBRARIES})
   endif()
 
   # If target is mutable, make sure to exclude the target from all, even when it is user-provided
@@ -392,6 +404,14 @@ function(dune_add_test)
   foreach(procnum ${ADDTEST_MPI_RANKS})
     if((NOT "${procnum}" GREATER "${DUNE_MAX_TEST_CORES}") AND (NOT ADDTEST_COMPILE_ONLY))
       set(ACTUAL_NAME ${ADDTEST_NAME})
+
+      # if the project is not a top-level project add a prefix to the testname
+      if(_name_prefix_policy STREQUAL "NEW")
+        if(NOT (PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR))
+          set(ACTUAL_NAME ${PROJECT_NAME}.${ACTUAL_NAME})
+        endif()
+      endif()
+
       set(ACTUAL_CMD_ARGS ${ADDTEST_CMD_ARGS})
       if(TARGET "${ADDTEST_COMMAND}")
         # if the target name is specified as command, expand to full path using the TARGET_FILE generator expression
@@ -441,4 +461,9 @@ function(dune_add_test)
       set_tests_properties(${ACTUAL_NAME} PROPERTIES LABELS "${ADDTEST_LABELS}")
     endif()
   endforeach()
+
+  # export the name of the test target to the parent scope
+  if(ADDTEST_OUTPUT_TARGET)
+    set(${ADDTEST_OUTPUT_TARGET} ${ADDTEST_TARGET} PARENT_SCOPE)
+  endif()
 endfunction()
