@@ -37,12 +37,12 @@
 #       :multi:
 #
 #       If your module contains libraries as well as programs and if the programs should automatically
-#       link to those libraries, you *MUST* list these libraries in :code:`MODULE_LIBRARIES`. Those libraries will be
-#       automatically created by :ref:`dune_enable_all_packages` (which internally calls :ref:`dune_add_library`) and placed
-#       in the lib/ directory. The order of the libraries matters: if one library depends on another one, it must
-#       be listed after its dependency. This special handling of the libraries is due to the way CMake
-#       handle linking (in particular CMP022 and CMP038). You can later add source files to the library
-#       anywhere in the source tree by calling :ref:`dune_library_add_sources`.
+#       link to those libraries, you *MUST* list these libraries in :code:`MODULE_LIBRARIES`. Those libraries
+#       will be automatically created by :ref:`dune_enable_all_packages` (which internally calls
+#       :ref:`dune_add_library` with `NO_EXPORT`) and placed in the lib/ directory. The order of the libraries
+#       matters: if one library depends on another one, it must be listed after its dependency. This special
+#       handling of the libraries is due to the way CMake handle linking (in particular CMP022 and CMP038).
+#       You can later add source files to the library anywhere in the source tree by calling :ref:`dune_library_add_sources`.
 #
 #    .. cmake_param:: VERBOSE
 #       :option:
@@ -141,7 +141,7 @@
 #       That library must have been created by an earlier call to :ref:`dune_enable_all_packages`
 #       in the current DUNE module.
 #
-#    Register sources for module exported library.
+#    Register sources for module registered library.
 #
 include_guard(GLOBAL)
 
@@ -272,7 +272,7 @@ function(dune_enable_all_packages)
       configure_file("${script_dir}/module_library.cc.in" "${PROJECT_BINARY_DIR}/lib/lib${module_lib}_stub.cc")
 
       # ...and create the library...
-      dune_add_library(${module_lib} SOURCES "${PROJECT_BINARY_DIR}/lib/lib${module_lib}_stub.cc")
+      dune_add_library(${module_lib} NO_EXPORT SOURCES "${PROJECT_BINARY_DIR}/lib/lib${module_lib}_stub.cc")
       # ...and add it to all future targets in the module
       link_libraries(${module_lib})
     endforeach(module_lib ${DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES})

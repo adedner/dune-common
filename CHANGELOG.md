@@ -194,6 +194,8 @@ In order to build the DUNE core modules you need at least the following software
 
 ## Build system: Deprecations and removals
 
+- The module libraries `MODULE_LIBRARIES` registered on `dune_enable_all_packages` are not exported anymore.
+
 - Remove the search of (currently broken) `pkg-config` files for dune packages.
 
 - Remove the `ALLOW_CXXFLAGS_OVERWRITE` configure option. The `CXXFLAGS`
