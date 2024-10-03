@@ -238,7 +238,7 @@ namespace Dune {
     }
 
 
-    /// \name Comparsion operators
+    /// \name Comparison operators
     /// @{
 
     //! comparison of FieldVectors for equality
