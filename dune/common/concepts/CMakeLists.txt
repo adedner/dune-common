@@ -4,4 +4,5 @@
 install(FILES
   container.hh
   hashable.hh
+  scalar.hh
 DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/common/concepts)
