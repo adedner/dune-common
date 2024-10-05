@@ -267,14 +267,18 @@ function(dune_enable_all_packages)
     # figure out the location of the stub source template
     dune_module_path(MODULE dune-common RESULT script_dir SCRIPT_DIR)
     foreach(module_lib ${DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES})
+      string(REPLACE " " ";" module_lib_args "${module_lib}")
+      list(POP_FRONT module_lib_args module_lib_name)
+
       # create the stub source file in the output directory (using a c++ compatible name)...
-      string(REGEX REPLACE "[^a-zA-Z0-9]" "_" module_lib_mangled ${module_lib})
-      configure_file("${script_dir}/module_library.cc.in" "${PROJECT_BINARY_DIR}/lib/lib${module_lib}_stub.cc")
+      set(module_source "${PROJECT_BINARY_DIR}/lib/lib${module_lib_name}_stub.cc")
+      configure_file("${script_dir}/module_library.cc.in" ${module_source})
 
       # ...and create the library...
-      dune_add_library(${module_lib} SOURCES "${PROJECT_BINARY_DIR}/lib/lib${module_lib}_stub.cc")
+      dune_add_library(${module_lib_name} "${module_lib_args}" SOURCES ${module_source})
+
       # ...and add it to all future targets in the module
-      link_libraries(${module_lib})
+      link_libraries(${module_lib_name})
     endforeach(module_lib ${DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES})
 
     # export the DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES variable to the parent scope
