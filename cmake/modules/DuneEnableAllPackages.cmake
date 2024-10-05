@@ -274,7 +274,8 @@ function(dune_enable_all_packages)
       list(POP_FRONT module_lib_args module_lib_name)
 
       # create the stub source file in the output directory (using a c++ compatible name)...
-      set(module_source "${PROJECT_BINARY_DIR}/lib/lib${module_lib_name}_stub.cc")
+      string(REGEX REPLACE "[^a-zA-Z0-9]" "_" module_lib_mangled ${module_lib_name})
+      set(module_source "${PROJECT_BINARY_DIR}/lib/lib${module_lib_mangled}_stub.cc")
       configure_file("${script_dir}/module_library.cc.in" ${module_source})
 
       # ...and create the library...
