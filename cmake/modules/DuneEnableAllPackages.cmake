@@ -283,13 +283,15 @@ function(dune_enable_all_packages)
 
       # ...and add it to all future targets in the module
       link_libraries(${module_lib_name})
+
+      list(APPEND _DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES ${module_lib_name})
     endforeach(module_lib ${DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES})
 
-    # export the DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES variable to the parent scope
+    # export the _DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES variable to the parent scope
     # this is required to make dune_library_add_sources() work (see further down)
     set(
       DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES
-      ${DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES}
+      ${_DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES}
       PARENT_SCOPE
       )
   endif(DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES)
