@@ -9,6 +9,12 @@ SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
 
 - Add deduction guides to `TupleVector` analogous to `std::tuple`.
 
+## Build system: Changelog
+
+- Allow to pass extra arguments forwarded to `dune_add_library` in the function
+  `dune_enable_all_packages` when `MODULE_LIBRARIES` is used. Enclose the extra
+  parameters in quotation marks for each module library name.
+
 # Release 2.10
 
 ## Dependencies
