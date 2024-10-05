@@ -44,6 +44,9 @@
 #       handle linking (in particular CMP022 and CMP038). You can later add source files to the library
 #       anywhere in the source tree by calling :ref:`dune_library_add_sources`.
 #
+#       Extra arguments that need to be passed to `dune_add_library` can be added the the library name by
+#       enclosing in quotation marks, e.g., `MODULE_LIBRARIES "name EXPORT_NAME Name NAMESPACE Dune::"`.
+#
 #    .. cmake_param:: VERBOSE
 #       :option:
 #
