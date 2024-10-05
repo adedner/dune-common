@@ -269,6 +269,7 @@ function(dune_enable_all_packages)
     file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
     # figure out the location of the stub source template
     dune_module_path(MODULE dune-common RESULT script_dir SCRIPT_DIR)
+    set(module_libs)
     foreach(module_lib ${DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES})
       string(REPLACE " " ";" module_lib_args "${module_lib}")
       list(POP_FRONT module_lib_args module_lib_name)
@@ -284,16 +285,14 @@ function(dune_enable_all_packages)
       # ...and add it to all future targets in the module
       link_libraries(${module_lib_name})
 
-      list(APPEND _DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES ${module_lib_name})
+      # collect the library names in a list
+      list(APPEND module_libs ${module_lib_name})
     endforeach(module_lib ${DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES})
 
-    # export the _DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES variable to the parent scope
-    # this is required to make dune_library_add_sources() work (see further down)
-    set(
-      DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES
-      ${_DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES}
-      PARENT_SCOPE
-      )
+    # export the list of library names as DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES
+    # variable to the parent scope this is required to make dune_library_add_sources()
+    # work (see further down)
+    set(DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES ${module_libs} PARENT_SCOPE)
   endif(DUNE_ENABLE_ALL_PACKAGES_MODULE_LIBRARIES)
 
   if(DUNE_ENABLE_ALL_PACKAGES_VERBOSE)
