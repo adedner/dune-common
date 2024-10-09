@@ -8,6 +8,7 @@
 #include <cmath>
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -63,12 +64,13 @@ namespace Dune
   namespace Impl
   {
 
-    template< class DenseMatrix, class RHS, class = void >
+    template< class DenseMatrix, class RHS >
     class DenseMatrixAssigner
     {};
 
     template< class DenseMatrix, class RHS >
-    class DenseMatrixAssigner< DenseMatrix, RHS, std::enable_if_t< Dune::IsNumber< RHS >::value > >
+      requires (Dune::IsNumber< RHS >::value)
+    class DenseMatrixAssigner<DenseMatrix, RHS>
     {
     public:
       static void apply ( DenseMatrix &denseMatrix, const RHS &rhs )
@@ -78,13 +80,11 @@ namespace Dune
       }
     };
 
-    template <class A, class B>
-    using MatrixElementsAssignable = decltype(
-        *std::begin(*std::declval<typename A::iterator>()) = *std::begin(*std::declval<typename B::const_iterator>()));
-
     template< class DenseMatrix, class RHS >
-    class DenseMatrixAssigner< DenseMatrix, RHS,
-      std::enable_if_t<Dune::Std::is_detected_v<MatrixElementsAssignable,DenseMatrix,RHS>>>
+      requires std::indirectly_copyable<
+        decltype(std::begin(*std::declval<typename RHS::const_iterator>())),
+        decltype(std::begin(*std::declval<typename DenseMatrix::iterator>()))>
+    class DenseMatrixAssigner<DenseMatrix, RHS>
     {
     public:
       static void apply ( DenseMatrix &denseMatrix, const RHS &rhs )
