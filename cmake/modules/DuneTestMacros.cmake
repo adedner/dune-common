@@ -217,7 +217,6 @@
 include_guard(GLOBAL)
 
 # enable the testing suite on the CMake side.
-enable_testing()
 include(CTest)
 
 # Introduce a target that triggers the building of all tests
@@ -376,7 +375,7 @@ function(dune_add_test)
 
   # Have build_tests and build_${label}_tests depend on the given target in
   # order to trigger the build correctly
-  if(NOT ADDTEST_EXPECT_COMPILE_FAIL)
+  if(BUILD_TESTING AND (NOT ADDTEST_EXPECT_COMPILE_FAIL))
     add_dependencies(build_tests ${ADDTEST_TARGET})
     foreach(label IN LISTS ADDTEST_LABELS)
       add_dependencies(build_${label}_tests ${ADDTEST_TARGET})
