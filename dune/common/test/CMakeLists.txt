@@ -189,8 +189,9 @@ dune_add_test(SOURCES filledarraytest.cc
 
 dune_add_test(SOURCES fmatrixtest.cc
               LINK_LIBRARIES dunecommon
-              LABELS quick)
-add_dune_vc_flags(fmatrixtest)
+              LABELS quick
+              OUTPUT_TARGET fmatrixtest)
+add_dune_vc_flags(${fmatrixtest})
 
 dune_add_test(SOURCES fvectortest.cc
               LINK_LIBRARIES dunecommon
@@ -237,8 +238,9 @@ dune_add_test(SOURCES mathclassifierstest.cc
 dune_add_test(SOURCES metistest.cc
               LINK_LIBRARIES dunecommon
               CMAKE_GUARD METIS_FOUND
-              LABELS quick)
-add_dune_metis_flags(metistest)
+              LABELS quick
+              OUTPUT_TARGET metistest)
+add_dune_metis_flags(${metistest})
 
 dune_add_test(SOURCES mpicommunicationtest.cc
               LINK_LIBRARIES dunecommon
@@ -420,8 +422,9 @@ dune_add_test(SOURCES mathtest.cc
 dune_add_test(SOURCES vcexpectedimpltest.cc
               LINK_LIBRARIES dunecommon
               LABELS quick
-              CMAKE_GUARD Vc_FOUND)
-add_dune_vc_flags(vcexpectedimpltest)
+              CMAKE_GUARD Vc_FOUND
+              OUTPUT_TARGET vcexpectedimpltest)
+add_dune_vc_flags(${vcexpectedimpltest})
 
 dune_add_test(SOURCES alignedallocatortest.cc
               LINK_LIBRARIES dunecommon)
