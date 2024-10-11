@@ -32,170 +32,170 @@ namespace Dune {
 
      \warning As this is only a proxy class, you can not get the
      address of the bitset.
-   */
-  template <int block_size, class Alloc>
-  class BitSetVectorConstReference
+  */
+template <int block_size, class Alloc>
+class BitSetVectorConstReference
+{
+protected:
+
+      typedef Dune::BitSetVector<block_size, Alloc> BitSetVector;
+      friend class Dune::BitSetVector<block_size, Alloc>;
+
+      BitSetVectorConstReference(const BitSetVector& blockBitField_, int block_number_) :
+        blockBitField(blockBitField_),
+        block_number(block_number_)
+      {
+        DUNE_ASSERT_BOUNDS(blockBitField_.size() > static_cast<size_t>(block_number_));
+      }
+
+      //! disable assignment operator
+      BitSetVectorConstReference& operator=(const BitSetVectorConstReference & b) = delete;
+
+public:
+
+  typedef std::bitset<block_size> bitset;
+
+  // bitset interface typedefs
+  typedef typename std::vector<bool, Alloc>::const_reference reference;
+  typedef typename std::vector<bool, Alloc>::const_reference const_reference;
+  typedef size_t size_type;
+
+  //! Returns a copy of *this shifted left by n bits.
+  bitset operator<<(size_type n) const
   {
-  protected:
+    bitset b = *this;
+    b <<= n;
+    return b;
+  }
 
-    typedef Dune::BitSetVector<block_size, Alloc> BitSetVector;
-    friend class Dune::BitSetVector<block_size, Alloc>;
+  //! Returns a copy of *this shifted right by n bits.
+  bitset operator>>(size_type n) const
+  {
+    bitset b = *this;
+    b >>= n;
+    return b;
+  }
 
-    BitSetVectorConstReference(const BitSetVector& blockBitField_, int block_number_) :
-      blockBitField(blockBitField_),
-      block_number(block_number_)
-    {
-      DUNE_ASSERT_BOUNDS(blockBitField_.size() > static_cast<size_t>(block_number_));
-    }
+  //! Returns a copy of *this with all of its bits flipped.
+  bitset operator~() const
+  {
+    bitset b = *this;
+    b.flip();
+    return b;
+  }
 
-    //! disable assignment operator
-    BitSetVectorConstReference& operator=(const BitSetVectorConstReference & b) = delete;
+  //! Returns block_size.
+  size_type size() const
+  {
+    return block_size;
+  }
 
-  public:
+  //! Returns the number of bits that are set.
+  size_type count() const
+  {
+    size_type n = 0;
+    for(size_type i=0; i<block_size; ++i)
+      n += getBit(i);
+    return n;
+  }
 
-    typedef std::bitset<block_size> bitset;
+  //! Returns true if any bits are set.
+  bool any() const
+  {
+    return count();
+  }
 
-    // bitset interface typedefs
-    typedef typename std::vector<bool, Alloc>::const_reference reference;
-    typedef typename std::vector<bool, Alloc>::const_reference const_reference;
-    typedef size_t size_type;
+  //! Returns true if no bits are set.
+  bool none() const
+  {
+    return ! any();
+  }
 
-    //! Returns a copy of *this shifted left by n bits.
-    bitset operator<<(size_type n) const
-    {
-      bitset b = *this;
-      b <<= n;
-      return b;
-    }
+  //! Returns true if all bits are set
+  bool all() const
+  {
+    for(size_type i=0; i<block_size; ++i)
+      if(not test(i))
+        return false;
+    return true;
+  }
 
-    //! Returns a copy of *this shifted right by n bits.
-    bitset operator>>(size_type n) const
-    {
-      bitset b = *this;
-      b >>= n;
-      return b;
-    }
+  //! Returns true if bit n is set.
+  bool test(size_type n) const
+  {
+    return getBit(n);
+  }
 
-    //! Returns a copy of *this with all of its bits flipped.
-    bitset operator~() const
-    {
-      bitset b = *this;
-      b.flip();
-      return b;
-    }
+  //! Return reference to the `i`-th bit
+  const_reference operator[](size_type i) const
+  {
+    return getBit(i);
+  }
 
-    //! Returns block_size.
-    size_type size() const
-    {
-      return block_size;
-    }
+  //! cast to bitset
+  operator bitset() const
+  {
+    return blockBitField.getRepr(block_number);
+  }
 
-    //! Returns the number of bits that are set.
-    size_type count() const
-    {
-      size_type n = 0;
-      for(size_type i=0; i<block_size; ++i)
-        n += getBit(i);
-      return n;
-    }
+  //! Equality of reference and std::bitset
+  bool operator== (const bitset& bs) const
+  {
+    return equals(bs);
+  }
 
-    //! Returns true if any bits are set.
-    bool any() const
-    {
-      return count();
-    }
+  //! Equality of reference and other reference
+  bool operator== (const BitSetVectorConstReference& bs) const
+  {
+    return equals(bs);
+  }
 
-    //! Returns true if no bits are set.
-    bool none() const
-    {
-      return ! any();
-    }
+  //! Inequality of reference and std::bitset
+  bool operator!= (const bitset& bs) const
+  {
+    return ! equals(bs);
+  }
 
-    //! Returns true if all bits are set
-    bool all() const
-    {
-      for(size_type i=0; i<block_size; ++i)
-        if(not test(i))
-          return false;
-      return true;
-    }
+  //! Inequality of reference and other reference
+  bool operator!= (const BitSetVectorConstReference& bs) const
+  {
+    return ! equals(bs);
+  }
 
-    //! Returns true if bit n is set.
-    bool test(size_type n) const
-    {
-      return getBit(n);
-    }
+  /*!
+      missing operators:
 
-    //! Return reference to the `i`-th bit
-    const_reference operator[](size_type i) const
-    {
-      return getBit(i);
-    }
+      - unsigned long to_ulong() const
+    */
 
-    //! cast to bitset
-    operator bitset() const
-    {
-      return blockBitField.getRepr(block_number);
-    }
+  friend std::ostream& operator<< (std::ostream& s, const BitSetVectorConstReference& v)
+  {
+    s << "(";
+    for(int i=0; i<block_size; ++i)
+      s << v[i];
+    s << ")";
+    return s;
+  }
 
-    //! Equality of reference and std::bitset
-    bool operator== (const bitset& bs) const
-    {
-      return equals(bs);
-    }
+protected:
+  const BitSetVector& blockBitField;
+  int block_number;
 
-    //! Equality of reference and other reference
-    bool operator== (const BitSetVectorConstReference& bs) const
-    {
-      return equals(bs);
-    }
+  const_reference getBit(size_type i) const
+  {
+    return blockBitField.getBit(block_number,i);
+  }
 
-    //! Inequality of reference and std::bitset
-    bool operator!= (const bitset& bs) const
-    {
-      return ! equals(bs);
-    }
+  template<class BS>
+  bool equals(const BS & bs) const
+  {
+    bool eq = true;
+    for(int i=0; i<block_size; ++i)
+      eq &= (getBit(i) == bs[i]);
+    return eq;
+  }
 
-    //! Inequality of reference and other reference
-    bool operator!= (const BitSetVectorConstReference& bs) const
-    {
-      return ! equals(bs);
-    }
-
-    /*!
-       missing operators:
-
-       - unsigned long to_ulong() const
-     */
-
-    friend std::ostream& operator<< (std::ostream& s, const BitSetVectorConstReference& v)
-    {
-      s << "(";
-      for(int i=0; i<block_size; ++i)
-        s << v[i];
-      s << ")";
-      return s;
-    }
-
-  protected:
-    const BitSetVector& blockBitField;
-    int block_number;
-
-    const_reference getBit(size_type i) const
-    {
-      return blockBitField.getBit(block_number,i);
-    }
-
-    template<class BS>
-    bool equals(const BS & bs) const
-    {
-      bool eq = true;
-      for(int i=0; i<block_size; ++i)
-        eq &= (getBit(i) == bs[i]);
-      return eq;
-    }
-
-  private:
+private:
     /**
        This is only a Proxy class, you can't get the address of the
        object it references
