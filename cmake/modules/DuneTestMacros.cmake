@@ -220,7 +220,8 @@ include_guard(GLOBAL)
 enable_testing()
 include(CTest)
 
-if(PROJECT_IS_TOP_LEVEL OR PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+# Enable testing by default if the project is a top-level project
+if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
   set(DUNE_ENABLE_TESTING_DEFAULT ON)
 else()
   set(DUNE_ENABLE_TESTING_DEFAULT OFF)
