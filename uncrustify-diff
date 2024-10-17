@@ -214,6 +214,7 @@ def diff_to_gitlab_merge_request(diff_hunks):
             '-d', f'{json.dumps(data)}',
             f'{merge_request_url}/versions'
         ]
+        print(post_request)
         response = subprocess.run(post_request, stdout=subprocess.PIPE, text=True).stdout
         print(response)
 
