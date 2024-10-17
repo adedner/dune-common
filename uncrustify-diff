@@ -169,7 +169,8 @@ def diff_to_gitlab_merge_request(diff_hunks):
         '-H', 'Content-Type: application/json',
         f'{merge_request_url}/versions'
     ]
-    merge_request_version = subprocess.run(get_request, stdout=subprocess.PIPE, text=True)
+
+    merge_request_version = subprocess.run(get_request, stdout=subprocess.PIPE, text=True).stdout
     merge_request_version = json.loads(merge_request_version)
     for hunk in diff_hunks:
         old_file = None
@@ -213,7 +214,7 @@ def diff_to_gitlab_merge_request(diff_hunks):
             '-d', f'\"json.dumps(data)\"',
             f'{merge_request_url}/versions'
         ]
-        response = subprocess.run(post_request, stdout=subprocess.PIPE, text=True)
+        response = subprocess.run(post_request, stdout=subprocess.PIPE, text=True).stdout
         print(response)
 
 if __name__ == "__main__":
