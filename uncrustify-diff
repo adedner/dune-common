@@ -194,12 +194,12 @@ def diff_to_gitlab_merge_request(diff_hunks):
             elif line.startswith("+"):
                 diff.append(line[1:])
 
-        if (new_line_size > 100)
+        if (new_line_size > 100):
             print('Skipping diff as this is too big for a suggestion')
             data = {
                 'body': f'To conform to the uncrustify format I suggest you apply the following suggestion:\n\n ```diff\n{'\n'.join(diff)}```'
             }
-        else 
+        else:
             suggestion = '\n'.join(diff)
             suggestion = f'```suggestion:-{new_line_size-1}+0\n{suggestion}\n```'
 
