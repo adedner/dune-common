@@ -161,7 +161,7 @@ def diff_to_code_climate(diff_hunks):
 def diff_to_gitlab_merge_request(diff_hunks):
 
     # We first need to get the latest information of the MR
-    project_url = f'{os.environ["CI_API_URL"]}/projects/{os.environ["CI_PROJECT_ID"]}'
+    project_url = f'{os.environ["CI_API_V4_URL"]}/projects/{os.environ["CI_PROJECT_ID"]}'
     merge_request_url = f'{project_url}/merge_requests/{os.environ["CI_MERGE_REQUEST_IID"]}'
     get_request = [
         'curl',
