@@ -209,11 +209,12 @@ def diff_to_gitlab_merge_request(diff_hunks):
 
         post_request =[
             'curl',
-            '-H', f'PRIVATE-TOKEN: {os.environ["BOT_TOKEN"]}',
+            # '-H', f'PRIVATE-TOKEN: {os.environ["BOT_TOKEN"]}',
             '-H', 'Content-Type: application/json',
             '-d', f'\"{json.dumps(data)}\"',
             f'{merge_request_url}/versions'
         ]
+        print(post_request)
         response = subprocess.run(post_request, stdout=subprocess.PIPE, text=True).stdout
         print(response)
 
