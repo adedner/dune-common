@@ -193,21 +193,28 @@ def diff_to_gitlab_merge_request(diff_hunks):
                 continue
             elif line.startswith("+"):
                 diff.append(line[1:])
-        suggestion = '\n'.join(diff)
-        suggestion = f'```suggestion:-{new_line_size-1}+0\n{suggestion}\n```'
 
-        data = {
-            'position': {
-                'position_type': 'text',
-                'base_sha': merge_request_version[0]['base_commit_sha'],
-                'head_sha':  merge_request_version[0]['head_commit_sha'],
-                'start_sha': merge_request_version[0]['start_commit_sha'],
-                'new_path': new_file,
-                'old_path': old_file,
-                'new_line': new_line_start+new_line_size-1,
-            },
-            'body': f'To conform to the uncrustify format we suggest you apply the following suggestion:\n\n {suggestion}'
-        }
+        if (new_line_size > 100)
+            print('Skipping diff as this is too big for a suggestion')
+            data = {
+                'body': f'To conform to the uncrustify format I suggest you apply the following suggestion:\n\n ```diff\n{'\n'.join(diff)}```'
+            }
+        else 
+            suggestion = '\n'.join(diff)
+            suggestion = f'```suggestion:-{new_line_size-1}+0\n{suggestion}\n```'
+
+            data = {
+                'position': {
+                    'position_type': 'text',
+                    'base_sha': merge_request_version[0]['base_commit_sha'],
+                    'head_sha':  merge_request_version[0]['head_commit_sha'],
+                    'start_sha': merge_request_version[0]['start_commit_sha'],
+                    'new_path': new_file,
+                    'old_path': old_file,
+                    'new_line': new_line_start+new_line_size-1,
+                },
+                'body': f'To conform to the uncrustify format I suggest you apply the following suggestion:\n\n {suggestion}'
+            }
 
         post_request =[
             'curl',
