@@ -95,25 +95,6 @@ namespace Dune {
   {
     size_type n = 0;
     for(size_type i=0; i<block_size; ++i)
-     //! Returns a copy of *this with all of its bits flipped.
-     bitset operator ~() const
-       {
-       bitset b = *this;
-       b.flip();
-       return b;
-     }
-
-     //! Returns block_size.
-     size_type size() const
-       {
-       return block_size;
-     }
-
-     //! Returns the number of bits that are set.
-     size_type count() const
-       {
-       size_type n = 0;
-       for(size_type i=0; i<block_size; ++i)
          n += getBit(i);
        return n;
      }
@@ -146,7 +127,7 @@ namespace Dune {
      }
 
      //! Return reference to the `i`-th bit
-     const_reference operator[] (size_type i) const
+     const_reference operator[](size_type i) const
        {
        return getBit(i);
      }
