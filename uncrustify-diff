@@ -146,7 +146,7 @@ def diff_to_code_climate(diff_hunks):
                     "check_name": "uncrustify",
                     "description": f"Non-conforming format",
                     "severity": "minor",
-                    "fingerprint": hashlib.sha256(diff_dump.encode()).digest(),
+                    "fingerprint": hashlib.sha256(diff_dump.encode()).hexdigest(),
                     "location": {
                         "path": old_file,
                         "lines": {
@@ -177,8 +177,6 @@ def diff_to_gitlab_merge_request(diff_hunks):
         new_file = None
         new_line_start = None
         new_line_size = None
-        old_line_start = None
-        old_line_size = None
         diff = []
         # generate suggestion based on this hunk
         for line in hunk.split('\n'):
@@ -187,8 +185,6 @@ def diff_to_gitlab_merge_request(diff_hunks):
             if hunk_match:
                 new_line_start = int(hunk_match.group(3))
                 new_line_size = int(hunk_match.group(4)  if hunk_match.group(4) else 1)
-                old_line_start = int(hunk_match.group(1))
-                old_line_size = int(hunk_match.group(2) if hunk_match.group(2) else 1)
             if line.startswith("---"):
                 old_file = os.path.relpath(new_filename_match.match(line).group(2))
                 continue
@@ -214,16 +210,8 @@ def diff_to_gitlab_merge_request(diff_hunks):
                     'head_sha':  merge_request_version[0]['head_commit_sha'],
                     'start_sha': merge_request_version[0]['start_commit_sha'],
                     'new_path': new_file,
-                    'line_range': {
-                        'start': {
-                            'line_code': f'{hashlib.sha1(new_file.encode()).digest()}_{old_line_start}_{new_line_start}',
-                            'type': 'new'
-                        },
-                        'end': {
-                            'line_code': f'{hashlib.sha1(new_file.encode()).digest()}_{old_line_start+old_line_size}_{new_line_start+new_line_size}',
-                            'type': 'new'
-                        },
-                    }
+                    'old_path': old_file,
+                    'new_line': new_line_start,
                 },
                 'body': f'To conform to the uncrustify format I suggest you apply the following suggestion:\n\n {suggestion}'
             }
