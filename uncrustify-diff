@@ -146,7 +146,7 @@ def diff_to_code_climate(diff_hunks):
                     "check_name": "uncrustify",
                     "description": f"Non-conforming format",
                     "severity": "minor",
-                    "fingerprint": hashlib.sha256(diff_dump.encode()).diges(),
+                    "fingerprint": hashlib.sha256(diff_dump.encode()).digest(),
                     "location": {
                         "path": old_file,
                         "lines": {
@@ -216,11 +216,11 @@ def diff_to_gitlab_merge_request(diff_hunks):
                     'new_path': new_file,
                     'line_range': {
                         'start': {
-                            'line_code': f'{hashlib.sha1(new_file.encode()).diges()}_{old_line_start}_{new_line_start}',
+                            'line_code': f'{hashlib.sha1(new_file.encode()).digest()}_{old_line_start}_{new_line_start}',
                             'type': 'new'
                         },
                         'end': {
-                            'line_code': f'{hashlib.sha1(new_file.encode()).diges()}_{old_line_start+old_line_size}_{new_line_start+new_line_size}',
+                            'line_code': f'{hashlib.sha1(new_file.encode()).digest()}_{old_line_start+old_line_size}_{new_line_start+new_line_size}',
                             'type': 'new'
                         },
                     }
