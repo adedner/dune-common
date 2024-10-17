@@ -146,7 +146,7 @@ def diff_to_code_climate(diff_hunks):
                     "check_name": "uncrustify",
                     "description": f"Non-conforming format",
                     "severity": "minor",
-                    "fingerprint": hashlib.sha256(diff_dump.encode()).hexdigest(),
+                    "fingerprint": hashlib.sha256(diff_dump.encode()).diges(),
                     "location": {
                         "path": old_file,
                         "lines": {
@@ -177,6 +177,8 @@ def diff_to_gitlab_merge_request(diff_hunks):
         new_file = None
         new_line_start = None
         new_line_size = None
+        old_line_start = None
+        old_line_size = None
         diff = []
         # generate suggestion based on this hunk
         for line in hunk.split('\n'):
@@ -185,6 +187,8 @@ def diff_to_gitlab_merge_request(diff_hunks):
             if hunk_match:
                 new_line_start = int(hunk_match.group(3))
                 new_line_size = int(hunk_match.group(4)  if hunk_match.group(4) else 1)
+                old_line_start = int(hunk_match.group(1))
+                old_line_size = int(hunk_match.group(2) if hunk_match.group(2) else 1)
             if line.startswith("---"):
                 old_file = os.path.relpath(new_filename_match.match(line).group(2))
                 continue
@@ -212,11 +216,11 @@ def diff_to_gitlab_merge_request(diff_hunks):
                     'new_path': new_file,
                     'line_range': {
                         'start': {
-                            'line_code': new_line_start,
+                            'line_code': f'{hashlib.sha1(new_file.encode()).diges()}_{old_line_start}_{new_line_start}',
                             'type': 'new'
                         },
                         'end': {
-                            'line_code': new_line_start+new_line_size,
+                            'line_code': f'{hashlib.sha1(new_file.encode()).diges()}_{old_line_start+old_line_size}_{new_line_start+new_line_size}',
                             'type': 'new'
                         },
                     }
