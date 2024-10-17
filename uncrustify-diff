@@ -201,7 +201,7 @@ def diff_to_gitlab_merge_request(diff_hunks):
             }
         else:
             suggestion = '\n'.join(diff)
-            suggestion = f'```suggestion:-{new_line_size-1}+0\n{suggestion}\n```'
+            suggestion = f'```suggestion:-0+{new_line_size-1}\n{suggestion}\n```'
 
             data = {
                 'position': {
@@ -210,8 +210,16 @@ def diff_to_gitlab_merge_request(diff_hunks):
                     'head_sha':  merge_request_version[0]['head_commit_sha'],
                     'start_sha': merge_request_version[0]['start_commit_sha'],
                     'new_path': new_file,
-                    'old_path': old_file,
-                    'new_line': new_line_start+new_line_size-1,
+                    'line_range': {
+                        'start': {
+                            'line_code': new_line_start,
+                            'type' 'new'
+                        },
+                        'end': {
+                            'line_code': new_line_start+new_line_size,
+                            'type': 'new'
+                        },
+                    }
                 },
                 'body': f'To conform to the uncrustify format I suggest you apply the following suggestion:\n\n {suggestion}'
             }
