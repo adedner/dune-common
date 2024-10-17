@@ -213,7 +213,7 @@ def diff_to_gitlab_merge_request(diff_hunks):
                     'line_range': {
                         'start': {
                             'line_code': new_line_start,
-                            'type' 'new'
+                            'type': 'new'
                         },
                         'end': {
                             'line_code': new_line_start+new_line_size,
