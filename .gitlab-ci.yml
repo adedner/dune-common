@@ -119,8 +119,9 @@ code-formatting-check:
   - git config --global --add safe.directory /builds/core/dune-common
   - git status
   - git diff --no-prefix remotes/origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} > target_diff.patch
-  - python3 uncrustify-diff --target-diff target_diff.patch --format diff         `find . -name "*.cc" -o -name "*.hh"`
-  - python3 uncrustify-diff --target-diff target_diff.patch --format code-climate `find . -name "*.cc" -o -name "*.hh"` > uncrustify-code-quality-report.json
+  - python3 uncrustify-diff --target-diff target_diff.patch --format diff                 `find . -name "*.cc" -o -name "*.hh"`
+  - python3 uncrustify-diff --target-diff target_diff.patch --format gitlab-merge-request `find . -name "*.cc" -o -name "*.hh"`
+  - python3 uncrustify-diff --target-diff target_diff.patch --format code-climate         `find . -name "*.cc" -o -name "*.hh"` > uncrustify-code-quality-report.json
   - report=$(cat ./uncrustify-code-quality-report.json)
   - |-
     if [[ -n "$report" && "$report" != "[]" ]]; then
