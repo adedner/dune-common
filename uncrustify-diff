@@ -7,8 +7,6 @@ import sys
 import tempfile
 import hashlib
 import os
-import requests
-from io import BytesIO
 from optparse import OptionParser
 
 
@@ -166,9 +164,14 @@ def diff_to_gitlab_merge_request(diff_hunks):
     project_url = f'{os.environ["CI_API_URL"]}/projects/{os.environ["CI_PROJECT_ID"]}'
     merge_request_url = f'{project_url}/merge_requests/{os.environ["CI_MERGE_REQUEST_IID"]}'
     headers = {'PRIVATE-TOKEN': f'{os.environ["BOT_TOKEN"]}'} # , 'Content-Type': 'application/json'
-
-    merge_request_version = requests.get(f'{merge_request_url}/versions', headers=headers).json()
-
+    get_request =[
+        'curl',
+        '-H', f'PRIVATE-TOKEN: {os.environ["BOT_TOKEN"]}',
+        '-H', 'Content-Type': 'application/json',
+        f'{merge_request_url}/versions'
+    ]
+    merge_request_version = subprocess.run(get_request, stdout=subprocess.PIPE, text=True)
+    merge_request_version = json.loads(merge_request_version)
     for hunk in diff_hunks:
         old_file = None
         new_file = None
@@ -204,7 +207,14 @@ def diff_to_gitlab_merge_request(diff_hunks):
             'body': f'To conform to the uncrustify format we suggest you apply the following suggestion:\n\n {suggestion}'
         }
 
-        response = requests.post(f'{merge_request_url}/discussions', headers=headers, data=data).json()
+        post_request =[
+            'curl',
+            '-H', f'PRIVATE-TOKEN: {os.environ["BOT_TOKEN"]}',
+            '-H', 'Content-Type': 'application/json',
+            '-d', json.dumps(data)
+            f'{merge_request_url}/versions'
+        ]
+        response = subprocess.run(post_request, stdout=subprocess.PIPE, text=True)
         print(response)
 
 if __name__ == "__main__":
