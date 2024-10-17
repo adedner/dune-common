@@ -93,8 +93,69 @@ namespace Dune {
   //! Returns the number of bits that are set.
   size_type count() const
   {
-    size_type n = 0;
-    for(size_type i=0; i<block_size; ++i)
+  */
+ template <int block_size, class Alloc>
+ class BitSetVectorConstReference
+   {
+ protected:
+
+   typedef Dune::BitSetVector<block_size, Alloc> BitSetVector;
+   friend class Dune::BitSetVector<block_size, Alloc>;
+
+   BitSetVectorConstReference(const BitSetVector& blockBitField_, int block_number_) :
+     blockBitField(blockBitField_),
+     block_number(block_number_)
+     {
+     DUNE_ASSERT_BOUNDS(blockBitField_.size() > static_cast<size_t>(block_number_));
+     }
+
+   //! disable assignment operator
+   BitSetVectorConstReference& operator=(const BitSetVectorConstReference & b) = delete;
+
+ public:
+
+   typedef std::bitset<block_size> bitset;
+
+   // bitset interface typedefs
+   typedef typename std::vector<bool, Alloc>::const_reference reference;
+   typedef typename std::vector<bool, Alloc>::const_reference const_reference;
+   typedef size_t size_type;
+
+   //! Returns a copy of *this shifted left by n bits.
+   bitset operator<<(size_type n) const
+       {
+       bitset b = *this;
+       b <<= n;
+       return b;
+     }
+
+     //! Returns a copy of *this shifted right by n bits.
+     bitset operator>>(size_type n) const
+       {
+       bitset b = *this;
+       b >>= n;
+       return b;
+     }
+
+     //! Returns a copy of *this with all of its bits flipped.
+     bitset operator ~() const
+       {
+       bitset b = *this;
+       b.flip();
+       return b;
+     }
+
+     //! Returns block_size.
+     size_type size() const
+       {
+       return block_size;
+     }
+
+     //! Returns the number of bits that are set.
+     size_type count() const
+       {
+       size_type n = 0;
+       for(size_type i=0; i<block_size; ++i)
          n += getBit(i);
        return n;
      }
@@ -127,7 +188,7 @@ namespace Dune {
      }
 
      //! Return reference to the `i`-th bit
-     const_reference operator[](size_type i) const
+     const_reference operator[] (size_type i) const
        {
        return getBit(i);
      }
