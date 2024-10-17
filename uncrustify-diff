@@ -7,6 +7,8 @@ import sys
 import tempfile
 import hashlib
 import os
+import requests
+from io import BytesIO
 from optparse import OptionParser
 
 
@@ -158,26 +160,14 @@ def diff_to_code_climate(diff_hunks):
     return issues
 
 
-
-import pycurl
-import json
-from io import BytesIO
-
 def diff_to_gitlab_merge_request(diff_hunks):
 
     # We first need to get the latest information of the MR
     project_url = f'{os.environ["CI_API_URL"]}/projects/{os.environ["CI_PROJECT_ID"]}'
     merge_request_url = f'{project_url}/merge_requests/{os.environ["CI_MERGE_REQUEST_IID"]}'
-    headers = [f'PRIVATE-TOKEN: {os.environ["BOT_TOKEN"]}', 'Content-Type: application/json']
+    headers = {'PRIVATE-TOKEN': f'{os.environ["BOT_TOKEN"]}'} # , 'Content-Type': 'application/json'
 
-    buffer = BytesIO()
-    c = pycurl.Curl()
-    c.setopt(c.URL, f'{merge_request_url}/versions')
-    c.setopt(c.WRITEDATA, buffer)
-    c.setopt(c.HTTPHEADER, headers)
-    c.perform()
-    c.close()
-    merge_request_version = json.loads(buffer.getvalue())
+    merge_request_version = requests.get(f'{merge_request_url}/versions', headers=headers).json()
 
     for hunk in diff_hunks:
         old_file = None
@@ -214,19 +204,8 @@ def diff_to_gitlab_merge_request(diff_hunks):
             'body': f'To conform to the uncrustify format we suggest you apply the following suggestion:\n\n {suggestion}'
         }
 
-        # post suggestion as a comment in the current MR
-        post_data = json.dumps(data)
-        buffer = BytesIO()
-        c = pycurl.Curl()
-        c.setopt(c.URL, f'{merge_request_url}/discussions')
-        c.setopt(c.POSTFIELDS, post_data)
-        c.setopt(c.HTTPHEADER, headers)
-        c.setopt(c.WRITEDATA, buffer)
-        c.perform()
-        c.close()
-
-        response = buffer.getvalue()
-        print(response.decode('utf-8'))
+        response = requests.post(f'{merge_request_url}/discussions', headers=headers, data=data).json()
+        print(response)
 
 if __name__ == "__main__":
     parser = OptionParser()
