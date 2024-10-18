@@ -1271,8 +1271,8 @@ namespace Dune
      * Only enabled for random-access iterators.
      */
     template<bool dummy=true, std::enable_if_t<isRandomAccess and dummy, int> =0>
-    constexpr DerivedIterator operator-(difference_type k) const
-    {
+                                                                               constexpr DerivedIterator operator-(difference_type k) const
+     {
       DerivedIterator tmpIt(derived());
       tmpIt -= k;
       return tmpIt;
