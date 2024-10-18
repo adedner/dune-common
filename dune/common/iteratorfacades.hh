@@ -788,8 +788,8 @@ namespace Dune
     //! @private
     template<class It>
     static constexpr auto baseIterator(It&& iterator) noexcept
-      -> decltype(iterator.baseIterator())
-    {
+   -> decltype(iterator.baseIterator())
+     {
       return iterator.baseIterator();
     }
 
