@@ -21,9 +21,9 @@
 
 namespace Dune::Impl
 {
-  void boundCheckThrow()
+  void boundCheckThrow(std::string_view func, std::string_view file, int line)
   {
-    DUNE_THROW(Dune::RangeError, "Index out of bounds.");
+    DUNE_THROW(Dune::RangeError, "\nDUNE_ASSERT_BOUNDS [" << func << ":" << file << ":" << line << "]: Index out of bounds.");
   }
 }
 
@@ -35,10 +35,10 @@ namespace Dune::Impl
  * do not occur outside of memory limits or pre-defined patterns
  * and related conditions.
  */
-#define DUNE_ASSERT_BOUNDS(cond)                            \
-  do {                                                      \
-    if (!(cond))                                            \
-      Dune::Impl::boundCheckThrow();                        \
+#define DUNE_ASSERT_BOUNDS(cond)                                  \
+  do {                                                            \
+    if (!(cond))                                                  \
+      Dune::Impl::boundCheckThrow(__func__, __FILE__, __LINE__);  \
   } while (false)
 
 #else
