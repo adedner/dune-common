@@ -19,6 +19,14 @@
 #ifndef DUNE_ASSERT_BOUNDS
 #if defined(DUNE_CHECK_BOUNDS) || defined(DOXYGEN)
 
+namespace Dune::Impl
+{
+  void boundCheckThrow()
+  {
+    DUNE_THROW(Dune::RangeError, "Index out of bounds.");
+  }
+}
+
 /**
  * \brief If `DUNE_CHECK_BOUNDS` is defined: check if condition
  * \a cond holds; otherwise, do nothing.
@@ -30,7 +38,7 @@
 #define DUNE_ASSERT_BOUNDS(cond)                            \
   do {                                                      \
     if (!(cond))                                            \
-      DUNE_THROW(Dune::RangeError, "Index out of bounds."); \
+      Dune::Impl::boundCheckThrow();                        \
   } while (false)
 
 #else

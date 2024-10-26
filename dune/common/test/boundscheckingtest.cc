@@ -8,8 +8,24 @@
 #include <dune/common/fvector.hh>
 #include <dune/common/fmatrix.hh>
 
+// simple bound checking in a constant evaluated context
+constexpr bool constexprCheck(std::size_t i, bool do_check) {
+  if (do_check)
+    DUNE_ASSERT_BOUNDS(i==0);
+  return i==0;
+}
+
 int main() try {
   bool passed = true;
+
+  // check that throw branch does not get evaluated
+  static_assert(constexprCheck(0, true));
+
+  // check that assert branch does not get evaluated
+  static_assert(!constexprCheck(1, false));
+
+  // this (rightfuly) fails to compile due a exception path not being constexpr
+  // static_assert(constexprCheck(1, true));
 
   // Write beyond end of singleton vector
   try {
