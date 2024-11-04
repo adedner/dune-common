@@ -1,0 +1,251 @@
+#!/usr/bin/env python3
+
+import subprocess
+import json
+import re
+import sys
+import tempfile
+import hashlib
+import os
+from optparse import OptionParser
+
+
+# A regex pattern to detect hunk start lines (lines beginning with @@)
+hunk_start_pattern = re.compile(r'@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@')
+new_filename_match = re.compile(r'(---|\+\+\+) ([^\t]+)(?:\t([\d\-:\s]+))?\s*')
+
+def uncrustify_diff(file):
+    # Create a temporary file to store the uncrustify output
+    with tempfile.NamedTemporaryFile(mode='w+', delete=False) as tmpfile:
+        # Run uncrustify on the original file and save the formatted output in the temporary file
+        subprocess.run(['uncrustify', '-q', '-c', '.uncrustify.cfg', '-f', file], stdout=tmpfile)
+        tmpfile.flush()  # Ensure all data is written to the file
+
+        # Run diff to compare the original file with the uncrustify output
+        diff_command = ['diff', file, tmpfile.name, '--color=never', '--unified=0']
+        diff_output = subprocess.run(diff_command, stdout=subprocess.PIPE, text=True)
+
+    # Replace temporary file name with the original file's name in the diff output
+    return diff_output.stdout.replace(tmpfile.name, file)
+
+# Extract covered line numbers from a diff and maps them to their corresponding files.
+def diff_coverage(diff):
+    # Split the diff text into individual lines
+    lines = diff.splitlines()
+
+    # Initialize variables for tracking hunks and file coverage
+    hunks = []
+    current_hunk = []
+    old_file = None
+    new_file = None
+
+    coverage = {}  # A dictionary to store file coverage (file -> covered lines)
+
+    # Loop through each line in the diff
+    for line in lines:
+        # Check if the line is the start of a new hunk
+        hunk_match = hunk_start_pattern.match(line)
+        if hunk_match:
+            # Initialize coverage for the new file if not already done
+            coverage.setdefault(new_file, set())
+            if current_hunk:
+                # If there is a current hunk, store it before starting a new one
+                hunks.append('\n'.join(current_hunk))
+
+            # Extract the starting line and size of the added lines in the hunk
+            new_line_start = int(hunk_match.group(3))
+            new_line_size = int(hunk_match.group(4)  if hunk_match.group(4) else 1)
+
+            # Mark the lines covered in this hunk in the coverage dictionary
+            for i in range(new_line_start, new_line_start + new_line_size):
+                coverage[new_file].add(i)
+
+        # If the line starts with `+++`, it indicates the new filename
+        elif line.startswith("+++"):
+            file = new_filename_match.match(line).group(2)
+            new_file = os.path.relpath(file)
+
+    return coverage
+
+# Split a diff string into a list of hunks, including the filenames.
+def diff_by_hunks(diff):
+    # Split the diff text into lines
+    lines = diff.splitlines()
+
+    # Initialize variables
+    hunks = []
+    current_hunk = []
+    old_file = None
+    new_file = None
+
+    # Loop through each line in the diff
+    for line in lines:
+        if line.startswith("---"):
+            old_file = line
+        elif line.startswith("+++"):
+            new_file = line
+        elif hunk_start_pattern.match(line):
+            # If we encounter a hunk start line, save the current hunk (if any)
+            if current_hunk:
+                hunks.append('\n'.join(current_hunk))
+            current_hunk = [old_file, new_file, line]
+        # If we're inside a diff section, collect lines for the current hunk
+        elif old_file and new_file:
+            current_hunk.append(line)
+    return hunks
+
+# keep lines of diff that are also contained in target diff
+def strip_diff(diff_hunks, target_diff):
+
+    # Parse the diff input to extract the changes
+    lines = diff.strip().splitlines()
+    issues = []
+    old_file = None
+    stripped_diff = ""
+    coverage = diff_coverage(target_diff)
+
+    new_hunks = []
+
+    for hunk in diff_hunks:
+        for line in hunk.split('\n'):
+            if line.startswith("---"):
+                old_file = os.path.relpath(new_filename_match.match(line).group(2))
+                continue
+            hunk_match = hunk_start_pattern.match(line)
+            if hunk_match:
+                old_line_start = int(hunk_match.group(1))
+                old_line_size = int(hunk_match.group(2) if hunk_match.group(2) else 1)
+                report = False
+                if old_file in coverage:
+                    for i in range(old_line_start, old_line_start+old_line_size):
+                        report = report or (i in coverage[old_file])
+                if report:
+                    new_hunks.append(hunk)
+                    old_file = None
+                    break
+    return new_hunks
+
+# convert diff into a code climate format
+def diff_to_code_climate(diff_hunks):
+
+    issues = []
+    old_file = None
+
+    for hunk in diff_hunks:
+        lines = hunk.strip().splitlines()
+        for i, line in enumerate(lines):
+            hunk_match = hunk_start_pattern.match(line)
+            if line.startswith("---"):
+                old_file = os.path.relpath(new_filename_match.match(line).group(2))
+            if hunk_match:
+                old_line_start = int(hunk_match.group(1))
+                old_line_size = int(hunk_match.group(2) if hunk_match.group(2) else 1)
+                new_line_size = int(hunk_match.group(4)  if hunk_match.group(4) else 1)
+                diff_dump = str.join('\n', lines[i+1:i+1+old_line_size+new_line_size])
+                issue = {
+                    "check_name": "uncrustify",
+                    "description": f"Non-conforming format",
+                    "severity": "minor",
+                    "fingerprint": hashlib.sha256(diff_dump.encode()).hexdigest(),
+                    "location": {
+                        "path": old_file,
+                        "lines": {
+                            "begin": old_line_start
+                        }
+                    }
+                }
+                issues.append(issue)
+    return issues
+
+
+def diff_to_gitlab_merge_request(diff_hunks):
+
+    # We first need to get the latest information of the MR
+    project_url = f'{os.environ["CI_API_V4_URL"]}/projects/{os.environ["CI_PROJECT_ID"]}'
+    merge_request_url = f'{project_url}/merge_requests/{os.environ["CI_MERGE_REQUEST_IID"]}'
+    get_request = [
+        'curl',
+        '-H', f'PRIVATE-TOKEN: {os.environ["BOT_TOKEN"]}',
+        '-H', 'Content-Type: application/json',
+        f'{merge_request_url}/versions'
+    ]
+
+    merge_request_version = subprocess.run(get_request, stdout=subprocess.PIPE, text=True).stdout
+    merge_request_version = json.loads(merge_request_version)
+    for hunk in diff_hunks:
+        old_file = None
+        new_file = None
+        new_line_start = None
+        new_line_size = None
+        diff = []
+        # generate suggestion based on this hunk
+        for line in hunk.split('\n'):
+            # Extract the starting line and size of the added lines in the hunk
+            hunk_match = hunk_start_pattern.match(line)
+            if hunk_match:
+                new_line_start = int(hunk_match.group(3))
+                new_line_size = int(hunk_match.group(4)  if hunk_match.group(4) else 1)
+            if line.startswith("---"):
+                old_file = os.path.relpath(new_filename_match.match(line).group(2))
+                continue
+            elif line.startswith("+++"):
+                new_file = os.path.relpath(new_filename_match.match(line).group(2))
+                continue
+            elif line.startswith("+"):
+                diff.append(line[1:])
+
+        if (new_line_size > 100):
+            suggestion = '\n'.join(diff)
+            data = {
+                'body': f'To conform to the uncrustify format I suggest you apply the following suggestion:\n\n ```diff\n{suggestion}```'
+            }
+        else:
+            suggestion = '\n'.join(diff)
+            suggestion = f'```suggestion:-0+{new_line_size-1}\n{suggestion}\n```'
+
+            data = {
+                'position': {
+                    'position_type': 'text',
+                    'base_sha': merge_request_version[0]['base_commit_sha'],
+                    'head_sha':  merge_request_version[0]['head_commit_sha'],
+                    'start_sha': merge_request_version[0]['start_commit_sha'],
+                    'new_path': new_file,
+                    'old_path': old_file,
+                    'new_line': new_line_start,
+                },
+                'body': f'To conform to the uncrustify format I suggest you apply the following suggestion:\n\n {suggestion}'
+            }
+
+        post_request =[
+            'curl',
+            '-H', f'PRIVATE-TOKEN: {os.environ["BOT_TOKEN"]}',
+            '-H', 'Content-Type: application/json',
+            '-d', f'{json.dumps(data)}',
+            f'{merge_request_url}/discussions'
+        ]
+        response = subprocess.run(post_request, stdout=subprocess.PIPE, text=True).stdout
+        print(response)
+
+if __name__ == "__main__":
+    parser = OptionParser()
+    parser.add_option("--format", dest="format",
+                  help="format to write output", default="code-climate", choices=["diff","code-climate", "gitlab-merge-request"])
+    parser.add_option("--target-diff", dest="target_diff",
+                  help="Compare uncrusify results with diff file. If uncrusify targets the same lines, it will report those.")
+    (options, args) = parser.parse_args()
+
+    diff = ""
+    for file in args:
+        diff = diff + uncrustify_diff(file)
+    diff_hunks = diff_by_hunks(diff)
+
+    if options.target_diff:
+        with open(options.target_diff) as f:
+            diff_hunks = strip_diff(diff_hunks, f.read())
+
+    if (options.format == "code-climate"):
+        print(json.dumps(diff_to_code_climate(diff_hunks)))
+    elif (options.format == "diff"):
+        print('\n'.join(diff_hunks))
+    elif (options.format == "gitlab-merge-request"):
+        diff_to_gitlab_merge_request(diff_hunks)

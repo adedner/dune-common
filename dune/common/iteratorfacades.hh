@@ -787,10 +787,10 @@ namespace Dune
 
     //! @private
     template<class It>
-    static constexpr auto baseIterator(It&& it) noexcept
-      -> decltype(it.baseIterator())
-    {
-      return it.baseIterator();
+    static constexpr auto baseIterator(It&& iterator) noexcept
+   -> decltype(iterator.baseIterator())
+     {
+      return iterator.baseIterator();
     }
 
     //! @private
@@ -1271,11 +1271,11 @@ namespace Dune
      * Only enabled for random-access iterators.
      */
     template<bool dummy=true, std::enable_if_t<isRandomAccess and dummy, int> =0>
-    constexpr DerivedIterator operator-(difference_type n) const
-    {
-      DerivedIterator tmp(derived());
-      tmp -= n;
-      return tmp;
+                                                                               constexpr DerivedIterator operator-(difference_type k) const
+     {
+      DerivedIterator tmpIt(derived());
+      tmpIt -= k;
+      return tmpIt;
     }
 
   };
