@@ -9,6 +9,12 @@
 #include <concepts>
 #include <type_traits>
 
+/**
+ * \file This file provides some concepts introduced in the c++ standard library
+ * <compare> and <concepts> not yet available in all library implementation.
+ * The code is partially extracted from https://en.cppreference.com/w/cpp/utility/compare.
+ */
+
 namespace Dune::Std {
 namespace Impl {
 
@@ -85,10 +91,10 @@ concept three_way_comparable =
  */
 template <class T, class U, class Cat = std::partial_ordering>
 concept three_way_comparable_with =
-  std::three_way_comparable<T, Cat> &&
-  std::three_way_comparable<U, Cat> &&
+  Std::three_way_comparable<T, Cat> &&
+  Std::three_way_comparable<U, Cat> &&
   Impl::comparisonCommonTypeWith<T, U> &&
-  std::three_way_comparable<
+  Std::three_way_comparable<
     std::common_reference_t<
       const std::remove_reference_t<T>&,
       const std::remove_reference_t<U>&>, Cat> &&

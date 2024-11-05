@@ -22,6 +22,7 @@
 #include <dune/common/simd/simd.hh>
 #include <dune/common/typetraits.hh>
 #include <dune/common/scalarvectorview.hh>
+#include <dune/common/std/iterator.hh>
 #include <dune/common/std/type_traits.hh>
 
 namespace Dune
@@ -81,7 +82,7 @@ namespace Dune
     };
 
     template< class DenseMatrix, class RHS >
-      requires std::indirectly_copyable<
+      requires Std::indirectly_copyable<
         decltype(std::begin(*std::declval<typename RHS::const_iterator>())),
         decltype(std::begin(*std::declval<typename DenseMatrix::iterator>()))>
     class DenseMatrixAssigner<DenseMatrix, RHS>
