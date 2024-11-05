@@ -5,7 +5,11 @@
 #ifndef DUNE_COMMON_STD_COMPARE_HH
 #define DUNE_COMMON_STD_COMPARE_HH
 
-#include <compare>
+#include <version>
+#if !(__cpp_lib_concepts && __has_include(<concepts>))
+  #error "Concept not supported!"
+#endif
+
 #include <concepts>
 #include <type_traits>
 
@@ -70,6 +74,8 @@ concept comparisonCommonTypeWith =
  * \brief The concept `std::three_way_comparable` specifies that the three way
  * comparison `operator <=>` on `T` yield results consistent with the comparison
  * category implied by `Cat`.
+ *
+ * The standard implementation is available in libstdc++ >= 10 and libc++ >= 14.
  */
 template <class T, class Cat = std::partial_ordering>
 concept three_way_comparable =
@@ -88,6 +94,8 @@ concept three_way_comparable =
  * results consistent with the comparison category implied by `Cat`. Comparing
  * mixed operands yields results equivalent to comparing the operands converted
  * to their common type.
+ *
+ * The standard implementation is available in libstdc++ >= 10 and libc++ >= 14.
  */
 template <class T, class U, class Cat = std::partial_ordering>
 concept three_way_comparable_with =

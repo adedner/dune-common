@@ -5,6 +5,12 @@
 #ifndef DUNE_COMMON_STD_ITERATOR_HH
 #define DUNE_COMMON_STD_ITERATOR_HH
 
+#include <version>
+#if !(__cpp_lib_concepts && __has_include(<concepts>))
+  #error "Concept not supported!"
+#endif
+
+#include <concepts>
 #include <iterator>
 
 namespace Dune::Std {
@@ -14,6 +20,8 @@ namespace Dune::Std {
  * an `indirectly_readable` type and a type that is `indirectly_writable`. The
  * `indirectly_writable` type must be able to directly copy the object that the
  * `indirectly_readable` type references.
+ *
+ * The standard implementation is available in libstdc++ >= 10 and libc++ >= 15
  */
 template <class In, class Out>
 concept indirectly_copyable =

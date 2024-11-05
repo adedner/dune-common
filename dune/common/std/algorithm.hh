@@ -5,6 +5,11 @@
 #ifndef DUNE_COMMON_STD_ALGORITHM_HH
 #define DUNE_COMMON_STD_ALGORITHM_HH
 
+#include <version>
+#if !(__cpp_impl_three_way_comparison >= 201907L && __cpp_lib_concepts && __has_include(<compare>))
+  #error "Three-way comparison requires language support!"
+#endif
+
 #include <algorithm>
 #include <compare>
 #include <type_traits>
@@ -29,7 +34,12 @@ struct CompareThreeWay
  * comparison category type.
  *
  * Implementation taken from https://en.cppreference.com/w/cpp/algorithm/lexicographical_compare_three_way
+ *
+ * The standard implementation is available with libstdc++ >= 10 and libc++ >= 17
  */
+#if __cpp_lib_three_way_comparison >= 201907L
+using std::lexicographical_compare_three_way
+#else // __cpp_lib_three_way_comparison
 template <class I1, class I2, class Cmp = Impl::CompareThreeWay>
 constexpr auto lexicographical_compare_three_way(I1 f1, I1 l1, I2 f2, I2 l2, Cmp comp = {})
     -> decltype(comp(*f1, *f2))
@@ -51,6 +61,7 @@ constexpr auto lexicographical_compare_three_way(I1 f1, I1 l1, I2 f2, I2 l2, Cmp
          !exhaust2 ? std::strong_ordering::less:
                      std::strong_ordering::equal;
 }
+#endif // __cpp_lib_three_way_comparison
 
 } // end namespace Dune::Std
 
