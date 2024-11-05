@@ -23,6 +23,7 @@
 #include <dune/common/promotiontraits.hh>
 #include <dune/common/typetraits.hh>
 #include <dune/common/typeutilities.hh>
+#include <dune/common/concepts/compare.hh>
 #include <dune/common/concepts/scalar.hh>
 
 namespace Dune {
@@ -283,7 +284,7 @@ namespace Dune {
 
     //! three-way comparison of FieldVectors
     template<class T>
-      requires (std::three_way_comparable_with<K,T>)
+      requires (Std::three_way_comparable_with<K,T>)
     friend constexpr auto operator<=> (const FieldVector& a, const FieldVector<T,SIZE>& b) noexcept
     {
       return a._data <=> b._data;
