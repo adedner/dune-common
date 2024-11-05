@@ -2,10 +2,6 @@
 // vi: set et ts=4 sw=2 sts=2:
 // SPDX-FileCopyrightInfo: Copyright © DUNE Project contributors, see file LICENSE.md in module root
 // SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
-#include <dune/common/concepts.hh>
-
-#if DUNE_ENABLE_CONCEPTS
-
 #include <array>
 #include <bitset>
 #include <list>
@@ -16,6 +12,9 @@
 #include <dune/common/fvector.hh>
 #include <dune/common/hash.hh>
 #include <dune/common/reservedvector.hh>
+#include <dune/common/concepts/container.hh>
+#include <dune/common/concepts/hashable.hh>
+#include <dune/common/concepts/scalar.hh>
 #include <dune/common/parallel/mpihelper.hh>
 
 int main (int argc, char **argv)
@@ -39,10 +38,23 @@ int main (int argc, char **argv)
 
   static_assert(not Concept::Container<double*>);
   static_assert(not Concept::Container<Dune::FieldVector<double,3>>);
+
+  // test comparable
+  static_assert(not Concept::Container<double*>);
+
+  // test Scalar
+  static_assert(Concept::Scalar<short>);
+  static_assert(Concept::Scalar<unsigned short>);
+  static_assert(Concept::Scalar<int>);
+  static_assert(Concept::Scalar<unsigned int>);
+  static_assert(Concept::Scalar<long>);
+  static_assert(Concept::Scalar<unsigned long>);
+
+  static_assert(Concept::Scalar<float>);
+  static_assert(Concept::Scalar<double>);
+  static_assert(Concept::Scalar<long double>);
+
+  static_assert(Concept::Scalar<std::complex<float>>);
+  static_assert(Concept::Scalar<std::complex<double>>);
+  static_assert(Concept::Scalar<std::complex<long double>>);
 }
-
-#else // DUNE_ENABLE_CONCEPTS
-
-int main () { return 77; }
-
-#endif // DUNE_ENABLE_CONCEPTS
