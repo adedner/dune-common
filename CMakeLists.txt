@@ -47,5 +47,24 @@ if(DUNE_ENABLE_PYTHONBINDINGS)
   add_subdirectory(python)
 endif()
 
+# since we link to some libraries (e.g. tbb) we need to make sure
+# they are found later by any project linking to dunecommon
+# this is done by adding the following to the dune-common-config.cmake file
+# via the hook DUNE_CUSTOM_PKG_CONFIG_SECTION
+if (TBB_FOUND)
+  string(JOIN "\n" DUNE_CUSTOM_PKG_CONFIG_SECTION ${DUNE_CUSTOM_PKG_CONFIG_SECTION}
+    "find_dependency(TBB)"
+  )
+endif()
+if (LAPACK_FOUND)
+  string(JOIN "\n" DUNE_CUSTOM_PKG_CONFIG_SECTION ${DUNE_CUSTOM_PKG_CONFIG_SECTION}
+    "find_dependency(LAPACK)"
+  )
+elseif (BLAS_FOUND)
+  string(JOIN "\n" DUNE_CUSTOM_PKG_CONFIG_SECTION ${DUNE_CUSTOM_PKG_CONFIG_SECTION}
+    "find_dependency(BLAS)"
+  )
+endif()
+
 # finalize the dune project, e.g. generating config.h etc.
 finalize_dune_project()
