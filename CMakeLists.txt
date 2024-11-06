@@ -63,6 +63,7 @@ endif()
 # ...and set required dependencies in dune-common-config.cmake via the DUNE_CUSTOM_PKG_CONFIG_SECTION
 if(_deps)
   string(JOIN "\n" DUNE_CUSTOM_PKG_CONFIG_SECTION
+    # make sure that Find<module>.cmake provided by dune-common can be found by cmake
     [[list(PREPEND CMAKE_MODULE_PATH "${dune-common_MODULE_PATH}")]]
     ${_deps}
     # drop path to avoid polluting downstream with cmake modules from dune-common
