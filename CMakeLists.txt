@@ -53,16 +53,12 @@ endif()
 # via the hook DUNE_CUSTOM_PKG_CONFIG_SECTION
 if (TBB_FOUND)
   string(JOIN "\n" DUNE_CUSTOM_PKG_CONFIG_SECTION ${DUNE_CUSTOM_PKG_CONFIG_SECTION}
-    "find_dependency(TBB)"
+    "find_dependency(TBB REQUIRED)"
   )
 endif()
-if (LAPACK_FOUND)
+if (LAPACK_FOUND OR BLAS_FOUND)
   string(JOIN "\n" DUNE_CUSTOM_PKG_CONFIG_SECTION ${DUNE_CUSTOM_PKG_CONFIG_SECTION}
-    "find_dependency(LAPACK)"
-  )
-elseif (BLAS_FOUND)
-  string(JOIN "\n" DUNE_CUSTOM_PKG_CONFIG_SECTION ${DUNE_CUSTOM_PKG_CONFIG_SECTION}
-    "find_dependency(BLAS)"
+    "find_dependency(LAPACK REQUIRED)"
   )
 endif()
 
