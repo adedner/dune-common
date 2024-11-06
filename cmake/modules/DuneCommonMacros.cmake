@@ -5,8 +5,10 @@ include(DuneStreams)
 dune_set_minimal_debug_level()
 
 # search for lapack
-find_package(LAPACK)
 include(AddBLASLapackFlags)
+
+# find library for Threading Building Blocks
+include(AddTBBFlags)
 
 find_package(GMP)
 include(AddGMPFlags)
@@ -24,10 +26,6 @@ include(AddThreadsFlags)
 # find the MPI library
 find_package(MPI 3.0 COMPONENTS C)
 include(AddMPIFlags)
-
-# find library for Threading Building Blocks
-find_package(TBB)
-include(AddTBBFlags)
 
 # find libraries for graph partitioning
 find_package(PTScotch)

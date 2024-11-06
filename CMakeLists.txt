@@ -30,9 +30,23 @@ dune_default_include_directories(dunecommon PUBLIC)
 # minimal c++ standard required
 target_compile_features(dunecommon PUBLIC cxx_std_20)
 
+# Collect dependencies to be added into the dune-common-config.cmake files
+set(DUNE_COMMON_PACKAGE_DEPENDENCIES)
+
 # Set properties to the dunecommon target
+find_package(LAPACK)
 add_dune_blas_lapack_flags(dunecommon)
+if (LAPACK_FOUND)
+  list(APPEND DUNE_COMMON_PACKAGE_DEPENDENCIES "find_dependency(LAPACK)")
+elseif (BLAS_FOUND)
+  list(APPEND DUNE_COMMON_PACKAGE_DEPENDENCIES "find_dependency(BLAS)")
+endif()
+
+find_package(TBB)
 add_dune_tbb_flags(dunecommon)
+if (TBB_FOUND)
+  list(APPEND DUNE_COMMON_PACKAGE_DEPENDENCIES "find_dependency(TBB)")
+endif()
 
 # add subdirectories to execute CMakeLists.txt there
 add_subdirectory(bin)
@@ -47,25 +61,12 @@ if(DUNE_ENABLE_PYTHONBINDINGS)
   add_subdirectory(python)
 endif()
 
-# linked libs (e.g. tbb) must be provided downstream,
-# so we gather external package dependencies of dune-common...
-unset(_deps)
-if (TBB_FOUND)
-  set(_deps "find_dependency(TBB REQUIRED)")
-endif()
-if (BLAS_FOUND)
-  set(_deps ${_deps} "find_dependency(BLAS REQUIRED)")
-endif()
-if (LAPACK_FOUND)
-  set(_deps ${_deps} "find_dependency(LAPACK REQUIRED)")
-endif()
-
 # ...and set required dependencies in dune-common-config.cmake via the DUNE_CUSTOM_PKG_CONFIG_SECTION
-if(_deps)
+if(DUNE_COMMON_PACKAGE_DEPENDENCIES)
   string(JOIN "\n" DUNE_CUSTOM_PKG_CONFIG_SECTION
     # make sure that Find<module>.cmake provided by dune-common can be found by cmake
     [[list(PREPEND CMAKE_MODULE_PATH "${dune-common_MODULE_PATH}")]]
-    ${_deps}
+    ${DUNE_COMMON_PACKAGE_DEPENDENCIES}
     # drop path to avoid polluting downstream with cmake modules from dune-common
     [[list(POP_FRONT CMAKE_MODULE_PATH)]]
   )
