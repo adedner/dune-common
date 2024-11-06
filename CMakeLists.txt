@@ -47,7 +47,8 @@ if(DUNE_ENABLE_PYTHONBINDINGS)
   add_subdirectory(python)
 endif()
 
-# gather external package dependencies of dune-common
+# linked libs (e.g. tbb) must be provided downstream,
+# so we gather external package dependencies of dune-common...
 unset(_deps)
 if (TBB_FOUND)
   set(_deps "find_dependency(TBB REQUIRED)")
@@ -59,11 +60,12 @@ if (LAPACK_FOUND)
   set(_deps ${_deps} "find_dependency(LAPACK REQUIRED)")
 endif()
 
-# set required dependencies to dune-common-config.cmake file via the DUNE_CUSTOM_PKG_CONFIG_SECTION
+# ...and set required dependencies in dune-common-config.cmake via the DUNE_CUSTOM_PKG_CONFIG_SECTION
 if(_deps)
   string(JOIN "\n" DUNE_CUSTOM_PKG_CONFIG_SECTION
     [[list(PREPEND CMAKE_MODULE_PATH "${dune-common_MODULE_PATH}")]]
     ${_deps}
+    # drop path to avoid polluting downstream with cmake modules from dune-common
     [[list(POP_FRONT CMAKE_MODULE_PATH)]]
   )
 endif()
