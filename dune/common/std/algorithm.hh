@@ -38,7 +38,7 @@ struct CompareThreeWay
  * The standard implementation is available with libstdc++ >= 10 and libc++ >= 17
  */
 #if __cpp_lib_three_way_comparison >= 201907L
-using std::lexicographical_compare_three_way
+using std::lexicographical_compare_three_way;
 #else // __cpp_lib_three_way_comparison
 template <class I1, class I2, class Cmp = Impl::CompareThreeWay>
 constexpr auto lexicographical_compare_three_way(I1 f1, I1 l1, I2 f2, I2 l2, Cmp comp = {})
