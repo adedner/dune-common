@@ -20,7 +20,7 @@ add_test(
     -S ${CMAKE_CURRENT_SOURCE_DIR}/dune_common_standalone
     -B ${CMAKE_CURRENT_BINARY_DIR}/dune_common_standalone
 )
-# test that a stand alone project depending on dune-commonc can be build
+# test that a standalone project depending on dune-common can be built
 add_test(
     NAME dunecommonstandalonebuildtest
     COMMAND ${CMAKE_COMMAND}
