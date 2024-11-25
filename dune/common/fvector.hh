@@ -222,14 +222,14 @@ namespace Dune {
     /// @{
 
     //! Return a reference to the `i`th element
-    reference operator[] (size_type i)
+    constexpr reference operator[] (size_type i)
     {
       DUNE_ASSERT_BOUNDS(i < size());
       return _data[i];
     }
 
     //! Return a (const) reference to the `i`th element
-    const_reference operator[] (size_type i) const
+    constexpr const_reference operator[] (size_type i) const
     {
       DUNE_ASSERT_BOUNDS(i < size());
       return _data[i];
