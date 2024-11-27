@@ -5,7 +5,9 @@
 #ifndef DUNE_COMMON_DENSEVECTORVIEW_HH
 #define DUNE_COMMON_DENSEVECTORVIEW_HH
 
+#include <array>
 #include <cstddef>
+#include <type_traits>
 #include <vector>
 
 #include <dune/common/boundschecking.hh>
@@ -24,20 +26,22 @@ namespace Dune {
    * \brief This file implements a dense vector view with a dynamic size.
    */
 
-  template< class K, std::size_t Extent > class DenseVectorSpan;
-  template< class K, std::size_t Extent >
-  struct DenseMatVecTraits< DenseVectorSpan< K, Extent > >
+  // forward declaration
+  template <class K, std::size_t Extent> class DenseVectorSpan;
+
+  template <class K, std::size_t Extent>
+  struct DenseMatVecTraits< DenseVectorSpan<K, Extent> >
   {
-    typedef DenseVectorSpan< K, Extent > derived_type;
+    typedef DenseVectorSpan<K, Extent> derived_type;
     typedef K value_type;
     typedef std::size_t size_type;
   };
 
-  template< class K, std::size_t Extent >
-  struct FieldTraits< DenseVectorSpan< K, Extent > >
+  template <class K, std::size_t Extent>
+  struct FieldTraits< DenseVectorSpan<K, Extent> >
   {
-    typedef typename FieldTraits< K >::field_type field_type;
-    typedef typename FieldTraits< K >::real_type real_type;
+    typedef typename FieldTraits<K>::field_type field_type;
+    typedef typename FieldTraits<K>::real_type real_type;
   };
 
   /** \brief Construct a vector-like span with static or dynamic size.
@@ -45,31 +49,29 @@ namespace Dune {
    * \tparam K is the field type (use float, double, complex, etc)
    * \tparam Extent The static size of the vector or `Std::dynamic_extent` if the size is dynamic
    */
-  template< class K, std::size_t Extent = Std::dynamic_extent >
+  template <class K, std::size_t Extent = Std::dynamic_extent>
   class DenseVectorSpan
       : private Std::mdspan< K, Std::extents<std::size_t,Extent> >
-      , public DenseVector< DenseVectorSpan< K, Extent > >
+      , public DenseVector< DenseVectorSpan<K, Extent> >
   {
     using Base = Std::mdspan< K, Std::extents<std::size_t,Extent> >;
-    using Interface = DenseVector< DenseVectorSpan< K, Extent > >;
+    using Interface = DenseVector< DenseVectorSpan<K, Extent> >;
 
   public:
     // import all constructors from Std::mdspan
     using Base::Base;
 
     //! Construct a span over a single scalar value
-    template <class Scalar,
-      std::enable_if_t<Dune::IsNumber<std::decay_t<Scalar>>::value, int> = 0>
-    constexpr DenseVectorSpan (Scalar&& v) noexcept
+    constexpr DenseVectorSpan (K& v) noexcept
       : Base(&v, 1)
     {}
 
-    //! Construct a span over a container type like `std::vector`, `DynamicVector`, or `FieldVector`
-    template <class Vector,
-      class P = decltype(std::declval<Vector>().data()),
-      class S = decltype(std::declval<Vector>().size()),
-      std::enable_if_t<std::is_convertible_v<P,typename Base::data_handle_type>, int> = 0,
-      std::enable_if_t<std::is_convertible_v<S,typename Base::index_type>, int> = 0>
+    //! Construct a span over a container type like `std::vector` or `std::array`
+    template <class Vector>
+      requires requires(Vector&& v) {
+        { v.data() } -> std::convertible_to<typename Base::data_handle_type>;
+        { v.size() } -> std::convertible_to<typename Base::index_type>;
+      }
     constexpr DenseVectorSpan (Vector&& v) noexcept
       : Base(v.data(), v.size())
     {}
@@ -103,6 +105,26 @@ namespace Dune {
   template <class K, class A>
   DenseVectorSpan (std::vector<K,A> const&)
     -> DenseVectorSpan<const K>;
+
+  template <class T, std::size_t N>
+  DenseVectorSpan (std::array<T,N>&)
+    -> DenseVectorSpan<T,N>;
+
+  template <class T, std::size_t N>
+  DenseVectorSpan (std::array<T,N> const&)
+    -> DenseVectorSpan<const T,N>;
+
+  // forward declaration
+  template <class T, int n>
+  class ReservedVector;
+
+  template <class T, int n>
+  DenseVectorSpan (ReservedVector<T,n>&)
+    -> DenseVectorSpan<T>;
+
+  template <class T, int n>
+  DenseVectorSpan (ReservedVector<T,n> const&)
+    -> DenseVectorSpan<const T>;
 
   // forward declaration
   template <class K, class A>
