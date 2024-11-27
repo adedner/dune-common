@@ -6,6 +6,7 @@
 #define DUNE_COMMON_DENSEVECTORVIEW_HH
 
 #include <array>
+#include <concepts>
 #include <cstddef>
 #include <type_traits>
 #include <vector>
