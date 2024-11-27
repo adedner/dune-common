@@ -83,3 +83,14 @@ reuse:
   before_script: ""
   script:
     - reuse lint
+
+ubuntu:24.04 gcc-13-20-g-og:
+  stage: test
+  image: registry.dune-project.org/docker/ci/ubuntu:24.04
+  script:
+    - ls -l
+    - ./bin/dunecontrol --cmake-opts="-DCMAKE_CXX_COMPILER='g++-13' -DCMAKE_CXX_FLAGS='-g -Og' -DCMAKE_CXX_STANDARD=20 -DCMAKE_DISABLE_FIND_PACKAGE_Python3=TRUE" --make-opts='-j4' --only=dune-common all
+    - cd ./build-cmake
+    - make -j4 build_tests
+    - ctest
+  tags: [duneci]
