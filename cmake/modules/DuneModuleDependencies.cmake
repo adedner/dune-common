@@ -210,27 +210,21 @@ endmacro(dune_process_dependency_macros)
 # ------------------------------------------------------------------------
 
 macro(dune_cmake_path_setup project_list)
-  # clean up module path from previeous modifications (a typical case is dune-common)
+  # clean up module path from previous modifications (a typical case is dune-common)
   list(REMOVE_ITEM CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
   foreach(_proj IN LISTS ${project_list})
-    if(${mod}_MODULE_PATH)
-      list(REMOVE_ITEM CMAKE_MODULE_PATH "${${_proj}_MODULE_PATH}")
-    endif()
+    list(REMOVE_ITEM CMAKE_MODULE_PATH "${${_proj}_MODULE_PATH}")
   endforeach()
-
-  # include current project cmake modules
-  list(FIND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules" src_proj_index)
-  if(src_proj_index EQUAL -1)
-    list(LENGTH CMAKE_MODULE_PATH src_proj_index)
-    list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
-  endif()
 
   # start over again including them in reversed order so that newer modules have precedence
   foreach(_proj IN LISTS ${project_list})
-    if(${_proj}_MODULE_PATH)
-      list(INSERT CMAKE_MODULE_PATH ${src_proj_index} "${${_proj}_MODULE_PATH}")
+    if(${_proj}_MODULE_PATH AND EXISTS ${${_proj}_MODULE_PATH})
+      list(PREPEND CMAKE_MODULE_PATH "${${_proj}_MODULE_PATH}")
     endif()
   endforeach()
+  if(EXISTS ${PROJECT_SOURCE_DIR}/cmake/modules)
+    list(PREPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
+  endif()
 endmacro(dune_cmake_path_setup)
 
 macro(find_dune_package module)
