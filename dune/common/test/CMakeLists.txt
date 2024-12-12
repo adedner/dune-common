@@ -143,6 +143,9 @@ dune_add_test(NAME densematrixassignmenttest_fail6
 dune_add_test(SOURCES densevectorassignmenttest.cc
               LABELS quick)
 
+dune_add_test(SOURCES densevectorspantest.cc
+              LABELS quick)
+
 dune_add_test(SOURCES diagonalmatrixtest.cc
               LABELS quick)
 
