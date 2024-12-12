@@ -70,6 +70,10 @@ template <class K>
 DenseVectorSpan (K*, std::size_t)
   -> DenseVectorSpan<K>;
 
+template <class K, std::size_t N>
+DenseVectorSpan (K (&)[N])
+  -> DenseVectorSpan<K,N>;
+
 template <class S, std::enable_if_t<Dune::IsNumber<S>::value,int> = 0>
 DenseVectorSpan (S&)
   -> DenseVectorSpan<S,1>;
