@@ -10,6 +10,8 @@
 #include <concepts>
 #include <functional>
 
+#include <dune/common/concepts/identity.hh>
+
 namespace Dune::Concept {
 
 //! Inverse is the inverse element of type `T` of the operation `Op`
@@ -23,6 +25,26 @@ constexpr auto inverse (T value, Op) noexcept
 {
   return Inverse<T,Op>{}(value);
 }
+
+template <class T>
+  requires requires(T value) { -value; }
+struct Inverse<T, std::plus<>>
+{
+  T operator() (const T& value) const noexcept
+  {
+    return -value;
+  }
+};
+
+template <class T>
+  requires requires(T value) { identity(value,std::multiplies<>{}) / value; }
+struct Inverse<T, std::multiplies<>>
+{
+  T operator() (const T& value) const noexcept
+  {
+    return identity(value,std::multiplies<>{}) / value;
+  }
+};
 
 // Overload for floating point types
 template <std::floating_point F>
@@ -54,7 +76,7 @@ struct Inverse<std::complex<F>, std::multiplies<>>
   constexpr std::complex<F> operator() (std::complex<F> value) const noexcept
   {
     assert(value != std::complex<F>(0,0));
-    return F(1) / value;
+    return identity(value,std::multiplies<>{}) / value;
   }
 };
 

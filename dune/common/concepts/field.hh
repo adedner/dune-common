@@ -6,6 +6,7 @@
 #define DUNE_COMMON_CONCEPTS_FIELD_HH
 
 #include <concepts>
+#include <functional>
 #include <limits>
 
 #include <dune/common/concepts/identity.hh>
@@ -41,9 +42,25 @@ concept MultiplicativeGroup = requires(G g, std::multiplies<> op)
 
 static_assert(MultiplicativeGroup<Dune::Concept::Archetypes::MultiplicativeGroup<>>);
 
+
+/**
+ * \brief The `Field` concept is satisfied by all regular types where addition (+),
+ * subtraction (-), multiplication (*), and division (/) are defined and behave
+ * as the corresponding operations in real numbers.
+ *
+ * A field is a set of numbers with two operations `+` and `*`, and corresponding
+ * inverse operations `-` and `/`. Associated to these operations are identity
+ * element, the zero `0` and one `1` for addition and multiplication, respectively.
+ * In order to distinguish these numbers, they must be equality comparable. To
+ * work with these numbers we additionally require that they are semiregular, i.e.,
+ * default constructible, copyable and movable.
+ *
+ * \b Examples:
+ * - floating-point types like `double`, and `float`
+ * - complex number types, e.g., `std::complex<double>`
+ */
 template <class F>
-concept Field = std::regular<F> && AdditiveGroup<F> && MultiplicativeGroup<F>
-  && std::numeric_limits<F>::is_specialized;
+concept Field = std::regular<F> && AdditiveGroup<F> && MultiplicativeGroup<F>;
 
 static_assert(Field<Dune::Concept::Archetypes::Field>);
 
