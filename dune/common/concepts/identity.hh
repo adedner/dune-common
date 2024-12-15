@@ -11,11 +11,11 @@
 
 namespace Dune::Concept {
 
-//! Zero is the neutral element of the addition
+//! Identity is the neutral element of type `T` of the operation `Op`
 template <class T, class Op>
 struct Identity;
 
-// Primary template depends on specializations of the template Zero
+// Primary template depends on specializations of the template Identity
 template <class T, class Op>
 constexpr auto identity (T value, Op) noexcept
   -> decltype(Identity<T,Op>{}(value))

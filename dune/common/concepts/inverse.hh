@@ -12,11 +12,11 @@
 
 namespace Dune::Concept {
 
-//! Zero is the neutral element of the addition
+//! Inverse is the inverse element of type `T` of the operation `Op`
 template <class T, class Op>
 struct Inverse;
 
-// Primary template depends on specializations of the template Zero
+// Primary template depends on specializations of the template Inverse
 template <class T, class Op>
 constexpr auto inverse (T value, Op) noexcept
   -> decltype(Inverse<T,Op>{}(value))

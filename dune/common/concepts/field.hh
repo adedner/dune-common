@@ -5,18 +5,6 @@
 #ifndef DUNE_COMMON_CONCEPTS_FIELD_HH
 #define DUNE_COMMON_CONCEPTS_FIELD_HH
 
-// check whether c++20 concept can be used
-#if __has_include(<version>) && __has_include(<concepts>)
-  #include <version>
-  #if  __cpp_concepts >= 201907L && __cpp_lib_concepts >= 202002L
-    #ifndef DUNE_ENABLE_CONCEPTS
-    #define DUNE_ENABLE_CONCEPTS 1
-    #endif
-  #endif
-#endif
-
-#if DUNE_ENABLE_CONCEPTS
-
 #include <concepts>
 #include <limits>
 
@@ -60,7 +48,5 @@ concept Field = std::regular<F> && AdditiveGroup<F> && MultiplicativeGroup<F>
 static_assert(Field<Dune::Concept::Archetypes::Field>);
 
 } // end namespace Dune::Concept
-
-#endif // DUNE_ENABLE_CONCEPTS
 
 #endif // DUNE_COMMON_CONCEPTS_FIELD_HH
