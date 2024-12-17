@@ -14,9 +14,23 @@
 #include <dune/common/densevector.hh>
 #include <dune/common/ftraits.hh>
 #include <dune/common/typetraits.hh>
+#include <dune/common/std/default_accessor.hh>
+#include <dune/common/std/iterator_accessor.hh>
+#include <dune/common/std/layout_right.hh>
 #include <dune/common/std/mdspan.hh>
 
 namespace Dune {
+namespace Impl {
+
+template <class V>
+concept IsVector = requires(V v)
+{
+  v.data();
+  { v.size() } -> std::integral;
+};
+
+} // end namespace Impl
+
 
 /** @addtogroup DenseMatVec
   *  @{
@@ -27,13 +41,13 @@ namespace Dune {
   * \tparam K is the field type (use float, double, complex, etc)
   * \tparam Extent The static size of the vector or `Std::dynamic_extent` if the size is dynamic
   */
-template <class K, std::size_t Extent = Std::dynamic_extent>
+template <class K, std::size_t Extent = Std::dynamic_extent, class Accessor = Std::default_accessor<K>>
 class DenseVectorSpan
-    : private Std::mdspan< K, Std::extents<std::size_t,Extent> >
-    , public DenseVector< DenseVectorSpan<K, Extent> >
+    : private Std::mdspan< K, Std::extents<std::size_t,Extent>, Std::layout_right, Accessor >
+    , public DenseVector< DenseVectorSpan<K, Extent, Accessor> >
 {
-  using Base = Std::mdspan< K, Std::extents<std::size_t,Extent> >;
-  using Interface = DenseVector< DenseVectorSpan<K, Extent> >;
+  using Base = Std::mdspan< K, Std::extents<std::size_t,Extent>, Std::layout_right, Accessor >;
+  using Interface = DenseVector< DenseVectorSpan<K, Extent, Accessor> >;
 
 public:
   // import all constructors from Std::mdspan
@@ -52,6 +66,16 @@ public:
     }
   constexpr DenseVectorSpan (Vector&& v) noexcept
     : Base(v.data(), v.size())
+  {}
+
+  //! Construct a span over an iterator range
+  template <class Range>
+    requires (not Impl::IsVector<Range>) && requires(Range&& r) {
+      { r.begin() } -> std::convertible_to<typename Base::data_handle_type>;
+      { r.end()   } -> std::convertible_to<typename Base::data_handle_type>;
+    }
+  constexpr DenseVectorSpan (Range&& r) noexcept
+    : Base(r.begin(), std::distance(r.begin(), r.end()))
   {}
 
   // make assignment of other vectors possible
@@ -134,17 +158,35 @@ template <class K, int N>
 DenseVectorSpan (FieldVector<K,N> const&)
   -> DenseVectorSpan<const K,std::size_t(N)>;
 
+// span over an iterator range
 
-template <class K, std::size_t Extent>
-struct DenseMatVecTraits< DenseVectorSpan<K, Extent> >
+template <class Range, class Iter = decltype(std::declval<Range>().begin())>
+  requires (not Impl::IsVector<Range>) && requires(Range& r) {
+    { r.begin() } -> std::convertible_to<Iter>;
+    { r.end() } -> std::convertible_to<Iter>;
+  }
+DenseVectorSpan (Range&)
+  -> DenseVectorSpan<typename std::iterator_traits<Iter>::value_type, Std::dynamic_extent, Std::iterator_accessor<Iter>>;
+
+template <class Range, class Iter = decltype(std::declval<Range>().cbegin())>
+  requires (not Impl::IsVector<Range>) && requires(const Range& r) {
+    { r.begin() } -> std::convertible_to<Iter>;
+    { r.end() } -> std::convertible_to<Iter>;
+  }
+DenseVectorSpan (const Range&)
+  -> DenseVectorSpan<typename std::iterator_traits<Iter>::value_type, Std::dynamic_extent, Std::iterator_accessor<Iter>>;
+
+
+template <class K, std::size_t Extent, class Accessor>
+struct DenseMatVecTraits< DenseVectorSpan<K, Extent, Accessor> >
 {
-  using derived_type = DenseVectorSpan<K, Extent>;
+  using derived_type = DenseVectorSpan<K, Extent, Accessor>;
   using value_type = K;
   using size_type = std::size_t;
 };
 
-template <class K, std::size_t Extent>
-struct FieldTraits< DenseVectorSpan<K, Extent> >
+template <class K, std::size_t Extent, class Accessor>
+struct FieldTraits< DenseVectorSpan<K, Extent, Accessor> >
 {
   using field_type = typename FieldTraits<K>::field_type;
   using real_type = typename FieldTraits<K>::real_type;

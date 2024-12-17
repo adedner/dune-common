@@ -8,6 +8,7 @@
 
 #include <dune/common/dynmatrix.hh>
 #include <dune/common/densevectorspan.hh>
+#include <dune/common/iteratorrange.hh>
 #include <dune/common/test/testsuite.hh>
 
 int main()
@@ -43,6 +44,11 @@ int main()
     double data[3]{1.0,2.0,3.0};
     [[maybe_unused]] auto x_span1 = Dune::DenseVectorSpan(data, 3);
     [[maybe_unused]] auto x_span2 = Dune::DenseVectorSpan(data);
+  }
+
+  {
+    auto range = Dune::IteratorRange{x.begin(), x.end()};
+    [[maybe_unused]] auto x_span1 = Dune::DenseVectorSpan(range);
   }
 
   return test.exit();
