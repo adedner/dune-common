@@ -314,22 +314,6 @@ namespace Dune
       return result;
     }
 
-    //! Multiplies M from the left to this matrix, this matrix is not modified
-    template<int l>
-    FieldMatrix<K,l,cols> leftmultiplyany (const FieldMatrix<K,l,rows>& M) const
-    {
-      FieldMatrix<K,l,cols> C;
-
-      for (size_type i=0; i<l; i++) {
-        for (size_type j=0; j<cols; j++) {
-          C[i][j] = 0;
-          for (size_type k=0; k<rows; k++)
-            C[i][j] += M[i][k]*(*this)[k][j];
-        }
-      }
-      return C;
-    }
-
     using Base::rightmultiply;
 
     //! Multiplies M from the right to this matrix
@@ -349,25 +333,12 @@ namespace Dune
       return *this;
     }
 
-    //! Multiplies M from the right to this matrix, this matrix is not modified
-    template<int l>
-    FieldMatrix<K,rows,l> rightmultiplyany (const FieldMatrix<K,cols,l>& M) const
-    {
-      FieldMatrix<K,rows,l> C;
-
-      for (size_type i=0; i<rows; i++) {
-        for (size_type j=0; j<l; j++) {
-          C[i][j] = 0;
-          for (size_type k=0; k<cols; k++)
-            C[i][j] += (*this)[i][k]*M[k][j];
-        }
-      }
-      return C;
-    }
-
     // make this thing a matrix
     static constexpr size_type mat_rows() { return ROWS; }
     static constexpr size_type mat_cols() { return COLS; }
+
+    static constexpr std::size_t static_rows() { return ROWS; }
+    static constexpr std::size_t static_cols() { return COLS; }
 
     row_reference mat_access ( size_type i )
     {
@@ -579,16 +550,6 @@ namespace Dune
       return result;
     }
 
-    //! Multiplies M from the left to this matrix, this matrix is not modified
-    template<int l>
-    FieldMatrix<K,l,1> leftmultiplyany (const FieldMatrix<K,l,1>& M) const
-    {
-      FieldMatrix<K,l,1> C;
-      for (size_type j=0; j<l; j++)
-        C[j][0] = M[j][0]*(*this)[0][0];
-      return C;
-    }
-
     //! left multiplication
     FieldMatrix& rightmultiply (const FieldMatrix& M)
     {
@@ -596,20 +557,12 @@ namespace Dune
       return *this;
     }
 
-    //! Multiplies M from the right to this matrix, this matrix is not modified
-    template<int l>
-    FieldMatrix<K,1,l> rightmultiplyany (const FieldMatrix<K,1,l>& M) const
-    {
-      FieldMatrix<K,1,l> C;
-
-      for (size_type j=0; j<l; j++)
-        C[0][j] = M[0][j]*_data[0];
-      return C;
-    }
-
     // make this thing a matrix
     static constexpr size_type mat_rows() { return 1; }
     static constexpr size_type mat_cols() { return 1; }
+
+    static constexpr std::size_t static_rows() { return 1; }
+    static constexpr std::size_t static_cols() { return 1; }
 
     row_reference mat_access ([[maybe_unused]] size_type i)
     {
