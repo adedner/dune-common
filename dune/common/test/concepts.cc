@@ -14,9 +14,30 @@
 
 #include <dune/common/bigunsignedint.hh>
 #include <dune/common/fvector.hh>
+#include <dune/common/gmpfield.hh>
 #include <dune/common/hash.hh>
 #include <dune/common/reservedvector.hh>
 #include <dune/common/parallel/mpihelper.hh>
+
+#if HAVE_GMP
+template <unsigned int precision>
+struct Dune::Concept::Identity<Dune::GMPField<precision>, std::plus<>>
+{
+  Dune::GMPField<precision> operator() (const Dune::GMPField<precision>& /*value*/) const noexcept
+  {
+    return Dune::GMPField<precision>(0);
+  }
+};
+
+template <unsigned int precision>
+struct Dune::Concept::Identity<Dune::GMPField<precision>, std::multiplies<>>
+{
+  Dune::GMPField<precision> operator() (const Dune::GMPField<precision>& /*value*/) const noexcept
+  {
+    return Dune::GMPField<precision>(1);
+  }
+};
+#endif
 
 int main (int argc, char **argv)
 {
@@ -39,6 +60,14 @@ int main (int argc, char **argv)
 
   static_assert(not Concept::Container<double*>);
   static_assert(not Concept::Container<Dune::FieldVector<double,3>>);
+
+  // test Field
+  static_assert(Concept::Field<float>);
+  static_assert(Concept::Field<double>);
+  static_assert(Concept::Field<std::complex<double>>);
+#if HAVE_GMP
+  static_assert(Concept::Field<Dune::GMPField<64>>);
+#endif
 }
 
 #else // DUNE_ENABLE_CONCEPTS

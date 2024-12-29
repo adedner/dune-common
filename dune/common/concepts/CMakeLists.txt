@@ -3,5 +3,8 @@
 
 install(FILES
   container.hh
+  field.hh
   hashable.hh
+  identity.hh
+  inverse.hh
 DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/common/concepts)
