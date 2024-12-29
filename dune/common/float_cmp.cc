@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <dune/common/fvector.hh>
+#include <dune/common/vector.hh>
 
 namespace Dune {
 
@@ -33,6 +34,17 @@ namespace Dune {
     template<class T, typename A>
     struct EpsilonType<std::vector<T, A> > {
       //! The epsilon type corresponding to value type std::vector<T, A>
+      typedef typename EpsilonType<T>::Type Type;
+    };
+    //! Specialization of EpsilonType for std::vector
+    /**
+     * @ingroup FloatCmp
+     * @tparam T The value_type of the std::vector
+     * @tparam A The Allocator of the std::vector
+     */
+    template<class T, typename A>
+    struct EpsilonType<Dune::Vector<T, A> > {
+      //! The epsilon type corresponding to value type Dune::Vector<T, A>
       typedef typename EpsilonType<T>::Type Type;
     };
     //! Specialization of EpsilonType for Dune::FieldVector
@@ -118,6 +130,27 @@ namespace Dune {
       struct eq_t<std::vector<T>, relativeStrong> : eq_t_std_vec<T, relativeStrong> {};
       template< class T>
       struct eq_t<std::vector<T>, absolute> : eq_t_std_vec<T, absolute> {};
+
+      template<class T, CmpStyle cstyle>
+      struct eq_t_dune_vec {
+        typedef Dune::Vector<T> V;
+        static bool eq(const V &first,
+                       const V &second,
+                       typename EpsilonType<V>::Type epsilon = DefaultEpsilon<V>::value()) {
+          auto size = first.size();
+          if(size != second.size()) return false;
+          for(unsigned int i = 0; i < size; ++i)
+            if(!eq_t<T, cstyle>::eq(first[i], second[i], epsilon))
+              return false;
+          return true;
+        }
+      };
+      template< class T>
+      struct eq_t<Dune::Vector<T>, relativeWeak> : eq_t_dune_vec<T, relativeWeak> {};
+      template< class T>
+      struct eq_t<Dune::Vector<T>, relativeStrong> : eq_t_dune_vec<T, relativeStrong> {};
+      template< class T>
+      struct eq_t<Dune::Vector<T>, absolute> : eq_t_dune_vec<T, absolute> {};
 
       template<class T, int n, CmpStyle cstyle>
       struct eq_t_fvec {
@@ -295,6 +328,18 @@ namespace Dune {
           return res;
         }
       };
+      template<class I, class T, CmpStyle cstyle, RoundingStyle rstyle>
+      struct round_t<Dune::Vector<I>, Dune::Vector<T>, cstyle, rstyle> {
+        static Dune::Vector<I>
+        round(const T &val,
+              typename EpsilonType<T>::Type epsilon = (DefaultEpsilon<T, cstyle>::value())) {
+          unsigned int size = val.size();
+          Dune::Vector<I> res(size);
+          for(unsigned int i = 0; i < size; ++i)
+            res[i] = round_t<I, T, cstyle, rstyle>::round(val[i], epsilon);
+          return res;
+        }
+      };
       template<class I, class T, int n, CmpStyle cstyle, RoundingStyle rstyle>
       struct round_t<Dune::FieldVector<I, n>, Dune::FieldVector<T, n>, cstyle, rstyle> {
         static Dune::FieldVector<I, n>
@@ -386,6 +431,18 @@ namespace Dune {
               typename EpsilonType<T>::Type epsilon = (DefaultEpsilon<T, cstyle>::value())) {
           unsigned int size = val.size();
           std::vector<I> res(size);
+          for(unsigned int i = 0; i < size; ++i)
+            res[i] = trunc_t<I, T, cstyle, rstyle>::trunc(val[i], epsilon);
+          return res;
+        }
+      };
+      template<class I, class T, CmpStyle cstyle, RoundingStyle rstyle>
+      struct trunc_t<Dune::Vector<I>, Dune::Vector<T>, cstyle, rstyle> {
+        static Dune::Vector<I>
+        trunc(const Dune::Vector<T> &val,
+              typename EpsilonType<T>::Type epsilon = (DefaultEpsilon<T, cstyle>::value())) {
+          unsigned int size = val.size();
+          Dune::Vector<I> res(size);
           for(unsigned int i = 0; i < size; ++i)
             res[i] = trunc_t<I, T, cstyle, rstyle>::trunc(val[i], epsilon);
           return res;

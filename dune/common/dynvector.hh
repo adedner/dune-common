@@ -18,8 +18,8 @@
 #include "exceptions.hh"
 #include "genericiterator.hh"
 
-#include <vector>
 #include "densevector.hh"
+#include "vector.hh"
 
 namespace Dune {
 
@@ -36,7 +36,7 @@ namespace Dune {
   struct DenseMatVecTraits< DynamicVector< K, Allocator > >
   {
     typedef DynamicVector< K, Allocator > derived_type;
-    typedef std::vector< K, Allocator > container_type;
+    typedef Dune::Vector< K, Allocator > container_type;
     typedef K value_type;
     typedef typename container_type::size_type size_type;
   };
@@ -57,14 +57,14 @@ namespace Dune {
   template< class K, class Allocator = std::allocator< K > >
   class DynamicVector : public DenseVector< DynamicVector< K, Allocator > >
   {
-    std::vector< K, Allocator > _data;
+    Dune::Vector< K, Allocator > _data;
 
     typedef DenseVector< DynamicVector< K, Allocator > > Base;
   public:
     typedef typename Base::size_type size_type;
     typedef typename Base::value_type value_type;
 
-    typedef std::vector< K, Allocator > container_type;
+    typedef Dune::Vector< K, Allocator > container_type;
 
     typedef Allocator allocator_type;
 
