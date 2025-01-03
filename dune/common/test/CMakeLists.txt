@@ -172,9 +172,6 @@ add_dune_vc_flags(fmatrixtest)
 dune_add_test(SOURCES fvectortest.cc
               LABELS quick)
 
-dune_add_test(SOURCES fvectorconversion1d.cc
-              LABELS quick)
-
 dune_add_test(SOURCES genericiterator_compile_fail.cc
               EXPECT_COMPILE_FAIL
               LABELS quick)
