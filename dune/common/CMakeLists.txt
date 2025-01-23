@@ -5,7 +5,10 @@ add_subdirectory("concepts")
 add_subdirectory("parallel")
 add_subdirectory("simd")
 add_subdirectory("std")
-add_subdirectory("test")
+
+if(DUNE_ENABLE_TESTING)
+  add_subdirectory("test")
+endif()
 
 # add some sources to the dunecommon library
 target_sources(dunecommon PRIVATE

@@ -20,4 +20,7 @@ install(FILES
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/common/std)
 
 add_subdirectory(impl)
-add_subdirectory(test)
+
+if(DUNE_ENABLE_TESTING)
+  add_subdirectory(test)
+endif()

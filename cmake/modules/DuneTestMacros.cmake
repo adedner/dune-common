@@ -220,6 +220,15 @@ include_guard(GLOBAL)
 enable_testing()
 include(CTest)
 
+# Enable testing by default if the project is a top-level project
+if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+  set(DUNE_ENABLE_TESTING_DEFAULT ON)
+else()
+  set(DUNE_ENABLE_TESTING_DEFAULT OFF)
+endif()
+
+option(DUNE_ENABLE_TESTING "Enable testing for the Dune project" ${DUNE_ENABLE_TESTING_DEFAULT})
+
 # Introduce a target that triggers the building of all tests
 add_custom_target(build_tests)
 
