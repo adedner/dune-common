@@ -119,10 +119,19 @@ namespace Dune
     typedef DenseMatrix< FieldMatrix<K,ROWS,COLS> > Base;
   public:
 
-    //! The number of rows.
-    constexpr static int rows = ROWS;
-    //! The number of columns.
-    constexpr static int cols = COLS;
+    /**
+     * \brief The number of rows.
+     * It can be used either as a constant Matrix::rows that also converts to int, or
+     * it can be used like a function `Matrix::rows()`.
+     **/
+    static constexpr std::integral_constant<int,ROWS> rows = {};
+
+    /**
+     * \brief The number of columns.
+     * It can be used either as a constant Matrix::cols that also converts to int, or
+     * it can be used like a function `Matrix::cols()`.
+     **/
+    static constexpr std::integral_constant<int,COLS> cols = {};
 
     typedef typename Base::size_type size_type;
     typedef typename Base::row_type row_type;
@@ -137,8 +146,8 @@ namespace Dune
 
     /** \brief Constructor initializing the matrix from a list of vector
      */
-    constexpr FieldMatrix(std::initializer_list<Dune::FieldVector<K, cols> > const &l) {
-      assert(l.size() == rows); // Actually, this is not needed any more!
+    constexpr FieldMatrix(std::initializer_list<Dune::FieldVector<K, COLS> > const &l) {
+      assert(l.size() == ROWS); // Actually, this is not needed any more!
       for(std::size_t i=0; i<std::min<std::size_t>(ROWS, l.size()); ++i)
         _data[i] = std::data(l)[i];
     }
@@ -168,8 +177,8 @@ namespace Dune
     }
 
     //! no copy assignment from FieldMatrix of different size
-    template <typename T, int rows, int cols>
-    FieldMatrix& operator=(FieldMatrix<T,rows,cols> const&) = delete;
+    template <typename T, int otherRows, int otherCols>
+    FieldMatrix& operator=(FieldMatrix<T,otherRows,otherCols> const&) = delete;
 
     //! Return transposed of the matrix as FieldMatrix
     FieldMatrix<K, COLS, ROWS> transposed() const
@@ -259,11 +268,11 @@ namespace Dune
     {
       FieldMatrix<typename PromotionTraits<K,OtherScalar>::PromotedType,ROWS,otherCols> result;
 
-      for (size_type i = 0; i < matrixA.mat_rows(); ++i)
-        for (size_type j = 0; j < matrixB.mat_cols(); ++j)
+      for (int i = 0; i < matrixA.rows(); ++i)
+        for (int j = 0; j < matrixB.cols(); ++j)
         {
           result[i][j] = 0;
-          for (size_type k = 0; k < matrixA.mat_cols(); ++k)
+          for (int k = 0; k < matrixA.cols(); ++k)
             result[i][j] += matrixA[i][k] * matrixB[k][j];
         }
 
@@ -274,7 +283,7 @@ namespace Dune
      *
      * This implements multiplication of a FieldMatrix with another matrix
      * of type OtherMatrix. The latter has to provide
-     * OtherMatrix::field_type, OtherMatrix::cols, and OtherMatrix::mtv(x,y).
+     * OtherMatrix::field_type, OtherMatrix::cols(), and OtherMatrix::mtv(x,y).
      */
     template <class OtherMatrix, std::enable_if_t<
       Impl::IsStaticSizeMatrix_v<OtherMatrix>
@@ -284,8 +293,8 @@ namespace Dune
                             const OtherMatrix& matrixB)
     {
       using Field = typename PromotionTraits<K, typename OtherMatrix::field_type>::PromotedType;
-      Dune::FieldMatrix<Field, rows ,OtherMatrix::cols> result;
-      for (std::size_t j=0; j<rows; ++j)
+      Dune::FieldMatrix<Field, ROWS, OtherMatrix::cols()> result;
+      for (int j=0; j<matrixA.rows(); ++j)
         matrixB.mtv(matrixA[j], result[j]);
       return result;
     }
@@ -294,7 +303,7 @@ namespace Dune
      *
      * This implements multiplication of another matrix
      * of type OtherMatrix with a FieldMatrix. The former has to provide
-     * OtherMatrix::field_type, OtherMatrix::rows, and OtherMatrix::mv(x,y).
+     * OtherMatrix::field_type, OtherMatrix::rows(), and OtherMatrix::mv(x,y).
      */
     template <class OtherMatrix, std::enable_if_t<
       Impl::IsStaticSizeMatrix_v<OtherMatrix>
@@ -304,8 +313,8 @@ namespace Dune
                             const FieldMatrix& matrixB)
     {
       using Field = typename PromotionTraits<K, typename OtherMatrix::field_type>::PromotedType;
-      Dune::FieldMatrix<Field, OtherMatrix::rows, cols> result;
-      for (std::size_t j=0; j<cols; ++j)
+      Dune::FieldMatrix<Field, OtherMatrix::rows(), COLS> result;
+      for (int j=0; j<matrixB.cols(); ++j)
       {
         auto B_j = Impl::ColumnVectorView(matrixB, j);
         auto result_j = Impl::ColumnVectorView(result, j);
@@ -316,14 +325,14 @@ namespace Dune
 
     //! Multiplies M from the left to this matrix, this matrix is not modified
     template<int l>
-    FieldMatrix<K,l,cols> leftmultiplyany (const FieldMatrix<K,l,rows>& M) const
+    FieldMatrix<K,l,COLS> leftmultiplyany (const FieldMatrix<K,l,ROWS>& M) const
     {
-      FieldMatrix<K,l,cols> C;
+      FieldMatrix<K,l,COLS> C;
 
       for (size_type i=0; i<l; i++) {
-        for (size_type j=0; j<cols; j++) {
+        for (size_type j=0; j<COLS; j++) {
           C[i][j] = 0;
-          for (size_type k=0; k<rows; k++)
+          for (size_type k=0; k<ROWS; k++)
             C[i][j] += M[i][k]*(*this)[k][j];
         }
       }
@@ -337,13 +346,13 @@ namespace Dune
     FieldMatrix& rightmultiply (const FieldMatrix<K,r,c>& M)
     {
       static_assert(r == c, "Cannot rightmultiply with non-square matrix");
-      static_assert(r == cols, "Size mismatch");
-      FieldMatrix<K,rows,cols> C(*this);
+      static_assert(r == COLS, "Size mismatch");
+      FieldMatrix<K,ROWS,COLS> C(*this);
 
-      for (size_type i=0; i<rows; i++)
-        for (size_type j=0; j<cols; j++) {
+      for (size_type i=0; i<ROWS; i++)
+        for (size_type j=0; j<COLS; j++) {
           (*this)[i][j] = 0;
-          for (size_type k=0; k<cols; k++)
+          for (size_type k=0; k<COLS; k++)
             (*this)[i][j] += C[i][k]*M[k][j];
         }
       return *this;
@@ -351,14 +360,14 @@ namespace Dune
 
     //! Multiplies M from the right to this matrix, this matrix is not modified
     template<int l>
-    FieldMatrix<K,rows,l> rightmultiplyany (const FieldMatrix<K,cols,l>& M) const
+    FieldMatrix<K,ROWS,l> rightmultiplyany (const FieldMatrix<K,COLS,l>& M) const
     {
-      FieldMatrix<K,rows,l> C;
+      FieldMatrix<K,ROWS,l> C;
 
-      for (size_type i=0; i<rows; i++) {
+      for (size_type i=0; i<ROWS; i++) {
         for (size_type j=0; j<l; j++) {
           C[i][j] = 0;
-          for (size_type k=0; k<cols; k++)
+          for (size_type k=0; k<COLS; k++)
             C[i][j] += (*this)[i][k]*M[k][j];
         }
       }
@@ -407,12 +416,19 @@ namespace Dune
     typedef typename Base::row_reference row_reference;
     typedef typename Base::const_row_reference const_row_reference;
 
-    //! \brief The number of rows.
-    //! This is always one for this type.
-    constexpr static int rows = 1;
-    //! \brief The number of columns.
-    //! This is always one for this type.
-    constexpr static int cols = 1;
+    /**
+     * \brief The number of rows = 1.
+     * It can be used either as a constant Matrix::rows that also converts to int, or
+     * it can be used like a function `Matrix::rows()`.
+     **/
+    static constexpr std::integral_constant<int,1> rows = {};
+
+    /**
+     * \brief The number of columns = 1.
+     * It can be used either as a constant Matrix::cols that also converts to int, or
+     * it can be used like a function `Matrix::cols()`.
+     **/
+    static constexpr std::integral_constant<int,1> cols = {};
 
     //===== constructors
     /** \brief Default constructor
@@ -527,7 +543,7 @@ namespace Dune
     {
       FieldMatrix<typename PromotionTraits<K,OtherScalar>::PromotedType,1,otherCols> result;
 
-      for (size_type j = 0; j < matrixB.mat_cols(); ++j)
+      for (int j = 0; j < matrixB.cols(); ++j)
         result[0][j] = matrixA[0][0] * matrixB[0][j];
 
       return result;
@@ -542,14 +558,14 @@ namespace Dune
     template <class OtherMatrix, std::enable_if_t<
       Impl::IsStaticSizeMatrix_v<OtherMatrix>
       and not Impl::IsFieldMatrix_v<OtherMatrix>
-      and (OtherMatrix::rows==1)
+      and (OtherMatrix::rows()==1)
       , int> = 0>
     friend auto operator* ( const FieldMatrix& matrixA,
                             const OtherMatrix& matrixB)
     {
       using Field = typename PromotionTraits<K, typename OtherMatrix::field_type>::PromotedType;
-      Dune::FieldMatrix<Field, rows ,OtherMatrix::cols> result;
-      for (std::size_t j=0; j<rows; ++j)
+      Dune::FieldMatrix<Field, 1, OtherMatrix::cols()> result;
+      for (int j=0; j<matrixA.rows(); ++j)
         matrixB.mtv(matrixA[j], result[j]);
       return result;
     }
@@ -558,19 +574,19 @@ namespace Dune
      *
      * This implements multiplication of another matrix
      * of type OtherMatrix with a FieldMatrix. The former has to provide
-     * OtherMatrix::field_type, OtherMatrix::rows, and OtherMatrix::mv(x,y).
+     * OtherMatrix::field_type, OtherMatrix::rows(), and OtherMatrix::mv(x,y).
      */
     template <class OtherMatrix, std::enable_if_t<
       Impl::IsStaticSizeMatrix_v<OtherMatrix>
       and not Impl::IsFieldMatrix_v<OtherMatrix>
-      and (OtherMatrix::cols==1)
+      and (OtherMatrix::cols()==1)
       , int> = 0>
     friend auto operator* ( const OtherMatrix& matrixA,
                             const FieldMatrix& matrixB)
     {
       using Field = typename PromotionTraits<K, typename OtherMatrix::field_type>::PromotedType;
-      Dune::FieldMatrix<Field, OtherMatrix::rows, cols> result;
-      for (std::size_t j=0; j<cols; ++j)
+      Dune::FieldMatrix<Field, OtherMatrix::rows(), 1> result;
+      for (int j=0; j<matrixB.cols(); ++j)
       {
         auto B_j = Impl::ColumnVectorView(matrixB, j);
         auto result_j = Impl::ColumnVectorView(result, j);

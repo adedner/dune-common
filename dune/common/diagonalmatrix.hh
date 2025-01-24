@@ -78,9 +78,9 @@ namespace Dune {
     typedef const_row_type const_row_reference;
 
     //! The number of rows
-    constexpr static int rows = n;
+    static constexpr std::integral_constant<int,n> rows = {};
     //! The number of columns
-    constexpr static int cols = n;
+    static constexpr std::integral_constant<int,n> cols = {};
 
     //==== size
 
@@ -586,10 +586,10 @@ namespace Dune {
 
     //! \brief The number of rows.
     //! This is always one for this type.
-    constexpr static int rows = 1;
+    static constexpr std::integral_constant<int,1> rows = {};
     //! \brief The number of columns.
     //! This is always one for this type.
-    constexpr static int cols = 1;
+    static constexpr std::integral_constant<int,1> cols = {};
 
 
     //! Default Constructor
