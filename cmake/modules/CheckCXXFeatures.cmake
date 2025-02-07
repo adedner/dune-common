@@ -96,3 +96,11 @@ dune_check_cxx_source_compiles("
   #include <functional>
   int main() { std::identity{}; }
 " DUNE_HAVE_CXX_STD_IDENTITY)
+
+# Check for polymorphic allocators
+dune_check_cxx_source_compiles("
+#include <memory_resource>
+int main() {
+  auto mr = std::pmr::monotonic_buffer_resource{};
+  std::pmr::polymorphic_allocator<std::byte> alloc{&mr};
+}" DUNE_HAVE_CXX_STD_POLYMORPHIC_ALLOCATOR)
