@@ -163,7 +163,7 @@ namespace Dune
     template<typename T>
     FieldMatrix& operator=(const FieldMatrix<T, ROWS, COLS>& x)
     {
-      _data = x._data;
+      std::copy(x.begin(), x.end(), this->begin());
       return *this;
     }
 
