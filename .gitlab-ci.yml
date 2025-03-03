@@ -81,3 +81,35 @@ reuse:
   before_script: ""
   script:
     - reuse lint
+
+
+debian:12 gcc-12-20 (with checking & coverage):
+  extends: .common
+  image: registry.dune-project.org/docker/ci/debian:12
+  variables:
+    DUNECI_CXXFLAGS: " -DDUNE_CHECK_BOUNDS=1 -DDUNE_ISTL_WITH_CHECKING=1 -DDUNE_FMatrix_WITH_CHECKING=1 -DCHECK_RESERVEDVECTOR=1 --coverage -lgcov "
+    DUNECI_TOOLCHAIN: gcc-12-20
+    # Notes:
+    # - Only works for gcc
+    # - The gcov executable needs to match the version of the gcc toolchain
+    GCOVR_OPTS:
+      --gcov-executable gcov-12
+      --root $CI_PROJECT_DIR
+      --exclude $CI_PROJECT_DIR/build-cmake
+      --exclude-unreachable-branches
+      --xml-pretty
+      --print-summary
+      --output $CI_PROJECT_DIR/coverage.xml
+  after_script:
+    # Create a coverage report 
+    - gcovr $GCOVR_OPTS $CI_PROJECT_DIR/build-cmake
+  artifacts:
+    reports:
+      expire_in: 2 years
+      junit: junit/*.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+  # gcovr reports results (`--print-summary` option above). With this line we extract the
+  # result (% of covered lines) to report them in gitlab
+  coverage: /^\s*lines:\s*\d+.\d+\%/
