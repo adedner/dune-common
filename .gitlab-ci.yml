@@ -83,11 +83,11 @@ reuse:
     - reuse lint
 
 
-debian:12 gcc-12-20 (with checking & coverage):
+debian:12 gcc-12-20 (with checking, coverage, no python):
   extends: .common
   image: registry.dune-project.org/docker/ci/debian:12
   variables:
-    DUNECI_CXXFLAGS: " -DDUNE_CHECK_BOUNDS=1 -DDUNE_ISTL_WITH_CHECKING=1 -DDUNE_FMatrix_WITH_CHECKING=1 -DCHECK_RESERVEDVECTOR=1 --coverage -lgcov "
+    DUNECI_CXXFLAGS: " -DCMAKE_DISABLE_FIND_PACKAGE_Python3:BOOL=ON -DDUNE_CHECK_BOUNDS=1 -DDUNE_ISTL_WITH_CHECKING=1 -DDUNE_FMatrix_WITH_CHECKING=1 -DCHECK_RESERVEDVECTOR=1 --coverage -lgcov "
     DUNECI_TOOLCHAIN: gcc-12-20
     # Notes:
     # - Only works for gcc
