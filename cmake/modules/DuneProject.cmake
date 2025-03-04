@@ -34,6 +34,8 @@ Initialize and finalize a Dune module.
   ``CMakeLists.txt`` file. Among other things it creates the cmake package
   configuration file and package version file. Modules can add additional
   entries to these files by setting the variable ``${ProjectName}_INIT``.
+  When `DUNE_PROJECT_BINARY_DIR_IN_PREFIX_PATH` is set to `ON`, this
+  function will append the project binary directory to `CMAKE_PREFIX_PATH`.
 
   Based on the template ``config.h.cmake`` in the project directory,
   a private header file ``${module}-private-config.hh`` and a public header
@@ -41,6 +43,17 @@ Initialize and finalize a Dune module.
   For legacy reasons, the file ``config.h`` with collected upstream
   configuration files is also created. For more information, see the build
   system documentation.
+
+Global options
+^^^^^^^^^^^^^^
+
+``DUNE_PROJECT_BINARY_DIR_IN_PREFIX_PATH``
+  When set to `ON`, the function `finalize_dune_project()` will append
+  the project binary directory to `CMAKE_PREFIX_PATH`. This is useful
+  for super builds where several modules are sub-directories of a cmake
+  (super) project and they depend on each other. In this way, subsequent
+  modules can find the build directory of a module when searched via
+  `find_package`.
 
 #]=======================================================================]
 include_guard(GLOBAL)
@@ -223,6 +236,10 @@ endmacro(dune_project)
 macro(finalize_dune_project)
   if(DUNE_SYMLINK_TO_SOURCE_TREE)
     dune_symlink_to_source_tree()
+  endif()
+
+  if(DUNE_PROJECT_BINARY_DIR_IN_PREFIX_PATH)
+    list(APPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_BINARY_DIR})
   endif()
 
   #configure all headerchecks
