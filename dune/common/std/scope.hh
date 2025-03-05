@@ -8,10 +8,11 @@
 
 #include <dune/common/std/no_unique_address.hh>
 
-#include <utility>
-#include <type_traits>
-#include <functional>
 #include <exception>
+#include <functional>
+#include <limits>
+#include <type_traits>
+#include <utility>
 
 namespace Dune::Std
 {
