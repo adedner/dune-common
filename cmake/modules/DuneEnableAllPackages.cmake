@@ -304,7 +304,7 @@ function(dune_target_enable_all_packages)
     endif()
 
     get_property(all_incs GLOBAL PROPERTY ALL_PKG_INCS)
-    target_include_directories(${_target} ${scope} ${all_incs})
+    target_include_directories(${_target} ${scope} "$<BUILD_INTERFACE:${all_incs}>$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 
     get_property(all_defs GLOBAL PROPERTY ALL_PKG_DEFS)
     target_compile_definitions(${_target} ${scope} ${all_defs})
