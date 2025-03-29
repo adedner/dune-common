@@ -15,6 +15,10 @@ SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
 - `ParameterizedObjectFactory` has now a method `keys()` that returns a range
   of valid keys. One intended use case are improved diagnostics in user code.
 
+- Add a new multi-precision backend, `MPFR`, as alternative to the outdated `GMPXX`. It
+  implements the same class `GMPField` but additionally provides proper specialization of
+  `std::numeric_limits`. If `MPFR` is not found, `GMPXX` is still used as a fallback, but
+  a cmake warning will be emitted to suggest an update to `MPFR`.
 
 ## Build system: Changelog
 
