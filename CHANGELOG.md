@@ -50,6 +50,9 @@ SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
 
 - Add the macro `DUNE_ASSUME` for portable compiler assumption.
 
+- Make the matrix-vector multiplication methods like `.mv` of `DenseMatrix` and `DiagonalMatrix` compatible
+  with standard vector containers, which provide a `.size()` method instead of a `.N()` method.
+
 ## C++: Deprecations and removals
 
 - Deprecate the utility `integerSequenceEntry` in favour of the shorter `get` from `integersequence.hh`.
