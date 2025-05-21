@@ -39,6 +39,10 @@ namespace Dune
         col_(col)
       {}
 
+      constexpr size_type N () const {
+        return matrix_.N();
+      }
+
       constexpr size_type size () const {
         return matrix_.N();
       }
