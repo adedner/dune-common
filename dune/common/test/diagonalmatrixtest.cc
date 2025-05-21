@@ -40,6 +40,10 @@ void test_matrix()
   // matrix vector product
   A.umv(v,f);
 
+  // matrix vector product with std container
+  std::vector<K> va(n,0.0), fa(n,0.0);
+  A.umv(va,fa);
+
 
   // test norms
   A.frobenius_norm();
