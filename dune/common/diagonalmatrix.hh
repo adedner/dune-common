@@ -277,8 +277,8 @@ namespace Dune {
     void mv (const X& x, Y& y) const
     {
 #ifdef DUNE_FMatrix_WITH_CHECKING
-      if (x.N()!=M()) DUNE_THROW(FMatrixError,"index out of range");
-      if (y.N()!=N()) DUNE_THROW(FMatrixError,"index out of range");
+      if (x.size()!=M()) DUNE_THROW(FMatrixError,"index out of range");
+      if (y.size()!=N()) DUNE_THROW(FMatrixError,"index out of range");
 #endif
       for (size_type i=0; i<n; ++i)
         y[i] = diag_[i] * x[i];
@@ -296,8 +296,8 @@ namespace Dune {
     void umv (const X& x, Y& y) const
     {
 #ifdef DUNE_FMatrix_WITH_CHECKING
-      if (x.N()!=M()) DUNE_THROW(FMatrixError,"index out of range");
-      if (y.N()!=N()) DUNE_THROW(FMatrixError,"index out of range");
+      if (x.size()!=M()) DUNE_THROW(FMatrixError,"index out of range");
+      if (y.size()!=N()) DUNE_THROW(FMatrixError,"index out of range");
 #endif
       for (size_type i=0; i<n; ++i)
         y[i] += diag_[i] * x[i];
@@ -308,8 +308,8 @@ namespace Dune {
     void umtv (const X& x, Y& y) const
     {
 #ifdef DUNE_FMatrix_WITH_CHECKING
-      if (x.N()!=N()) DUNE_THROW(FMatrixError,"index out of range");
-      if (y.N()!=M()) DUNE_THROW(FMatrixError,"index out of range");
+      if (x.size()!=N()) DUNE_THROW(FMatrixError,"index out of range");
+      if (y.size()!=M()) DUNE_THROW(FMatrixError,"index out of range");
 #endif
       for (size_type i=0; i<n; ++i)
         y[i] += diag_[i] * x[i];
@@ -320,8 +320,8 @@ namespace Dune {
     void umhv (const X& x, Y& y) const
     {
 #ifdef DUNE_FMatrix_WITH_CHECKING
-      if (x.N()!=N()) DUNE_THROW(FMatrixError,"index out of range");
-      if (y.N()!=M()) DUNE_THROW(FMatrixError,"index out of range");
+      if (x.size()!=N()) DUNE_THROW(FMatrixError,"index out of range");
+      if (y.size()!=M()) DUNE_THROW(FMatrixError,"index out of range");
 #endif
       for (size_type i=0; i<n; i++)
         y[i] += conjugateComplex(diag_[i])*x[i];
@@ -332,8 +332,8 @@ namespace Dune {
     void mmv (const X& x, Y& y) const
     {
 #ifdef DUNE_FMatrix_WITH_CHECKING
-      if (x.N()!=M()) DUNE_THROW(FMatrixError,"index out of range");
-      if (y.N()!=N()) DUNE_THROW(FMatrixError,"index out of range");
+      if (x.size()!=M()) DUNE_THROW(FMatrixError,"index out of range");
+      if (y.size()!=N()) DUNE_THROW(FMatrixError,"index out of range");
 #endif
       for (size_type i=0; i<n; ++i)
         y[i] -= diag_[i] * x[i];
@@ -344,8 +344,8 @@ namespace Dune {
     void mmtv (const X& x, Y& y) const
     {
 #ifdef DUNE_FMatrix_WITH_CHECKING
-      if (x.N()!=N()) DUNE_THROW(FMatrixError,"index out of range");
-      if (y.N()!=M()) DUNE_THROW(FMatrixError,"index out of range");
+      if (x.size()!=N()) DUNE_THROW(FMatrixError,"index out of range");
+      if (y.size()!=M()) DUNE_THROW(FMatrixError,"index out of range");
 #endif
       for (size_type i=0; i<n; ++i)
         y[i] -= diag_[i] * x[i];
@@ -356,8 +356,8 @@ namespace Dune {
     void mmhv (const X& x, Y& y) const
     {
 #ifdef DUNE_FMatrix_WITH_CHECKING
-      if (x.N()!=N()) DUNE_THROW(FMatrixError,"index out of range");
-      if (y.N()!=M()) DUNE_THROW(FMatrixError,"index out of range");
+      if (x.size()!=N()) DUNE_THROW(FMatrixError,"index out of range");
+      if (y.size()!=M()) DUNE_THROW(FMatrixError,"index out of range");
 #endif
       for (size_type i=0; i<n; i++)
         y[i] -= conjugateComplex(diag_[i])*x[i];
@@ -369,8 +369,8 @@ namespace Dune {
       const X& x, Y& y) const
     {
 #ifdef DUNE_FMatrix_WITH_CHECKING
-      if (x.N()!=M()) DUNE_THROW(FMatrixError,"index out of range");
-      if (y.N()!=N()) DUNE_THROW(FMatrixError,"index out of range");
+      if (x.size()!=M()) DUNE_THROW(FMatrixError,"index out of range");
+      if (y.size()!=N()) DUNE_THROW(FMatrixError,"index out of range");
 #endif
       for (size_type i=0; i<n; i++)
         y[i] += alpha * diag_[i] * x[i];
@@ -382,8 +382,8 @@ namespace Dune {
       const X& x, Y& y) const
     {
 #ifdef DUNE_FMatrix_WITH_CHECKING
-      if (x.N()!=N()) DUNE_THROW(FMatrixError,"index out of range");
-      if (y.N()!=M()) DUNE_THROW(FMatrixError,"index out of range");
+      if (x.size()!=N()) DUNE_THROW(FMatrixError,"index out of range");
+      if (y.size()!=M()) DUNE_THROW(FMatrixError,"index out of range");
 #endif
       for (size_type i=0; i<n; i++)
         y[i] += alpha * diag_[i] * x[i];
@@ -395,8 +395,8 @@ namespace Dune {
       const X& x, Y& y) const
     {
 #ifdef DUNE_FMatrix_WITH_CHECKING
-      if (x.N()!=N()) DUNE_THROW(FMatrixError,"index out of range");
-      if (y.N()!=M()) DUNE_THROW(FMatrixError,"index out of range");
+      if (x.size()!=N()) DUNE_THROW(FMatrixError,"index out of range");
+      if (y.size()!=M()) DUNE_THROW(FMatrixError,"index out of range");
 #endif
       for (size_type i=0; i<n; i++)
         y[i] += alpha * conjugateComplex(diag_[i]) * x[i];
