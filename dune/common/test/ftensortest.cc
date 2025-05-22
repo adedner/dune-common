@@ -3,6 +3,7 @@
 // SPDX-FileCopyrightInfo: Copyright © DUNE Project contributors, see file LICENSE.md in module root
 // SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
 
+#include "dune/common/indices.hh"
 #include <iostream>
 
 #include <dune/common/fvector.hh>
@@ -13,6 +14,7 @@
 #include <dune/common/test/foreachindex.hh>
 #include <dune/common/test/testsuite.hh>
 #include <stdexcept>
+#include <utility>
 
 using namespace Dune;
 
@@ -158,12 +160,30 @@ void checkConstructors(Dune::TestSuite& testSuite)
   // check whether a function with a TensorMixin argument can be called
   call(tensor);
 
-  TensorSpan span(tensor);
-  TensorSpan span2(tensor.toTensorSpan());
+  {
+    TensorSpan span(tensor);
+    TensorSpan span2(tensor.toTensorSpan());
+
+    Tensor tensorFromSpan(span);
+    Tensor tensorFromSpan2(span2);
+  }
 
   // check whether a function with a TensorSpan argument can be called
   call2(tensor);
   call2(tensor.toTensorSpan());
+
+  {
+    // check conversion between dynamic and static extents
+    using extents_type = Dune::Std::dextents<std::size_t,Tensor::rank()>;
+    [[maybe_unused]] auto dynext = extents_type(tensor.extents());
+    [[maybe_unused]] auto ext = (typename Tensor::extents_type)(dynext);
+
+    // check conversion between dynamic and static tensors
+    using T = typename Tensor::element_type;
+    [[maybe_unused]] auto dyntensor = Dune::Tensor{dynext, T(0)};
+    [[maybe_unused]] Tensor dynamicToStatic(dyntensor);
+    [[maybe_unused]] decltype(dyntensor) staticToDynamic(tensor);
+  }
 
   testSuite.subTest(subTestSuite);
 }
