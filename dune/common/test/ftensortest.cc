@@ -8,6 +8,7 @@
 
 #include <dune/common/densetensor.hh>
 #include <dune/common/fvector.hh>
+#include <dune/common/indices.hh>
 #include <dune/common/fmatrix.hh>
 #include <dune/common/hybridutilities.hh>
 #include <dune/common/parallel/mpihelper.hh>
