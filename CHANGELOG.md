@@ -85,6 +85,9 @@ In order to build the DUNE core modules you need at least the following software
 
 - Add the macro `DUNE_ASSUME` for portable compiler assumption.
 
+- Make the matrix-vector multiplication methods like `.mv` of `DenseMatrix` and `DiagonalMatrix` compatible
+  with standard vector containers, which provide a `.size()` method instead of a `.N()` method.
+
 ## C++: Deprecations and removals
 
 - Deprecate the utility `integerSequenceEntry` in favour of the shorter `get` from `integersequence.hh`.

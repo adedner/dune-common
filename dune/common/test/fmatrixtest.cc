@@ -324,6 +324,14 @@ void test_matrix()
     test_mult(A, v0, f0, vT, fT);
   }
 
+  {
+    std::vector<K2> v0(m, 0.0);
+    std::vector<K3> f0(n,0.0);
+    std::vector<K3> vT(m,0.0);
+    std::vector<K2> fT(n,0.0);
+    test_mult(A, v0, f0, vT, fT);
+  }
+
   // {
   //   std::vector<K2> v1( m ) ;
   //   std::vector<K3> f1( n, 1 ) ;

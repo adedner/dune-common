@@ -375,8 +375,8 @@ namespace Dune
       auto&& xx = Impl::asVector(x);
       auto&& yy = Impl::asVector(y);
       DUNE_ASSERT_BOUNDS((void*)(&x) != (void*)(&y));
-      DUNE_ASSERT_BOUNDS(xx.N() == M());
-      DUNE_ASSERT_BOUNDS(yy.N() == N());
+      DUNE_ASSERT_BOUNDS(xx.size() == M());
+      DUNE_ASSERT_BOUNDS(yy.size() == N());
 
       using y_field_type = typename FieldTraits<Y>::field_type;
       for (size_type i=0; i<rows(); ++i)
@@ -394,8 +394,8 @@ namespace Dune
       auto&& xx = Impl::asVector(x);
       auto&& yy = Impl::asVector(y);
       DUNE_ASSERT_BOUNDS((void*)(&x) != (void*)(&y));
-      DUNE_ASSERT_BOUNDS(xx.N() == N());
-      DUNE_ASSERT_BOUNDS(yy.N() == M());
+      DUNE_ASSERT_BOUNDS(xx.size() == N());
+      DUNE_ASSERT_BOUNDS(yy.size() == M());
 
       using y_field_type = typename FieldTraits<Y>::field_type;
       for(size_type i = 0; i < cols(); ++i)
@@ -412,8 +412,8 @@ namespace Dune
     {
       auto&& xx = Impl::asVector(x);
       auto&& yy = Impl::asVector(y);
-      DUNE_ASSERT_BOUNDS(xx.N() == M());
-      DUNE_ASSERT_BOUNDS(yy.N() == N());
+      DUNE_ASSERT_BOUNDS(xx.size() == M());
+      DUNE_ASSERT_BOUNDS(yy.size() == N());
       for (size_type i=0; i<rows(); ++i)
         for (size_type j=0; j<cols(); j++)
           yy[i] += (*this)[i][j] * xx[j];
@@ -425,8 +425,8 @@ namespace Dune
     {
       auto&& xx = Impl::asVector(x);
       auto&& yy = Impl::asVector(y);
-      DUNE_ASSERT_BOUNDS(xx.N() == N());
-      DUNE_ASSERT_BOUNDS(yy.N() == M());
+      DUNE_ASSERT_BOUNDS(xx.size() == N());
+      DUNE_ASSERT_BOUNDS(yy.size() == M());
       for(size_type i = 0; i<rows(); ++i)
         for (size_type j=0; j<cols(); j++)
           yy[j] += (*this)[i][j]*xx[i];
@@ -438,8 +438,8 @@ namespace Dune
     {
       auto&& xx = Impl::asVector(x);
       auto&& yy = Impl::asVector(y);
-      DUNE_ASSERT_BOUNDS(xx.N() == N());
-      DUNE_ASSERT_BOUNDS(yy.N() == M());
+      DUNE_ASSERT_BOUNDS(xx.size() == N());
+      DUNE_ASSERT_BOUNDS(yy.size() == M());
       for (size_type i=0; i<rows(); i++)
         for (size_type j=0; j<cols(); j++)
           yy[j] += conjugateComplex((*this)[i][j])*xx[i];
@@ -451,8 +451,8 @@ namespace Dune
     {
       auto&& xx = Impl::asVector(x);
       auto&& yy = Impl::asVector(y);
-      DUNE_ASSERT_BOUNDS(xx.N() == M());
-      DUNE_ASSERT_BOUNDS(yy.N() == N());
+      DUNE_ASSERT_BOUNDS(xx.size() == M());
+      DUNE_ASSERT_BOUNDS(yy.size() == N());
       for (size_type i=0; i<rows(); i++)
         for (size_type j=0; j<cols(); j++)
           yy[i] -= (*this)[i][j] * xx[j];
@@ -464,8 +464,8 @@ namespace Dune
     {
       auto&& xx = Impl::asVector(x);
       auto&& yy = Impl::asVector(y);
-      DUNE_ASSERT_BOUNDS(xx.N() == N());
-      DUNE_ASSERT_BOUNDS(yy.N() == M());
+      DUNE_ASSERT_BOUNDS(xx.size() == N());
+      DUNE_ASSERT_BOUNDS(yy.size() == M());
       for (size_type i=0; i<rows(); i++)
         for (size_type j=0; j<cols(); j++)
           yy[j] -= (*this)[i][j]*xx[i];
@@ -477,8 +477,8 @@ namespace Dune
     {
       auto&& xx = Impl::asVector(x);
       auto&& yy = Impl::asVector(y);
-      DUNE_ASSERT_BOUNDS(xx.N() == N());
-      DUNE_ASSERT_BOUNDS(yy.N() == M());
+      DUNE_ASSERT_BOUNDS(xx.size() == N());
+      DUNE_ASSERT_BOUNDS(yy.size() == M());
       for (size_type i=0; i<rows(); i++)
         for (size_type j=0; j<cols(); j++)
           yy[j] -= conjugateComplex((*this)[i][j])*xx[i];
@@ -491,8 +491,8 @@ namespace Dune
     {
       auto&& xx = Impl::asVector(x);
       auto&& yy = Impl::asVector(y);
-      DUNE_ASSERT_BOUNDS(xx.N() == M());
-      DUNE_ASSERT_BOUNDS(yy.N() == N());
+      DUNE_ASSERT_BOUNDS(xx.size() == M());
+      DUNE_ASSERT_BOUNDS(yy.size() == N());
       for (size_type i=0; i<rows(); i++)
         for (size_type j=0; j<cols(); j++)
           yy[i] += alpha * (*this)[i][j] * xx[j];
@@ -505,8 +505,8 @@ namespace Dune
     {
       auto&& xx = Impl::asVector(x);
       auto&& yy = Impl::asVector(y);
-      DUNE_ASSERT_BOUNDS(xx.N() == N());
-      DUNE_ASSERT_BOUNDS(yy.N() == M());
+      DUNE_ASSERT_BOUNDS(xx.size() == N());
+      DUNE_ASSERT_BOUNDS(yy.size() == M());
       for (size_type i=0; i<rows(); i++)
         for (size_type j=0; j<cols(); j++)
           yy[j] += alpha*(*this)[i][j]*xx[i];
@@ -519,8 +519,8 @@ namespace Dune
     {
       auto&& xx = Impl::asVector(x);
       auto&& yy = Impl::asVector(y);
-      DUNE_ASSERT_BOUNDS(xx.N() == N());
-      DUNE_ASSERT_BOUNDS(yy.N() == M());
+      DUNE_ASSERT_BOUNDS(xx.size() == N());
+      DUNE_ASSERT_BOUNDS(yy.size() == M());
       for (size_type i=0; i<rows(); i++)
         for (size_type j=0; j<cols(); j++)
           yy[j] +=

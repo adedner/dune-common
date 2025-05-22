@@ -43,6 +43,10 @@ namespace Dune
         return matrix_.N();
       }
 
+      constexpr size_type size () const {
+        return matrix_.N();
+      }
+
       template<class M_ = M,
         std::enable_if_t<std::is_same_v<M_,M> and not std::is_const_v<M_>, int> = 0>
       constexpr value_type& operator[] (size_type row) {
