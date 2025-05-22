@@ -235,12 +235,12 @@ int main(int argc, char** argv)
   TestSuite testSuite;
 
   using Tensor0 = Dune::Tensor<double>;
-  using Tensor1 = Dune::Tensor<double,Dune::dynamic>;
-  using Tensor2 = Dune::Tensor<double,Dune::dynamic,Dune::dynamic>;
-  using Tensor3 = Dune::Tensor<double,Dune::dynamic,Dune::dynamic,Dune::dynamic>;
+  using Tensor1 = Dune::Tensor<double,Dune::dynamic_extent>;
+  using Tensor2 = Dune::Tensor<double,Dune::dynamic_extent,Dune::dynamic_extent>;
+  using Tensor3 = Dune::Tensor<double,Dune::dynamic_extent,Dune::dynamic_extent,Dune::dynamic_extent>;
 
-  // using Tensor4 = Dune::Tensor<bool,Dune::dynamic>;
-  // using Tensor5 = Dune::Tensor<bool,Dune::dynamic,Dune::dynamic>;
+  // using Tensor4 = Dune::Tensor<bool,Dune::dynamic_extent>;
+  // using Tensor5 = Dune::Tensor<bool,Dune::dynamic_extent,Dune::dynamic_extent>;
 
   checkConstructors<Tensor0>(testSuite);
   checkConstructors<Tensor1>(testSuite);
