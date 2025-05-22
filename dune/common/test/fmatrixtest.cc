@@ -366,7 +366,7 @@ void test_matrix()
         DUNE_THROW(FMatrixError, "Operator-= had no effect!");
     }
     FM A1 = A;         // A1 == A
-    FM A2 = (A1 *= 2); // A1 == A2 == 2*A
+    FM A2 = (A1 *= K{ 2 }); // A1 == A2 == 2*A
     {
       FM tmp = A1; tmp -= A;
       if (tmp.infinity_norm() < 1e-12)
@@ -377,10 +377,10 @@ void test_matrix()
       if (tmp.infinity_norm() > 1e-12)
         DUNE_THROW(FMatrixError, "Return value of Operator*= incorrect!");
     }
-    [[maybe_unused]] FM A3 = (A2 *= 3); // A2 == A3 == 6*A
-    FM A4 = (A2 /= 2); // A2 == A4 == 3*A;
+    [[maybe_unused]] FM A3 = (A2 *= K{ 3 }); // A2 == A3 == 6*A
+    FM A4 = (A2 /= K{ 2 }); // A2 == A4 == 3*A;
     FM A5 = A;
-    A5 *= 3;           // A5       == 3*A
+    A5 *= K{ 3 };           // A5       == 3*A
     {
       FM tmp = A2; tmp -= A5;
       if (tmp.infinity_norm() > 1e-12)
@@ -500,7 +500,7 @@ void test_matrix()
     using std::abs;
 
     FieldMatrix<K,n,m> A3 = A;
-    A3 *= 3;
+    A3 *= K{ 3 };
 
     FieldMatrix<K,n,m> B = A;
     B.axpy( K( 2 ), B );

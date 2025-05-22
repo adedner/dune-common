@@ -100,7 +100,7 @@ void checkTransposeProduct(Dune::TestSuite& suite, A a, B b_original)
     suite.subTest(checkAxBT(a,b_original,bt));
     // Check if bt was captured by value
     b = b_original;
-    b *= 2;
+    b *= 2.;
     suite.subTest(checkAxBT(a,b_original,bt));
   }
 
@@ -110,7 +110,7 @@ void checkTransposeProduct(Dune::TestSuite& suite, A a, B b_original)
     auto bt = transpose(std::ref(b));
     suite.subTest(checkAxBT(a,b,bt));
     // Check if bt was captured by reference
-    b *= 2;
+    b *= 2.;
     suite.subTest(checkAxBT(a,b,bt));
   }
 
@@ -127,7 +127,7 @@ void checkTransposeProduct(Dune::TestSuite& suite, A a, B b_original)
     auto bt = transposedView(b);
     suite.subTest(checkAxBT(a,b,bt));
     // Check if bt was captured by reference
-    b *= 2;
+    b *= 2.;
     suite.subTest(checkAxBT(a,b,bt));
   }
 
