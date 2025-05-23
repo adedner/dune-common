@@ -8,11 +8,11 @@
 #include <array>
 #include <concepts>
 #include <functional>
+#include <span>
 #include <utility>
 
 #include <dune/common/forceinline.hh>
 #include <dune/common/std/extents.hh>
-#include <dune/common/std/span.hh>
 #include <dune/common/std/functional.hh>
 
 namespace Dune {
@@ -23,7 +23,7 @@ DUNE_FORCE_INLINE void forEachIndexImpl (const Extents& extents, Fun f, Indices.
 {
   constexpr typename Extents::rank_type pos = sizeof...(Indices);
   if constexpr(pos < Extents::rank()) {
-    if constexpr(Extents::static_extent(pos) == Std::dynamic_extent)
+    if constexpr(Extents::static_extent(pos) == std::dynamic_extent)
       for (typename Extents::index_type i = 0; i < extents.extent(pos); ++i)
         forEachIndexImpl(extents, std::move(f), ii...,i);
     else
