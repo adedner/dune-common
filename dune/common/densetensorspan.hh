@@ -103,7 +103,7 @@ DenseTensorSpan (element_type*, II...)
   -> DenseTensorSpan<element_type, Std::dextents<std::size_t, sizeof...(II)>>;
 
 template <class element_type, std::integral SizeType, std::size_t N>
-DenseTensorSpan (element_type*, std::span<SizeType,N>&)
+DenseTensorSpan (element_type*, std::span<SizeType,N>)
   -> DenseTensorSpan<element_type, Std::dextents<std::size_t, N>>;
 
 template <class element_type, std::integral SizeType, std::size_t N>
