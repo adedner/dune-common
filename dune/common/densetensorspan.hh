@@ -97,28 +97,28 @@ template <class Pointer>
 DenseTensorSpan (Pointer&&)
   -> DenseTensorSpan<std::remove_pointer_t<std::remove_reference_t<Pointer>>, Std::extents<std::size_t>>;
 
-template <class element_type, std::convertible_to<std::size_t>... II>
+template <class ElementType, std::convertible_to<std::size_t>... II>
   requires (sizeof...(II) > 0)
-DenseTensorSpan (element_type*, II...)
-  -> DenseTensorSpan<element_type, Std::dextents<std::size_t, sizeof...(II)>>;
+DenseTensorSpan (ElementType*, II...)
+  -> DenseTensorSpan<ElementType, Std::dextents<std::size_t, sizeof...(II)>>;
 
-template <class element_type, std::integral SizeType, std::size_t N>
-DenseTensorSpan (element_type*, std::span<SizeType,N>)
-  -> DenseTensorSpan<element_type, Std::dextents<std::size_t, N>>;
+template <class ElementType, std::integral SizeType, std::size_t N>
+DenseTensorSpan (ElementType*, std::span<SizeType,N>)
+  -> DenseTensorSpan<ElementType, Std::dextents<std::size_t, N>>;
 
-template <class element_type, std::integral SizeType, std::size_t N>
-DenseTensorSpan (element_type*, const std::array<SizeType,N>&)
-  -> DenseTensorSpan<element_type, Std::dextents<std::size_t, N>>;
+template <class ElementType, std::integral SizeType, std::size_t N>
+DenseTensorSpan (ElementType*, const std::array<SizeType,N>&)
+  -> DenseTensorSpan<ElementType, Std::dextents<std::size_t, N>>;
 
-template <class element_type, std::integral IndexType, std::size_t... exts>
-DenseTensorSpan (element_type*, const Std::extents<IndexType,exts...>&)
-  -> DenseTensorSpan<element_type, Std::extents<IndexType,exts...>>;
+template <class ElementType, std::integral IndexType, std::size_t... exts>
+DenseTensorSpan (ElementType*, const Std::extents<IndexType,exts...>&)
+  -> DenseTensorSpan<ElementType, Std::extents<IndexType,exts...>>;
 
-template <class element_type, class Mapping,
+template <class ElementType, class Mapping,
   class Extents = typename Mapping::extents_type,
   class Layout = typename Mapping::layout_type>
-DenseTensorSpan (element_type*, const Mapping&)
-  -> DenseTensorSpan<element_type, Extents, Layout>;
+DenseTensorSpan (ElementType*, const Mapping&)
+  -> DenseTensorSpan<ElementType, Extents, Layout>;
 
 template <class Mapping, class Accessor,
   class DataHandle = typename Accessor::data_handle_type,
