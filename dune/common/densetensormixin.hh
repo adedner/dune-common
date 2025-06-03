@@ -7,8 +7,6 @@
 
 #include <cassert>
 #include <concepts>
-#include <span>
-#include <stdexcept>
 #include <type_traits>
 #include <utility>
 
