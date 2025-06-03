@@ -2,8 +2,8 @@
 // vi: set et ts=4 sw=2 sts=2:
 // SPDX-FileCopyrightInfo: Copyright © DUNE Project contributors, see file LICENSE.md in module root
 // SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
-#ifndef DUNE_COMMON_TENSOR_HH
-#define DUNE_COMMON_TENSOR_HH
+#ifndef DUNE_COMMON_DENSETENSOR_HH
+#define DUNE_COMMON_DENSETENSOR_HH
 
 #include <array>
 #include <concepts>
@@ -11,9 +11,9 @@
 #include <type_traits>
 #include <vector>
 
+#include <dune/common/densetensormixin.hh>
+#include <dune/common/densetensorspan.hh>
 #include <dune/common/initializerlist.hh>
-#include <dune/common/tensormixin.hh>
-#include <dune/common/tensorspan.hh>
 #include <dune/common/concepts/number.hh>
 #include <dune/common/std/extents.hh>
 #include <dune/common/std/layout_right.hh>
@@ -23,7 +23,7 @@ namespace Dune {
 namespace Impl {
 
 template <class Element, std::size_t... extents>
-struct TensorStorageType
+struct DenseTensorStorageType
 {
   using container_type = std::conditional_t<((extents == std::dynamic_extent) || ...),
     std::vector<Element>, std::array<Element, (extents * ... * std::size_t(1))>>;
@@ -46,13 +46,13 @@ struct TensorStorageType
  * \tparam extents  Individual static extents or std::dynamic_extent
  **/
 template <class Element, std::size_t... extents>
-class Tensor
-    : public TensorMixin<Tensor<Element,extents...>,
-        typename Impl::TensorStorageType<Element,extents...>::type>
+class DenseTensor
+    : public DenseTensorMixin<DenseTensor<Element,extents...>,
+        typename Impl::DenseTensorStorageType<Element,extents...>::type>
 {
-  using self_type = Tensor;
-  using storage_type = typename Impl::TensorStorageType<Element,extents...>::type;
-  using base_type = TensorMixin<self_type, storage_type>;
+  using self_type = DenseTensor;
+  using storage_type = typename Impl::DenseTensorStorageType<Element,extents...>::type;
+  using base_type = DenseTensorMixin<self_type, storage_type>;
 
 public:
   using element_type = typename base_type::element_type;
@@ -62,17 +62,17 @@ public:
   using layout_type = typename base_type::layout_type;
   using mapping_type = typename base_type::mapping_type;
 
-  using tensorspan_type = TensorSpan<element_type,extents_type,layout_type>;
-  using const_tensorspan_type = TensorSpan<const element_type,extents_type,layout_type>;
+  using tensorspan_type = DenseTensorSpan<element_type,extents_type,layout_type>;
+  using const_tensorspan_type = DenseTensorSpan<const element_type,extents_type,layout_type>;
 
 public:
-  /// \brief Inherit constructor from TensorMixin
+  /// \brief Inherit constructor from DenseTensorMixin
   using base_type::base_type;
 
-  /// \name Additional Tensor constructors
+  /// \name Additional DenseTensor constructors
   /// @{
 
-  explicit constexpr Tensor (const value_type& value)
+  explicit constexpr DenseTensor (const value_type& value)
     : base_type{extents_type{}, value}
   {}
 
@@ -81,7 +81,7 @@ public:
    *
    * \b Example:
    * \code{.cpp}
-   Tensor<double,2,2> matrix{
+   DenseTensor<double,2,2> matrix{
      {1.0,2.0},
      {2.0, 3.0}
    };
@@ -89,8 +89,8 @@ public:
    **/
   template <class E = extents_type>
     requires (E::rank_dynamic() == 0 && std::is_default_constructible_v<E>)
-  constexpr Tensor (NestedInitializerList_t<value_type,extents_type::rank()> init)
-    : Tensor{extents_type{}, init}
+  constexpr DenseTensor (NestedInitializerList_t<value_type,extents_type::rank()> init)
+    : DenseTensor{extents_type{}, init}
   {}
 
   /**
@@ -98,8 +98,8 @@ public:
    *
    * \b Example:
    * \code{.cpp}
-   using Extents = typename Tensor<double,dynamic_extent,dynamic_extent>::extents_type;
-   Tensor<double,dynamic_extent,dynamic_extent> matrix(Extents{2,2},
+   using Extents = typename DenseTensor<double,dynamic_extent,dynamic_extent>::extents_type;
+   DenseTensor<double,dynamic_extent,dynamic_extent> matrix(Extents{2,2},
    {
      {1.0,2.0},
      {2.0, 3.0}
@@ -108,8 +108,8 @@ public:
    **/
   template <class M = mapping_type>
     requires (std::is_constructible_v<M,extents_type>)
-  constexpr Tensor (const extents_type& e, NestedInitializerList_t<value_type,extents_type::rank()> init)
-    : Tensor{mapping_type{e}, init}
+  constexpr DenseTensor (const extents_type& e, NestedInitializerList_t<value_type,extents_type::rank()> init)
+    : DenseTensor{mapping_type{e}, init}
   {}
 
   /**
@@ -117,7 +117,7 @@ public:
    *
    * \b Example:
    * \code{.cpp}
-   Tensor<double,dynamic_extent,dynamic_extent> matrix(std::array{2,2},
+   DenseTensor<double,dynamic_extent,dynamic_extent> matrix(std::array{2,2},
    {
      {1.0,2.0},
      {2.0, 3.0}
@@ -127,9 +127,9 @@ public:
   template <std::convertible_to<index_type> Otherindex_type, std::size_t N>
     requires (std::is_nothrow_constructible_v<index_type,const Otherindex_type&> &&
               (N == extents_type::rank_dynamic() || N == extents_type::rank()))
-  constexpr Tensor (std::span<Otherindex_type,N> e,
+  constexpr DenseTensor (std::span<Otherindex_type,N> e,
                     NestedInitializerList_t<value_type,extents_type::rank()> init)
-    : Tensor{mapping_type{extents_type{e}}, init}
+    : DenseTensor{mapping_type{extents_type{e}}, init}
   {}
 
   /**
@@ -137,16 +137,16 @@ public:
    *
    * \b Example:
    * \code{.cpp}
-   using Extents = typename Tensor<double,dynamic_extent,dynamic_extent>::extents_type;
-   using Mapping = typename Tensor<double,dynamic_extent,dynamic_extent>::mapping_type;
-   Tensor<double,dynamic_extent,dynamic_extent> matrix(Mapping{Extents{2,2}},
+   using Extents = typename DenseTensor<double,dynamic_extent,dynamic_extent>::extents_type;
+   using Mapping = typename DenseTensor<double,dynamic_extent,dynamic_extent>::mapping_type;
+   DenseTensor<double,dynamic_extent,dynamic_extent> matrix(Mapping{Extents{2,2}},
    {
      {1.0,2.0},
      {2.0, 3.0}
    });
    * \endcode
    **/
-  constexpr Tensor (const mapping_type& m, NestedInitializerList_t<value_type,extents_type::rank()> init)
+  constexpr DenseTensor (const mapping_type& m, NestedInitializerList_t<value_type,extents_type::rank()> init)
     : base_type{m}
   {
     auto it = this->container_data();
@@ -154,17 +154,17 @@ public:
       [&it](value_type value) { *it++ = value; });
   }
 
-  /// \brief Converting constructor from another Tensor
+  /// \brief Converting constructor from another DenseTensor
   template <class OtherElement, std::size_t... otherExtents>
-  constexpr Tensor (const Tensor<OtherElement,otherExtents...>& other)
+  constexpr DenseTensor (const DenseTensor<OtherElement,otherExtents...>& other)
     : base_type{other.toTensorSpan()}
   {}
 
   /// \brief Copy constructor with default behavior
-  constexpr Tensor (const Tensor&) = default;
+  constexpr DenseTensor (const DenseTensor&) = default;
 
   /// \brief Move constructor with default behavior
-  constexpr Tensor (Tensor&&) = default;
+  constexpr DenseTensor (DenseTensor&&) = default;
 
   /// @}
 
@@ -176,10 +176,10 @@ public:
   using base_type::operator=;
 
   /// \brief Copy assignment-operator with default behavior
-  constexpr Tensor& operator= (const Tensor&) = default;
+  constexpr DenseTensor& operator= (const DenseTensor&) = default;
 
   /// \brief Move assignment-operator with default behavior
-  constexpr Tensor& operator= (Tensor&&) = default;
+  constexpr DenseTensor& operator= (DenseTensor&&) = default;
 
   /// @}
 
@@ -191,10 +191,10 @@ public:
    * \brief Subscript operator to access the tensor components using a single index or an array of indices.
    * \b Examples:
    * \code{c++}
-     Tensor<double,3,3> matrix;
+     DenseTensor<double,3,3> matrix;
      matrix[std::array{0,1}] = 7.0;
 
-     Tensor<double,3> vector;
+     DenseTensor<double,3> vector;
      vector[2] = 42.0;
      \endcode
    **/
@@ -204,7 +204,7 @@ public:
    * \brief Access an element of the tensor using a variadic list of indices.
    * \b Examples:
    * \code{c++}
-     Tensor<double,3,3,3> tensor;
+     DenseTensor<double,3,3,3> tensor;
      tensor(0,1,2) = 42.0;
      \endcode
    **/
@@ -288,38 +288,38 @@ public:
   /// \name Conversion into mdspan
   /// @{
 
-  /// \brief Conversion operator to TensorSpan
+  /// \brief Conversion operator to DenseTensorSpan
   template <class V, class E, class L, class A>
-    requires std::constructible_from<TensorSpan<V,E,L,A>, tensorspan_type>
-  constexpr operator TensorSpan<V,E,L,A> ()
+    requires std::constructible_from<DenseTensorSpan<V,E,L,A>, tensorspan_type>
+  constexpr operator DenseTensorSpan<V,E,L,A> ()
   {
     return tensorspan_type(this->container_data(), this->mapping());
   }
 
-  /// \brief Conversion operator to TensorSpan
+  /// \brief Conversion operator to DenseTensorSpan
   template <class V, class E, class L, class A>
-    requires std::constructible_from<TensorSpan<V,E,L,A>, const_tensorspan_type>
-  constexpr operator TensorSpan<V,E,L,A> () const
+    requires std::constructible_from<DenseTensorSpan<V,E,L,A>, const_tensorspan_type>
+  constexpr operator DenseTensorSpan<V,E,L,A> () const
   {
     return const_tensorspan_type(this->container_data(), this->mapping());
   }
 
-  /// \brief Conversion function to TensorSpan
+  /// \brief Conversion function to DenseTensorSpan
   template <class A = Std::default_accessor<element_type>>
-    requires std::assignable_from<tensorspan_type&, TensorSpan<element_type,extents_type,layout_type,A>>
-  constexpr TensorSpan<element_type,extents_type,layout_type,A>
+    requires std::assignable_from<tensorspan_type&, DenseTensorSpan<element_type,extents_type,layout_type,A>>
+  constexpr DenseTensorSpan<element_type,extents_type,layout_type,A>
   toTensorSpan (const A& accessor = A{})
   {
-    return TensorSpan<element_type,extents_type,layout_type,A>(this->container_data(), this->mapping(), accessor);
+    return DenseTensorSpan<element_type,extents_type,layout_type,A>(this->container_data(), this->mapping(), accessor);
   }
 
-  /// \brief Conversion function to TensorSpan
+  /// \brief Conversion function to DenseTensorSpan
   template <class A = Std::default_accessor<const element_type>>
-    requires std::assignable_from<const_tensorspan_type&, TensorSpan<const element_type,extents_type,layout_type,A>>
-  constexpr TensorSpan<const element_type,extents_type,layout_type,A>
+    requires std::assignable_from<const_tensorspan_type&, DenseTensorSpan<const element_type,extents_type,layout_type,A>>
+  constexpr DenseTensorSpan<const element_type,extents_type,layout_type,A>
   toTensorSpan (const A& accessor = A{}) const
   {
-    return TensorSpan<const element_type,extents_type,layout_type,A>(this->container_data(), this->mapping(), accessor);
+    return DenseTensorSpan<const element_type,extents_type,layout_type,A>(this->container_data(), this->mapping(), accessor);
   }
 
   /// @}
@@ -336,12 +336,12 @@ concept LayoutMapping = std::same_as<M,
 
 
 /// \name Deduction guides
-/// \relates Tensor
+/// \relates DenseTensor
 /// @{
 
 template <class index_type, std::size_t... exts, class value_type>
-Tensor (Std::extents<index_type, exts...>, value_type)
-  -> Tensor<value_type, exts...>;
+DenseTensor (Std::extents<index_type, exts...>, value_type)
+  -> DenseTensor<value_type, exts...>;
 
 // NOTE: since deduction guides cannot be unrolled or defined inside a
 // helper class, we need to write out the specialization for the different
@@ -350,80 +350,80 @@ Tensor (Std::extents<index_type, exts...>, value_type)
 
 template <Concept::LayoutMapping Mapping, Concept::Number value_type>
   requires (Mapping::extents_type::rank() == 0)
-Tensor (Mapping, value_type)
-  -> Tensor<value_type>;
+DenseTensor (Mapping, value_type)
+  -> DenseTensor<value_type>;
 
 template <Concept::LayoutMapping Mapping, Concept::Number value_type>
   requires (Mapping::extents_type::rank() == 1)
-Tensor (Mapping, value_type)
-  -> Tensor<value_type, Mapping::extents_type::static_extent(0)>;
+DenseTensor (Mapping, value_type)
+  -> DenseTensor<value_type, Mapping::extents_type::static_extent(0)>;
 
 template <Concept::LayoutMapping Mapping, Concept::Number value_type>
   requires (Mapping::extents_type::rank() == 2)
-Tensor (Mapping, value_type)
-  -> Tensor<value_type,
+DenseTensor (Mapping, value_type)
+  -> DenseTensor<value_type,
       Mapping::extents_type::static_extent(0),
       Mapping::extents_type::static_extent(1)>;
 
 template <Concept::LayoutMapping Mapping, Concept::Number value_type>
   requires (Mapping::extents_type::rank() == 3)
-Tensor (Mapping, value_type)
-  -> Tensor<value_type,
+DenseTensor (Mapping, value_type)
+  -> DenseTensor<value_type,
       Mapping::extents_type::static_extent(0),
       Mapping::extents_type::static_extent(1),
       Mapping::extents_type::static_extent(2)>;
 
 template <class index_type, std::size_t... exts, Concept::Number value_type, class Alloc>
-Tensor (Std::extents<index_type, exts...>, value_type, const Alloc&)
-  -> Tensor<value_type, exts...>;
+DenseTensor (Std::extents<index_type, exts...>, value_type, const Alloc&)
+  -> DenseTensor<value_type, exts...>;
 
 template <Concept::LayoutMapping Mapping, Concept::Number value_type, class Alloc>
   requires (Mapping::extents_type::rank() == 0)
-Tensor (Mapping, value_type, const Alloc&)
-  -> Tensor<value_type>;
+DenseTensor (Mapping, value_type, const Alloc&)
+  -> DenseTensor<value_type>;
 
 template <Concept::LayoutMapping Mapping, Concept::Number value_type, class Alloc>
   requires (Mapping::extents_type::rank() == 1)
-Tensor (Mapping, value_type, const Alloc&)
-  -> Tensor<value_type, Mapping::extents_type::static_extent(0)>;
+DenseTensor (Mapping, value_type, const Alloc&)
+  -> DenseTensor<value_type, Mapping::extents_type::static_extent(0)>;
 
 template <Concept::LayoutMapping Mapping, Concept::Number value_type, class Alloc>
   requires (Mapping::extents_type::rank() == 2)
-Tensor (Mapping, value_type, const Alloc&)
-  -> Tensor<value_type,
+DenseTensor (Mapping, value_type, const Alloc&)
+  -> DenseTensor<value_type,
       Mapping::extents_type::static_extent(0),
       Mapping::extents_type::static_extent(1)>;
 
 template <Concept::LayoutMapping Mapping, Concept::Number value_type, class Alloc>
   requires (Mapping::extents_type::rank() == 3)
-Tensor (Mapping, value_type, const Alloc&)
-  -> Tensor<value_type,
+DenseTensor (Mapping, value_type, const Alloc&)
+  -> DenseTensor<value_type,
       Mapping::extents_type::static_extent(0),
       Mapping::extents_type::static_extent(1),
       Mapping::extents_type::static_extent(2)>;
 
 template <class V, class I, std::size_t... exts, class L, class C>
-Tensor (Std::mdarray<V,Dune::Std::extents<I,exts...>,L,C>)
-  -> Tensor<V, exts...>;
+DenseTensor (Std::mdarray<V,Dune::Std::extents<I,exts...>,L,C>)
+  -> DenseTensor<V, exts...>;
 
 template <class V, class I, std::size_t... exts, class L, class C>
-Tensor (Std::mdspan<V,Dune::Std::extents<I,exts...>,L,C>)
-  -> Tensor<std::remove_cv_t<V>, exts...>;
+DenseTensor (Std::mdspan<V,Dune::Std::extents<I,exts...>,L,C>)
+  -> DenseTensor<std::remove_cv_t<V>, exts...>;
 
 /// @}
 
 
 template <class V, std::size_t... exts>
-TensorSpan (Tensor<V,exts...>&)
-  -> TensorSpan<V,typename Impl::TensorStorageType<V,exts...>::extents_type,Std::layout_right,Std::default_accessor<V>>;
+DenseTensorSpan (DenseTensor<V,exts...>&)
+  -> DenseTensorSpan<V,typename Impl::DenseTensorStorageType<V,exts...>::extents_type,Std::layout_right,Std::default_accessor<V>>;
 
 template <class V, std::size_t... exts>
-TensorSpan (const Tensor<V,exts...>&)
-  -> TensorSpan<const V,typename Impl::TensorStorageType<V,exts...>::extents_type,Std::layout_right,Std::default_accessor<const V>>;
+DenseTensorSpan (const DenseTensor<V,exts...>&)
+  -> DenseTensorSpan<const V,typename Impl::DenseTensorStorageType<V,exts...>::extents_type,Std::layout_right,Std::default_accessor<const V>>;
 
 
 template <class V, std::size_t... exts>
-struct FieldTraits< Tensor<V,exts...> >
+struct FieldTraits< DenseTensor<V,exts...> >
 {
   using field_type = typename FieldTraits<V>::field_type;
   using real_type = typename FieldTraits<V>::real_type;
@@ -431,4 +431,4 @@ struct FieldTraits< Tensor<V,exts...> >
 
 } // end namespace Dune
 
-#endif // DUNE_COMMON_TENSOR_HH
+#endif // DUNE_COMMON_DENSETENSOR_HH

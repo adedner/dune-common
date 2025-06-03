@@ -6,9 +6,9 @@
 #include "dune/common/indices.hh"
 #include <iostream>
 
+#include <dune/common/densetensor.hh>
 #include <dune/common/fvector.hh>
 #include <dune/common/fmatrix.hh>
-#include <dune/common/tensor.hh>
 #include <dune/common/hybridutilities.hh>
 #include <dune/common/parallel/mpihelper.hh>
 #include <dune/common/test/foreachindex.hh>
@@ -41,24 +41,24 @@ void checkEqualValue(Dune::TestSuite& testSuite, Tensor const& a, typename Tenso
 }
 
 template <class D, class B>
-void call (const TensorMixin<D,B>& tensor)
+void call (const DenseTensorMixin<D,B>& tensor)
 {
   // it is possible to call a function that expects the TensorMixin base class
 }
 
-void call2 (TensorSpan<const double, Std::dextents<int,0>> tensorspan)
+void call2 (DenseTensorSpan<const double, Std::dextents<int,0>> tensorspan)
 {
   // it is possible to call a function that expects the TensorSpan argument
 }
-void call2 (TensorSpan<const double, Std::dextents<int,1>> tensorspan)
+void call2 (DenseTensorSpan<const double, Std::dextents<int,1>> tensorspan)
 {
   // it is possible to call a function that expects the TensorSpan argument
 }
-void call2 (TensorSpan<const double, Std::dextents<int,2>> tensorspan)
+void call2 (DenseTensorSpan<const double, Std::dextents<int,2>> tensorspan)
 {
   // it is possible to call a function that expects the TensorSpan argument
 }
-void call2 (TensorSpan<const double, Std::dextents<int,3>> tensorspan)
+void call2 (DenseTensorSpan<const double, Std::dextents<int,3>> tensorspan)
 {
   // it is possible to call a function that expects the TensorSpan argument
 }
@@ -161,8 +161,8 @@ void checkConstructors(Dune::TestSuite& testSuite)
   call(tensor);
 
   {
-    TensorSpan span(tensor);
-    TensorSpan span2(tensor.toTensorSpan());
+    DenseTensorSpan span(tensor);
+    DenseTensorSpan span2(tensor.toTensorSpan());
 
     Tensor tensorFromSpan(span);
     Tensor tensorFromSpan2(span2);
@@ -180,7 +180,7 @@ void checkConstructors(Dune::TestSuite& testSuite)
 
     // check conversion between dynamic and static tensors
     using T = typename Tensor::element_type;
-    [[maybe_unused]] auto dyntensor = Dune::Tensor{dynext, T(0)};
+    [[maybe_unused]] auto dyntensor = Dune::DenseTensor{dynext, T(0)};
     [[maybe_unused]] Tensor dynamicToStatic(dyntensor);
     [[maybe_unused]] decltype(dyntensor) staticToDynamic(tensor);
   }
@@ -281,10 +281,10 @@ int main(int argc, char** argv)
 
   TestSuite testSuite;
 
-  using Tensor0 = Dune::Tensor<double>;
-  using Tensor1 = Dune::Tensor<double,2>;
-  using Tensor2 = Dune::Tensor<double,2,2>;
-  using Tensor3 = Dune::Tensor<double,2,2,2>;
+  using Tensor0 = Dune::DenseTensor<double>;
+  using Tensor1 = Dune::DenseTensor<double,2>;
+  using Tensor2 = Dune::DenseTensor<double,2,2>;
+  using Tensor3 = Dune::DenseTensor<double,2,2,2>;
 
   checkConstructors<Tensor0>(testSuite);
   checkConstructors<Tensor1>(testSuite);

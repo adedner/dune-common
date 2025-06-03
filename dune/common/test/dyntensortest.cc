@@ -5,12 +5,12 @@
 
 #include <array>
 
+#include <dune/common/densetensor.hh>
+#include <dune/common/densetensorspan.hh>
 #include <dune/common/filledarray.hh>
 #include <dune/common/fvector.hh>
 #include <dune/common/fmatrix.hh>
 #include <dune/common/hybridutilities.hh>
-#include <dune/common/tensor.hh>
-#include <dune/common/tensorspan.hh>
 #include <dune/common/parallel/mpihelper.hh>
 #include <dune/common/test/testsuite.hh>
 #include <dune/common/test/foreachindex.hh>
@@ -127,9 +127,9 @@ void checkConstructors(Dune::TestSuite& testSuite)
 
   { // check deduction guides
 
-    Dune::Tensor t1{tensor1.extents(), T{}};
-    Dune::Tensor t2{tensor1.mapping(), T{}};
-    Dune::Tensor t3{tensor1.toTensorSpan()};
+    Dune::DenseTensor t1{tensor1.extents(), T{}};
+    Dune::DenseTensor t2{tensor1.mapping(), T{}};
+    Dune::DenseTensor t3{tensor1.toTensorSpan()};
   }
 
   testSuite.subTest(subTestSuite);
@@ -234,13 +234,13 @@ int main(int argc, char** argv)
 
   TestSuite testSuite;
 
-  using Tensor0 = Dune::Tensor<double>;
-  using Tensor1 = Dune::Tensor<double,std::dynamic_extent>;
-  using Tensor2 = Dune::Tensor<double,std::dynamic_extent,std::dynamic_extent>;
-  using Tensor3 = Dune::Tensor<double,std::dynamic_extent,std::dynamic_extent,std::dynamic_extent>;
+  using Tensor0 = Dune::DenseTensor<double>;
+  using Tensor1 = Dune::DenseTensor<double,std::dynamic_extent>;
+  using Tensor2 = Dune::DenseTensor<double,std::dynamic_extent,std::dynamic_extent>;
+  using Tensor3 = Dune::DenseTensor<double,std::dynamic_extent,std::dynamic_extent,std::dynamic_extent>;
 
-  // using Tensor4 = Dune::Tensor<bool,std::dynamic_extent>;
-  // using Tensor5 = Dune::Tensor<bool,std::dynamic_extent,std::dynamic_extent>;
+  // using Tensor4 = Dune::DenseTensor<bool,std::dynamic_extent>;
+  // using Tensor5 = Dune::DenseTensor<bool,std::dynamic_extent,std::dynamic_extent>;
 
   checkConstructors<Tensor0>(testSuite);
   checkConstructors<Tensor1>(testSuite);

@@ -2,8 +2,8 @@
 // vi: set et ts=4 sw=2 sts=2:
 // SPDX-FileCopyrightInfo: Copyright © DUNE Project contributors, see file LICENSE.md in module root
 // SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
-#ifndef DUNE_COMMON_TENSORMIXIN_HH
-#define DUNE_COMMON_TENSORMIXIN_HH
+#ifndef DUNE_COMMON_DENSETENSORMIXIN_HH
+#define DUNE_COMMON_DENSETENSORMIXIN_HH
 
 #include <cassert>
 #include <concepts>
@@ -32,10 +32,10 @@ namespace Dune {
  * \tparam Base     Either mdarray or mdspan base type for storage.
  **/
 template <class Derived, class Base>
-class TensorMixin
+class DenseTensorMixin
     : public Base
 {
-  using self_type = TensorMixin;
+  using self_type = DenseTensorMixin;
   using derived_type = Derived;
   using base_type = Base;
 
@@ -189,8 +189,8 @@ public:
   /// @}
 
 
-  /// \brief Comparison of two TensorMixins for equality
-  friend constexpr bool operator== (const TensorMixin& lhs, const TensorMixin& rhs) noexcept
+  /// \brief Comparison of two DenseTensorMixins for equality
+  friend constexpr bool operator== (const DenseTensorMixin& lhs, const DenseTensorMixin& rhs) noexcept
   {
     return static_cast<const base_type&>(lhs) == static_cast<const base_type&>(rhs);
   }
@@ -240,7 +240,7 @@ private:
 // specialization for rank-0 tensor and comparison with scalar
 template <class D, class B, Concept::Number S>
   requires (B::extents_type::rank() == 0)
-constexpr bool operator== (const TensorMixin<D,B>& lhs, const S& number) noexcept
+constexpr bool operator== (const DenseTensorMixin<D,B>& lhs, const S& number) noexcept
 {
   return lhs() == number;
 }
@@ -248,13 +248,13 @@ constexpr bool operator== (const TensorMixin<D,B>& lhs, const S& number) noexcep
 // specialization for rank-0 tensor and comparison with scalar
 template <Concept::Number S, class D, class B>
   requires (B::extents_type::rank() == 0)
-constexpr bool operator== (const S& number, const TensorMixin<D,B>& rhs) noexcept
+constexpr bool operator== (const S& number, const DenseTensorMixin<D,B>& rhs) noexcept
 {
   return number == rhs();
 }
 
 template <class D, class B>
-struct FieldTraits< TensorMixin<D,B> >
+struct FieldTraits< DenseTensorMixin<D,B> >
 {
   using field_type = typename FieldTraits<D>::field_type;
   using real_type = typename FieldTraits<D>::real_type;
@@ -262,4 +262,4 @@ struct FieldTraits< TensorMixin<D,B> >
 
 } // end namespace Dune
 
-#endif // DUNE_COMMON_TENSORMIXIN_HH
+#endif // DUNE_COMMON_DENSETENSORMIXIN_HH

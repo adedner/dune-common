@@ -41,6 +41,9 @@ install(FILES
         debugstream.hh
         deprecated.hh
         densematrix.hh
+        densetensor.hh
+        densetensormixin.hh
+        densetensorspan.hh
         densevector.hh
         diagonalmatrix.hh
         documentation.hh
@@ -100,9 +103,6 @@ install(FILES
         stdthread.hh
         streamoperators.hh
         stringutility.hh
-        tensor.hh
-        tensormixin.hh
-        tensorspan.hh
         timer.hh
         transpose.hh
         tupleutility.hh
