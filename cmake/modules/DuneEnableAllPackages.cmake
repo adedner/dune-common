@@ -87,7 +87,10 @@
 #
 #    Adds all currently registered package flags (see :ref:`dune_register_package_flags`) to the given targets.
 #    This function is mainly intended to help write DUNE modules that want to use :ref:`dune_enable_all_packages` and
-#    define their own libraries, but need to be compatible with CMake < 3.1
+#    define their own libraries, but need to be compatible with CMake < 3.1.
+#    If this function is used on an exported target, make sure to enable
+#    `DUNE_REGISTER_DUNE_DEPENDENCIES_WITH_BUILD_INTERFACE` to ensure that build include directories of dune projects
+#    are not propagated on the installed targets.
 #
 # .. cmake_function:: dune_register_package_flags
 #
