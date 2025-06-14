@@ -432,7 +432,7 @@ public:
    **/
   template <Concept::TensorLike... Tensors>
     requires (sizeof...(Tensors) == extents_type::rank())
-  constexpr Concept::Tensor auto multiDot (const Tensors&... tensors)
+  constexpr Concept::Tensor auto multiDot (const Tensors&... tensors) const
   {
     return tensorMultiDot(*this, tensors...);
   }
@@ -601,6 +601,26 @@ public:
       requires (extents_type::rank() == 1)
   {
     return frobenius_norm();
+  }
+
+  /// \brief Infinity norm
+  typename FieldTraits<value_type>::real_type infinity_norm () const
+  {
+    using std::abs;
+    using R = typename FieldTraits<value_type>::real_type;
+    if (this->is_exhaustive()) {
+      R result(0);
+      for (auto const& vi : valueRange(this->asBase()))
+        result = std::max<R>(result, abs(vi));
+      return result;
+    } else {
+      R result(0);
+      forEachIndex(base_type::extents(), [&](auto&& index) {
+        auto const& vi = (*this)[index];
+        result = std::max<R>(result, abs(vi));
+      });
+      return result;
+    }
   }
 
   /// @}
