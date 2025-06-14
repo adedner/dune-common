@@ -104,6 +104,7 @@ install(FILES
         streamoperators.hh
         stringutility.hh
         tensordot.hh
+        tensormultidot.hh
         timer.hh
         transpose.hh
         tupleutility.hh
