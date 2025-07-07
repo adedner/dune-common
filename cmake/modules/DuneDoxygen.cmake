@@ -48,7 +48,7 @@ add_custom_target(doxygen_install)
 # This functions adds the necessary routines for the generation of the
 # Doxyfile[.in] files needed to doxygen.
 macro(prepare_doxyfile)
-  cmake_parse_arguments(DOXYFILE "" "TARGET" "TAGFILES" ${ARGN})
+  cmake_parse_arguments(DOXYFILE "" "TARGET;DOXYFILE" "TAGFILES" ${ARGN})
 
   # default target name is the module name
   if(NOT DOXYFILE_TARGET)
@@ -61,19 +61,19 @@ macro(prepare_doxyfile)
   # check whether module has a Doxylocal file
   find_file(_DOXYLOCAL Doxylocal PATHS ${CMAKE_CURRENT_SOURCE_DIR} NO_DEFAULT_PATH)
 
-  set(make_doxyfile_options -D DOT_TRUE=${DOT_TRUE} -D DUNE_MOD_NAME=${PROJECT_NAME} -D DUNE_MOD_VERSION=${ProjectVersion} -D DOXYSTYLE=${DOXYSTYLE_FILE} -D DOXYGENMACROS=${DOXYGENMACROS_FILE} -D abs_top_srcdir=${CMAKE_SOURCE_DIR} -D top_srcdir=${${PROJECT_NAME}_SOURCE_DIR} -D DOXYGEN_TAGFILES=${DOXYFILE_TAGFILES} -P ${scriptdir}/CreateDoxyFile.cmake)
+  set(make_doxyfile_options -D DOXYFILE=${DOXYFILE_DOXYFILE} -D DOT_TRUE=${DOT_TRUE} -D DUNE_MOD_NAME=${PROJECT_NAME} -D DUNE_MOD_VERSION=${ProjectVersion} -D DOXYSTYLE=${DOXYSTYLE_FILE} -D DOXYGENMACROS=${DOXYGENMACROS_FILE} -D abs_top_srcdir=${CMAKE_SOURCE_DIR} -D top_srcdir=${${PROJECT_NAME}_SOURCE_DIR} -D DOXYGEN_TAGFILES=${DOXYFILE_TAGFILES})
   if(_DOXYLOCAL)
-    add_custom_command(OUTPUT Doxyfile.in Doxyfile
+    add_custom_command(OUTPUT ${DOXYFILE_DOXYFILE}.in ${DOXYFILE_DOXYFILE}
       COMMAND ${CMAKE_COMMAND} ${make_doxyfile_options} -D DOXYLOCAL=${CMAKE_CURRENT_SOURCE_DIR}/Doxylocal -D srcdir=${CMAKE_CURRENT_SOURCE_DIR} -P ${scriptdir}/CreateDoxyFile.cmake
-      COMMENT "Creating Doxyfile.in"
+      COMMENT "Creating ${DOXYFILE_DOXYFILE}.in"
       DEPENDS ${DOXYSTYLE_FILE} ${DOXYGENMACROS_FILE} ${CMAKE_CURRENT_SOURCE_DIR}/Doxylocal)
   else()
-    add_custom_command(OUTPUT Doxyfile.in Doxyfile
+    add_custom_command(OUTPUT ${DOXYFILE_DOXYFILE}.in ${DOXYFILE_DOXYFILE}
       COMMAND ${CMAKE_COMMAND}  ${make_doxyfile_options} -P ${scriptdir}/CreateDoxyFile.cmake
-      COMMENT "Creating Doxyfile.in"
+      COMMENT "Creating ${DOXYFILE_DOXYFILE}.in"
       DEPENDS ${DOXYSTYLE_FILE} ${DOXYGENMACROS_FILE})
   endif()
-  add_custom_target(doxyfile_${DOXYFILE_TARGET} DEPENDS Doxyfile.in Doxyfile)
+  add_custom_target(doxyfile_${DOXYFILE_TARGET} DEPENDS ${DOXYFILE_DOXYFILE}.in ${DOXYFILE_DOXYFILE})
 endmacro(prepare_doxyfile)
 
 macro(add_doxygen_target)
@@ -87,11 +87,6 @@ macro(add_doxygen_target)
     set(DOXYGEN_TARGET ${PROJECT_NAME})
   endif()
 
-  # default output is html
-  if(NOT DOXYGEN_OUTPUT)
-    set(DOXYGEN_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/html")
-  endif()
-
   dune_module_path(MODULE dune-common RESULT scriptdir SCRIPT_DIR)
   if(PROJECT_NAME STREQUAL "dune-common")
     set(DOXYSTYLE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/Doxystyle)
@@ -99,41 +94,54 @@ macro(add_doxygen_target)
   endif()
   message(STATUS "Using scripts from ${scriptdir} for creating doxygen stuff.")
 
-  foreach(module ${DUNE_FOUND_DEPENDENCIES})
-    set(DOXYGEN_TAGFILES "${DOXYGEN_TAGFILES} ${${module}_DOXYGEN_DIR}/${module}.tag=${${module}_DOXYGEN_DIR}/html")
-  endforeach()
-
   if(TARGET Doxygen::doxygen)
-    prepare_doxyfile(TARGET ${DOXYGEN_TARGET} TAGFILES ${DOXYGEN_TAGFILES})
+
+    set(DOXYGEN_BUILD_TAGFILES ${DOXYGEN_TAGFILES})
+    foreach(module ${DUNE_FOUND_DEPENDENCIES})
+      set(DOXYGEN_BUILD_TAGFILES "${DOXYGEN_BUILD_TAGFILES} ${${module}_DOXYGEN_DIR}/${module}.tag=${${module}_DOXYGEN_DIR}/html")
+    endforeach()
+    prepare_doxyfile(TARGET ${DOXYGEN_TARGET}_build TAGFILES ${DOXYGEN_BUILD_TAGFILES} DOXYFILE Doxyfile)
     # custom command that executes doxygen
-    add_custom_command(OUTPUT ${DOXYGEN_OUTPUT} ${PROJECT_NAME}.tag
-      COMMAND ${CMAKE_COMMAND} -D DOXYGEN_EXECUTABLE=$<TARGET_FILE:Doxygen::doxygen> -P ${scriptdir}/RunDoxygen.cmake
+    add_custom_command(OUTPUT ${DOXYGEN_OUTPUT} html/ ${PROJECT_NAME}.tag
+      COMMAND ${CMAKE_COMMAND} -D DOXYGEN_EXECUTABLE=$<TARGET_FILE:Doxygen::doxygen> -D DOXYFILE=Doxyfile -P ${scriptdir}/RunDoxygen.cmake
       COMMENT "Building doxygen documentation. This may take a while"
-      DEPENDS Doxyfile.in ${DOXYGEN_DEPENDS})
+      DEPENDS Doxyfile ${DOXYGEN_DEPENDS})
     # Create a target for building the doxygen documentation of a module,
     # that is run during make doc
-    add_custom_target(doxygen_${DOXYGEN_TARGET}
-      DEPENDS ${DOXYGEN_OUTPUT})
-    add_dependencies(doxygen doxygen_${DOXYGEN_TARGET})
+    add_custom_target(doxygen_${DOXYGEN_TARGET}_build
+      DEPENDS html ${PROJECT_NAME}.tag)
+    add_dependencies(doxygen doxygen_${DOXYGEN_TARGET}_build)
 
     set_property(GLOBAL PROPERTY ${PROJECT_NAME}_DOXYGEN_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 
     # Use a cmake call to install the doxygen documentation and create a
     # target for it
     include(GNUInstallDirs)
+
+    set(DOXYGEN_INSTALL_TAGFILES ${DOXYGEN_TAGFILES})
+    foreach(module ${DUNE_FOUND_DEPENDENCIES})
+      set(DOXYGEN_INSTALL_TAGFILES "${DOXYGEN_INSTALL_TAGFILES} ${${module}_DOXYGEN_DIR}/installdir/${module}.tag=../../${module}/doxygen")
+    endforeach()
+    prepare_doxyfile(TARGET ${DOXYGEN_TARGET}_install TAGFILES ${DOXYGEN_INSTALL_TAGFILES} DOXYFILE installdir/Doxyfile)
+    # custom command that executes doxygen
+    add_custom_command(OUTPUT ${DOXYGEN_OUTPUT} installdir/html/ installdir/${PROJECT_NAME}.tag
+      COMMAND ${CMAKE_COMMAND} -D DOXYGEN_EXECUTABLE=$<TARGET_FILE:Doxygen::doxygen> -D DOXYFILE=Doxyfile -P ${scriptdir}/RunDoxygen.cmake
+      COMMENT "Building doxygen documentation. This may take a while"
+      WORKING_DIRECTORY installdir
+      DEPENDS installdir/Doxyfile ${DOXYGEN_DEPENDS})
+
+    add_custom_target(doxygen_${DOXYGEN_TARGET}_install
+      DEPENDS installdir/html/ installdir/${PROJECT_NAME}.tag)
+
     # When installing call cmake install with the above install target
     install(CODE
-      "execute_process(COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target doxygen_${ProjectName}
+      "execute_process(COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target doxygen_${ProjectName}_install
           WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
         file(GLOB doxygenfiles
-          GLOB ${CMAKE_CURRENT_BINARY_DIR}/html/*.html
-          ${CMAKE_CURRENT_BINARY_DIR}/html/*.js
-          ${CMAKE_CURRENT_BINARY_DIR}/html/*.png
-          ${CMAKE_CURRENT_BINARY_DIR}/html/*.css
-          ${CMAKE_CURRENT_BINARY_DIR}/html/*.gif
-          ${CMAKE_CURRENT_BINARY_DIR}/*.tag
+          ${CMAKE_CURRENT_BINARY_DIR}/installdir/html/*
+          ${CMAKE_CURRENT_BINARY_DIR}/installdir/html/search/*
           )
-        set(doxygenfiles \"\${doxygenfiles}\")
+        set(doxygenfiles ${CMAKE_CURRENT_BINARY_DIR}/installdir/${PROJECT_NAME}.tag \"\${doxygenfiles}\")
         foreach(_file \${doxygenfiles})
            get_filename_component(_basename \${_file} NAME)
            # Manifest is generated when prefix was set at configuration time, otherwise is skipped
