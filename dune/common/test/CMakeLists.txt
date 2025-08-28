@@ -279,6 +279,9 @@ dune_add_test(SOURCES streamtest.cc
 dune_add_test(SOURCES stringutilitytest.cc
               LABELS quick)
 
+dune_add_test(SOURCES tensordottest.cc
+              LABELS quick)
+
 dune_add_test(SOURCES testdebugallocator.cc
               LABELS quick)
 
@@ -359,3 +362,27 @@ install(
   collectorstream.hh
   testsuite.hh
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/common/test)
+
+
+# benchmarking the dune module
+add_test(NAME dunecommonbenchmark_cmake
+    COMMAND ${CMAKE_COMMAND}
+    -DCMAKE_PREFIX_PATH=${PROJECT_BINARY_DIR}
+    -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+    -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+    -S ${CMAKE_CURRENT_SOURCE_DIR}/benchmark
+    -B ${CMAKE_CURRENT_BINARY_DIR}/benchmark
+)
+add_test(NAME dunecommonbenchmark_build_tests
+    COMMAND ${CMAKE_COMMAND}
+    --build ${CMAKE_CURRENT_BINARY_DIR}/benchmark
+    --target build_tests
+)
+add_test(NAME dunecommonbenchmark_run_tests
+    COMMAND ${CMAKE_COMMAND}
+    --build ${CMAKE_CURRENT_BINARY_DIR}/benchmark
+    --target test
+)
+
+set_tests_properties(dunecommonbenchmark_build_tests PROPERTIES DEPENDS dunecommonbenchmark_cmake)
+set_tests_properties(dunecommonbenchmark_run_tests PROPERTIES DEPENDS dunecommonbenchmark_build_tests)

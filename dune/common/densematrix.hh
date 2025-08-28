@@ -201,6 +201,19 @@ namespace Dune
       return asImp().mat_access(i);
     }
 
+    //! random access with array of indices
+    template <std::convertible_to<size_type> SizeType>
+    value_type & operator[] (std::array<SizeType,2> i)
+    {
+      return asImp().mat_access(i[0])[i[1]];
+    }
+
+    template <std::convertible_to<size_type> SizeType>
+    const value_type & operator[] (std::array<SizeType,2> i) const
+    {
+      return asImp().mat_access(i[0])[i[1]];
+    }
+
     //! size method (number of rows)
     constexpr size_type size() const
     {
