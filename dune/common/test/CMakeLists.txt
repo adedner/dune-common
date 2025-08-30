@@ -127,6 +127,9 @@ dune_add_test(SOURCES dunethrowtest.cc
 dune_add_test(SOURCES dynmatrixtest.cc
               LABELS quick)
 
+dune_add_test(SOURCES dyntensortest.cc
+              LABELS quick)
+
 dune_add_test(SOURCES dynvectortest.cc
               LABELS quick)
 
@@ -144,6 +147,9 @@ dune_add_test(SOURCES fmatrixtest.cc
 add_dune_vc_flags(fmatrixtest)
 
 dune_add_test(SOURCES forceinlinetest.cc
+              LABELS quick)
+
+dune_add_test(SOURCES ftensortest.cc
               LABELS quick)
 
 dune_add_test(SOURCES fvectortest.cc
