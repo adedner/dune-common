@@ -17,6 +17,7 @@
 #include <dune/common/rangeutilities.hh>
 #include <dune/common/tensortraits.hh>
 #include <dune/common/typetraits.hh>
+#include <dune/common/zero.hh>
 #include <dune/common/concepts/tensor.hh>
 #include <dune/common/std/extents.hh>
 #include <dune/common/std/forceinline.hh>
@@ -238,6 +239,63 @@ constexpr void tensordotOut (const A& a, const B& b, C& c,
   Impl::tensorDotImpl(a,SeqI{},InvSeqI{},b,SeqJ{},InvSeqJ{},c,std::ref(op1),std::ref(op2));
 }
 
+/**
+ * \brief Traits class to determine the extents of the result of a tensordot operation.
+ */
+struct TensorDotTraits
+{
+  template <Concept::TensorLike A, std::size_t... II,
+            Concept::TensorLike B, std::size_t... JJ,
+            class BinaryOp1 = std::plus<>, class BinaryOp2 = std::multiplies<>>
+  static constexpr auto extents (const A& a, std::index_sequence<II...> aSeq,
+                                 const B& b, std::index_sequence<JJ...> bSeq)
+  {
+    using ATraits = TensorTraits<A>;
+    using BTraits = TensorTraits<B>;
+
+    // the extents(II) of a and the extents(JJ) of b must match
+    using EA = typename ATraits::extents_type;
+    using EB = typename BTraits::extents_type;
+    static_assert(Impl::checkStaticExtents<EA,EB>(aSeq, bSeq));
+    assert((Impl::checkExtents(ATraits::extents(a), aSeq, BTraits::extents(b), bSeq)));
+
+    // create integer sequences that do not include the contraction indices
+    const auto aSeqInv = difference<ATraits::rank()>(aSeq); // {0,1,...A::rank()-1} \ {II...}
+    const auto bSeqInv = difference<BTraits::rank()>(bSeq); // {0,1,...B::rank()-1} \ {JJ...}
+
+    // create result extents by collecting the extents of a and b that are not contracted
+    return Impl::concatExtents(
+      Impl::sliceExtents(ATraits::extents(a), aSeqInv),
+      Impl::sliceExtents(BTraits::extents(b), bSeqInv));
+  }
+
+  template <std::size_t N,
+            Concept::TensorLike A,
+            Concept::TensorLike B,
+            class BinaryOp1 = std::plus<>, class BinaryOp2 = std::multiplies<>>
+  static constexpr auto extents (const A& a, const B& b,
+                                std::integral_constant<std::size_t,N> axes = {})
+  {
+    using ATraits = TensorTraits<A>;
+    using SeqI = typename StaticIntegralRange<std::size_t,ATraits::rank(),ATraits::rank()-N>::integer_sequence;
+    using SeqJ = std::make_index_sequence<N>;
+    return extents(a, SeqI{}, b, SeqJ{});
+  }
+
+  template <Concept::TensorLike A, Concept::TensorLike B,
+            class BinaryOp1 = std::plus<>, class BinaryOp2 = std::multiplies<>>
+  static constexpr auto zero (const A& a, const B& b, BinaryOp1 op1 = {}, BinaryOp2 op2 = {})
+  {
+    using ATraits = TensorTraits<A>;
+    using BTraits = TensorTraits<B>;
+
+    using VA = decltype(a[std::array<typename ATraits::index_type,ATraits::rank()>{}]);
+    using VB = decltype(b[std::array<typename BTraits::index_type,BTraits::rank()>{}]);
+    using V2 = std::invoke_result_t<BinaryOp2,VA,VB>;
+    using V1 = std::invoke_result_t<BinaryOp1,V2,V2>;
+    return zero<V1>();
+  }
+};
 
 /**
  * \brief Product of two tensors, contracted over indices `II...` of tensor `A` and `JJ...` of tensor `B`.
@@ -268,25 +326,13 @@ constexpr auto tensordot (const A& a, std::index_sequence<II...> aSeq,
   using ATraits = TensorTraits<A>;
   using BTraits = TensorTraits<B>;
 
-  // the extents(II) of a and the extents(JJ) of b must match
-  using EA = typename ATraits::extents_type;
-  using EB = typename BTraits::extents_type;
-  static_assert(Impl::checkStaticExtents<EA,EB>(aSeq, bSeq));
-  assert((Impl::checkExtents(ATraits::extents(a), aSeq, BTraits::extents(b), bSeq)));
-
   // create integer sequences that do not include the contraction indices
   const auto aSeqInv = difference<ATraits::rank()>(aSeq); // {0,1,...A::rank()-1} \ {II...}
   const auto bSeqInv = difference<BTraits::rank()>(bSeq); // {0,1,...B::rank()-1} \ {JJ...}
 
-  // create result extents by collecting the extents of a and b that are not contracted
-  auto cExtents = Impl::concatExtents(
-    Impl::sliceExtents(ATraits::extents(a), aSeqInv),
-    Impl::sliceExtents(BTraits::extents(b), bSeqInv));
-
-  using VA = decltype(std::declval<A>()[std::array<typename ATraits::index_type,ATraits::rank()>{}]);
-  using VB = decltype(std::declval<B>()[std::array<typename BTraits::index_type,BTraits::rank()>{}]);
-  using V = std::invoke_result_t<BinaryOp2,VA,VB>;
-  auto c = DenseTensor{cExtents, V(0)};
+  auto c = DenseTensor{
+    TensorDotTraits::zero(a,b,std::ref(op1),std::ref(op2)),
+    TensorDotTraits::extents(a, aSeq, b, bSeq)};
   Impl::tensorDotImpl(a,aSeq,aSeqInv,b,bSeq,bSeqInv,c,std::ref(op1),std::ref(op2));
   return c;
 }
