@@ -5,7 +5,7 @@
 #ifndef DUNE_COMMON_ZERO_HH
 #define DUNE_COMMON_ZERO_HH
 
-namespace Dune::Impl {
+namespace Dune {
 
 template <class T>
 struct Zero
@@ -28,6 +28,6 @@ constexpr T zero() noexcept
   return Zero<T>::value();
 }
 
-} // namespace Dune::Impl
+} // namespace Dune
 
 #endif // DUNE_COMMON_ZERO_HH

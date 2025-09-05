@@ -356,6 +356,9 @@ add_dune_vc_flags(vcexpectedimpltest)
 
 dune_add_test(SOURCES alignedallocatortest.cc)
 
+dune_add_test(SOURCES zerotensortest.cc
+              LABELS quick)
+
 install(
   FILES
   arithmetictestsuite.hh

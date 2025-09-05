@@ -9,6 +9,7 @@
 #include <type_traits>
 
 #include <dune/common/densetensormixin.hh>
+#include <dune/common/ftraits.hh>
 #include <dune/common/indices.hh>
 #include <dune/common/zero.hh>
 #include <dune/common/std/mdspan.hh>
@@ -26,7 +27,7 @@ struct ZeroTensorStorageType
   public:
     using element_type = Element;
     using data_handle_type = std::nullptr_t;
-    using reference = element_type&;
+    using reference = element_type;
     using offset_policy = ZeroTensorAccessor;
 
   public:
@@ -129,6 +130,7 @@ class ZeroTensor
 public:
   using element_type =	typename storage_type::element_type;
   using value_type = typename base_type::value_type;
+  using field_type = typename Dune::FieldTraits<value_type>::field_type;
   using extents_type = typename storage_type::extents_type;
   using index_type = typename storage_type::index_type;
   using layout_type = typename storage_type::layout_type;
@@ -138,6 +140,11 @@ public:
 public:
   /// \name ZeroTensor constructors
   /// @{
+
+  /// \brief Default constructor, only available if extents are default constructible
+  constexpr ZeroTensor () requires (std::default_initializable<extents_type>)
+    : ZeroTensor(extents_type())
+  {}
 
   /// \brief Construct from the dynamic extents given as variadic list
   template <class... IndexTypes,
@@ -164,13 +171,8 @@ public:
   {}
 
   /// \brief Construct from the pointer to the data of the tensor and its extents
-  constexpr ZeroTensor (const extents_type& e)
-    : base_type(storage_type(nullptr, e))
-  {}
-
-  /// \brief Construct from the pointer to the data of the tensor and its extents
-  constexpr ZeroTensor (const element_type& v, const extents_type& e)
-    : base_type(storage_type(nullptr, e))
+  constexpr ZeroTensor (extents_type e, const element_type& v = zero<element_type>())
+    : base_type(nullptr, std::move(e))
   {
     assert(v == zero<element_type>());
   }
@@ -215,8 +217,7 @@ public:
 
   // unary and binary arithmetic operations
 
-  template <class OtherTensor>
-  constexpr ZeroTensor const& operator- () { return *this; }
+  constexpr ZeroTensor const& operator- () const { return *this; }
 
   template <class OtherTensor>
   friend constexpr OtherTensor const& operator+ (const ZeroTensor&, const OtherTensor& rhs) { return rhs; }
@@ -251,8 +252,8 @@ public:
   constexpr Concept::Tensor auto dot (const Tensor& tensor) const
   {
     return Dune::Impl::ZeroTensor{
-      TensorDotTraits::zero(*this,tensor,std::plus<>{},DotProduct{}),
-      TensorDotTraits::extents<1>(*this, tensor)};
+      TensorDotTraits::extents<1>(*this, tensor),
+      TensorDotTraits::zero(*this,tensor,std::plus<>{},DotProduct{})};
   }
 
   /// \brief Returns the Hermitian tensor product with contraction over two indices `conj(A_{ijk}) B_{jkl}`
@@ -262,8 +263,8 @@ public:
   constexpr Concept::Tensor auto ddot (const Tensor& tensor) const
   {
     return Dune::Impl::ZeroTensor{
-      TensorDotTraits::zero(*this,tensor,std::plus<>{},DotProduct{}),
-      TensorDotTraits::extents<2>(*this, tensor)};
+      TensorDotTraits::extents<2>(*this, tensor),
+      TensorDotTraits::zero(*this,tensor,std::plus<>{},DotProduct{})};
   }
 
   /// \brief y = A x
@@ -359,8 +360,8 @@ public:
   constexpr Concept::Number auto inner (const Tensor& tensor) const
   {
     using Result = decltype(Dune::Impl::ZeroTensor{
-      TensorDotTraits::zero(*this,tensor,std::plus<>{},DotProduct{}),
-      TensorDotTraits::extents<extents_type::rank()>(*this, tensor)});
+      TensorDotTraits::extents<extents_type::rank()>(*this, tensor),
+      TensorDotTraits::zero(*this,tensor,std::plus<>{},DotProduct{})});
     using F = typename FieldTraits<Result>::field_type;
     return zero<F>();
   }
@@ -405,6 +406,17 @@ public:
   /// @}
 };
 
+template <class IndexType, std::size_t... exts, class ElementType>
+ZeroTensor (Dune::Std::extents<IndexType,exts...>, ElementType)
+  -> ZeroTensor<ElementType, exts...>;
+
 } // namespace Dune::Impl
+
+template <class T, std::size_t... extents>
+struct Dune::FieldTraits<Dune::Impl::ZeroTensor<T,extents...>>
+{
+  using field_type = typename Dune::FieldTraits<T>::field_type;
+  using real_type = typename Dune::FieldTraits<T>::real_type;
+};
 
 #endif // DUNE_COMMON_ZEROTENSOR_HH

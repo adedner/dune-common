@@ -293,7 +293,7 @@ struct TensorDotTraits
     using VB = decltype(b[std::array<typename BTraits::index_type,BTraits::rank()>{}]);
     using V2 = std::invoke_result_t<BinaryOp2,VA,VB>;
     using V1 = std::invoke_result_t<BinaryOp1,V2,V2>;
-    return zero<V1>();
+    return Dune::zero<V1>();
   }
 };
 
