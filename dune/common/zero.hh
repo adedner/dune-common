@@ -7,8 +7,18 @@
 
 namespace Dune {
 
+/**
+ * \brief The additive identity element for the type `T`.
+ *
+ * The additive identity `zero` should satisfy `zero + x = x + zero = x` for all
+ * `x` of type `T`. It is by default defined as `T(0)`. The template can be
+ * specialized for user-defined types, if the construction from a zero number is
+ * not possible.
+ *
+ * \relates zero()
+ */
 template <class T>
-struct Zero
+struct AdditiveIdentity
 {
   static constexpr T value() noexcept
   {
@@ -16,16 +26,22 @@ struct Zero
   }
 };
 
+// specialization for const types
 template <class T>
-constexpr T zero(const T& /*x*/) noexcept
+struct AdditiveIdentity<const T> : AdditiveIdentity<T> {};
+
+/// The additive identity element for the type of `x`.
+template <class T>
+constexpr T zero([[maybe_unused]] const T& x) noexcept
 {
-  return Zero<T>::value();
+  return AdditiveIdentity<T>::value();
 }
 
+/// The additive identity element for the type `T`.
 template <class T>
 constexpr T zero() noexcept
 {
-  return Zero<T>::value();
+  return AdditiveIdentity<T>::value();
 }
 
 } // namespace Dune

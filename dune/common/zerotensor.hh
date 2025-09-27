@@ -32,13 +32,13 @@ struct ZeroTensorStorageType
 
   public:
     /// \brief Return a reference to the i'th element in the data range starting at `p`
-    static constexpr element_type access (data_handle_type /*p*/, std::size_t /*i*/) noexcept
+    static constexpr element_type access ([[maybe_unused]] data_handle_type p, [[maybe_unused]] std::size_t i) noexcept
     {
       return zero<element_type>();
     }
 
     /// \brief Return a data handle to the i'th element in the data range starting at `p`
-    static constexpr data_handle_type offset (data_handle_type p, std::size_t /*i*/) noexcept
+    static constexpr data_handle_type offset (data_handle_type p, [[maybe_unused]] std::size_t i) noexcept
     {
       return p;
     }
