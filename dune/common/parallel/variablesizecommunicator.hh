@@ -354,7 +354,7 @@ public:
    * @brief Creates a communicator with the default maximum buffer size.
    * @param inf The communication interface.
    */
-  VariableSizeCommunicator(const Interface& inf)
+  explicit VariableSizeCommunicator(const Interface& inf)
   : maxBufferSize_(32768), interface_(&inf.interfaces())
   {
     MPI_Comm_dup(inf.communicator(), &communicator_);
@@ -376,7 +376,7 @@ public:
    * @brief Creates a communicator with the default maximum buffer size.
    * @param inf The communication interface.
    */
-  VariableSizeCommunicator(const Interface& inf)
+  explicit VariableSizeCommunicator(const Interface& inf)
   : maxBufferSize_(DUNE_PARALLEL_MAX_COMMUNICATION_BUFFER_SIZE),
     interface_(&inf.interfaces())
   {
