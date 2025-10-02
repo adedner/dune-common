@@ -73,7 +73,11 @@ function(dune_python_find_package)
   endif()
   # sanity check on the interpreter
   if(NOT EXISTS ${PYPACKAGE_LOCATION})
-    message(FATAL_ERROR "The location of the python interpreter '${PYPACKAGE_LOCATION}' is not executable")
+    if(PYPACKAGE_REQUIRED)
+      message(FATAL_ERROR "The location of the python interpreter '${PYPACKAGE_LOCATION}' is not executable")
+    else()
+      message(WARNING "The location of the python interpreter '${PYPACKAGE_LOCATION}' is not executable")
+    endif()
   endif()
 
   # Do the actual check
