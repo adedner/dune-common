@@ -473,10 +473,6 @@ namespace Dune
    * The iterators of the TransformedRangeView have the same
    * iterator_category as the ones of the wrapped container.
    *
-   * If range is given as r-value, then the returned TransformedRangeView
-   * stores it by value, if range is given as (const) l-value, then the
-   * TransformedRangeView stores it by (const) reference.
-   *
    * If R is a value type, then the TransformedRangeView stores the wrapped range by value,
    * if R is a reference type, then the TransformedRangeView stores the wrapped range by reference.
    *
