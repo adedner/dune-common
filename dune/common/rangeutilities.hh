@@ -331,6 +331,35 @@ namespace Dune
 
 
 
+    // Invoke function with iterator.
+    // There are four different modes for invocation:
+    //
+    // The TransformationTag template parameter allows to
+    // explicitly select if the callable should be invoked
+    // with the raw iterator (using IteratorTransformationTag)
+    // or with the dereferenced one. In any case the passed function
+    // is either invoked directly on the argument or, if this
+    // is not possible, it is dereferenced first to support
+    // invocation of function pointers.
+    template<class TransformationTag, class Function, class Iterator>
+    decltype(auto) invokeWithIterator(Function&& f, Iterator&& it)
+    {
+      if constexpr (std::is_same_v<TransformationTag, IteratorTransformationTag>)
+      {
+        if constexpr (requires { f(it); })
+          return f(it);
+        else
+          return (*f)(it);
+      }
+      else
+      {
+        if constexpr (requires { f(*it); })
+          return f(*it);
+        else
+          return (*f)(*it);
+      }
+    }
+
     // An iterator transforming a wrapped iterator using
     // an unary function. It inherits the iterator-category
     // of the underlying iterator.
@@ -345,25 +374,7 @@ namespace Dune
     template<class I, class F, class TT, class C>
     struct TransformationRangeIteratorTraits
     {
-      template<class FF>
-      static decltype(auto) transform(FF&& f, const I& it) {
-        if constexpr (std::is_same_v<TT,IteratorTransformationTag>)
-        {
-          if constexpr (Dune::IsCallable<FF(const I&)>::value)
-            return f(it);
-          else
-            return (*f)(it);
-        }
-        else
-        {
-          if constexpr (Dune::IsCallable<FF(decltype(*it))>::value)
-            return f(*it);
-          else
-            return (*f)(*it);
-        }
-      }
-
-      using reference = decltype(transform(std::declval<F>(), std::declval<I>()));
+      using reference = decltype(invokeWithIterator<TT>(std::declval<F>(), std::declval<I>()));
       using value_type = Dune::AutonomousValue<reference>;
       using pointer = std::conditional_t<std::is_lvalue_reference_v<reference>, value_type*, ProxyArrowResult<reference>>;
       using difference_type = typename std::iterator_traits<I>::difference_type;
@@ -428,7 +439,7 @@ namespace Dune
 
       // Dereferencing returns a value created by the function
       constexpr reference operator*() const noexcept {
-        return Traits::transform(f_, it_);
+        return invokeWithIterator<TT>(f_, it_);
       }
 
     protected:
