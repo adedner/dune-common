@@ -707,6 +707,307 @@ namespace Dune
   }
 
 
+
+  namespace Impl
+  {
+
+    class FilterIteratorSentinel {};
+
+    // A filtering iterator wrapper based on an unary predicate.
+    //
+    // Notice that this is always a forward_iterator. The filter predicate
+    // is invoced with the iterator using `invokeWithIterator<TT>`. The end
+    // iterator is passed as explicit template parameter in order to support
+    // sentinel iterators.
+    //
+    // \tparam It Type of the underlying iterator
+    // \tparam End Type of the underlying sentinel
+    // \tparam P Type of predicate for filtering
+    // \tparam TT Tag describing how to apply the predicate (ValueTransformationTag or IteratorTransformationTag)
+    template <class It, class End, class P, class TT=ValueTransformationTag>
+    class FilteredRangeIterator :
+      public Dune::IteratorFacadeForTraits<
+        FilteredRangeIterator<It, End, P, TT>,
+        DefaultIteratorTraits<std::forward_iterator_tag, decltype(*(std::declval<It>()))>
+      >
+    {
+      using Traits = DefaultIteratorTraits<std::forward_iterator_tag, decltype(*(std::declval<It>()))>;
+      using Facade = Dune::IteratorFacadeForTraits<FilteredRangeIterator, Traits>;
+
+    public:
+
+      using Predicate = P;
+      using reference = typename Facade::reference;
+      using difference_type = typename Facade::difference_type;
+
+      // Construct FilteredRangeIterator from iterator, end-iterator,
+      // and filter predicate.
+      template<class P_Arg>
+      requires std::is_convertible_v<P_Arg, P>
+      constexpr FilteredRangeIterator(It it, End end, P_Arg&& predicate) noexcept :
+        it_(std::move(it)),
+        end_(std::move(end)),
+        predicate_(predicate)
+      {
+        while ((it_ != end_) and (not invokeWithIterator<TT>(predicate_, it_)))
+          ++it_;
+      }
+
+      // Explicitly initialize members. Using a plain
+      //
+      //   constexpr FilteredRangeIterator() noexcept {}
+      //
+      // would default-initialize the members while
+      //
+      //   constexpr FilteredRangeIterator() noexcept : it_(), end_(), predicate_ {}
+      //
+      // leads to value-initialization. This is a case where
+      // both are really different. If it_ is a raw pointer (i.e. POD)
+      // then default-initialization leaves it uninitialized while
+      // value-initialization zero-initializes it.
+      constexpr FilteredRangeIterator() noexcept :
+        it_(),
+        end_(),
+        predicate_()
+      {}
+
+      constexpr FilteredRangeIterator& operator++()
+      {
+        ++it_;
+        while ((it_ != end_) and (not invokeWithIterator<TT>(predicate_, it_)))
+          ++it_;
+        return *this;
+      }
+
+      using Facade::operator++;
+
+      friend bool operator==(const FilteredRangeIterator& it, const FilterIteratorSentinel& end)
+      {
+        return it.it_ == it.end_;
+      }
+
+    protected:
+
+      friend Dune::IteratorFacadeAccess;
+
+      // Export base iterator, such that equalilty comparison,
+      // differences, and inequality comparisons are automatically
+      // forwarded to the base iterator by the facade.
+      const It& baseIterator() const noexcept
+      {
+        return it_;
+      }
+
+      It& baseIterator() noexcept
+      {
+        return it_;
+      }
+
+      It it_;
+      End end_;
+      Predicate predicate_;
+    };
+
+  } // namespace Impl
+
+
+
+  /**
+   * \brief A range view filtering a range with given predicate
+   *
+   * This behaves like a range providing `begin()` and `end()`.
+   * The iterators over this range internally iterate over
+   * the wrapped range but skip elements where the predicate
+   * is not true.
+   *
+   * Notice that, strictly speaking, this class does _not_ satisfy
+   * the range concept. The reason is, that the complexity of its
+   * `begin()` method is not 'amortized O(1) as required by the concept.
+   * Implementing the latter would require that the range caches
+   * the begin iterator the first time `begin()` is called as done
+   * in `std::ranges::filter_view`. This, however, introduces
+   * several potential pitfalls. E.g. `begin()` is not `const`
+   * and not thread-safe unless one does expensive synchronization.
+   * Furthermore it is not allowed to modify the entries of the range
+   * in way that changes the predicate.
+   *
+   * To avoid such issues, FilteredRangeView does not cache the begin
+   * iterator making begin() an O(n) operation. Since the complexity
+   * requirement of the range concept is vague and cannot be checked
+   * at all, not satisfying it is OK, but may destroy complexity guarantees
+   * of certain algorithms. We may even argue that complexity
+   * _is_ O(1) with the rather large (but fixed) constant 2^64.
+   * Furthermore the iterators of the FilteredRangeView are always
+   * `forward_iterator`s to prevent complexity issues with algorithms
+   * like `reverse`.
+   *
+   * If R is a value type, then the FilteredRangeView stores the wrapped range by value,
+   * if R is a reference type, then the FilteredRangeView stores the wrapped range by reference.
+   *
+   * \tparam R Underlying range.
+   * \tparam P Type of predicate for filtering.
+   * \tparam TT Class for describing how to apply the predicate.
+   *
+   * TT has to be either ValueTransformationTag (default) or IteratorTransformationTag.
+   * In the former case, the predicate is applied to the values
+   * obtained by dereferencing the wrapped iterator. In the latter case
+   * it is applied to the iterator directly, allowing to access non-standard
+   * functions of the iterator.
+   **/
+  template <class R, class P, class TT=ValueTransformationTag>
+  class FilteredRangeView
+  {
+    using  RawConstIterator = std::decay_t<decltype(std::declval<const R>().begin())>;
+    using  RawIterator = std::decay_t<decltype(std::declval<R>().begin())>;
+    using  RawConstSentinel = std::decay_t<decltype(std::declval<const R>().end())>;
+    using  RawSentinel = std::decay_t<decltype(std::declval<R>().end())>;
+
+  public:
+
+    /**
+     * \brief Const iterator type
+     */
+    using const_iterator = Impl::FilteredRangeIterator<RawConstIterator, RawConstSentinel, const P*, TT>;
+
+    /**
+     * \brief Mutable iterator type
+     */
+    using iterator = Impl::FilteredRangeIterator<RawIterator, RawSentinel, P*, TT>;
+
+    /**
+     * \brief Sentinel type
+     */
+    using sentinel = Impl::FilterIteratorSentinel;
+
+    /**
+     * \brief Export type of the wrapped untransformed range.
+     *
+     * Notice that this will always be the raw type with references
+     * removed, even if a reference is stored.
+     */
+    using RawRange = std::remove_reference_t<R>;
+
+    /**
+     * \brief Construct from range and function
+     */
+    template<class R_Arg, class P_Arg>
+    constexpr FilteredRangeView(R_Arg&& rawRange, P_Arg&& predicate) noexcept :
+      rawRange_(std::forward<R_Arg>(rawRange)),
+      predicate_(std::forward<P_Arg>(predicate))
+    {
+      static_assert(std::is_same_v<TT, ValueTransformationTag> or std::is_same_v<TT, IteratorTransformationTag>,
+          "The TransformationType passed to FilteredRangeView has to be either ValueTransformationTag or IteratorTransformationTag.");
+    }
+
+    /**
+     * \brief Obtain a iterator to the first element
+     *
+     * The life time of the returned iterator is bound to
+     * the life time of the range since it only contains a
+     * pointer to the predicate function stored
+     * in the range.
+     */
+    constexpr const_iterator begin() const noexcept {
+      return const_iterator(rawRange_.begin(), rawRange_.end(), &predicate_);
+    }
+
+    /**
+     * \brief Obtain a iterator to the first element
+     *
+     * The life time of the returned iterator is bound to
+     * the life time of the range since it only contains a
+     * pointer to the predicate function stored
+     * in the range.
+     */
+    constexpr iterator begin() noexcept {
+      return iterator(rawRange_.begin(), rawRange_.end(), &predicate_);
+    }
+
+    /**
+     * \brief Obtain a end sentinel
+     */
+    constexpr sentinel end() const noexcept {
+      return sentinel{};
+    }
+
+    /**
+     * \brief Checks whether the range is empty
+     */
+    constexpr bool empty() const noexcept
+    {
+      return begin() == end();
+    }
+
+    /**
+     * \brief Export the wrapped untransformed range.
+     */
+    const RawRange& rawRange() const noexcept
+    {
+      return rawRange_;
+    }
+
+    /**
+     * \brief Export the wrapped untransformed range.
+     */
+    RawRange& rawRange() noexcept
+    {
+      return rawRange_;
+    }
+
+  private:
+    R rawRange_;
+    P predicate_;
+  };
+
+
+
+  /**
+   * \brief Create a FilteredRangeView
+   *
+   * \param range The range to transform
+   * \param predicate Predicate for filtering the range
+   *
+   * This behaves like a range providing `begin()` and `end()`.
+   * The iterators over this range internally iterate over
+   * the wrapped range but skip elements where the predicate
+   * is not true.
+   *
+   * Notice that the `begin()` method of this range has complexiy O(n).
+   *
+   * If range is an r-value, then the TransformedRangeView stores it by value,
+   * if range is an l-value, then the TransformedRangeView stores it by reference.
+   **/
+  template <class R, class P>
+  auto filteredRangeView(R&& range, P&& predicate)
+  {
+    return FilteredRangeView<R, std::decay_t<P>, ValueTransformationTag>(std::forward<R>(range), std::forward<P>(predicate));
+  }
+
+  /**
+   * \brief Create a FilteredRangeView
+   *
+   * \param range The range to transform
+   * \param predicate Predicate for filtering the range
+   *
+   * This behaves like a range providing `begin()` and `end()`.
+   * The iterators over this range internally iterate over
+   * the wrapped range but skip elements where the predicate
+   * is not true. In contrast to filteredRangeView() the
+   * predicate is applied to the non-dereferenced iterator.
+   *
+   * Notice that the `begin()` method of this range has complexiy O(n).
+   *
+   * If range is an r-value, then the TransformedRangeView stores it by value,
+   * if range is an l-value, then the TransformedRangeView stores it by reference.
+   **/
+  template <class R, class P>
+  auto iteratorFilteredRangeView(R&& range, P&& predicate)
+  {
+    return FilteredRangeView<R, std::decay_t<P>, IteratorTransformationTag>(std::forward<R>(range), std::forward<P>(predicate));
+  }
+
+
+
   /**
    * \brief Allow structured-binding for-loops for sparse iterators
    *
