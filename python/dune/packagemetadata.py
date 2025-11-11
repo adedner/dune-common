@@ -31,7 +31,6 @@ import logging
 from datetime import date
 from importlib.metadata import Distribution, packages_distributions
 from urllib.parse import urlparse
-import requests
 from packaging.version import Version as PkgVersion
 
 logger = logging.getLogger(__name__)
@@ -90,6 +89,7 @@ class Version:
 
     @staticmethod
     def list_versions(package_name):
+        import requests
         url = f"https://pypi.org/pypi/{package_name}/json"
         try:
             response = requests.get(url, timeout=10)
