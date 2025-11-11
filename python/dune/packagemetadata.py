@@ -547,7 +547,7 @@ def _extractBuildMetaData():
         for metadataPath in dune.data.__path__:
             for metaDataFile in glob.glob(os.path.join(metadataPath, "*.cmake")):
                 package = os.path.splitext(os.path.basename(metaDataFile))[0]
-                # print("adding",package,metaDataFile)
+                print("adding",package,metaDataFile)
                 addPackageMetaData(package, metaDataFile)
         mods = packages_distributions()['dune']
         for m in mods:
@@ -556,11 +556,11 @@ def _extractBuildMetaData():
                 editablePath = json.loads(direct_url).get("url")
                 editablePath = urlparse(editablePath).path
                 dataPath = os.path.join(editablePath,"dune","data")
-                # print(editablePath, dataPath)
+                print(editablePath, dataPath)
                 if os.path.isdir(dataPath):
                     for metaDataFile in glob.glob(os.path.join(dataPath, "*.cmake")):
                         package = os.path.splitext(os.path.basename(metaDataFile))[0]
-                        # print("adding",package,metaDataFile)
+                        print("adding",package,metaDataFile)
                         addPackageMetaData(package, metaDataFile)
             except:
                 pass

@@ -56,7 +56,7 @@ try:
                         dunesubmodules.add(f'dune.{modname}')
         except Exception as e:
             pass
-except ImportError:  # no dune module was installed which can happen during packaging
+except ImportError, KeyError:  # no dune module was installed which can happen during packaging
     pass
 
 for modname in dunesubmodules:
