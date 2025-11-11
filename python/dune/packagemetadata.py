@@ -566,7 +566,7 @@ def _extractBuildMetaData():
                 pass
 
 
-    except ImportError:  # no dune module was installed which can happen during packaging
+    except ImportError, KeyError:  # no dune module was installed which can happen during packaging
         pass
 
     # possible add meta data from externally registered modules
