@@ -557,7 +557,7 @@ def _extractBuildMetaData():
                 editablePath = urlparse(editablePath).path
                 dataPath = os.path.join(editablePath,"dune","data")
                 # print(editablePath, dataPath)
-                if os.path.exists(dataPath):
+                if os.path.isdir(dataPath):
                     for metaDataFile in glob.glob(os.path.join(dataPath, "*.cmake")):
                         package = os.path.splitext(os.path.basename(metaDataFile))[0]
                         # print("adding",package,metaDataFile)
