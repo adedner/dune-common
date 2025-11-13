@@ -21,15 +21,6 @@
 /* Standard debug streams with a level below will collapse to doing nothing */
 #define DUNE_MINIMAL_DEBUG_LEVEL ${DUNE_MINIMAL_DEBUG_LEVEL}
 
-/* does the standard library provide experimental::is_detected ? */
-#cmakedefine DUNE_HAVE_CXX_EXPERIMENTAL_IS_DETECTED 1
-
-/* does the language support lambdas in unevaluated contexts ? */
-#cmakedefine DUNE_HAVE_CXX_UNEVALUATED_CONTEXT_LAMBDA 1
-
-/* does the standard library provide identity ? */
-#cmakedefine DUNE_HAVE_CXX_STD_IDENTITY 1
-
 /* Define if you have a BLAS library. */
 #cmakedefine HAVE_BLAS 1
 
