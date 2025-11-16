@@ -222,7 +222,7 @@ function(dune_python_configure_dependencies)
   string(MD5 PACKAGE_HASH "${PYCONFDEPS_PATH}")
   set(EGG_INFO_PATH "${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_HASH}")
   file(MAKE_DIRECTORY "${EGG_INFO_PATH}")
-  dune_execute_process(COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} -m pip
+  dune_execute_process(COMMAND ${DUNE_PYTHON_VIRTUALENV_EXECUTABLE} setup.py
                         egg_info --egg-base "${EGG_INFO_PATH}"
                         WORKING_DIRECTORY "${PYCONFDEPS_PATH}"
                         RESULT_VARIABLE REQUIREMENTS_FAILED
