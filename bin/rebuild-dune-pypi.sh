@@ -17,6 +17,7 @@ set -e
 
 # We authenticate with a personal Gitlab API token. You are expected to
 # have set TWINE_PASSWORD to your API token when calling this script.
+# The token (for gitlab dune-common) requires api, read_api, read_registry, write_registry scope
 export TWINE_USERNAME=__token__
 
 # Make sure that TWINE_PASSWORD was set
@@ -33,28 +34,28 @@ pushd $TMPDIR
 
 python3 -m venv env
 source env/bin/activate
-python -m pip install pip-download twine
+python -m pip install pip-download
+python -m pip install "twine<6.2.0"  # newer twine does not support skip-existing.
+                           # Perhaps it is possible to configure the gitlab
+                           # registry to allow upload of same version but not sure how.
+                           # Alternative is to manually check versions
+                           # But I'm going with this workaround for now.
+                           # See: https://developercommunity.visualstudio.com/t/ProblemusingPython's%60twine%60tooltouploadPythonpackagestoartifactsfeed/10961593
 
 pip-download -d $(pwd)/downloads \
-  # dune-common \
-  # dune-geometry \
-  # dune-grid \
-  # dune-istl \
-  # dune-localfunctions \
-  # dune-alugrid \
-  # dune-fem \
   pyparsing \
   mpi4py \
   wheel \
   setuptools \
   jinja2 \
   portalocker \
-  fenics-ufl==2019.1.0 \
+  fenics-ufl \
   matplotlib \
   scipy \
   pip>=21 \
   ninja \
-  sortedcontainers
+  sortedcontainers \
+  scikit-umfpack
 
 
 # Upload the packages to the index
