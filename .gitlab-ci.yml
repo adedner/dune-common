@@ -25,7 +25,6 @@ core-modules-test:
   trigger:
     project: infrastructure/dune-nightly-test
     branch: core
-    strategy: depend
   rules:
     - when: manual
       allow_failure: false
@@ -40,7 +39,6 @@ full-system-test:
   trigger:
     project: infrastructure/dune-nightly-test
     branch: master
-    strategy: depend
   rules:
     - when: manual
       allow_failure: true
