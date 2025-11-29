@@ -62,8 +62,8 @@ void testOutputIterator(Iter iterator, std::size_t iterations, Value value)
  * @param end Iterator positioned at the end
  * @param opt Functor for doing whatever one wants
  */
-template<class Iter, class Opt>
-int testForwardIterator(Iter begin, Iter end, Opt& opt)
+template<class Iter, class Opt, class End>
+int testForwardIterator(Iter begin, End end, Opt& opt)
 {
   // Return status
   int ret=0;
@@ -305,11 +305,11 @@ int testRandomAccessIterator(Iter begin, Iter end, Opt opt){
   return ret;
 }
 
-template<class Iter, class Opt, typename iterator_category>
-int testIterator(Iter& begin, Iter& end, Opt& opt, iterator_category cat);
+template<class Iter, class Opt, typename iterator_category, class End>
+int testIterator(Iter& begin, End& end, Opt& opt, iterator_category cat);
 
-template<class Iter, class Opt>
-int testIterator(Iter& begin, Iter& end, Opt& opt, std::forward_iterator_tag)
+template<class Iter, class Opt, class End>
+int testIterator(Iter& begin, End& end, Opt& opt, std::forward_iterator_tag)
 {
   return testForwardIterator(begin, end, opt);
 }
@@ -329,8 +329,8 @@ int testIterator(Iter& begin, Iter& end, Opt& opt, std::random_access_iterator_t
   return ret;
 }
 
-template<class Iter, class Opt>
-int testConstIterator(Iter& begin, Iter& end, Opt& opt)
+template<class Iter, class Opt, class End>
+int testConstIterator(Iter& begin, End& end, Opt& opt)
 {
   //std::cout << "Testing constant iterator: ";
   int ret=testIterator(begin, end, opt, typename std::iterator_traits<Iter>::iterator_category());

@@ -346,6 +346,63 @@ auto testTransformedRangeView()
 }
 
 
+auto testFilteredRangeView()
+{
+  Dune::TestSuite suite("Check filteredRangeView()");
+
+  auto checkFilteredRangeView = [&](auto&& predicate, auto&& range, auto&& result)
+  {
+    using Range = std::decay_t<decltype(range)>;
+
+    // Check value based filtering of l- and r-value range
+    {
+      auto filteredRange = Dune::filteredRangeView(range, predicate);
+      suite.check(checkRangeIterators(filteredRange, std::forward_iterator_tag()))
+        << "iterator test fails for filteredRangeView of l-value range";
+      suite.check(checkSameRange(filteredRange, result))
+        << "incorrect values in filteredRangeView of l-value range";
+    }
+    {
+      auto filteredRange = Dune::filteredRangeView(Range(range), predicate);
+      suite.check(checkRangeIterators(filteredRange, std::forward_iterator_tag()))
+        << "iterator test fails for filteredRangeView of r-value range";
+      suite.check(checkSameRange(filteredRange, result))
+        << "incorrect values in filteredRangeView of r-value range";
+    }
+
+    // Check iterator based filtering of l- and r-value range
+    {
+      auto filteredRange = Dune::iteratorFilteredRangeView(range, [&](auto&& it) { return predicate(*it); });
+      suite.check(checkRangeIterators(filteredRange, std::forward_iterator_tag()))
+        << "iterator test fails for iteratorFilteredRangeView of l-value range";
+      suite.check(checkSameRange(filteredRange, result))
+        << "incorrect values in iteratorFilteredRangeView of l-value range";
+    }
+    {
+      auto filteredRange = Dune::iteratorFilteredRangeView(Range(range), [&](auto&& it) { return predicate(*it); });
+      suite.check(checkRangeIterators(filteredRange, std::forward_iterator_tag()))
+        << "iterator test fails for iteratorFilteredRangeView of r-value range";
+      suite.check(checkSameRange(filteredRange, result))
+        << "incorrect values in iteratorFilteredRangeView of r-value range";
+    }
+  };
+
+  auto isOdd = [](auto&& z) { return (z % 2) == 1; };
+
+  // Check range where first and last entry is not included
+  checkFilteredRangeView(isOdd, std::array<int,5>({0,1,2,3,4}), std::vector{1,3});
+  checkFilteredRangeView(isOdd, std::vector<int>({0,1,2,3,4}), std::vector{1,3});
+  checkFilteredRangeView(isOdd, Dune::range(5), std::vector{1, 3});
+
+  // Check range where first and last entry is included
+  checkFilteredRangeView(isOdd, std::array<int,5>({1,2,3,4,5}), std::vector{1,3,5});
+  checkFilteredRangeView(isOdd, std::vector<int>({1,2,3,4,5}), std::vector{1,3,5});
+  checkFilteredRangeView(isOdd, Dune::range(1,6), std::vector{1,3,5});
+
+  return suite;
+}
+
+
 auto testSparseRange()
 {
   Dune::TestSuite suite("Check sparseRange()");
@@ -555,6 +612,8 @@ int main()
   }
 
   suite.subTest(testTransformedRangeView());
+
+  suite.subTest(testFilteredRangeView());
 
   suite.subTest(testSparseRange());
 
