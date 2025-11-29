@@ -15,23 +15,6 @@ variables:
   PIP_DEFAULT_TIMEOUT: 0
   DUNE_LOG_LEVEL:     DEBUG
 
-debian:11 gcc-10-20-expensive:
-  extends: .common
-  # This image has Vc
-  image: registry.dune-project.org/docker/ci/debian:11
-  # allow expensive tests
-  variables:
-    DUNECI_CXXFLAGS: -mavx
-    DUNECI_TEST_LABELS: ""
-    DUNECI_TOOLCHAIN: gcc-10-20
-    DUNECI_CMAKE_FLAGS: '-DDUNE_ENABLE_PYTHONMODULE_PRECOMPILE:BOOL=TRUE'
-    DUNE_TEST_EXPECTED_VC_IMPLEMENTATION: AVX
-  # require AVX to properly test Vc
-  tags: [duneci, "iset:avx"]
-  # allowed to fail to e.g. do no hold up a merge when a runner supporting avx
-  # is unavailable
-  allow_failure: true
-
 core-modules-test:
   stage: downstream
   inherit:
@@ -42,7 +25,6 @@ core-modules-test:
   trigger:
     project: infrastructure/dune-nightly-test
     branch: core
-    strategy: depend
   rules:
     - when: manual
       allow_failure: false
@@ -57,7 +39,6 @@ full-system-test:
   trigger:
     project: infrastructure/dune-nightly-test
     branch: master
-    strategy: depend
   rules:
     - when: manual
       allow_failure: true

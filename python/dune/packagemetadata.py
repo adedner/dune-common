@@ -87,27 +87,35 @@ class Version:
         return self.as_tuple() >= other.as_tuple()
 
     @staticmethod
-    def list_versions(package_name):
+    def listVersions(package_name,major):
         import requests
         url = f"https://pypi.org/pypi/{package_name}/json"
         try:
             response = requests.get(url, timeout=10)
             response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
             data = response.json()
-            versions = sorted([PkgVersion(v) for v in data['releases'].keys()], reverse=True)
+            releases = [str(k) for k in data['releases'].keys()]
+            releases = [k for k in releases if k.startswith(major)]
+            versions = sorted([PkgVersion(v) for v in releases], reverse=True)
             return versions
         except requests.exceptions.RequestException as e:
             print(f"Error fetching data from PyPI: {e}")
             return [] # Return empty list
     @staticmethod
-    def next_version(package_name):
-        versions = Version.list_versions(package_name)
+    def nextVersion(package_name,major):
+        versions = Version.listVersions(package_name,major)
         if len(versions)>0:
             v = str(versions[0]).split('.')
             v[-1] = str(int(v[-1])+1)
             return '.'.join(x for x in v)
         else:
-            return None
+            v = str(major).split('.')
+            if len(v) == 2: # 2.12 -> 2.12.0.0
+                v += ["0","0"]
+            elif len(v) == 3: # 2.12.1 -> 2.12.0.1
+                v += ["0"]
+            assert len(v) == 4
+        return '.'.join(x for x in v)
 
 
 
@@ -292,14 +300,11 @@ class Data:
         self.suggests = description.suggests
         self.python_requires = description.python_requires
 
-        # if -git version parameter specified, append devDATE to version number for all DUNE modules
+        # if -git version parameter specified, obtain latest version on pypi and add one to last version entry (2.10.0.0 -> 2.10.0.1)
         if self.version.find('git') or version is not None:
             if version is None:
                 major = self.version.split('-')[0]
-                self.version = Version.next_version(self.name) # add +1 to latest version on pypi if exists
-                if self.version is None:
-                    # devDate appended to base version - no package found on pypi
-                    self.version = Version(major).__str__() + '.dev' + date.today().strftime('%Y%m%d')
+                self.version = Version.nextVersion(self.name,major) # add +1 to latest version on pypi if exists
             # append self.version to any dune python requirement that has no specified version number
             new_python_requires = []
             for req in self.python_requires:
