@@ -162,6 +162,12 @@ if(DUNE_PYTHON_USE_VENV)
     endif()
   endif()
 
+  # Check if determined virtual env folder is actually writeable
+  execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${DUNE_PYTHON_VIRTUALENV_PATH} RESULT_VARIABLE env_writable)
+  if(NOT env_writable EQUAL "0")
+      message(FATAL_ERROR "Found python virtual env path ${DUNE_PYTHON_VIRTUALENV_PATH} is not writeable.")
+  endif()
+
   # If it does not yet exist, set it up!
   if(NOT IS_DIRECTORY "${DUNE_PYTHON_VIRTUALENV_PATH}")
     # Check for presence of the virtualenv/venv package
