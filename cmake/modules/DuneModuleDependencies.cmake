@@ -56,12 +56,34 @@ Macros to extract dependencies between Dune modules by inspecting the
   Include the corresponding ``Dune<module>Macros.cmake`` file of all
   dependencies if this file exists.
 
+
+.. cmake:variable:: DUNE_REGISTER_DUNE_DEPENDENCIES_WITH_BUILD_INTERFACE
+
+    This variable can be used to control whether the finding of dune modules registers
+    their include directories as raw paths or as `BUILD_INTERFACE` generator expression.
+
+    This option is only present in patches of the 2.10 release as future versions do not register
+    include directories in the dune package registry and this problem does not occur
+    (see https://gitlab.dune-project.org/core/dune-common/-/merge_requests/1457).
+    Since upstream modules are imported dependencies, they should not be exported
+    through the registry either, therefore the `BUILD_INTERFACE` is required if a target is linked
+    against the registry and installed. However, if the contents of the registry are parsed
+    manually, the `BUILD_INTERFACE` may break such parsing. So, this option is OFF by default
+    and one can opt-in to the "correct" behavior in case it's necessary.
+
 #]=======================================================================]
 include_guard(GLOBAL)
 
 include(DuneEnableAllPackages)
 include(DuneModuleInformation)
 include(DuneUtilities)
+
+option(DUNE_REGISTER_DUNE_DEPENDENCIES_WITH_BUILD_INTERFACE
+  "Controls whether the finding of dune modules registers their
+  include directories as raw paths or as `BUILD_INTERFACE` generator expression.
+  ON: Register dune-module include directories as raw path.
+  OFF: Register as `BUILD_INTERFACE` generator expression."
+  OFF)
 
 # checks that a module version is compatible with the found version of a module
 # notice that this has the side effect of populating the ${module}_VERSION information
@@ -201,7 +223,11 @@ macro(dune_process_dependency_macros)
       endif()
 
       # register dune module
-      dune_register_package_flags(INCLUDE_DIRS "${${_mod}_INCLUDE_DIRS}")
+      if(DUNE_REGISTER_DUNE_DEPENDENCIES_WITH_BUILD_INTERFACE)
+        dune_register_package_flags(INCLUDE_DIRS $<BUILD_INTERFACE:${${_mod}_INCLUDE_DIRS}>)
+      else()
+        dune_register_package_flags(INCLUDE_DIRS "${${_mod}_INCLUDE_DIRS}")
+      endif()
     endif()
   endforeach()
 endmacro(dune_process_dependency_macros)
