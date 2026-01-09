@@ -402,6 +402,9 @@ In order to build the DUNE core modules you need at least the following software
 
 ## Build System
 
+- Introduce a new cmake function `dune_export_toolchain` to export system and compiler
+  configurations into a toolchain file.
+
 - Improve the the function `dune_add_library` by separating the target types normal, interface, and
   object. Additional properties can be passed to the cmake function like `LINK_LIBRARIES`,
   `OUTPUT_NAME`, and `EXPORT_NAME`
