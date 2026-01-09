@@ -2,11 +2,11 @@
 // vi: set et ts=4 sw=2 sts=2:
 // SPDX-FileCopyrightInfo: Copyright © DUNE Project contributors, see file LICENSE.md in module root
 // SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
-#ifndef DUNE_GMPFIELD_HH
-#define DUNE_GMPFIELD_HH
+#ifndef DUNE_COMMON_GMPFIELD_HH
+#define DUNE_COMMON_GMPFIELD_HH
 
 /** \file
- * \brief Wrapper for the GNU multiprecision (GMP) library
+ * \brief Wrapper for the GNU MPF(R) multi-precision floating point library
  */
 
 #include <iostream>
@@ -15,7 +15,11 @@
 
 #if HAVE_GMP || DOXYGEN
 
-#include <gmpxx.h>
+#if HAVE_MPFR
+#include <mpreal.h>
+#elif HAVE_GMPXX
+#include <gmpxx.h> // fallback implementation
+#endif
 
 #include <dune/common/math.hh>
 #include <dune/common/promotiontraits.hh>
@@ -23,84 +27,126 @@
 
 namespace Dune
 {
-
   /**
    * \ingroup Numbers
-   * \brief Number class for high precision floating point number using the GMP library mpf_class implementation
+   * \brief Number class for high precision floating point number using the MPF(R) library mpreal implementation
    */
   template< unsigned int precision >
   class GMPField
+#if HAVE_MPFR
+    : public mpfr::mpreal
+#elif HAVE_GMPXX
     : public mpf_class
+#endif
   {
-    typedef mpf_class Base;
+#if HAVE_MPFR
+    using Base = mpfr::mpreal;
+    using Prec = mp_prec_t;
+#elif HAVE_GMPXX
+    using Base = mpf_class;
+    using Prec = mp_bitcnt_t;
+#endif
+
+  static_assert(precision > 0 && precision < std::numeric_limits<Prec>::max());
 
   public:
-    /** default constructor, initialize to zero */
+    //! default constructor, initialize to zero.
     GMPField ()
-      : Base(0,precision)
+      : Base(0, Prec(precision))
     {}
 
-    /** \brief initialize from a string
-        \note this is the only reliable way to initialize with higher precision values
+    /**
+     * \brief initialize from a string
+     * \note this is the only reliable way to initialize with higher precision values
      */
-    GMPField ( const char* str )
-      : Base(str,precision)
+    explicit GMPField (const char* str)
+      : Base(str, Prec(precision))
     {}
 
-    /** \brief initialize from a string
-        \note this is the only reliable way to initialize with higher precision values
+    /**
+     * \brief initialize from a string
+     * \note this is the only reliable way to initialize with higher precision values
      */
-    GMPField ( const std::string& str )
-      : Base(str,precision)
+    explicit GMPField (const std::string& str)
+      : Base(str, Prec(precision))
     {}
 
-    /** \brief initialize from a compatible scalar type
-     */
-    template< class T,
-              typename EnableIf = typename std::enable_if<
-                std::is_convertible<T, mpf_class>::value>::type
-              >
-    GMPField ( const T &v )
-      : Base( v,precision )
+    //! initialize from from mpreal value.
+    GMPField (const Base& v)
+      : Base(v)
     {}
 
-    // type conversion operators
-    operator double () const
+    //! initialize from a compatible scalar type.
+    template <class T,
+      std::enable_if_t<std::is_arithmetic_v<T>,int> = 0>
+    GMPField (const T& v)
+      : Base(v, Prec(precision))
+    {}
+
+    GMPField (const GMPField&) = default;
+    GMPField (GMPField&&) = default;
+
+    GMPField& operator= (GMPField const&) = default;
+    GMPField& operator= (GMPField&&) = default;
+
+#if HAVE_MPFR
+    //! return a double representation
+    double get_d () const
     {
-      return this->get_d();
+      return this->toDouble();
     }
+#endif
+  };
 
+} // end namespace Dune
+
+
+namespace Dune
+{
+  template <unsigned int precision>
+  struct IsNumber<GMPField<precision>>
+    : public std::true_type {};
+
+  template <unsigned int precision1, unsigned int precision2>
+  struct PromotionTraits<GMPField<precision1>, GMPField<precision2>>
+  {
+    using PromotedType = GMPField<(precision1 > precision2 ? precision1 : precision2)>;
   };
 
   template <unsigned int precision>
-  struct IsNumber<GMPField<precision>>
-    : public std::integral_constant<bool, true> {
-  };
-
-  template< unsigned int precision1, unsigned int precision2 >
-  struct PromotionTraits<GMPField<precision1>, GMPField<precision2>>
-  {
-    typedef GMPField<(precision1 > precision2 ? precision1 : precision2)> PromotedType;
-  };
-
-  template< unsigned int precision >
   struct PromotionTraits<GMPField<precision>,GMPField<precision>>
   {
-    typedef GMPField<precision> PromotedType;
+    using PromotedType = GMPField<precision>;
   };
 
-  template< unsigned int precision, class T >
+  template <unsigned int precision, class T>
   struct PromotionTraits<GMPField<precision>, T>
   {
-    typedef GMPField<precision> PromotedType;
+    using PromotedType = GMPField<std::max<unsigned int>(8*sizeof(T), precision)>;
   };
 
-  template< class T, unsigned int precision >
+  template <class T, unsigned int precision>
   struct PromotionTraits<T, GMPField<precision>>
   {
-    typedef GMPField<precision> PromotedType;
+    using PromotedType = GMPField<std::max<unsigned int>(8*sizeof(T), precision)>;
   };
 
+#if HAVE_MPFR
+  template< unsigned int precision >
+  struct MathematicalConstants<GMPField<precision>>
+  {
+    using T = GMPField<precision>;
+    static const T e ()
+    {
+      return mpfr::const_euler(mp_prec_t(precision));
+    }
+
+    static const T pi ()
+    {
+      return mpfr::const_pi(mp_prec_t(precision));
+    }
+  };
+#elif HAVE_GMPXX
   template< unsigned int precision >
   struct MathematicalConstants<GMPField<precision>>
   {
@@ -119,8 +165,59 @@ namespace Dune
       return pi;
     }
   };
-}
+#endif
+
+} // end namespace Dune
+
+namespace std
+{
+#if HAVE_MPFR
+  template <unsigned int precision>
+  inline void swap (Dune::GMPField<precision>& x, Dune::GMPField<precision>& y)
+  {
+    return mpfr::swap(x, y);
+  }
+
+  //! Specialization of numeric_limits for known precision width
+  template <unsigned int precision>
+  class numeric_limits<Dune::GMPField<precision>>
+      : public numeric_limits<mpfr::mpreal>
+  {
+    using type = Dune::GMPField<precision>;
+    using Base = numeric_limits<mpfr::mpreal>;
+
+    static constexpr int bits2digits (int prec)
+    {
+      constexpr double LOG10_2 = 0.301029995663981195213738894724493;
+      return int(prec * LOG10_2);
+    }
+
+  public:
+    inline static type min () { return mpfr::minval(precision); }
+    inline static type max () {  return  mpfr::maxval(precision); }
+    inline static type lowest () { return -mpfr::maxval(precision); }
+    inline static type epsilon () { return  mpfr::machine_epsilon(precision); }
+    inline static type round_error () { return Base::round_error(precision); }
+
+    static constexpr int digits = int(precision);
+    static constexpr int digits10 = bits2digits(precision);
+    static constexpr int max_digits10 = bits2digits(precision);
+  };
+#elif HAVE_GMPXX
+  template <unsigned int precision>
+  inline void swap (Dune::GMPField<precision>& x, Dune::GMPField<precision>& y)
+  {
+    return x.swap(y);
+  }
+
+  // NOTE that the specialization of `std::numeric_limits` for mpf_class is not usable
+  // since all entries are simply set to 0. Thus, we do not provide a specialization
+  // for the wrapper class GMPField, which would lead to wrong results and could not
+  // be detected by `std::numeric_limit<GMPField<...>>::is_specialized`.
+#endif
+
+} // end namespace std
 
 #endif // HAVE_GMP
 
-#endif // #ifndef DUNE_GMPFIELD_HH
+#endif // DUNE_COMMON_GMPFIELD_HH
