@@ -47,9 +47,9 @@ namespace Dune {
 #if HAVE_LAPACK
       {
         const long int N = matrix.rows();
+        const long int LDA = (N <= 0) ? 1 : N; // needs to max(1,N)
         const char jobvl = 'n';
         const char jobvr = eigenVectors ? 'v' : 'n';
-
 
         // matrix to put into dgeev
         auto matrixVector = std::make_unique<double[]>(N*N);
@@ -76,13 +76,13 @@ namespace Dune {
         long int info = 0;
 
         // call LAPACK routine (see fmatrixev_ext.cc)
-        eigenValuesNonsymLapackCall(&jobvl, &jobvr, &N, matrixVector.get(), &N,
+        eigenValuesNonsymLapackCall(&jobvl, &jobvr, &N, matrixVector.get(), &LDA,
                                     eigenR.get(), eigenI.get(), nullptr, &N, vr.get(), &N, work.get(),
                                     &lwork, &info);
 
         if( info != 0 )
         {
-          std::cerr << "For matrix " << matrix << " eigenvalue calculation failed! " << std::endl;
+          std::cerr << "For matrix " << matrix << " eigenvalue calculation failed! (N = " << N<< " LDA = "<<LDA<<")" <<std::endl;
           DUNE_THROW(InvalidStateException,"eigenValues: Eigenvalue calculation failed!");
         }
 
