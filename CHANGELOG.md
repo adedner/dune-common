@@ -14,7 +14,7 @@ In order to build the DUNE core modules you need at least the following software
 
 - C++ compilers LLVM Clang >= 13 or GCC g++ >= 10, with standard library LLVM
   libc++ >= 13 or GNU libstdc++ >= 10.
-- CMake >= 3.16
+- CMake >= 3.22
 - pkg-config to find other optional dependencies
 - The Python bindings require at least Python 3.7 or higher and are currently not
   compatible to libc++.
