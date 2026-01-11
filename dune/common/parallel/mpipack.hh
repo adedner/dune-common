@@ -41,7 +41,7 @@ namespace Dune {
     friend struct MPIData<MPIPack>;
     friend struct MPIData<const MPIPack>;
   public:
-    MPIPack(Communication<MPI_Comm> comm, std::size_t size = 0)
+    explicit MPIPack(Communication<MPI_Comm> comm, std::size_t size = 0)
       : _buffer(size)
       , _position(0)
       , _comm(comm)
@@ -200,7 +200,7 @@ namespace Dune {
   struct MPIData<P, std::enable_if_t<std::is_same<std::remove_const_t<P>, MPIPack>::value>> {
   protected:
     friend auto getMPIData<P>(P& t);
-    MPIData(P& t) :
+    explicit MPIData(P& t) :
       data_(t)
     {}
   public:
