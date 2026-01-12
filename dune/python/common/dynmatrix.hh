@@ -14,8 +14,13 @@
 
 #include <dune/python/common/typeregistry.hh>
 #include <dune/python/common/densematrix.hh>
+#if DUNE_USE_SYSTEM_PYBIND11
+#include <pybind11/pybind11.h>
+#include <pybind11/operators.h>
+#else
 #include <dune/python/pybind11/pybind11.h>
 #include <dune/python/pybind11/operators.h>
+#endif
 
 namespace Dune
 {

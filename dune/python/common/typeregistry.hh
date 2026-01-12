@@ -18,10 +18,15 @@
 #include <dune/common/typelist.hh>
 #include <dune/common/visibility.hh>
 
+#if DUNE_USE_SYSTEM_PYBIND11
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <pybind11/detail/internals.h>
+#else
 #include <dune/python/pybind11/pybind11.h>
 #include <dune/python/pybind11/stl.h>
-
 #include <dune/python/pybind11/detail/internals.h>
+#endif
 
 namespace Dune
 {

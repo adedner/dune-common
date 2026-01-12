@@ -8,9 +8,15 @@
 #include <type_traits>
 #include <utility>
 
+#if DUNE_USE_SYSTEM_PYBIND11
+// extensions.h seems to have disappeared from upstream pybind11
+#include <pybind11/operators.h>
+#include <pybind11/pybind11.h>
+#else
 #include <dune/python/pybind11/extensions.h>
 #include <dune/python/pybind11/operators.h>
 #include <dune/python/pybind11/pybind11.h>
+#endif
 
 namespace Dune
 {

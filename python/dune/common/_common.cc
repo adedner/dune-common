@@ -12,8 +12,13 @@
 #include <dune/python/common/fvector.hh>
 #include <dune/python/common/mpihelper.hh>
 
+#if DUNE_USE_SYSTEM_PYBIND11
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#else
 #include <dune/python/pybind11/pybind11.h>
 #include <dune/python/pybind11/stl.h>
+#endif
 
 #ifdef DUNE_ENABLE_PYTHONMODULE_PRECOMPILE
 #include "registerfvector.hh"

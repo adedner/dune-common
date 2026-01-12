@@ -2,9 +2,15 @@
 // SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
 #include <iostream>
 
+#include <dune-common-config.hh>
+
 #include <dune/common/fvector.hh>
 #include <dune/python/common/fvector.hh>
+#if DUNE_USE_SYSTEM_PYBIND11
+#include <pybind11/embed.h>
+#else
 #include <dune/python/pybind11/embed.h>
+#endif
 
 int main()
 {
