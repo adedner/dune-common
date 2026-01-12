@@ -67,6 +67,15 @@ add_subdirectory(dune)
 add_subdirectory(lib)
 add_subdirectory(share)
 
+# Option to disable the local copy of pybind11
+option(DUNE_USE_SYSTEM_PYBIND11 "Use system version of pybind11, not our vendored copy" FALSE)
+add_feature_info(DUNE_USE_SYSTEM_PYBIND11 DUNE_USE_SYSTEM_PYBIND11 "Use system version of pybind11, not our vendored copy")
+
+# Look for a system installation of pybind11, if requested
+if(DUNE_ENABLE_PYTHONBINDINGS AND DUNE_USE_SYSTEM_PYBIND11)
+  find_package(pybind11 CONFIG)
+endif()
+
 # if Python bindings are enabled, include necessary sub directories.
 if(DUNE_ENABLE_PYTHONBINDINGS)
   add_subdirectory(python)

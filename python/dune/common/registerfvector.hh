@@ -9,8 +9,13 @@
 #include <dune/python/common/fmatrix.hh>
 #include <dune/python/common/fvector.hh>
 
+#if DUNE_USE_SYSTEM_PYBIND11
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#else
 #include <dune/python/pybind11/pybind11.h>
 #include <dune/python/pybind11/stl.h>
+#endif
 
 template <int s>
 void registerFieldVectorToModule( pybind11::module module )

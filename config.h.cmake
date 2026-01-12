@@ -81,6 +81,9 @@
 /* If enabled certain Python modules will be precompiled */
 #cmakedefine DUNE_ENABLE_PYTHONMODULE_PRECOMPILE
 
+/* If enabled the system pybind11 library will be used. */
+#cmakedefine01 DUNE_USE_SYSTEM_PYBIND11
+
 /* end dune-common
    Everything below here will be overwritten
 */

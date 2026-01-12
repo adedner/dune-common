@@ -11,8 +11,13 @@
 #include <dune/common/typetraits.hh>
 #include <dune/common/std/type_traits.hh>
 
+#if DUNE_USE_SYSTEM_PYBIND11
+#include <pybind11/numpy.h>
+#include <pybind11/pybind11.h>
+#else
 #include <dune/python/pybind11/numpy.h>
 #include <dune/python/pybind11/pybind11.h>
+#endif
 
 namespace Dune
 {

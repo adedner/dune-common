@@ -11,8 +11,13 @@
 #include <tuple>
 #include <iostream>
 
+#if DUNE_USE_SYSTEM_PYBIND11
+#include <pybind11/pybind11.h>
+#include <pybind11/cast.h>
+#else
 #include <dune/python/pybind11/pybind11.h>
 #include <dune/python/pybind11/cast.h>
+#endif
 
 #include <dune/common/classname.hh>
 #include <dune/common/indices.hh>

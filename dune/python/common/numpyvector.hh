@@ -7,9 +7,15 @@
 #include <dune/common/densevector.hh>
 #include <dune/common/ftraits.hh>
 
+#if DUNE_USE_SYSTEM_PYBIND11
+#include <pybind11/numpy.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#else
 #include <dune/python/pybind11/numpy.h>
 #include <dune/python/pybind11/pybind11.h>
 #include <dune/python/pybind11/stl.h>
+#endif
 
 namespace Dune
 {

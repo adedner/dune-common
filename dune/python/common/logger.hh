@@ -8,7 +8,11 @@
 
 #include <dune/common/visibility.hh>
 
+#if DUNE_USE_SYSTEM_PYBIND11
+#include <pybind11/pybind11.h>
+#else
 #include <dune/python/pybind11/pybind11.h>
+#endif
 
 namespace Dune
 {
