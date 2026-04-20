@@ -10,8 +10,9 @@ include(AddBLASLapackFlags)
 
 # find libraries for high/multi-precision arithmetic
 find_package(GMP)
-find_package(MPFR)
 include(AddGMPFlags)
+find_package(MPFR)
+include(AddMPFRFlags)
 find_package(QuadMath)
 include(AddQuadMathFlags)
 

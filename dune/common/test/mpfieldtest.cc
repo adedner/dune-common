@@ -7,8 +7,9 @@
 #include <dune/common/float_cmp.hh>
 #include <dune/common/fmatrix.hh>
 #include <dune/common/fvector.hh>
-#include <dune/common/gmpfield.hh>
 #include <dune/common/math.hh>
+#include <dune/common/mpfield.hh>
+#include <dune/common/quadmath.hh>
 #include <dune/common/test/testsuite.hh>
 
 template <class T>
@@ -37,7 +38,7 @@ int main ()
   auto e0 = Dune::StandardMathematicalConstants<F>::e();
   auto pi0 = Dune::StandardMathematicalConstants<F>::pi();
 
-  using G = Dune::GMPField<128>;
+  using G = Dune::MPField<128>;
   auto e = Dune::StandardMathematicalConstants<G>::e();
   auto pi = Dune::StandardMathematicalConstants<G>::pi();
 
@@ -54,21 +55,42 @@ int main ()
   G x2 = float(pi);
   G x3 = double(pi);
   G x4 = (long double)(pi);
+#if HAVE_QUADMATH
+  G x5 = Dune::StandardMathematicalConstants<Dune::Float128>::pi();
+#endif
 
   [[maybe_unused]] int z1 = int(x1);
   [[maybe_unused]] float z2 = float(x2);
   [[maybe_unused]] double z3 = double(x3);
   [[maybe_unused]] long double z4 = (long double)(x4);
+#if HAVE_QUADMATH
+  [[maybe_unused]] Dune::Float128 z5 = (Dune::Float128)(x5);
+#endif
+
+  // assignment
+  x1 = z1;
+  x2 = z2;
+  x3 = z3;
+  x4 = z4;
+#if HAVE_QUADMATH
+  x5 = z5;
+#endif
 
   [[maybe_unused]] G xx1 = z1;
   [[maybe_unused]] G xx2 = z2;
   [[maybe_unused]] G xx3 = z3;
   [[maybe_unused]] G xx4 = z4;
+#if HAVE_QUADMATH
+  [[maybe_unused]] G xx5 = z5;
+#endif
 
   test.check(abs(x1 - xx1) < tol);
   test.check(abs(x2 - xx2) < tol);
   test.check(abs(x3 - xx3) < tol);
   test.check(abs(x4 - xx4) < tol);
+#if HAVE_QUADMATH
+  test.check(abs(x5 - xx5) < tol);
+#endif
 
   // mixed type operation
   test.check(abs(z2 - xx2) < tol);
@@ -108,7 +130,7 @@ int main ()
   using namespace Dune::FMatrixHelp;
   invertMatrix(M,A);
 
-  // test cmath functions for GMPField type
+  // test cmath functions for MPField type
   test.check(cmp(G(0.5), G("0.5")), "string constructor");
 
   test.check(cmp(abs(G{-1}),G{1}), "abs");

@@ -144,11 +144,6 @@ dune_add_test(SOURCES genericiterator_compile_fail.cc
               EXPECT_COMPILE_FAIL
               LABELS quick)
 
-dune_add_test(SOURCES gmpfieldtest.cc
-              CMAKE_GUARD MPFR_FOUND
-              LABELS quick)
-add_dune_gmp_flags(gmpfieldtest)
-
 dune_add_test(SOURCES hybridutilitiestest.cc
               LABELS quick)
 
@@ -179,6 +174,12 @@ dune_add_test(SOURCES metistest.cc
               CMAKE_GUARD METIS_FOUND
               LABELS quick)
 add_dune_metis_flags(metistest)
+
+dune_add_test(SOURCES mpfieldtest.cc
+              CMAKE_GUARD MPFR_FOUND
+              LABELS quick)
+add_dune_mpfr_flags(mpfieldtest)
+add_dune_quadmath_flags(mpfieldtest)
 
 dune_add_test(SOURCES mpicommunicationtest.cc
               MPI_RANKS 1 2 4 8

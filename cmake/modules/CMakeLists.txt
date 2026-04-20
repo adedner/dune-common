@@ -8,6 +8,7 @@ install(FILES
   AddBLASLapackFlags.cmake
   AddGMPFlags.cmake
   AddMETISFlags.cmake
+  AddMPFRFlags.cmake
   AddMPIFlags.cmake
   AddParMETISFlags.cmake
   AddPTScotchFlags.cmake
