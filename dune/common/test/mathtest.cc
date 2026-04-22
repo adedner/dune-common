@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 
+#include <dune/common/bigfloat.hh>
 #include <dune/common/classname.hh>
 #include <dune/common/gmpfield.hh>
 #include <dune/common/hybridutilities.hh>
@@ -137,6 +138,10 @@ int main(int argc, char** argv)
   t.subTest(testMathematicalConstants<float>());
   t.subTest(testMathematicalConstants<double>());
   t.subTest(testMathematicalConstants<long double>());
+
+#if HAVE_MPFR
+  t.subTest(testMathematicalConstants<Dune::BigFloat<128>>());
+#endif
 
 #if HAVE_QUADMATH
   t.subTest(testMathematicalConstants<Dune::Float128>());
