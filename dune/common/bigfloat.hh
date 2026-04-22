@@ -211,7 +211,7 @@ namespace Dune
     using T = BigFloat<precision>;
     static const T e ()
     {
-      return mpfr::const_euler(mp_prec_t(precision));
+      return exp(T(1));
     }
 
     static const T pi ()
