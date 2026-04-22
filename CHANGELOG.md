@@ -16,8 +16,8 @@ SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
   of valid keys. One intended use case are improved diagnostics in user code.
 
 - Add a new multi-precision backend, `MPFR`, as alternative to the outdated `GMPXX`. It
-  is implemented in the class `MPField` with a proper specialization of
-  `std::numeric_limits` in `dune/common/mpfield.hh`. Use `find_package(MPFR)` and
+  is implemented in the class `BigFloat` with a proper specialization of
+  `std::numeric_limits` in `dune/common/bigfloat.hh`. Use `find_package(MPFR)` and
   `add_dune_mpfr_flags(target)` to activate this package on your target.
 
 ## Build system: Changelog

@@ -30,6 +30,7 @@ install(FILES
         alignedallocator.hh
         arraylist.hh
         bartonnackmanifcheck.hh
+        bigfloat.hh
         bigunsignedint.hh
         binaryfunctions.hh
         bitsetvector.hh
@@ -80,7 +81,6 @@ install(FILES
         matrixconcepts.hh
         matvectraits.hh
         metis.hh
-        mpfield.hh
         overloadset.hh
         parameterizedobject.hh
         parametertree.hh

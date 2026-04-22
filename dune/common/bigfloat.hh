@@ -2,17 +2,18 @@
 // vi: set et ts=4 sw=2 sts=2:
 // SPDX-FileCopyrightInfo: Copyright © DUNE Project contributors, see file LICENSE.md in module root
 // SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
-#ifndef DUNE_COMMON_MPFIELD_HH
-#define DUNE_COMMON_MPFIELD_HH
+#ifndef DUNE_COMMON_BIGFLOAT_HH
+#define DUNE_COMMON_BIGFLOAT_HH
 
 /** \file
  * \brief Wrapper for the GNU MPF(R) multi-precision floating point library
  */
 
-#if !HAVE_MPFR
-#error "The MPField requires MPFR to be found and enabled. Use find_package(MPFR) and add_dune_mpfr_flags(target) in CMake to activate this package on your target."
-#endif
+#if HAVE_MPFR
+// The BigFloat type requires MPFR to be found and enabled. Use find_package(MPFR) and
+// add_dune_mpfr_flags(target) in CMake to activate this package on your target.
 
+#include <compare>
 #include <limits>
 #include <type_traits>
 
@@ -31,7 +32,7 @@ namespace Dune
    * \brief Number class for high precision floating point number using the MPF(R) library mpreal implementation
    */
   template< unsigned int precision >
-  class MPField
+  class BigFloat
     : public mpfr::mpreal
   {
     using Base = mpfr::mpreal;
@@ -41,7 +42,7 @@ namespace Dune
 
   public:
     //! default constructor, initialize to zero.
-    MPField () noexcept
+    BigFloat () noexcept
       : Base(0, Prec(precision))
     {}
 
@@ -49,30 +50,30 @@ namespace Dune
      * \brief constructor from pointer to null-terminated byte string
      * \note this is the only reliable way to initialize with higher precision values
      */
-    explicit MPField (const char* str)
+    explicit BigFloat (const char* str)
       : Base(str, Prec(precision))
     {}
 
     //! copy-construct from mpreal value.
-    MPField (const Base& v) noexcept
+    BigFloat (const Base& v) noexcept
       : Base(v)
     {}
 
     //! move-construct from mpreal value.
-    MPField (Base&& v) noexcept
+    BigFloat (Base&& v) noexcept
       : Base(std::move(v))
     {}
 
     //! initialize from any floating-point or integer type
     template <class T,
       std::enable_if_t<std::is_arithmetic_v<T>,int> = 0>
-    MPField (const T& v) noexcept
+    BigFloat (const T& v) noexcept
       : Base(v, Prec(precision))
     {}
 
 #if HAVE_QUADMATH
     //! initialize from Float128 type
-    MPField (const Dune::Float128& v)
+    BigFloat (const Dune::Float128& v)
       : Base([](const Dune::Float128& v) {
           std::ostringstream oss; oss << v;
           return oss.str();
@@ -80,13 +81,13 @@ namespace Dune
     {}
 #endif
 
-    MPField (const MPField&) = default;
-    MPField (MPField&&) = default;
+    BigFloat (const BigFloat&) = default;
+    BigFloat (BigFloat&&) = default;
 
     //! assignment from floating-point or integer type
     template <class T,
       std::enable_if_t<std::is_arithmetic_v<T>,int> = 0>
-    MPField& operator= (const T& v) noexcept
+    BigFloat& operator= (const T& v) noexcept
     {
       static_cast<Base&>(*this) = v;
       return *this;
@@ -94,7 +95,7 @@ namespace Dune
 
 #if HAVE_QUADMATH
     //! assignment from Float128 type
-    MPField& operator= (const Dune::Float128& v)
+    BigFloat& operator= (const Dune::Float128& v)
     {
       std::ostringstream oss; oss << v;
       static_cast<Base&>(*this) = oss.str();
@@ -102,8 +103,32 @@ namespace Dune
     }
 #endif
 
-    MPField& operator= (const MPField&) = default;
-    MPField& operator= (MPField&&) = default;
+    BigFloat& operator= (const BigFloat&) = default;
+    BigFloat& operator= (BigFloat&&) = default;
+
+    //! equality of two BigFloat numbers, uses IEEE semantics (NaN != NaN)
+    template <unsigned int p1, unsigned int p2>
+    friend bool operator== (const BigFloat<p1>& A, const BigFloat<p2>& B)
+    {
+      const Base& a = static_cast<const Base&>(A);
+      const Base& b = static_cast<const Base&>(B);
+      return a == b;
+    }
+
+    //! three-way comparison of BigFloat numbers implements a partial ordering, due to NaN values
+    template <unsigned int p1, unsigned int p2>
+    friend std::partial_ordering operator<=> (const BigFloat<p1>& A, const BigFloat<p2>& B)
+    {
+      const Base& a = static_cast<const Base&>(A);
+      const Base& b = static_cast<const Base&>(B);
+      if (isnan(a) || isnan(b))
+        return std::partial_ordering::unordered;
+      if (a < b)
+        return std::partial_ordering::less;
+      if (a > b)
+        return std::partial_ordering::greater;
+      return std::partial_ordering::equivalent;
+    }
 
     //! Explicit conversion into floating-point or integer type
     template <class T,
@@ -152,38 +177,38 @@ namespace Dune
 namespace Dune
 {
   template <unsigned int precision>
-  struct IsNumber<MPField<precision>>
+  struct IsNumber<BigFloat<precision>>
     : public std::true_type {};
 
   template <unsigned int precision1, unsigned int precision2>
-  struct PromotionTraits<MPField<precision1>, MPField<precision2>>
+  struct PromotionTraits<BigFloat<precision1>, BigFloat<precision2>>
   {
-    using PromotedType = MPField<(precision1 > precision2 ? precision1 : precision2)>;
+    using PromotedType = BigFloat<(precision1 > precision2 ? precision1 : precision2)>;
   };
 
   template <unsigned int precision>
-  struct PromotionTraits<MPField<precision>,MPField<precision>>
+  struct PromotionTraits<BigFloat<precision>,BigFloat<precision>>
   {
-    using PromotedType = MPField<precision>;
+    using PromotedType = BigFloat<precision>;
   };
 
   template <unsigned int precision, class T>
-  struct PromotionTraits<MPField<precision>, T>
+  struct PromotionTraits<BigFloat<precision>, T>
   {
-    using PromotedType = MPField<std::max<unsigned int>(8*sizeof(T), precision)>;
+    using PromotedType = BigFloat<std::max<unsigned int>(8*sizeof(T), precision)>;
   };
 
   template <class T, unsigned int precision>
-  struct PromotionTraits<T, MPField<precision>>
+  struct PromotionTraits<T, BigFloat<precision>>
   {
-    using PromotedType = MPField<std::max<unsigned int>(8*sizeof(T), precision)>;
+    using PromotedType = BigFloat<std::max<unsigned int>(8*sizeof(T), precision)>;
   };
 
 
   template< unsigned int precision >
-  struct MathematicalConstants<MPField<precision>>
+  struct MathematicalConstants<BigFloat<precision>>
   {
-    using T = MPField<precision>;
+    using T = BigFloat<precision>;
     static const T e ()
     {
       return mpfr::const_euler(mp_prec_t(precision));
@@ -200,17 +225,17 @@ namespace Dune
 namespace std
 {
   template <unsigned int precision>
-  inline void swap (Dune::MPField<precision>& x, Dune::MPField<precision>& y)
+  inline void swap (Dune::BigFloat<precision>& x, Dune::BigFloat<precision>& y)
   {
     return mpfr::swap(x, y);
   }
 
   //! Specialization of numeric_limits for known precision width
   template <unsigned int precision>
-  class numeric_limits<Dune::MPField<precision>>
+  class numeric_limits<Dune::BigFloat<precision>>
       : public numeric_limits<mpfr::mpreal>
   {
-    using type = Dune::MPField<precision>;
+    using type = Dune::BigFloat<precision>;
     using Base = numeric_limits<mpfr::mpreal>;
 
     static constexpr int bits2digits (int prec)
@@ -233,4 +258,20 @@ namespace std
 
 } // end namespace std
 
-#endif // DUNE_COMMON_MPFIELD_HH
+#else // HAVE_MPFR
+
+#include <dune/common/typetraits.hh>
+
+namespace Dune
+{
+  template< unsigned int precision >
+  class BigFloat
+  {
+    static_assert(AlwaysFalse<BigFloat<precision>>::value,
+      "The BigFloat type requires MPFR to be found and enabled. Use find_package(MPFR) and add_dune_mpfr_flags(target) in CMake to activate this package on your target.");
+  };
+
+} // end namespace std
+
+#endif // HAVE_MPFR
+#endif // DUNE_COMMON_BIGFLOAT_HH

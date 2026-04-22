@@ -4,11 +4,11 @@
 // SPDX-License-Identifier: LicenseRef-GPL-2.0-only-with-DUNE-exception
 #include <limits>
 
+#include <dune/common/bigfloat.hh>
 #include <dune/common/float_cmp.hh>
 #include <dune/common/fmatrix.hh>
 #include <dune/common/fvector.hh>
 #include <dune/common/math.hh>
-#include <dune/common/mpfield.hh>
 #include <dune/common/quadmath.hh>
 #include <dune/common/test/testsuite.hh>
 
@@ -38,7 +38,7 @@ int main ()
   auto e0 = Dune::StandardMathematicalConstants<F>::e();
   auto pi0 = Dune::StandardMathematicalConstants<F>::pi();
 
-  using G = Dune::MPField<128>;
+  using G = Dune::BigFloat<128>;
   auto e = Dune::StandardMathematicalConstants<G>::e();
   auto pi = Dune::StandardMathematicalConstants<G>::pi();
 
@@ -130,7 +130,7 @@ int main ()
   using namespace Dune::FMatrixHelp;
   invertMatrix(M,A);
 
-  // test cmath functions for MPField type
+  // test cmath functions for BigFloat type
   test.check(cmp(G(0.5), G("0.5")), "string constructor");
 
   test.check(cmp(abs(G{-1}),G{1}), "abs");
