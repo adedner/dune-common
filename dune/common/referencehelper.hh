@@ -100,6 +100,31 @@ template<class T>
 using ResolveRef_t = std::remove_reference_t<decltype(Dune::resolveRef(std::declval<T&>()))>;
 
 
+
+template<class T>
+constexpr T& resolvePtrOrRef(T& t) noexcept
+{
+  return t;
+}
+
+template<class T>
+constexpr T& resolvePtrOrRef(T&&) = delete;
+
+template<class T>
+constexpr T& resolvePtrOrRef(std::reference_wrapper<T> t) noexcept
+{
+  return t.get();
+}
+
+template<class T>
+constexpr T& resolvePtrOrRef(T* t) noexcept
+{
+  return *t;
+}
+
+
+
+
 } // namespace Dune
 
 
