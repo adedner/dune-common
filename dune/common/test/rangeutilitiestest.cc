@@ -470,16 +470,18 @@ Dune::TestSuite testBorrowedRangeEnablement()
   suite.check(std::ranges::enable_borrowed_range<StaticRange>)
     << "StaticIntegralRange must be marked as std::ranges borrowed_range";
 
+#if __cpp_lib_ranges >= 201911L
   suite.check(std::ranges::is_sorted(DynamicRange{10}))
     << "IntegralRange must be a std::ranges borrowed_range";
   suite.check(not std::ranges::is_sorted(DynamicRange{10} | std::views::reverse))
     << "reverse view of IntegralRange must not be a std::ranges borrowed_range";
 
-
   suite.check(std::ranges::is_sorted(StaticRange{}))
     << "StaticIntegralRange must be a std::ranges borrowed_range";
   suite.check(not std::ranges::is_sorted(StaticRange{} | std::views::reverse))
     << "reverse view of StaticIntegralRange must not be a std::ranges borrowed_range";
+#endif
+
   return suite;
 }
 
