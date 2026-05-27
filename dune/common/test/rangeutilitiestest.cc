@@ -473,13 +473,13 @@ Dune::TestSuite testBorrowedRangeEnablement()
 #if __cpp_lib_ranges >= 201911L
   suite.check(std::ranges::is_sorted(DynamicRange{10}))
     << "IntegralRange must be a std::ranges borrowed_range";
-  suite.check(not std::ranges::is_sorted(DynamicRange{10} | std::views::reverse))
-    << "reverse view of IntegralRange must not be a std::ranges borrowed_range";
+  auto dangling_iter_d = std::ranges::max_element(DynamicRange{10});
+    static_assert(not std::is_same_v<std::ranges::dangling, decltype(dangling_iter_d)>);
 
   suite.check(std::ranges::is_sorted(StaticRange{}))
     << "StaticIntegralRange must be a std::ranges borrowed_range";
-  suite.check(not std::ranges::is_sorted(StaticRange{} | std::views::reverse))
-    << "reverse view of StaticIntegralRange must not be a std::ranges borrowed_range";
+  auto dangling_iter_s = std::ranges::max_element(StaticRange{});
+    static_assert(not std::is_same_v<std::ranges::dangling, decltype(dangling_iter_s)>);
 #endif
 
   return suite;
