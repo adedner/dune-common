@@ -107,7 +107,7 @@ namespace Dune
      *
      * As this is implementation for the sequential setting, the communicator is a dummy and simply discarded.
      */
-    Communication (const Communicator&)
+    explicit Communication (const Communicator&)
     {}
 
     //! Return rank, is between 0 and size()-1
@@ -274,7 +274,7 @@ namespace Dune
      */
     PseudoFuture<void> ibarrier () const
     {
-      return {true}; // return a valid future
+      return PseudoFuture<void>{true}; // return a valid future
     }
 
     /** @brief Distribute an array from the process with rank root to all other processes
