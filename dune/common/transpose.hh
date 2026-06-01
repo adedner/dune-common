@@ -206,6 +206,12 @@ namespace Impl {
       return MT;
     }
 
+    // Obtain wrapped, untransposed matrix
+    const M& wrappedMatrix() const
+    {
+      return matrix_;
+    }
+
   private:
 
     Matrix matrix_;
@@ -296,6 +302,19 @@ template<class Matrix>
 auto transpose(const std::reference_wrapper<Matrix>& matrix) {
   return Impl::TransposedMatrixWrapper(matrix);
 }
+
+/**
+ * \brief transpose() overload for a transposed matrix wrapper.
+ *
+ * This will un-transpose (i.e. double transpose) the passed
+ * transposed matrix by returning a reference to the un-wrapped
+ * original matrix.
+ */
+template<class Matrix>
+decltype(auto) transpose(const Impl::TransposedMatrixWrapper<Matrix>& matrix) {
+  return matrix.wrappedMatrix();
+}
+
 
 
 
