@@ -11,13 +11,17 @@ install(FILES
   functional.hh
   iterator.hh
   layout_left.hh
+  layout_left_padded.hh
   layout_right.hh
+  layout_right_padded.hh
   layout_stride.hh
   mdarray.hh
   mdspan.hh
   memory.hh
   no_unique_address.hh
   span.hh
+  submdspan.hh
+  submdspan_slices.hh
   type_traits.hh
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dune/common/std)
 
