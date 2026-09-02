@@ -118,7 +118,7 @@ namespace Dune {
      *                  if the key is already present.
      */
     static void readINITree(std::istream& in, ParameterTree& pt,
-                            const std::string srcname = "stream",
+                            const std::string& srcname = "stream",
                             bool overwrite = true);
 
 
@@ -176,14 +176,14 @@ namespace Dune {
     */
     static void readNamedOptions(int argc, char* argv[],
       ParameterTree& pt,
-      std::vector<std::string> keywords,
+      const std::vector<std::string>& keywords,
       unsigned int required = std::numeric_limits<unsigned int>::max(),
       bool allow_more = true,
       bool overwrite = true,
-      std::vector<std::string> help = std::vector<std::string>());
+      const std::vector<std::string>& help = std::vector<std::string>());
 
   private:
-    static std::string generateHelpString(std::string progname, std::vector<std::string> keywords, unsigned int required, std::vector<std::string> help);
+    static std::string generateHelpString(const std::string& progname, const std::vector<std::string>& keywords, unsigned int required, const std::vector<std::string>& help);
   };
 
 } // end namespace Dune
