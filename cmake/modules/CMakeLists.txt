@@ -26,6 +26,7 @@ install(FILES
   DuneDoxygen.cmake
   DuneEnableAllPackages.cmake
   DuneExecuteProcess.cmake
+  DuneExportToolchain.cmake
   DuneInstance.cmake
   DuneMacros.cmake
   DuneModuleDependencies.cmake
