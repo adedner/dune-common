@@ -52,8 +52,8 @@ requires(const E e, typename E::rank_type r)
 
 
 /**
- * \brief A `MultiDimensional` object provides element access on a multi-dimensional
- * index space, following the interface of `mdspan`.
+ * \brief A `MultiDimensionalAnyRank` object provides element access on a multi-dimensional
+ * index space of arbitrary rank, following the interface of `mdspan`.
  * \ingroup CxxConcepts
  *
  * The index space is described by the `extents()` of the object, a model of \ref Extents.
@@ -65,6 +65,9 @@ requires(const E e, typename E::rank_type r)
  * `FieldMatrix::size()` returns the number of rows, while `mdspan::size()` returns
  * the total number of elements, and `FieldMatrix` provides an iterator over its rows
  * and `m[i][j]` element access, which `mdspan` does not provide.
+ *
+ * Most algorithms are written for objects of a fixed rank, e.g., vectors or matrices.
+ * These should be constrained by \ref MultiDimensional instead.
  *
  * \par Notation:
  * - `t`: a const object of type `T`
@@ -89,7 +92,7 @@ requires(const E e, typename E::rank_type r)
  * \hideinitializer
  **/
 template <class T>
-concept MultiDimensional = Extents<typename T::extents_type> &&
+concept MultiDimensionalAnyRank = Extents<typename T::extents_type> &&
 requires(const T t, typename T::rank_type r,
          const std::array<typename T::index_type, T::extents_type::rank()>& indices)
 {
@@ -107,14 +110,25 @@ requires(const T t, typename T::rank_type r,
 
 
 /**
- * \brief A \ref MultiDimensional object with a given rank.
+ * \brief A \ref MultiDimensionalAnyRank object with the given `rank`, e.g., a vector for
+ * `rank == 1` or a matrix for `rank == 2`.
  * \ingroup CxxConcepts
+ *
+ * Since this concept refines \ref MultiDimensionalAnyRank, a function constrained by
+ * `MultiDimensional<T,2>` is preferred in overload resolution over a function constrained
+ * by `MultiDimensionalAnyRank<T>`.
+ *
+ * \b Example:
+ * \code{.cpp}
+   template <Concept::MultiDimensional<2> Matrix>
+   auto trace (const Matrix& A);
+ * \endcode
  *
  * \experimental
  * \hideinitializer
  **/
 template <class T, std::size_t rank>
-concept MultiDimensionalWithRank = MultiDimensional<T> && (T::rank() == rank);
+concept MultiDimensional = MultiDimensionalAnyRank<T> && (T::rank() == rank);
 
 } // end namespace Dune::Concept
 
