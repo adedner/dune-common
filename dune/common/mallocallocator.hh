@@ -56,7 +56,7 @@ namespace Dune
                      [[maybe_unused]] const void* hint = 0)
     {
       if (n > this->max_size())
-        throw std::bad_alloc();
+        throw std::bad_array_new_length();
 
       pointer ret = static_cast<pointer>(std::malloc(n * sizeof(T)));
       if (!ret)
