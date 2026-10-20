@@ -211,7 +211,7 @@ namespace Dune
        */
       MemberType item_;
 
-      Element(const MemberType& item, Element* next_=0);
+      explicit Element(const MemberType& item, Element* next_=0);
 
       Element();
 
@@ -274,16 +274,17 @@ namespace Dune
     friend class SLList<T,A>;
 
   public:
-    inline SLListIterator(typename SLList<T,A>::Element* item,
-                          SLList<T,A>* sllist)
+    SLListIterator(typename SLList<T,A>::Element* item,
+                   SLList<T,A>* sllist)
       : current_(item), list_(sllist)
     {}
 
-    inline SLListIterator()
+    SLListIterator()
       : current_(0), list_(0)
     {}
 
-    inline SLListIterator(const SLListModifyIterator<T,A>& other)
+    // NOTE: implicit conversion intended
+    SLListIterator(const SLListModifyIterator<T,A>& other)
       : current_(other.iterator_.current_), list_(other.iterator_.list_)
     {}
 
@@ -373,19 +374,21 @@ namespace Dune
     friend class SLList<T,A>;
 
   public:
-    inline SLListConstIterator()
+    SLListConstIterator()
       : current_(0)
     {}
 
-    inline SLListConstIterator(typename SLList<T,A>::Element* item)
+    explicit SLListConstIterator(typename SLList<T,A>::Element* item)
       : current_(item)
     {}
 
-    inline SLListConstIterator(const SLListIterator<T,A>& other)
+    // NOTE: implicit conversion intended
+    SLListConstIterator(const SLListIterator<T,A>& other)
       : current_(other.current_)
     {}
 
-    inline SLListConstIterator(const SLListModifyIterator<T,A>& other)
+    // NOTE: implicit conversion intended
+    SLListConstIterator(const SLListModifyIterator<T,A>& other)
       : current_(other.iterator_.current_)
     {}
 
@@ -430,12 +433,12 @@ namespace Dune
     friend class SLListConstIterator<T,A>;
     friend class SLListIterator<T,A>;
   public:
-    inline SLListModifyIterator(SLListIterator<T,A> beforeIterator,
-                                SLListIterator<T,A> _iterator)
+    SLListModifyIterator(SLListIterator<T,A> beforeIterator,
+                         SLListIterator<T,A> _iterator)
       : beforeIterator_(beforeIterator), iterator_(_iterator)
     {}
 
-    inline SLListModifyIterator()
+    SLListModifyIterator()
       : beforeIterator_(), iterator_()
     {}
 

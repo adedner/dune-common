@@ -46,7 +46,7 @@ namespace Dune
      * @brief Constructor.
      * @param index The value of the index.
      */
-    LocalIndex(std::size_t index) :
+    explicit LocalIndex(std::size_t index) :
       localIndex_(index), state_(VALID){}
     /**
      * @brief get the local index.

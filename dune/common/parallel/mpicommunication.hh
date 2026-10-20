@@ -108,7 +108,7 @@ namespace Dune
   {
   public:
     //! Instantiation using a MPI communicator
-    Communication (const MPI_Comm& c = MPI_COMM_WORLD)
+    explicit Communication (const MPI_Comm& c = MPI_COMM_WORLD)
       : communicator(c)
     {
       if(communicator!=MPI_COMM_NULL) {
@@ -125,7 +125,7 @@ namespace Dune
     }
 
     //! Converting constructor for no-communication that is interpreted as MPI_COMM_SELF
-    Communication (const Communication<No_Comm>&)
+    explicit Communication (const Communication<No_Comm>&)
       : Communication(MPI_COMM_SELF)
     {}
 

@@ -140,7 +140,7 @@ namespace Dune
       : indexSet_()
     {}
 
-    UncachedSelection(const ParallelIndexSet& indexset)
+    explicit UncachedSelection(const ParallelIndexSet& indexset)
       : indexSet_(&indexset)
     {}
     /**
@@ -168,7 +168,7 @@ namespace Dune
 
 
   private:
-    const ParallelIndexSet* indexSet_;
+    const ParallelIndexSet* indexSet_ = nullptr;
 
   };
 
@@ -221,7 +221,7 @@ namespace Dune
       : selected_()
     {}
 
-    Selection(const ParallelIndexSet& indexset)
+    explicit Selection(const ParallelIndexSet& indexset)
       : selected_(), size_(0), built_(false)
     {
       setIndexSet(indexset);
@@ -259,9 +259,9 @@ namespace Dune
 
 
   private:
-    uint32_t* selected_;
-    size_t size_;
-    bool built_;
+    uint32_t* selected_ = nullptr;
+    size_t size_ = 0;
+    bool built_ = false;
 
   };
 

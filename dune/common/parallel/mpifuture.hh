@@ -25,12 +25,12 @@ namespace Dune{
   namespace Impl{
     template<class T>
     struct Buffer{
-      Buffer(bool valid){
+      explicit Buffer(bool valid){
         if(valid)
           value = std::make_unique<T>();
       }
       template<class V>
-      Buffer(V&& t)
+      explicit Buffer(V&& t)
         : value(std::make_unique<T>(std::forward<V>(t)))
       {}
       std::unique_ptr<T> value;
@@ -49,13 +49,13 @@ namespace Dune{
 
     template<class T>
     struct Buffer<T&>{
-      Buffer(bool valid = false)
+      explicit Buffer(bool valid = false)
       {
         if(valid)
           value = T();
       }
       template<class V>
-      Buffer(V&& t)
+      explicit Buffer(V&& t)
         : value(std::forward<V>(t))
       {}
       std::optional<std::reference_wrapper<T>> value;
@@ -75,7 +75,7 @@ namespace Dune{
     template<>
     struct Buffer<void>{
       bool valid_;
-      Buffer(bool valid = false)
+      explicit Buffer(bool valid = false)
         : valid_(valid)
       {}
       operator bool () const{
@@ -97,7 +97,7 @@ namespace Dune{
     Impl::Buffer<S> send_data_;
     friend class Communication<MPI_Comm>;
   public:
-    MPIFuture(bool valid = false)
+    explicit MPIFuture(bool valid = false)
       : req_(MPI_REQUEST_NULL)
       , data_(valid)
     {}
@@ -111,6 +111,7 @@ namespace Dune{
     {}
 
     // hide this constructor if R is void
+    // NOTE: implicit conversion intended.
     template<class V = R>
     MPIFuture(V&& recv_data, typename std::enable_if_t<!std::is_void<V>::value>* = 0)
       : req_(MPI_REQUEST_NULL)
