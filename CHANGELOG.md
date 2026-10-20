@@ -16,6 +16,30 @@ In order to build the DUNE core modules you need at least the following software
 
 ## C++: Changelog
 
+- Add the concepts `Dune::Concept::MultiDimensional<T,rank>` and `Dune::Concept::MultiDimensionalAnyRank<T>`
+  in `dune/common/concepts/multidimensional.hh` for objects with an `mdspan`-like interface, i.e.,
+  `extents()`, `extent(r)`, `rank()`, and element access `t[std::array{i,j,...}]`, of a fixed or
+  arbitrary rank. Generic code constrained by these concepts should restrict itself to this
+  interface. An archetype for testing such code is provided in
+  `dune/common/concepts/archetypes/multidimensional.hh`.
+
+- `DenseVector` and `DenseMatrix`, and thus `FieldVector`, `FieldMatrix`, `DynamicVector`,
+  and `DynamicMatrix`, provide the `mdspan`-like index-space interface `extents()`, `extent(r)`,
+  `rank()`, `rank_dynamic()`, `static_extent(r)`, and the element access by a multi-index,
+  `v[std::array{i}]` and `m[std::array{i,j}]`, and `m[i,j]` if the compiler supports multi-argument
+  `operator[]`. Thereby, these types model `Concept::MultiDimensional<T,1>` and
+  `Concept::MultiDimensional<T,2>`, respectively. The `extents_type` can be
+  provided in the `DenseMatVecTraits`. Implementations of `DenseVector` that define their own
+  `operator[]` need to add `using Base::operator[];` to provide the multi-index access.
+
+- Add utilities for `Concept::MultiDimensionalAnyRank` objects in `dune/common/multidimensional.hh`:
+  `asMultiDimensional(t)` represents contiguous ranges, like `std::vector`, as `Std::mdspan`,
+  and the concepts `Concept::MultiDimensionalLike<T,rank>` and `Concept::MultiDimensionalLikeAnyRank<T>`
+  describe all types accepted by `asMultiDimensional(t)`. Further,
+  `indexSpaceSize(t)` returns the number of elements in the index space, which differs from
+  `size()` for matrices, and `indicesOf(t)`, `entriesOf(t)`, and `rowsOf(t)` return ranges
+  over the multi-indices, the elements, and the rows.
+
 - Add `Dune::Std::dims`, the standard mdspan alias template for dynamic
   extents with default index type `std::size_t`.
 
