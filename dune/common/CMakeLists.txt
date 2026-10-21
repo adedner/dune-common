@@ -40,6 +40,7 @@ install(FILES
         concept.hh
         concepts.hh
         conditional.hh
+        config.hh
         copyableoptional.hh
         debugalign.hh
         debugallocator.hh
